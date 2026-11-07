@@ -41,8 +41,8 @@ The commands and folder names are German – just type them as shown.
 2. **Download the project** – on GitHub “Code → Download ZIP” and unpack (or `git clone`). Open a terminal in the
    folder and run `npm install` once.
 3. **Put your pictures in `bilder/`** – one per day: `1.jpg`, `2.jpg` … `24.jpg` (no leading zero; JPG, PNG or WebP).
-   Optional: `bilder/texte.txt` with captions (`12 = Baking cookies`), folder `bilder/12/` with single photos for the
-   “Advent Stories” view.
+   Optional: `bilder/texte.txt` with captions (`12 = Baking cookies`, shown as written in every language),
+   folder `bilder/12/` with single photos for the “Advent Stories” view.
 4. **Edit `einstellungen.json`:**
 
    ```json
@@ -57,7 +57,7 @@ The commands and folder names are German – just type them as shown.
    }
    ```
 
-   `titel` = heading (text, or one per language) · `jahr` = year of Advent · `ansichten` = `"alle"` (all), `["kranz"]`
+   `titel` = heading per language (or plain text, the same in every language) · `jahr` = year of Advent · `ansichten` = `"alle"` (all), `["kranz"]`
    (just one) or your selection · `standard_ansicht` = the view it starts with · `sprachen` = languages to offer ·
    `sprache` = `"auto"` (browser language on the first visit) or e.g. `"en"` · `testschluessel` = test key for trying it
    out before December (empty = no test mode).

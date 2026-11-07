@@ -50,6 +50,7 @@ npm install
 
 - ohne führende Null (`7.jpg`, nicht `07.jpg`) · JPG, PNG oder WebP · gut sind 1200–2400 px
 - optional `bilder/texte.txt` mit Bildunterschriften, eine Zeile je Tag: `12 = Plätzchen backen`
+  (sie erscheinen in jeder Sprache so, wie sie dort stehen)
 - optional Ordner `bilder/12/` mit Einzelfotos – die zeigt die Ansicht „Advent-Stories“ nacheinander
 
 Mehr dazu: [`bilder/LIES-MICH.md`](bilder/LIES-MICH.md).
@@ -58,7 +59,7 @@ Mehr dazu: [`bilder/LIES-MICH.md`](bilder/LIES-MICH.md).
 
 ```json
 {
-  "titel": "Omas Adventskalender",
+  "titel": { "de": "Omas Adventskalender", "en": "Grandma’s Advent Calendar" },
   "jahr": 2026,
   "ansichten": "alle",
   "standard_ansicht": "tueren",
@@ -70,7 +71,7 @@ Mehr dazu: [`bilder/LIES-MICH.md`](bilder/LIES-MICH.md).
 
 | Feld | Bedeutung |
 |---|---|
-| `titel` | Überschrift – kurz halten, z. B. zwei Wörter; je Sprache: `{ "de": "Omas Adventskalender", "en": "Grandma’s Advent Calendar" }` |
+| `titel` | Überschrift je Sprache – kurz halten, z. B. zwei Wörter. Nur Deutsch oder überall gleich: einfach Text, `"titel": "Omas Adventskalender"` |
 | `jahr` | der Advent, für den der Kalender gilt |
 | `ansichten` | `"alle"` = alle 12, umschaltbar über die Schneeflocke<br>`["kranz"]` = nur diese eine Ansicht, ohne Umschalten<br>`["tueren", "kranz", "schneekugel"]` = deine Auswahl |
 | `standard_ansicht` | damit startet der Kalender – muss in `ansichten` vorkommen |
