@@ -371,28 +371,28 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
 
 <div class="app" id="app">
   <header class="kopf" id="kopf">
-    <h1><span class="h1-klein">{{TITEL_A}}</span> {{TITEL_B}}</h1>
+    <h1><span class="h1-klein" data-titel="a">{{TITEL_A}}</span> <span data-titel="b">{{TITEL_B}}</span></h1>
     <p class="status" id="status"></p>
   </header>
 
-  <main class="buehne" id="buehne" aria-label="Adventskranz mit 24 Kerzen. Zum Drehen seitlich wischen.">
-    <div class="kerzen" id="kerzen" role="group" aria-label="Kerzen vom 1. bis 24. Dezember"></div>
+  <main class="buehne" id="buehne" aria-label="Adventskranz mit 24 Kerzen. Zum Drehen seitlich wischen." data-i18n-attr="aria-label:kranz.buehne">
+    <div class="kerzen" id="kerzen" role="group" aria-label="Kerzen vom 1. bis 24. Dezember" data-i18n-attr="aria-label:kranz.kerzen"></div>
     <div class="schild aus" id="schild" aria-hidden="true"></div>
-    <div class="hinweis" id="hinweis" aria-hidden="true">Zum Drehen seitlich wischen</div>
+    <div class="hinweis" id="hinweis" aria-hidden="true" data-i18n="kranz.hinweis.wischen">Zum Drehen seitlich wischen</div>
     <div class="blase" id="blase" role="status" aria-live="polite"></div>
   </main>
 
   <aside class="seite" id="seite">
-    <section class="panel" id="panel" aria-label="Ausgewählte Kerze">
+    <section class="panel" id="panel" aria-label="Ausgewählte Kerze" data-i18n-attr="aria-label:kranz.panel">
       <div class="panel-kopf">
-        <button class="pfeil" id="p-zurueck" type="button" aria-label="Vorherige Kerze">
+        <button class="pfeil" id="p-zurueck" type="button" aria-label="Vorherige Kerze" data-i18n-attr="aria-label:kranz.vorherige">
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div class="panel-mitte">
           <p class="panel-eyebrow" id="p-eyebrow"></p>
           <h2 class="panel-titel" id="p-titel"></h2>
         </div>
-        <button class="pfeil" id="p-weiter" type="button" aria-label="Nächste Kerze">
+        <button class="pfeil" id="p-weiter" type="button" aria-label="Nächste Kerze" data-i18n-attr="aria-label:kranz.naechste">
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
@@ -401,10 +401,10 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
         <p class="panel-text" id="p-text"></p>
       </div>
       <div class="panel-knoepfe">
-        <button class="aktion" id="p-aktion" type="button">Kerze anzünden</button>
-        <button class="neben" id="p-neben" type="button" hidden>Zu heute</button>
+        <button class="aktion" id="p-aktion" type="button" data-i18n="kranz.aktion.anzuenden">Kerze anzünden</button>
+        <button class="neben" id="p-neben" type="button" hidden data-i18n="kranz.zuHeute">Zu heute</button>
       </div>
-      <p class="wichern" id="wichern">Wie bei Wicherns erstem Adventskranz (Hamburg, 1839): kleine rote Kerzen für die Werktage, große weiße für die Sonntage.</p>
+      <p class="wichern" id="wichern" data-i18n="kranz.wichern">Wie bei Wicherns erstem Adventskranz (Hamburg, 1839): kleine rote Kerzen für die Werktage, große weiße für die Sonntage.</p>
     </section>
 
     <div class="ansicht" id="ansicht" role="dialog" aria-modal="true" aria-labelledby="a-titel" tabindex="-1" hidden>
@@ -413,7 +413,7 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
           <p class="a-datum" id="a-datum"></p>
           <h2 class="a-titel" id="a-titel"></h2>
         </div>
-        <button class="a-zu" id="a-zu" type="button" aria-label="Bildansicht schließen">
+        <button class="a-zu" id="a-zu" type="button" aria-label="Bildansicht schließen" data-i18n-attr="aria-label:kranz.ansicht.schliessen">
           <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3 3 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
       </div>
@@ -421,18 +421,18 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
         <div class="a-glut" id="a-glut"></div>
         <figure class="a-rahmen" id="a-rahmen">
           <img id="a-bild" alt="" draggable="false" decoding="async">
-          <span class="a-laden" id="a-laden" aria-hidden="true"><span class="a-laden-bild" id="a-laden-bild"></span><span class="a-laden-text">Foto wird geholt …</span></span>
+          <span class="a-laden" id="a-laden" aria-hidden="true"><span class="a-laden-bild" id="a-laden-bild"></span><span class="a-laden-text" data-i18n="kranz.ansicht.laden">Foto wird geholt …</span></span>
           <span class="a-licht" id="a-licht"></span>
         </figure>
       </div>
       <div class="a-fuss">
         <button class="a-nav" id="a-zurueck" type="button">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span id="a-zurueck-t">Tag 1</span>
+          <span id="a-zurueck-t"></span>
         </button>
         <div class="a-kerze" aria-hidden="true"><canvas id="a-flamme" width="80" height="108"></canvas><span id="a-tag"></span></div>
         <button class="a-nav" id="a-weiter" type="button">
-          <span id="a-weiter-t">Tag 2</span>
+          <span id="a-weiter-t"></span>
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
@@ -441,11 +441,14 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
 </div>
 <p class="sr" id="ansage" aria-live="polite"></p>
 
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „kranz“ (t ist hier die Tageszahl)
 
   var K = window.Kalender.init('kranz');
   var F = window.Fotos;
@@ -478,7 +481,7 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
   var app = $('app'), kopf = $('kopf'), buehne = $('buehne'), kerzenBox = $('kerzen');
   var schild = $('schild'), blase = $('blase'), seite = $('seite'), panel = $('panel'), hinweis = $('hinweis');
   function hinweisWeg() { hinweis.classList.add('weg'); }
-  if (!GROB) hinweis.textContent = 'Zum Drehen den Kranz ziehen';
+  if (!GROB) hinweis.textContent = tx('kranz.hinweis.ziehen', 'Zum Drehen den Kranz ziehen');
   setTimeout(hinweisWeg, 12000);
   var pEyebrow = $('p-eyebrow'), pTitel = $('p-titel'), pText = $('p-text'), pBild = $('p-bild'), pBildRahmen = $('p-bildrahmen');
   var pAktion = $('p-aktion'), pNeben = $('p-neben'), pZurueck = $('p-zurueck'), pWeiter = $('p-weiter');
@@ -1526,10 +1529,10 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
     kerzen[b].btn = bt;
   }
   function kerzeLabel(t) {
-    var z = kerzen[t].zustand, d = 'Tag ' + t + ', ' + K.datumText(t);
-    if (t === 24) d += ', große Kerze in der Mitte';
-    else if (K.istSonntag(t)) d += ', ' + K.adventsSonntag(t) + '. Advent';
-    var m = { brennt: 'geöffnet, die Kerze brennt', heute: 'heute, Kerze noch nicht angezündet', verpasst: 'verpasst, kann nachgeholt werden', leer: 'noch gesperrt' };
+    var z = kerzen[t].zustand, d = tx('kranz.kerze.tag', 'Tag {n}, {datum}', { n: t, datum: K.datumText(t) });
+    if (t === 24) d += ', ' + tx('kranz.kerze.mitte', 'große Kerze in der Mitte');
+    else if (K.istSonntag(t)) d += ', ' + tx('kranz.advent', '{n}. Advent', { n: K.adventsSonntag(t) });
+    var m = { brennt: tx('kranz.kerze.brennt', 'geöffnet, die Kerze brennt'), heute: tx('kranz.kerze.heute', 'heute, Kerze noch nicht angezündet'), verpasst: tx('kranz.kerze.verpasst', 'verpasst, kann nachgeholt werden'), leer: tx('kranz.kerze.leer', 'noch gesperrt') };
     return d + ' – ' + m[z];
   }
   function labelsSetzen() { for (var t = 1; t <= 24; t++) buttons[t].setAttribute('aria-label', kerzeLabel(t)); }
@@ -1631,30 +1634,30 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
   // Panel & Status
   function panelAktualisieren() {
     var t = auswahl, c = kerzen[t], z = c.zustand;
-    var zusatz = t === 24 ? ' · Heiligabend' : (K.istSonntag(t) ? ' · ' + K.adventsSonntag(t) + '. Advent' : '');
+    var zusatz = t === 24 ? ' · ' + tx('kranz.heiligabend', 'Heiligabend') : (K.istSonntag(t) ? ' · ' + tx('kranz.advent', '{n}. Advent', { n: K.adventsSonntag(t) }) : '');
     var eyebrow, text, titelText = false, aktion = null, still = false, neben = false;
     if (H === 0) {
-      eyebrow = 'Tag ' + t + zusatz + ' · noch leer';
-      text = 'Ab dem 1. Dezember kommt jeden Tag eine Kerze dazu, bis an Heiligabend alle 24 brennen.';
+      eyebrow = tx('kranz.tag', 'Tag {n}', { n: t }) + zusatz + ' · ' + tx('kranz.nochLeer', 'noch leer');
+      text = tx('kranz.text.november', 'Ab dem 1. Dezember kommt jeden Tag eine Kerze dazu, bis an Heiligabend alle 24 brennen.');
     } else if (z === 'heute') {
-      eyebrow = 'Heute' + zusatz;
-      text = t === 24 ? 'Die große Kerze in der Mitte ist da. Zünde die Kerze von heute an!' : 'Eine neue Kerze ist dazugekommen. Zünde die Kerze von heute an!';
-      aktion = 'Kerze anzünden';
+      eyebrow = tx('kranz.heute', 'Heute') + zusatz;
+      text = t === 24 ? tx('kranz.text.heute24', 'Die große Kerze in der Mitte ist da. Zünde die Kerze von heute an!') : tx('kranz.text.heute', 'Eine neue Kerze ist dazugekommen. Zünde die Kerze von heute an!');
+      aktion = tx('kranz.aktion.anzuenden', 'Kerze anzünden');
     } else if (z === 'verpasst') {
-      eyebrow = 'Nachholen · Tag ' + t + zusatz;
-      text = 'Diese Kerze wartet noch darauf, angezündet zu werden.';
-      aktion = 'Kerze anzünden';
+      eyebrow = tx('kranz.nachholenTag', 'Nachholen · Tag {n}', { n: t }) + zusatz;
+      text = tx('kranz.text.verpasst', 'Diese Kerze wartet noch darauf, angezündet zu werden.');
+      aktion = tx('kranz.aktion.anzuenden', 'Kerze anzünden');
       neben = true;
     } else if (z === 'brennt') {
-      eyebrow = (t === H ? 'Heute' : 'Tag ' + t) + zusatz;
+      eyebrow = (t === H ? tx('kranz.heute', 'Heute') : tx('kranz.tag', 'Tag {n}', { n: t })) + zusatz;
       // ohne Bildunterschrift ein kurzer, freundlicher Satz statt einer leeren Zeile
-      text = fotoTitel(t) || 'Die Kerze brennt – schau dir das Foto an!'; titelText = true;
-      aktion = 'Foto ansehen';
+      text = fotoTitel(t) || tx('kranz.text.brennt', 'Die Kerze brennt – schau dir das Foto an!'); titelText = true;
+      aktion = tx('kranz.aktion.foto', 'Foto ansehen');
       neben = H <= 24 && t !== H;
     } else {
-      eyebrow = 'Tag ' + t + zusatz + ' · noch leer';
-      text = K.sperrText(t) + ' Dann kommt hier eine Kerze dazu.';
-      aktion = 'Zur Kerze von heute'; still = true;
+      eyebrow = tx('kranz.tag', 'Tag {n}', { n: t }) + zusatz + ' · ' + tx('kranz.nochLeer', 'noch leer');
+      text = tx('kranz.text.gesperrt', '{sperre} Dann kommt hier eine Kerze dazu.', { sperre: K.sperrText(t) });
+      aktion = tx('kranz.aktion.zuHeute', 'Zur Kerze von heute'); still = true;
     }
     pEyebrow.textContent = eyebrow;
     pTitel.textContent = K.datumText(t);
@@ -1677,9 +1680,9 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
   function statusAktualisieren() {
     var n = brennende();
     statusEl.classList.toggle('fest', H >= 25);
-    if (H === 0) statusEl.textContent = 'Noch ist November. Der Kranz wartet auf seine Kerzen.';
-    else if (H >= 25) statusEl.textContent = n >= 24 ? 'Frohe Weihnachten! Alle Kerzen brennen.' : 'Frohe Weihnachten! ' + (n === 0 ? 'Zünde die Kerzen an.' : n === 1 ? '1 Kerze brennt.' : n + ' von 24 Kerzen brennen.');
-    else statusEl.textContent = K.datumText(H) + ' · ' + (n === 0 ? 'noch brennt keine Kerze' : n === 1 ? '1 Kerze brennt' : n + ' von 24 Kerzen brennen');
+    if (H === 0) statusEl.textContent = tx('kranz.status.november', 'Noch ist November. Der Kranz wartet auf seine Kerzen.');
+    else if (H >= 25) statusEl.textContent = n >= 24 ? tx('kranz.status.alleBrennen', 'Frohe Weihnachten! Alle Kerzen brennen.') : tx('kranz.status.weihnachten', 'Frohe Weihnachten!') + ' ' + (n === 0 ? tx('kranz.status.anzuenden', 'Zünde die Kerzen an.') : tx('kranz.status.festBrennen', { one: '1 Kerze brennt.', other: '{n} von 24 Kerzen brennen.' }, { n: n }));
+    else statusEl.textContent = K.datumText(H) + ' · ' + (n === 0 ? tx('kranz.status.keine', 'noch brennt keine Kerze') : tx('kranz.status.brennen', { one: '1 Kerze brennt', other: '{n} von 24 Kerzen brennen' }, { n: n }));
   }
 
   function waehle(t, drehen, ansagen, ausAnsicht) {
@@ -1733,7 +1736,7 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
     c.anteil = 0;
     var warte = Math.abs(rotZiel - rot) > 0.01 ? 380 : 60;
     ablauf = { tag: t, t0: jetzt() + warte, phase: 0, zl: 0, zx: 0, zy: 0 };
-    pText.classList.remove('titel'); pText.textContent = 'Die Kerze wird angezündet …';
+    pText.classList.remove('titel'); pText.textContent = tx('kranz.text.anzuenden', 'Die Kerze wird angezündet …');
     pAktion.classList.add('platzhalter'); pAktion.tabIndex = -1; pNeben.hidden = true; panelBildSetzen(0);
     // das Foto schon während des Anzündens holen (es steigt danach aus der Flamme auf)
     setTimeout(function () { try { F.bild(t); } catch (e) { } }, 0);
@@ -1816,26 +1819,26 @@ button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
   }
   function ansichtInhalt(t) {
     AN.tag = t;
-    var zus = t === 24 ? ' · Heiligabend' : (K.istSonntag(t) ? ' · ' + K.adventsSonntag(t) + '. Advent' : '');
+    var zus = t === 24 ? ' · ' + tx('kranz.heiligabend', 'Heiligabend') : (K.istSonntag(t) ? ' · ' + tx('kranz.advent', '{n}. Advent', { n: K.adventsSonntag(t) }) : '');
     var titel = fotoTitel(t);
     if (titel) { aDatum.textContent = K.datumText(t) + zus; aTitel.textContent = titel; }
     else {
       // ohne Bildunterschrift wird das Datum zur Überschrift – nichts bleibt leer
-      aDatum.textContent = (t === H ? 'Heute' : 'Tag ' + t) + zus;
+      aDatum.textContent = (t === H ? tx('kranz.heute', 'Heute') : tx('kranz.tag', 'Tag {n}', { n: t })) + zus;
       aTitel.textContent = K.datumText(t);
     }
-    aBild.alt = 'Foto vom ' + t + '. Dezember' + (titel ? ': ' + titel : '');
+    aBild.alt = titel ? tx('kranz.ansicht.altTitel', 'Foto vom {n}. Dezember: {titel}', { n: t, titel: titel }) : tx('kranz.ansicht.alt', 'Foto vom {n}. Dezember', { n: t });
     ansichtBild(t);
-    aTag.textContent = 'Tag ' + t;
+    aTag.textContent = tx('kranz.tag', 'Tag {n}', { n: t });
     var liste = offeneTage(), i = liste.indexOf(t);
     var vor = i > 0 ? liste[i - 1] : 0, nach = i >= 0 && i < liste.length - 1 ? liste[i + 1] : 0;
     aZurueck.classList.toggle('weg', !vor); aZurueck.disabled = !vor;
     aWeiter.classList.toggle('weg', !nach); aWeiter.disabled = !nach;
-    aZurueckT.textContent = vor ? 'Tag ' + vor : '';
+    aZurueckT.textContent = vor ? tx('kranz.tag', 'Tag {n}', { n: vor }) : '';
     if ((document.activeElement === aWeiter && !nach) || (document.activeElement === aZurueck && !vor)) (nach ? aWeiter : vor ? aZurueck : ansicht).focus({ preventScroll: true });
-    aWeiterT.textContent = nach ? 'Tag ' + nach : '';
-    aZurueck.setAttribute('aria-label', vor ? 'Vorheriges Foto, Tag ' + vor : 'Kein vorheriges Foto');
-    aWeiter.setAttribute('aria-label', nach ? 'Nächstes Foto, Tag ' + nach : 'Kein nächstes Foto');
+    aWeiterT.textContent = nach ? tx('kranz.tag', 'Tag {n}', { n: nach }) : '';
+    aZurueck.setAttribute('aria-label', vor ? tx('kranz.ansicht.zurueck', 'Vorheriges Foto, Tag {n}', { n: vor }) : tx('kranz.ansicht.keinZurueck', 'Kein vorheriges Foto'));
+    aWeiter.setAttribute('aria-label', nach ? tx('kranz.ansicht.weiter', 'Nächstes Foto, Tag {n}', { n: nach }) : tx('kranz.ansicht.keinWeiter', 'Kein nächstes Foto'));
     fotoGroesse();
     var nb = [vor, nach];
     setTimeout(function () { for (var j = 0; j < nb.length; j++) if (nb[j]) { try { F.bild(nb[j]); } catch (e) { } } }, 450);

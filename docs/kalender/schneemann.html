@@ -91,7 +91,6 @@ body.fest .himmel h1{text-shadow:0 2px 14px rgba(10,10,40,.5)}
 .wiese{position:relative;max-width:1180px;margin:0 auto;padding:6px max(10px,env(safe-area-inset-right)) calc(78px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
 .wiese-kopf{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 14px;margin:0 6px}
 .wiese h2{margin:0;font-family:var(--schrift-titel);font-weight:800;font-size:1.45rem;line-height:1.1}
-.zaehler{margin:0;font-size:.95rem;color:#55608a}
 .wiese-hilfe{margin:.25rem 6px 12px;max-width:40rem;font-size:.95rem;color:#4b5680;text-wrap:pretty}
 .plaetze{--sp:3;display:grid;grid-template-columns:repeat(var(--sp),minmax(0,1fr));column-gap:2px;row-gap:4px;padding-top:4%}
 .platz{--fh:113.2%;position:relative;display:block;width:100%;aspect-ratio:100/106;margin:0;padding:0;border:0;border-radius:18px;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
@@ -100,6 +99,14 @@ body.fest .himmel h1{text-shadow:0 2px 14px rgba(10,10,40,.5)}
 .platz:focus-visible::after{content:"";position:absolute;left:3%;right:3%;bottom:-2%;height:calc(var(--fh) + 1%);border-radius:22px;pointer-events:none;box-shadow:0 0 0 3px var(--karotte),0 0 0 6px rgba(255,255,255,.85)}
 .figur{position:absolute;left:0;right:0;bottom:0;height:var(--fh);pointer-events:none;transform-origin:50% 92%}
 .figur svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+/* Damit weiße Figuren und Schneehaufen sich abheben: Wiese im kühlen Schatten-Schnee (oben gleich hell wie die
+   Hügelkante), festgetretene Mulde je Bauplatz (der heutige hat seinen Schein) und eine feine Kontur */
+.wiese{z-index:0}
+.wiese::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);pointer-events:none;
+  background:linear-gradient(180deg,#f2f5fb 0,#e6ebf6 clamp(60px,12vw,140px),#dbe2f1 100%)}
+.platz:not(.z-heute)::before{content:"";position:absolute;left:6%;right:6%;bottom:-2%;height:22%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(96,118,178,.28),rgba(96,118,178,.1) 62%,rgba(96,118,178,0))}
+.figur svg{filter:drop-shadow(0 0 .7px rgba(45,62,120,.55)) drop-shadow(0 3px 3px rgba(45,62,120,.18))}
 .figur svg path,.figur svg circle,.figur svg ellipse,.figur svg rect,.figur svg text{pointer-events:visiblePainted}
 .zahl{font-family:var(--schrift-titel);font-weight:800;font-size:12.5px;fill:#fff7ea}
 .zahl.gross{font-size:17px}
@@ -339,7 +346,6 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
   .huegel{height:62px}
   .wiese{padding-top:0}
   .wiese-hilfe{max-width:none;margin-bottom:4px}
-  .zaehler{font-size:1rem}
   .plaetze{--sp:8;row-gap:0;padding-top:3.2%;max-width:1090px;margin:0 auto}
   .platz{aspect-ratio:100/94;--fh:127.66%}
 }
@@ -394,8 +400,8 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
 <header class="himmel">
   <div class="himmel-innen">
     <div class="titelblock">
-      <h1>Dein Adventskalender</h1>
-      <p class="unterzeile" id="unterzeile">Jeden Tag eine andere Schneefigur – und jede hält ein Foto.</p>
+      <h1 data-titel="ganz">Dein Adventskalender</h1>
+      <p class="unterzeile" id="unterzeile" data-i18n="schneemann.unterzeile.advent">Jeden Tag eine andere Schneefigur – und jede hält ein Foto.</p>
     </div>
     <div class="karte" id="karte"></div>
   </div>
@@ -403,7 +409,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
 </header>
 
 <main class="wiese" id="wiese">
-  <div class="wiese-kopf"><h2>Die Schneewiese</h2><p class="zaehler" id="zaehler"></p></div>
+  <div class="wiese-kopf"><h2 data-i18n="schneemann.wiese">Die Schneewiese</h2></div>
   <p class="wiese-hilfe" id="hilfe"></p>
   <div class="plaetze" id="plaetze"></div>
   <div class="blase" id="blase" hidden></div>
@@ -413,9 +419,9 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
 <dialog class="bau" id="bau" aria-labelledby="bauTitel">
   <div class="buehne" id="buehne">
     <canvas id="feld" aria-hidden="true"></canvas>
-    <canvas id="szene" tabindex="0" role="application" aria-roledescription="Schneefeld" aria-label="Schneefeld: Kugel mit den Pfeiltasten rollen"></canvas>
-    <button type="button" class="schild" id="schild" aria-label="Foto groß ansehen" tabindex="-1">
-      <span class="schild-innen"><img id="schildBild" alt="" draggable="false"><span class="schild-text" id="schildText">Ab 1. Dezember!</span><span class="schild-status" id="schildStatus"></span><span class="schild-decke"></span></span>
+    <canvas id="szene" tabindex="0" role="application" aria-roledescription="Schneefeld" aria-label="Schneefeld: Kugel mit den Pfeiltasten rollen" data-i18n-attr="aria-roledescription:schneemann.szene.rolle;aria-label:schneemann.szene.label"></canvas>
+    <button type="button" class="schild" id="schild" aria-label="Foto groß ansehen" data-i18n-attr="aria-label:schneemann.foto.gross" tabindex="-1">
+      <span class="schild-innen"><img id="schildBild" alt="" draggable="false"><span class="schild-text" id="schildText" data-i18n="schneemann.schild.ab">Ab 1. Dezember!</span><span class="schild-status" id="schildStatus"></span><span class="schild-decke"></span></span>
     </button>
     <div class="plan" id="plan" hidden>
       <div class="plan-blatt" id="planBlatt" role="group" aria-labelledby="planTitel">
@@ -428,32 +434,32 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
           </div>
         </div>
         <ul class="plan-liste" id="planListe"></ul>
-        <div class="knoepfe"><button type="button" class="knopf knopf-wolle" id="planLos"><svg aria-hidden="true"><use href="#i-kugel"/></svg><span>Los geht’s</span></button></div>
+        <div class="knoepfe"><button type="button" class="knopf knopf-wolle" id="planLos"><svg aria-hidden="true"><use href="#i-kugel"/></svg><span data-i18n="schneemann.plan.los">Los geht’s</span></button></div>
       </div>
     </div>
   </div>
   <div class="bau-kopf" id="bauKopf">
-    <button type="button" class="rund" id="bauZu" aria-label="Bauen beenden, zurück zur Wiese"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
-    <div class="bau-titel"><h2 id="bauTitel">Schneefigur bauen</h2><p id="bauDatum"></p></div>
-    <button type="button" class="hud" id="hud" aria-label="Bauplan zeigen"><span class="hud-kugeln" id="hudKugeln"></span><span class="hud-zahl" id="hudZahl"></span><span class="hud-sachen" id="hudSachen"></span></button>
-    <button type="button" class="rund wahl" id="wHut" aria-label="Anderen Hut aufsetzen" title="Anderen Hut aufsetzen" hidden><svg aria-hidden="true"><use href="#i-hut"/></svg></button>
-    <button type="button" class="rund wahl" id="wSchal" aria-label="Andere Schalfarbe" title="Andere Schalfarbe" hidden><svg aria-hidden="true"><use href="#i-schal"/></svg></button>
-    <button type="button" class="rund" id="nochmal" aria-label="Nochmal bauen" title="Nochmal bauen" hidden><svg aria-hidden="true"><use href="#i-nochmal"/></svg></button>
+    <button type="button" class="rund" id="bauZu" aria-label="Bauen beenden, zurück zur Wiese" data-i18n-attr="aria-label:schneemann.bau.zu"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+    <div class="bau-titel"><h2 id="bauTitel" data-i18n="schneemann.bau.titel">Schneefigur bauen</h2><p id="bauDatum"></p></div>
+    <button type="button" class="hud" id="hud" aria-label="Bauplan zeigen" data-i18n-attr="aria-label:schneemann.hud.label"><span class="hud-kugeln" id="hudKugeln"></span><span class="hud-zahl" id="hudZahl"></span><span class="hud-sachen" id="hudSachen"></span></button>
+    <button type="button" class="rund wahl" id="wHut" aria-label="Anderen Hut aufsetzen" title="Anderen Hut aufsetzen" data-i18n-attr="aria-label:schneemann.wahl.hut;title:schneemann.wahl.hut" hidden><svg aria-hidden="true"><use href="#i-hut"/></svg></button>
+    <button type="button" class="rund wahl" id="wSchal" aria-label="Andere Schalfarbe" title="Andere Schalfarbe" data-i18n-attr="aria-label:schneemann.wahl.schal;title:schneemann.wahl.schal" hidden><svg aria-hidden="true"><use href="#i-schal"/></svg></button>
+    <button type="button" class="rund" id="nochmal" aria-label="Nochmal bauen" title="Nochmal bauen" data-i18n-attr="aria-label:schneemann.bau.nochmal;title:schneemann.bau.nochmal" hidden><svg aria-hidden="true"><use href="#i-nochmal"/></svg></button>
   </div>
   <div class="bau-fuss" id="bauFuss">
     <div class="fuss-bauen" id="fussBauen">
       <p class="hinweis" id="hinweis"></p>
       <div class="knoepfe">
-        <button type="button" class="rund klein" id="ton" aria-pressed="true" aria-label="Geräusche" title="Geräusche an oder aus"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4Z"/><path class="an" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="aus" d="M16 9.5l5 5M21 9.5l-5 5"/></g></svg></button>
-        <button type="button" class="knopf knopf-glut" id="zaunKnopf" aria-label="Warnzaun um die warmen Stellen aufstellen" hidden><svg aria-hidden="true"><use href="#i-zaun"/></svg><span>Warnzaun</span></button>
-        <button type="button" class="knopf knopf-schnee" id="lassen">Bauen lassen</button>
+        <button type="button" class="rund klein" id="ton" aria-pressed="true" aria-label="Geräusche" title="Geräusche an oder aus" data-i18n-attr="aria-label:schneemann.ton.label;title:schneemann.ton.titel"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4Z"/><path class="an" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="aus" d="M16 9.5l5 5M21 9.5l-5 5"/></g></svg></button>
+        <button type="button" class="knopf knopf-glut" id="zaunKnopf" aria-label="Warnzaun um die warmen Stellen aufstellen" data-i18n-attr="aria-label:schneemann.zaun.lang" hidden><svg aria-hidden="true"><use href="#i-zaun"/></svg><span data-i18n="schneemann.zaun.kurz">Warnzaun</span></button>
+        <button type="button" class="knopf knopf-schnee" id="lassen" data-i18n="schneemann.bau.lassen">Bauen lassen</button>
       </div>
     </div>
     <div class="fuss-fertig" id="fussFertig" hidden>
       <div><h3 id="fertigTitel"></h3><p id="fertigDatum"></p></div>
       <div class="knoepfe">
-        <button type="button" class="knopf knopf-wolle" id="gross"><svg aria-hidden="true"><use href="#i-gross"/></svg><span>Foto groß ansehen</span></button>
-        <button type="button" class="knopf knopf-schnee" id="zurWiese">Zur Wiese</button>
+        <button type="button" class="knopf knopf-wolle" id="gross"><svg aria-hidden="true"><use href="#i-gross"/></svg><span data-i18n="schneemann.foto.gross">Foto groß ansehen</span></button>
+        <button type="button" class="knopf knopf-schnee" id="zurWiese" data-i18n="schneemann.bau.zurWiese">Zur Wiese</button>
       </div>
     </div>
   </div>
@@ -463,32 +469,35 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
   <div class="a-innen">
     <div class="a-kopf">
       <p class="a-zaehler" id="aZaehler"></p>
-      <button type="button" class="pille" id="aNochmal" title="Diese Figur nochmal bauen"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Nochmal bauen</span></button>
-      <button type="button" class="rund" id="aZu" aria-label="Bildansicht schließen"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+      <button type="button" class="pille" id="aNochmal" title="Diese Figur nochmal bauen" data-i18n-attr="title:schneemann.ansicht.nochmalTitel"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span data-i18n="schneemann.bau.nochmal">Nochmal bauen</span></button>
+      <button type="button" class="rund" id="aZu" aria-label="Bildansicht schließen" data-i18n-attr="aria-label:schneemann.ansicht.schliessen"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
     </div>
     <div class="a-buehne" id="aBuehne">
       <div class="a-spur" id="aSpur">
         <div class="a-rahmen" id="aRahmen">
           <img id="aBild" alt="" draggable="false">
-          <span class="a-laden"><span class="lader"></span><span>Foto wird geholt …</span></span>
-          <span class="a-fehler"><span>Das Foto lässt sich gerade nicht laden.</span><button type="button" class="knopf knopf-schnee" id="aNeu">Nochmal versuchen</button></span>
+          <span class="a-laden"><span class="lader"></span><span data-i18n="schneemann.ansicht.laden">Foto wird geholt …</span></span>
+          <span class="a-fehler"><span data-i18n="schneemann.ansicht.fehler">Das Foto lässt sich gerade nicht laden.</span><button type="button" class="knopf knopf-schnee" id="aNeu" data-i18n="schneemann.ansicht.nochmal">Nochmal versuchen</button></span>
         </div>
       </div>
     </div>
     <div class="a-fuss" id="aFuss">
-      <button type="button" class="rund" id="aZurueck" aria-label="Vorheriges Foto"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
+      <button type="button" class="rund" id="aZurueck" aria-label="Vorheriges Foto" data-i18n-attr="aria-label:schneemann.ansicht.zurueck"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
       <div class="a-text"><h2 id="aTitel"></h2><p id="aDatum"></p></div>
-      <button type="button" class="rund" id="aWeiter" aria-label="Nächstes Foto"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
+      <button type="button" class="rund" id="aWeiter" aria-label="Nächstes Foto" data-i18n-attr="aria-label:schneemann.ansicht.weiter"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
     </div>
   </div>
 </dialog>
 
 <script src="../shared/start.js" data-ansicht="schneemann"></script>
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „schneemann“ (t ist hier die Tageszahl)
   var K = window.Kalender.init('schneemann');
   var F = window.Fotos;
   var TAU = Math.PI * 2, HALB = Math.PI / 2, Q = .5;   // Q: Stauchung des Bodens (Draufsicht von schräg oben)
@@ -497,7 +506,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
   var WURZEL = document.documentElement;
   function $(id) { return document.getElementById(id); }
   var el = {
-    karte: $('karte'), unterzeile: $('unterzeile'), zaehler: $('zaehler'), hilfe: $('hilfe'), plaetze: $('plaetze'), blase: $('blase'), wiese: $('wiese'), ansage: $('ansage'),
+    karte: $('karte'), unterzeile: $('unterzeile'), hilfe: $('hilfe'), plaetze: $('plaetze'), blase: $('blase'), wiese: $('wiese'), ansage: $('ansage'),
     bau: $('bau'), buehne: $('buehne'), feld: $('feld'), szene: $('szene'), schild: $('schild'), schildBild: $('schildBild'), schildStatus: $('schildStatus'), schildText: $('schildText'),
     bauKopf: $('bauKopf'), hud: $('hud'), hudKugeln: $('hudKugeln'), hudZahl: $('hudZahl'), hudSachen: $('hudSachen'), bauZu: $('bauZu'), bauTitel: $('bauTitel'), bauDatum: $('bauDatum'),
     bauFuss: $('bauFuss'), fussBauen: $('fussBauen'), hinweis: $('hinweis'), lassen: $('lassen'), ton: $('ton'), zaunKnopf: $('zaunKnopf'),
@@ -606,7 +615,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     tonAn = !tonAn; tonKnopf();
     try { window.localStorage.setItem(TON_KEY, tonAn ? '1' : '0'); } catch (e) { /* egal */ }
     if (tonAn) { audio(true); klang([784], .16, .08); }
-    sage(tonAn ? 'Geräusche an.' : 'Geräusche aus.');
+    sage(tonAn ? tx('schneemann.ton.an', 'Geräusche an.') : tx('schneemann.ton.aus', 'Geräusche aus.'));
   });
 
   // Bilder immer über Image laden (später echte Server-URLs, evtl. 403/404 oder als Promise)
@@ -753,20 +762,20 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
 
   /* ---------- Sachen zum Finden (Symbol in −10…10) ---------- */
   var SACHE = {
-    karotte: { name: 'Karotte', ein: 'eine Karotte', t: [{ d: 'M-8.5,7L6,-4C8,-5.6 9.8,-3.4 8,-1.8Z', f: 'karotte' }, { d: 'M-2,1.6l1.4,1.6M2.4,-1.2l1.2,1.6', s: 'karotte2', w: .7 }, { d: 'M7,-4l1.6,-5M7.6,-3.4l4,-2.6M6.6,-4.6l-1.6,-4.2', s: 'gruen', w: 1.3 }] },
-    besen: { name: 'Besen', ein: 'einen Besen', t: [{ d: 'M-1,-10H1V4H-1Z', f: 'holz2' }, { d: 'M-4.8,3L4.8,3L7.4,10L-7.4,10Z', f: 'gelb' }, { d: 'M-5,3.2H5V5H-5Z', f: 'rot' }, { d: 'M-2.6,6l-.8,3.6M0,6v3.8M2.6,6l.8,3.6', s: 'gold2', w: .7 }] },
-    fisch: { name: 'Fisch', ein: 'einen Fisch', t: [{ d: 'M5,0L10,-4.6L10,4.6Z', f: 'blau' }, { d: 'M-8,0C-4,-6 4,-6 6,0C4,6 -4,6 -8,0Z', f: 'hell', s: 'blau', w: .8 }, { d: kreis(-4.4, -1, 1.1), f: 'kohle' }, { d: 'M-1,-2.6Q1,0 -1,2.6', s: 'blau', w: .7 }] },
-    schleife: { name: 'Schleife', ein: 'eine Schleife', t: [{ d: 'M-1,1.2L-4.6,9L-2.2,8L-.6,10Z', f: 'rot2' }, { d: sp('M-1,1.2L-4.6,9L-2.2,8L-.6,10Z'), f: 'rot2' }, { d: 'M0,0C-4,-6.4 -10,-5.4 -9.4,0C-10,5.4 -4,6.4 0,0Z', f: 'rot', s: 'rot2', w: .6 }, { d: 'M0,0C4,-6.4 10,-5.4 9.4,0C10,5.4 4,6.4 0,0Z', f: 'rot', s: 'rot2', w: .6 }, { d: kreis(0, 0, 2.2), f: 'rot2' }] },
-    glocke: { name: 'Glöckchen', ein: 'ein Glöckchen', t: [{ d: 'M-1.6,-7.4a1.6,1.6 0 1,1 3.2,0', s: 'gold2', w: .9 }, { d: 'M-6,5C-6,-2 -4,-7 0,-7C4,-7 6,-2 6,5L8.2,7L-8.2,7Z', f: 'gold', s: 'gold2', w: .6 }, { d: kreis(0, 8, 1.8), f: 'gold2' }, { d: 'M-3,-3.4Q-3.6,0 -3.4,3', s: 'glanz', w: 1.2 }] },
-    sack: { name: 'Geschenksack', ein: 'den Geschenksack', t: [{ d: 'M-7.4,9C-10.6,2 -7.6,-3 -3,-5L-4,-8.6L4,-8.6L3,-5C7.6,-3 10.6,2 7.4,9Z', f: 'braun2', s: 'holz', w: .7 }, { d: 'M-4.2,-5.2H4.2', s: 'rot', w: 1.6 }, { d: 'M-3,-8.6L-1.6,-11.4M1,-8.6L3,-11', s: 'gold', w: 1.1 }] },
-    brille: { name: 'Brille', ein: 'eine Brille', t: [{ d: kreis(-4.6, 0, 3.8), s: 'kohle', w: 1.1 }, { d: kreis(4.6, 0, 3.8), s: 'kohle', w: 1.1 }, { d: 'M-.9,-.4Q0,-1.6 .9,-.4', s: 'kohle', w: 1 }, { d: 'M-8.4,-.6L-10,-1.6M8.4,-.6L10,-1.6', s: 'kohle', w: 1 }] },
-    stern: { name: 'Stern', ein: 'einen Stern', t: [{ d: stern(0, .6, 9.4), f: 'gold', s: 'gold2', w: .7 }, { d: 'M-2,-3.6L0,-6.6', s: 'glanz', w: 1.3 }] },
-    fahne: { name: 'Fahne', ein: 'eine Fahne', t: [{ d: 'M-6,10V-10', s: 'holz', w: 1.4 }, { d: 'M-6,-10L8.6,-6L-6,-1.4Z', f: 'rot', s: 'rot2', w: .5 }, { d: kreis(-6, -10.6, 1.2), f: 'gold' }] },
-    apfel: { name: 'Apfel', ein: 'einen Apfel', t: [{ d: 'M0,-4C-4,-7.2 -9.2,-4.4 -8.2,1.2C-7.2,7 -3,9.2 0,7.2C3,9.2 7.2,7 8.2,1.2C9.2,-4.4 4,-7.2 0,-4Z', f: 'rot', s: 'rot2', w: .6 }, { d: 'M0,-4C0,-6 1,-8 2,-9.4', s: 'braun', w: 1 }, { d: 'M1,-6.6C4,-9.6 7.2,-8.2 7.2,-7C5,-5.4 3,-5.4 1,-6.6Z', f: 'gruen' }, { d: 'M-4.6,-1.4Q-5.4,1.6 -4,3.6', s: 'glanz', w: 1.4 }] },
-    knochen: { name: 'Knochen', ein: 'einen Knochen', t: [{ d: 'M-5.4,-1.8H5.4A2.8,2.8 0 1,1 7.4,-4.2A2.8,2.8 0 1,1 7.4,4.2A2.8,2.8 0 1,1 5.4,1.8H-5.4A2.8,2.8 0 1,1 -7.4,4.2A2.8,2.8 0 1,1 -7.4,-4.2A2.8,2.8 0 1,1 -5.4,-1.8Z', f: 'weiss', s: 'schneeR', w: .8 }] },
-    kaese: { name: 'Käse', ein: 'ein Stück Käse', t: [{ d: 'M-9,6.4L9,6.4L9,-1.6L-9,3Z', f: 'gelb', s: 'gold2', w: .6 }, { d: 'M-9,3L9,-1.6L4.6,-5.4Z', f: '#ffe39a', s: 'gold2', w: .6 }, { d: kreis(-3.4, 4.2, 1.3), f: 'gold2' }, { d: kreis(3.4, 3, 1), f: 'gold2' }, { d: kreis(6.6, 4.8, .8), f: 'gold2' }] },
-    geschenk: { name: 'Geschenk', ein: 'ein Geschenk', t: [{ d: rr(-7.4, -2.4, 14.8, 11, 1.2), f: 'petrol' }, { d: rr(-8.4, -5.6, 16.8, 3.8, 1), f: '#238579' }, { d: 'M-1.3,-5.6H1.3V8.6H-1.3Z', f: 'gold' }, { d: 'M0,-5.6C-3,-10.4 -7.4,-8.6 -5,-6.2Z', f: 'gold', s: 'gold2', w: .5 }, { d: 'M0,-5.6C3,-10.4 7.4,-8.6 5,-6.2Z', f: 'gold', s: 'gold2', w: .5 }] },
-    krone: { name: 'Krone', ein: 'eine Krone', t: [{ d: 'M-8.4,5.4L-8.4,-4.6L-4.2,-.2L0,-7.6L4.2,-.2L8.4,-4.6L8.4,5.4Z', f: 'gold', s: 'gold2', w: .7 }, { d: kreis(0, 1.6, 1.6), f: 'rot' }, { d: kreis(-4.6, 2.2, 1.1), f: 'petrol' }, { d: kreis(4.6, 2.2, 1.1), f: 'petrol' }] }
+    karotte: { name: tx('schneemann.sache.karotte', 'Karotte'), t: [{ d: 'M-8.5,7L6,-4C8,-5.6 9.8,-3.4 8,-1.8Z', f: 'karotte' }, { d: 'M-2,1.6l1.4,1.6M2.4,-1.2l1.2,1.6', s: 'karotte2', w: .7 }, { d: 'M7,-4l1.6,-5M7.6,-3.4l4,-2.6M6.6,-4.6l-1.6,-4.2', s: 'gruen', w: 1.3 }] },
+    besen: { name: tx('schneemann.sache.besen', 'Besen'), t: [{ d: 'M-1,-10H1V4H-1Z', f: 'holz2' }, { d: 'M-4.8,3L4.8,3L7.4,10L-7.4,10Z', f: 'gelb' }, { d: 'M-5,3.2H5V5H-5Z', f: 'rot' }, { d: 'M-2.6,6l-.8,3.6M0,6v3.8M2.6,6l.8,3.6', s: 'gold2', w: .7 }] },
+    fisch: { name: tx('schneemann.sache.fisch', 'Fisch'), t: [{ d: 'M5,0L10,-4.6L10,4.6Z', f: 'blau' }, { d: 'M-8,0C-4,-6 4,-6 6,0C4,6 -4,6 -8,0Z', f: 'hell', s: 'blau', w: .8 }, { d: kreis(-4.4, -1, 1.1), f: 'kohle' }, { d: 'M-1,-2.6Q1,0 -1,2.6', s: 'blau', w: .7 }] },
+    schleife: { name: tx('schneemann.sache.schleife', 'Schleife'), t: [{ d: 'M-1,1.2L-4.6,9L-2.2,8L-.6,10Z', f: 'rot2' }, { d: sp('M-1,1.2L-4.6,9L-2.2,8L-.6,10Z'), f: 'rot2' }, { d: 'M0,0C-4,-6.4 -10,-5.4 -9.4,0C-10,5.4 -4,6.4 0,0Z', f: 'rot', s: 'rot2', w: .6 }, { d: 'M0,0C4,-6.4 10,-5.4 9.4,0C10,5.4 4,6.4 0,0Z', f: 'rot', s: 'rot2', w: .6 }, { d: kreis(0, 0, 2.2), f: 'rot2' }] },
+    glocke: { name: tx('schneemann.sache.glocke', 'Glöckchen'), t: [{ d: 'M-1.6,-7.4a1.6,1.6 0 1,1 3.2,0', s: 'gold2', w: .9 }, { d: 'M-6,5C-6,-2 -4,-7 0,-7C4,-7 6,-2 6,5L8.2,7L-8.2,7Z', f: 'gold', s: 'gold2', w: .6 }, { d: kreis(0, 8, 1.8), f: 'gold2' }, { d: 'M-3,-3.4Q-3.6,0 -3.4,3', s: 'glanz', w: 1.2 }] },
+    sack: { name: tx('schneemann.sache.sack', 'Geschenksack'), t: [{ d: 'M-7.4,9C-10.6,2 -7.6,-3 -3,-5L-4,-8.6L4,-8.6L3,-5C7.6,-3 10.6,2 7.4,9Z', f: 'braun2', s: 'holz', w: .7 }, { d: 'M-4.2,-5.2H4.2', s: 'rot', w: 1.6 }, { d: 'M-3,-8.6L-1.6,-11.4M1,-8.6L3,-11', s: 'gold', w: 1.1 }] },
+    brille: { name: tx('schneemann.sache.brille', 'Brille'), t: [{ d: kreis(-4.6, 0, 3.8), s: 'kohle', w: 1.1 }, { d: kreis(4.6, 0, 3.8), s: 'kohle', w: 1.1 }, { d: 'M-.9,-.4Q0,-1.6 .9,-.4', s: 'kohle', w: 1 }, { d: 'M-8.4,-.6L-10,-1.6M8.4,-.6L10,-1.6', s: 'kohle', w: 1 }] },
+    stern: { name: tx('schneemann.sache.stern', 'Stern'), t: [{ d: stern(0, .6, 9.4), f: 'gold', s: 'gold2', w: .7 }, { d: 'M-2,-3.6L0,-6.6', s: 'glanz', w: 1.3 }] },
+    fahne: { name: tx('schneemann.sache.fahne', 'Fahne'), t: [{ d: 'M-6,10V-10', s: 'holz', w: 1.4 }, { d: 'M-6,-10L8.6,-6L-6,-1.4Z', f: 'rot', s: 'rot2', w: .5 }, { d: kreis(-6, -10.6, 1.2), f: 'gold' }] },
+    apfel: { name: tx('schneemann.sache.apfel', 'Apfel'), t: [{ d: 'M0,-4C-4,-7.2 -9.2,-4.4 -8.2,1.2C-7.2,7 -3,9.2 0,7.2C3,9.2 7.2,7 8.2,1.2C9.2,-4.4 4,-7.2 0,-4Z', f: 'rot', s: 'rot2', w: .6 }, { d: 'M0,-4C0,-6 1,-8 2,-9.4', s: 'braun', w: 1 }, { d: 'M1,-6.6C4,-9.6 7.2,-8.2 7.2,-7C5,-5.4 3,-5.4 1,-6.6Z', f: 'gruen' }, { d: 'M-4.6,-1.4Q-5.4,1.6 -4,3.6', s: 'glanz', w: 1.4 }] },
+    knochen: { name: tx('schneemann.sache.knochen', 'Knochen'), t: [{ d: 'M-5.4,-1.8H5.4A2.8,2.8 0 1,1 7.4,-4.2A2.8,2.8 0 1,1 7.4,4.2A2.8,2.8 0 1,1 5.4,1.8H-5.4A2.8,2.8 0 1,1 -7.4,4.2A2.8,2.8 0 1,1 -7.4,-4.2A2.8,2.8 0 1,1 -5.4,-1.8Z', f: 'weiss', s: 'schneeR', w: .8 }] },
+    kaese: { name: tx('schneemann.sache.kaese', 'Käse'), t: [{ d: 'M-9,6.4L9,6.4L9,-1.6L-9,3Z', f: 'gelb', s: 'gold2', w: .6 }, { d: 'M-9,3L9,-1.6L4.6,-5.4Z', f: '#ffe39a', s: 'gold2', w: .6 }, { d: kreis(-3.4, 4.2, 1.3), f: 'gold2' }, { d: kreis(3.4, 3, 1), f: 'gold2' }, { d: kreis(6.6, 4.8, .8), f: 'gold2' }] },
+    geschenk: { name: tx('schneemann.sache.geschenk', 'Geschenk'), t: [{ d: rr(-7.4, -2.4, 14.8, 11, 1.2), f: 'petrol' }, { d: rr(-8.4, -5.6, 16.8, 3.8, 1), f: '#238579' }, { d: 'M-1.3,-5.6H1.3V8.6H-1.3Z', f: 'gold' }, { d: 'M0,-5.6C-3,-10.4 -7.4,-8.6 -5,-6.2Z', f: 'gold', s: 'gold2', w: .5 }, { d: 'M0,-5.6C3,-10.4 7.4,-8.6 5,-6.2Z', f: 'gold', s: 'gold2', w: .5 }] },
+    krone: { name: tx('schneemann.sache.krone', 'Krone'), t: [{ d: 'M-8.4,5.4L-8.4,-4.6L-4.2,-.2L0,-7.6L4.2,-.2L8.4,-4.6L8.4,5.4Z', f: 'gold', s: 'gold2', w: .7 }, { d: kreis(0, 1.6, 1.6), f: 'rot' }, { d: kreis(-4.6, 2.2, 1.1), f: 'petrol' }, { d: kreis(4.6, 2.2, 1.1), f: 'petrol' }] }
   };
   function sacheS(st, id, x, y, s, rot, z) {
     if (!st.x[id]) return null;
@@ -808,7 +817,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
   function qpunkt(x0, y0, cx, cy, x1, y1, t) { var u = 1 - t; return [u * u * x0 + 2 * u * t * cx + t * t * x1, u * u * y0 + 2 * u * t * cy + t * t * y1]; }
 
   var FIG = {
-    schneemann: { name: 'Schneemann', ein: 'ein Schneemann', hut: 'zylinder', sachen: ['karotte', 'besen'],
+    schneemann: { name: tx('schneemann.figur.schneemann.name', 'Schneemann'), ein: tx('schneemann.figur.schneemann.ein', 'ein Schneemann'), hut: 'zylinder', sachen: ['karotte', 'besen'],
       bau: function (st, a) {
         var sch = schildRect(0, -47.5, 34, 43.5, a), hx = sch.w / 2 + .5, KY = -67.5;
         var nase = st.x.karotte ? karotteTeile(st.seite) : [{ d: kreis(0, 1.8, 1.7), f: 'kohle' }, { d: kreis(-.5, 1.3, .5), f: 'weiss' }];
@@ -823,7 +832,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             S('arme', [K10(0, KY, 10, armTeile(hx, 26))], { a: [0, KY + 22] })],
           schild: sch, box: [-33, -96, 26, 2], kopf: { x: 0, y: KY, r: 10 }, hut: true, schal: true };
       } },
-    pinguin: { name: 'Pinguin', ein: 'ein Pinguin', hut: 'bommel', sachen: ['fisch'],
+    pinguin: { name: tx('schneemann.figur.pinguin.name', 'Pinguin'), ein: tx('schneemann.figur.pinguin.ein', 'ein Pinguin'), hut: 'bommel', sachen: ['fisch'],
       bau: function (st, a) {
         var sch = schildRect(0, -25, 24, 24, a), hx = sch.w / 2 + .2, KY = -42, KR = 12;
         var frack = 'M-11,-33C-21,-27 -22,-10 -15,-1.5C-18.5,-12 -17.5,-25 -11,-33Z';
@@ -840,7 +849,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'fisch', hx + 6.5, -5, .62, -25)],
           schild: sch, box: [-22, -75, 30, 3], kopf: { x: 0, y: KY, r: KR }, hut: true, schal: false };
       } },
-    hase: { name: 'Schneehase', ein: 'ein Schneehase', sachen: ['karotte', 'schleife'],
+    hase: { name: tx('schneemann.figur.hase.name', 'Schneehase'), ein: tx('schneemann.figur.hase.ein', 'ein Schneehase'), sachen: ['karotte', 'schleife'],
       bau: function (st, a) {
         var sch = schildRect(0, -27, 26, 26, a), hx = sch.w / 2, KY = -39.5, KR = 11.5;
         var ohr = 'M-6.2,-6C-10.4,-16 -9.6,-27.4 -5.8,-28.4C-2.2,-29.4 -1,-18.4 -2.4,-7Z', innen = 'M-5.6,-9.4C-7.8,-16.4 -7.2,-24.4 -5.4,-25.4C-3.8,-26 -3.2,-17.4 -3.8,-9.8Z';
@@ -854,7 +863,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'karotte', hx + 5, -4, .75, 10)],
           schild: sch, box: [-21, -73, 27, 2], kopf: { x: 0, y: KY, r: KR }, hut: false, schal: false };
       } },
-    raupe: { name: 'Raupe', ein: 'eine Raupe', kopfRechts: true, sachen: ['apfel'],
+    raupe: { name: tx('schneemann.figur.raupe.name', 'Raupe'), ein: tx('schneemann.figur.raupe.ein', 'eine Raupe'), kopfRechts: true, sachen: ['apfel'],
       bau: function (st, a) {
         // Die Raupe macht einen Buckel: Schwanz und Kopf am Boden, die Mitte hochgewölbt
         var sch = schildRect(-6, 0, 42, 38, a); sch.y = n2(-40 - sch.h);
@@ -875,7 +884,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'apfel', 42, -6, .62, 8)],
           schild: sch, box: [-40, sch.y - 1, 49, 2], kopf: null, hut: false, schal: false };
       } },
-    rentier: { name: 'Rentier', ein: 'ein Rentier', sachen: ['glocke'],
+    rentier: { name: tx('schneemann.figur.rentier.name', 'Rentier'), ein: tx('schneemann.figur.rentier.ein', 'ein Rentier'), sachen: ['glocke'],
       bau: function (st, a) {
         var sch = schildRect(-31, -55, 26, 26, a), KX = 13, KY = -36, KR = 10.5;
         return { kugeln: [{ x: -2, y: -15.5, r: 17, z: 0 }, { x: KX, y: KY, r: KR, z: 1 }, { x: 22, y: -32.5, r: 6, z: 2 }],
@@ -891,7 +900,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'glocke', KX - 1.4, KY + 13.6, .44, 0)],
           schild: sch, box: [-46, -62, 31, 2], kopf: { x: KX, y: KY, r: KR }, hut: false, schal: true };
       } },
-    nikolaus: { name: 'Nikolaus', ein: 'der Nikolaus', sachen: ['sack', 'glocke'],
+    nikolaus: { name: tx('schneemann.figur.nikolaus.name', 'Nikolaus'), ein: tx('schneemann.figur.nikolaus.ein', 'der Nikolaus'), sachen: ['sack', 'glocke'],
       bau: function (st, a) {
         var sch = schildRect(0, -47.5, 32, 40, a), hx = sch.w / 2 + .4, KY = -67.5, arme = [];
         [-1, 1].forEach(function (s) {
@@ -911,7 +920,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             S('arme', [K10(0, KY, 10, arme)], { a: [0, KY + 22] })],
           schild: sch, box: [-27, -91, 31, 2], kopf: null, hut: false, schal: false };
       } },
-    eule: { name: 'Schneeeule', ein: 'eine Schneeeule', sachen: ['brille'],
+    eule: { name: tx('schneemann.figur.eule.name', 'Schneeeule'), ein: tx('schneemann.figur.eule.ein', 'eine Schneeeule'), sachen: ['brille'],
       bau: function (st, a) {
         var sch = schildRect(0, -28, 26, 26, a), hx = sch.w / 2 + .4, KY = -44, KR = 13.5;
         var fl = 'M-14,-31.4C-22.4,-27 ' + n2(-hx - 3) + ',-22 ' + n2(-hx) + ',-15C' + n2(-hx + 2) + ',-18 -17,-19.6 -16,-22C-17.6,-24 -15.4,-26 -15.6,-28Z';
@@ -926,7 +935,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
         return { kugeln: [{ x: 0, y: -17.5, r: 19 }, { x: 0, y: KY, r: KR }], schritte: schritte,
           schild: sch, box: [-22, -64, 22, 2], kopf: { x: 0, y: KY, r: KR }, hut: false, schal: true };
       } },
-    robbe: { name: 'Robbe', ein: 'eine Robbe mit Ball', sachen: ['fisch'],
+    robbe: { name: tx('schneemann.figur.robbe.name', 'Robbe'), ein: tx('schneemann.figur.robbe.ein', 'eine Robbe mit Ball'), sachen: ['fisch'],
       bau: function (st, a) {
         var sch = schildRect(-25, -57, 26, 26, a), KX = 11, KY = -30, KR = 11, BX = 15.5, BY = -47, BR = 7;
         return { kugeln: [{ x: -6, y: -13.5, r: 16, sy: .88, z: 0 }, { x: KX, y: KY, r: KR, z: 1 }, { x: BX, y: BY, r: BR, z: 2 }],
@@ -940,7 +949,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'fisch', 17, -3.4, .6, 12)],
           schild: sch, box: [-41, -58, 30, 2], kopf: null, hut: false, schal: false };
       } },
-    schildkroete: { name: 'Schildkröte', ein: 'eine Schildkröte', kopfRechts: true, hut: 'bommel', sachen: ['stern'],
+    schildkroete: { name: tx('schneemann.figur.schildkroete.name', 'Schildkröte'), ein: tx('schneemann.figur.schildkroete.ein', 'eine Schildkröte'), kopfRechts: true, hut: 'bommel', sachen: ['stern'],
       bau: function (st, a) {
         var sch = schildRect(-3, 0, 30, 26, a), KX = 27, KY = -12.5, KR = 8; sch.y = n2(-31 - sch.h);
         return { kugeln: [{ x: 0, y: -13, r: 21, sy: .7, z: 1 }, { x: KX, y: KY, r: KR, z: 2 }],
@@ -954,7 +963,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'stern', 0, -26, .5, 0)],
           schild: sch, box: [-28, sch.y - 1, 38, 2], kopf: { x: KX, y: KY, r: KR }, hut: true, schal: false };
       } },
-    katze: { name: 'Katze', ein: 'eine Katze', sachen: ['schleife', 'fisch'],
+    katze: { name: tx('schneemann.figur.katze.name', 'Katze'), ein: tx('schneemann.figur.katze.ein', 'eine Katze'), sachen: ['schleife', 'fisch'],
       bau: function (st, a) {
         var sch = schildRect(0, -27, 26, 26, a), hx = sch.w / 2, KY = -40, KR = 12;
         var ohr = 'M-9.6,-4L-8.6,-15.4L-2.4,-8.6Z', innen = 'M-8.1,-6.6L-7.7,-12.6L-4.4,-8.9Z';
@@ -970,7 +979,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'fisch', -20, -2.6, .62, -8)],
           schild: sch, box: [-30, -60, 28, 2], kopf: null, hut: false, schal: false };
       } },
-    iglu: { name: 'Iglu', ein: 'ein Iglu', sachen: ['fahne'],
+    iglu: { name: tx('schneemann.figur.iglu.name', 'Iglu'), ein: tx('schneemann.figur.iglu.ein', 'ein Iglu'), sachen: ['fahne'],
       bau: function (st, a) {
         var sch = schildRect(9, 0, 30, 26, a); sch.y = n2(-33 - sch.h);
         return { kugeln: [{ x: 0, y: -12.5, r: 22, sy: .74, z: 0 }, { x: -17, y: -7.4, r: 10.5, sy: .8, z: 1 }],
@@ -982,7 +991,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             S('fenster', [{ d: ell(11, -17, 3.4, 2.6), f: 'hell', s: 'schneeR', w: .7 }, { d: 'M9.4,-18.4l1.4,-.8', s: 'weiss', w: .7 }], { z: 1, a: [11, -17] })],
           schild: sch, box: [-28, sch.y - 1, 26, 4], kopf: null, hut: false, schal: false };
       } },
-    eisbaer: { name: 'Eisbär', ein: 'ein Eisbär', kopfRechts: true, hut: 'bommel', sachen: ['fisch', 'stern'],
+    eisbaer: { name: tx('schneemann.figur.eisbaer.name', 'Eisbär'), ein: tx('schneemann.figur.eisbaer.ein', 'ein Eisbär'), kopfRechts: true, hut: 'bommel', sachen: ['fisch', 'stern'],
       bau: function (st, a) {
         var sch = schildRect(-12, 0, 38, 34, a), KX = 22, KY = -14.5, KR = 11; sch.y = n2(-30 - sch.h);
         return { kugeln: [{ x: -15, y: -12.5, r: 13.5, z: 0 }, { x: 3, y: -14.5, r: 15.5, z: 1 }, { x: KX, y: KY, r: KR, z: 2 }],
@@ -999,7 +1008,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'fisch', -5, -2.4, .6, 6)],
           schild: sch, box: [-31, sch.y - 1, 37, 2], kopf: { x: KX, y: KY, r: KR }, hut: true, schal: true };
       } },
-    engel: { name: 'Engel', ein: 'ein Engel', sachen: ['stern', 'glocke'],
+    engel: { name: tx('schneemann.figur.engel.name', 'Engel'), ein: tx('schneemann.figur.engel.ein', 'ein Engel'), sachen: ['stern', 'glocke'],
       bau: function (st, a) {
         var sch = schildRect(0, -34, 26, 26, a), hx = sch.w / 2 + .3, KY = -58, KR = 9;
         var fl = 'M-8,-45C-21,-60 -36,-57 -34.4,-44.6C-33,-36.4 -24.6,-30 -12.6,-33.4Z', fe = 'M-28,-50.6Q-24,-46 -26.4,-40M-21.4,-53.6Q-18,-48 -20,-41.4M-15.4,-52Q-13,-46.6 -14.4,-41';
@@ -1017,7 +1026,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'glocke', -hx - 3.6, -24, .42, 0)],
           schild: sch, box: [-35, -75, 35, 2], kopf: null, hut: false, schal: false };
       } },
-    igel: { name: 'Igel', ein: 'ein Igel', kopfRechts: true, sachen: ['apfel'],
+    igel: { name: tx('schneemann.figur.igel.name', 'Igel'), ein: tx('schneemann.figur.igel.ein', 'ein Igel'), kopfRechts: true, sachen: ['apfel'],
       bau: function (st, a) {
         var sch = schildRect(-6, 0, 28, 26, a), kx = -2, ky = -14, rx = 16.5, ry = 16.5 * .9, d1 = '', d2 = ''; sch.y = n2(-36 - sch.h);
         for (var g = 150, i = 0; g <= 336; g += 11, i++) {
@@ -1034,7 +1043,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             S('gesicht', [{ d: kreis(10.4, -14.4, 1.4), f: 'kohle' }, { d: kreis(10.9, -15, .45), f: 'weiss' }, { d: kreis(23.6, -9.6, 1.9), f: 'kohle' }, { d: kreis(23, -10.3, .5), f: 'glanz' }, { d: 'M17,-5.4Q19.4,-3.6 21.6,-5.2', s: 'kohle', w: .7 }, { d: kreis(13.8, -8.6, 1.5), f: 'wange' }], { a: [16, -9] })],
           schild: sch, box: [-26, sch.y - 1, 26, 2], kopf: null, hut: false, schal: false };
       } },
-    teddy: { name: 'Teddybär', ein: 'ein Teddybär', hut: 'melone', sachen: ['schleife', 'stern'],
+    teddy: { name: tx('schneemann.figur.teddy.name', 'Teddybär'), ein: tx('schneemann.figur.teddy.ein', 'ein Teddybär'), hut: 'melone', sachen: ['schleife', 'stern'],
       bau: function (st, a) {
         var sch = schildRect(27, -60, 26, 26, a), KY = -40, KR = 12, sohle = [];
         [-10.5, 10.5].forEach(function (x) { sohle.push({ d: ell(x, -5.2, 3.2, 3.6), f: 'fell' }, { d: kreis(x - 2.1, -9.4, 1) + kreis(x, -10.2, 1) + kreis(x + 2.1, -9.4, 1), f: 'fell' }); });
@@ -1052,7 +1061,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'stern', 0, -17, .42, 0)],
           schild: sch, box: [-22, -63, 43, 2], kopf: { x: 0, y: KY, r: KR }, hut: true, schal: false };
       } },
-    dackel: { name: 'Dackel', ein: 'ein Dackel', kopfRechts: true, hut: 'zipfel', sachen: ['knochen'],
+    dackel: { name: tx('schneemann.figur.dackel.name', 'Dackel'), ein: tx('schneemann.figur.dackel.ein', 'ein Dackel'), kopfRechts: true, hut: 'zipfel', sachen: ['knochen'],
       bau: function (st, a) {
         var sch = schildRect(-8, 0, 40, 36, a), KX = 23.5, KY = -21, KR = 9; sch.y = n2(-26 - sch.h);
         return { kugeln: [{ x: -13, y: -11, r: 11.5, z: 0 }, { x: 6, y: -11.6, r: 12, z: 1 }, { x: KX, y: KY, r: KR, z: 2 }],
@@ -1068,7 +1077,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'knochen', 30, -2.4, .62, -12)],
           schild: sch, box: [-32, sch.y - 1, 36, 2], kopf: { x: KX, y: KY, r: KR }, hut: true, schal: false };
       } },
-    tanne: { name: 'Schneetanne', ein: 'eine Schneetanne', sachen: ['stern', 'geschenk'],
+    tanne: { name: tx('schneemann.figur.tanne.name', 'Schneetanne'), ein: tx('schneemann.figur.tanne.ein', 'eine Schneetanne'), sachen: ['stern', 'geschenk'],
       bau: function (st, a) {
         var sch = schildRect(0, -36, 24, 22, a), lichter = [], gl = [];
         var zw = 'M0,-93L-12,-73L-8.4,-73L-19.4,-52L-14.4,-52L-26,-27L-20,-27L-29.4,-4L29.4,-4L20,-27L26,-27L14.4,-52L19.4,-52L8.4,-73L12,-73Z';
@@ -1085,7 +1094,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'geschenk', 23, -5.6, .75, 0)],
           schild: sch, box: [-30, -101, 31, 2], kopf: null, hut: false, schal: false };
       } },
-    elefant: { name: 'Elefant', ein: 'ein Elefant mit Baby', kopfRechts: true, hut: 'bommel', sachen: ['schleife', 'apfel'],
+    elefant: { name: tx('schneemann.figur.elefant.name', 'Elefant'), ein: tx('schneemann.figur.elefant.ein', 'ein Elefant mit Baby'), kopfRechts: true, hut: 'bommel', sachen: ['schleife', 'apfel'],
       bau: function (st, a) {
         var sch = schildRect(-17, 0, 28, 26, a), KX = 7, KY = -35, KR = 12, BX = 27, BY = -17, BR = 7; sch.y = n2(-38 - sch.h);
         var ohr = 'M-7.6,-4.4C-18,-10.4 -22.4,4 -16,10.4C-12,13.4 -8,8.4 -7,4Z', bohr = 'M-7,-3.4C-14,-7.4 -16,3 -11.4,7C-9,8.6 -7.4,5.4 -6.6,3Z';
@@ -1103,7 +1112,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'apfel', 16.4, -19.6, .46, 0)],
           schild: sch, box: [-33, sch.y - 1, 35, 2], kopf: { x: KX, y: KY, r: KR }, hut: true, schal: false };
       } },
-    maus: { name: 'Maus', ein: 'eine Maus', sachen: ['kaese'],
+    maus: { name: tx('schneemann.figur.maus.name', 'Maus'), ein: tx('schneemann.figur.maus.ein', 'eine Maus'), sachen: ['kaese'],
       bau: function (st, a) {
         var sch = schildRect(-22, -54, 24, 24, a), KX = 11, KY = -31, KR = 9.5;
         return { kugeln: [{ x: 0, y: -14, r: 15.5, z: 0 }, { x: KX, y: KY, r: KR, z: 1 }],
@@ -1118,7 +1127,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             S('pfoetchen', [{ d: ell(3.6, -17.4, 2.6, 2), f: 'rosa' }, { d: ell(12.6, -17.8, 2.6, 2), f: 'rosa' }], { a: [8, -17] })],
           schild: sch, box: [-37, -56, 25, 2], kopf: null, hut: false, schal: false };
       } },
-    drache: { name: 'Schneedrache', ein: 'ein kleiner Schneedrache', sachen: ['krone', 'stern'],
+    drache: { name: tx('schneemann.figur.drache.name', 'Schneedrache'), ein: tx('schneemann.figur.drache.ein', 'ein kleiner Schneedrache'), sachen: ['krone', 'stern'],
       bau: function (st, a) {
         var sch = schildRect(-22, 0, 26, 24, a), KX = 14, KY = -34.5, KR = 11; sch.y = n2(-27 - sch.h);
         var ku = [{ x: -2, y: -15.5, r: 16, z: 2 }, { x: KX, y: KY, r: KR, z: 3 }, { x: -19, y: -8, r: 8.5, z: 1 }, { x: -29.5, y: -5.4, r: 6, z: 0 }];
@@ -1135,7 +1144,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'stern', -34.6, -10.6, .4, 0)],
           schild: sch, box: [-37, sch.y - 1, 30, 2], kopf: { x: KX, y: KY, r: KR }, hut: false, schal: true };
       } },
-    wichtel: { name: 'Wichtel', ein: 'ein Wichtel', sachen: ['geschenk', 'stern'],
+    wichtel: { name: tx('schneemann.figur.wichtel.name', 'Wichtel'), ein: tx('schneemann.figur.wichtel.ein', 'ein Wichtel'), sachen: ['geschenk', 'stern'],
       bau: function (st, a) {
         var sch = schildRect(-30, -62, 26, 34, a);
         return { kugeln: [{ x: 0, y: -16, r: 17 }, { x: 0, y: -36.5, r: 9.5 }],
@@ -1150,7 +1159,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'geschenk', 15, -6, .8, 6)],
           schild: sch, box: [-42, -73, 23, 2], kopf: null, hut: false, schal: false };
       } },
-    burg: { name: 'Schneeburg', ein: 'eine Schneeburg', sachen: ['fahne', 'krone'],
+    burg: { name: tx('schneemann.figur.burg.name', 'Schneeburg'), ein: tx('schneemann.figur.burg.ein', 'eine Schneeburg'), sachen: ['fahne', 'krone'],
       bau: function (st, a) {
         var sch = schildRect(0, -33, 26, 24, a), zi = [];
         [[-23, -21.6], [23, -21.6], [0, -46]].forEach(function (p) { [-6.6, -2, 2.6].forEach(function (dx) { zi.push(SN(rr(p[0] + dx, p[1] - 4, 4, 5.6, .8))); }); });
@@ -1165,7 +1174,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'krone', 23, -25.6, .5, 0)],
           schild: sch, box: [-36, -67, 36, 2], kopf: null, hut: false, schal: false };
       } },
-    schaf: { name: 'Schaf', ein: 'ein Schaf', kopfRechts: true, sachen: ['glocke', 'stern'],
+    schaf: { name: tx('schneemann.figur.schaf.name', 'Schaf'), ein: tx('schneemann.figur.schaf.ein', 'ein Schaf'), kopfRechts: true, sachen: ['glocke', 'stern'],
       bau: function (st, a) {
         var sch = schildRect(-7, 0, 28, 26, a), KX = 16, KY = -25, KR = 8.5, wolle = []; sch.y = n2(-34 - sch.h);
         for (var g = 150; g <= 390; g += 24) { var w = g * Math.PI / 180; wolle.push(SN(kreis(-3 + Math.cos(w) * 15.4, -15 + Math.sin(w) * 14.2, 4.2))); }
@@ -1181,7 +1190,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
             sacheS(st, 'stern', -18, -27, .42, -10)],
           schild: sch, box: [-24, sch.y - 1, 27, 2], kopf: null, hut: false, schal: false };
       } },
-    familie: { name: 'Schneemann-Familie', ein: 'eine Schneemann-Familie', hut: 'zylinder', sachen: ['stern', 'geschenk'],
+    familie: { name: tx('schneemann.figur.familie.name', 'Schneemann-Familie'), ein: tx('schneemann.figur.familie.ein', 'eine Schneemann-Familie'), hut: 'zylinder', sachen: ['stern', 'geschenk'],
       bau: function (st, a) {
         // Papa und Mama halten zwei Stangen – oben hängt das große Foto wie ein Festschild über der Familie
         var sch = schildRect(-1, 0, 44, 40, a), PX = -24, PY = -38, MX = 22, MY = -35, KX = 0, KY = -6.9, KR = 7.5, SL = -9.4, SR = 7.6; sch.y = n2(-70 - sch.h);
@@ -1240,9 +1249,12 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
   var UEBEN = { fig: 'schneemann', thema: 'nebel', warm: ['tee'], waende: ['stein'], eis: 0, gras: 0 };
   function tagInfo(t) { return t ? TAGE[t] : UEBEN; }
   function figInfo(t) { return FIG[tagInfo(t).fig]; }
-  var WARM = { feuer: { name: 'Lagerfeuer', vom: 'vom Lagerfeuer', um: 'um das Lagerfeuer' }, tee: { name: 'heiße Teepfütze', vom: 'von der Teepfütze', um: 'um die Teepfütze' },
-    sonne: { name: 'Sonnenfleck', vom: 'vom Sonnenfleck', um: 'um den Sonnenfleck' }, gitter: { name: 'Heizungsgitter', vom: 'vom Heizungsgitter', um: 'um das Gitter' },
-    kakao: { name: 'Kakao-Ofen', vom: 'vom Kakao-Ofen', um: 'um den Kakao-Ofen' } };
+  var WARM = {
+    feuer: { name: tx('schneemann.warm.feuer.name', 'Lagerfeuer'), vom: tx('schneemann.warm.feuer.vom', 'vom Lagerfeuer'), um: tx('schneemann.warm.feuer.um', 'um das Lagerfeuer') },
+    tee: { name: tx('schneemann.warm.tee.name', 'heiße Teepfütze'), vom: tx('schneemann.warm.tee.vom', 'von der Teepfütze'), um: tx('schneemann.warm.tee.um', 'um die Teepfütze') },
+    sonne: { name: tx('schneemann.warm.sonne.name', 'Sonnenfleck'), vom: tx('schneemann.warm.sonne.vom', 'vom Sonnenfleck'), um: tx('schneemann.warm.sonne.um', 'um den Sonnenfleck') },
+    gitter: { name: tx('schneemann.warm.gitter.name', 'Heizungsgitter'), vom: tx('schneemann.warm.gitter.vom', 'vom Heizungsgitter'), um: tx('schneemann.warm.gitter.um', 'um das Gitter') },
+    kakao: { name: tx('schneemann.warm.kakao.name', 'Kakao-Ofen'), vom: tx('schneemann.warm.kakao.vom', 'vom Kakao-Ofen'), um: tx('schneemann.warm.kakao.um', 'um den Kakao-Ofen') } };
   var THEMEN = {
     morgen: { himmel: ['#7fa3dc', '#c4c4ea', '#f6cdbf'], schnee: ['#eef1fa', '#f7f8fd', '#e9edf8'], huegel: ['#cdd0ec', '#e4e7f5'], baeume: ['#8197b9', '#93a7c7'], sonne: [.8, .62, '#fff1cf'] },
     sonne: { himmel: ['#4f8fdc', '#9cc5ee', '#dcecf8'], schnee: ['#f2f6fd', '#fbfcff', '#edf2fb'], huegel: ['#d0ddf1', '#e9eff9'], baeume: ['#6f8fb5', '#86a3c4'], sonne: [.18, .35, '#fffbe8'] },
@@ -1380,6 +1392,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     return out;
   }
   function groessenWort(r) { return r >= 17 ? 'groß' : r >= 12.5 ? 'mittel' : r >= 8.5 ? 'klein' : 'winzig'; }
+  var GROESSE = { 'groß': tx('schneemann.groesse.gross', 'groß'), mittel: tx('schneemann.groesse.mittel', 'mittel'), klein: tx('schneemann.groesse.klein', 'klein'), winzig: tx('schneemann.groesse.winzig', 'winzig') };
 
   /* ---------- SVG (Wiese, Bauplan) ---------- */
   function tfText(tf) { return 'translate(' + n2(tf[0]) + ' ' + n2(tf[1]) + ')' + (tf[3] ? ' rotate(' + n2(tf[3]) + ')' : '') + (tf[2] !== 1 ? ' scale(' + n2(tf[2]) + ')' : ''); }
@@ -1416,7 +1429,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
       '<path d="M' + n2(b[0] - 4) + ',0H' + n2(b[2] + 4) + '" stroke="rgba(255,255,255,.5)" stroke-width="1" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"/>' +
       figurInnen(d, f, true, false, px ? 11.5 / masz : 0) +
       '<rect x="' + s.x + '" y="' + s.y + '" width="' + s.w + '" height="' + s.h + '" rx="2" fill="rgba(40,80,143,.78)" stroke="#ffe7a6" stroke-width="1.4" stroke-dasharray="3 2.4" vector-effect="non-scaling-stroke"/>' +
-      '<text x="' + n2(s.x + s.w / 2) + '" y="' + n2(s.y + s.h / 2) + '" dy=".35em" text-anchor="middle" font-family="Atkinson Hyperlegible, Segoe UI, sans-serif" font-weight="700" font-size="' + n2(Math.min(7, s.w * .24)) + '" fill="#ffe7a6">Foto</text></svg>';
+      '<text x="' + n2(s.x + s.w / 2) + '" y="' + n2(s.y + s.h / 2) + '" dy=".35em" text-anchor="middle" font-family="Atkinson Hyperlegible, Segoe UI, sans-serif" font-weight="700" font-size="' + n2(Math.min(7, s.w * .24)) + '" fill="#ffe7a6">' + tx('schneemann.foto.platzhalter', 'Foto') + '</text></svg>';
   }
   function sacheSVG(id, extra) { return '<svg viewBox="-11 -11 22 22" aria-hidden="true"' + (extra || '') + '>' + teileSVG(SACHE[id].t, BASIS) + '</svg>'; }
 
@@ -1506,11 +1519,11 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
       var fk = figurKachel(t);
       h = '<span class="figur"><svg viewBox="0 0 100 120" aria-hidden="true" focusable="false">' + fk.svg + '</svg><span class="foto" style="' + fk.foto + '"><img alt="" decoding="async" draggable="false"></span></span>';
     } else h = '<span class="figur">' + figurSVG(t, z) + '</span>';
-    if (z === 'heute') h += '<span class="marke" aria-hidden="true">Heute</span><span class="pfeil" aria-hidden="true"></span>';
+    if (z === 'heute') h += '<span class="marke" aria-hidden="true">' + tx('schneemann.platz.heute', 'Heute') + '</span><span class="pfeil" aria-hidden="true"></span>';
     b.innerHTML = h;
-    var name = z === 'zu' ? '' : ' (' + figInfo(t).name + ')';
-    var status = z === 'offen' ? 'gebaut, Foto ansehen' : z === 'heute' ? 'heute bauen' : z === 'verpasst' ? 'verpasst, jetzt nachholen' : 'noch nicht dran';
-    b.setAttribute('aria-label', 'Tag ' + t + name + ', ' + K.datumText(t) + ' – ' + status);
+    var status = z === 'offen' ? tx('schneemann.platz.offen', 'gebaut, Foto ansehen') : z === 'heute' ? tx('schneemann.platz.heuteBauen', 'heute bauen') : z === 'verpasst' ? tx('schneemann.platz.verpasst', 'verpasst, jetzt nachholen') : tx('schneemann.platz.zu', 'noch nicht dran');
+    b.setAttribute('aria-label', z === 'zu' ? tx('schneemann.platz.label', 'Tag {n}, {datum} – {status}', { n: t, datum: K.datumText(t), status: status })
+      : tx('schneemann.platz.labelFigur', 'Tag {n} ({figur}), {datum} – {status}', { n: t, figur: figInfo(t).name, datum: K.datumText(t), status: status }));
     if (z === 'offen') ladeMini(t);
   }
   function tiefe() {
@@ -1543,42 +1556,42 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
   function karte() {
     var h = K.heute(), v = verpassteListe(), html = '', n = K.geoeffnet().length;
     if (h === 0) {
-      html = '<p class="karte-zeile"><strong>Noch ist November.</strong>Ab 1. Dezember liegt hier jeden Tag ein neuer Bauplan: Schneemann, Pinguin, Iglu … und jede Figur hält ein Foto.</p>' +
-        '<div class="knoepfe"><button type="button" class="knopf knopf-wolle" data-aktion="ueben"><svg aria-hidden="true"><use href="#i-kugel"/></svg><span>Schon mal üben</span></button></div>';
+      html = '<p class="karte-zeile"><strong>' + tx('schneemann.karte.november', 'Noch ist November.') + '</strong>' + tx('schneemann.karte.novemberText', 'Ab 1. Dezember liegt hier jeden Tag ein neuer Bauplan: Schneemann, Pinguin, Iglu … und jede Figur hält ein Foto.') + '</p>' +
+        '<div class="knoepfe"><button type="button" class="knopf knopf-wolle" data-aktion="ueben"><svg aria-hidden="true"><use href="#i-kugel"/></svg><span>' + tx('schneemann.karte.ueben', 'Schon mal üben') + '</span></button></div>';
     } else if (h >= 25) {
-      html = '<p class="karte-zeile"><strong>Frohe Weihnachten!</strong>' + (n === 24 ? 'Alle 24 Schneefiguren stehen auf der Wiese.' : n === 0 ? 'Alle Bauplätze sind offen – such dir einen Schneehaufen aus und bau los.' : n + ' von 24 Schneefiguren stehen auf der Wiese.') + '</p>' +
-        (n ? '<div class="knoepfe"><button type="button" class="knopf knopf-wolle" data-aktion="alle"><svg aria-hidden="true"><use href="#i-gross"/></svg><span>Alle Fotos ansehen</span></button></div>' : '');
+      html = '<p class="karte-zeile"><strong>' + tx('schneemann.karte.weihnachten', 'Frohe Weihnachten!') + '</strong>' + (n === 24 ? tx('schneemann.karte.alleStehen', 'Alle 24 Schneefiguren stehen auf der Wiese.') : n === 0 ? tx('schneemann.karte.alleOffen', 'Alle Bauplätze sind offen – such dir einen Schneehaufen aus und bau los.') : tx('schneemann.karte.teil', '{n} von 24 Schneefiguren stehen auf der Wiese.', { n: n })) + '</p>' +
+        (n ? '<div class="knoepfe"><button type="button" class="knopf knopf-wolle" data-aktion="alle"><svg aria-hidden="true"><use href="#i-gross"/></svg><span>' + tx('schneemann.karte.alleFotos', 'Alle Fotos ansehen') + '</span></button></div>' : '');
     } else {
       var info = figInfo(h);
       if (K.istGeoeffnet(h)) {
-        html = '<p class="karte-zeile"><strong>' + gross1(info.ein) + ' steht schon.</strong>' + (h < 24 ? 'Morgen wartet ein neuer Bauplan.' : 'Frohe Weihnachten!') + '</p>' +
-          '<div class="knoepfe"><button type="button" class="knopf knopf-wolle" data-aktion="ansehen" data-tag="' + h + '"><svg aria-hidden="true"><use href="#i-gross"/></svg><span>Foto von heute</span></button>' +
-          '<button type="button" class="knopf knopf-schnee" data-aktion="bauen" data-tag="' + h + '">Nochmal bauen</button></div>';
+        html = '<p class="karte-zeile"><strong>' + tx('schneemann.karte.steht', '{figur} steht schon.', { figur: gross1(info.ein) }) + '</strong>' + (h < 24 ? tx('schneemann.karte.morgen', 'Morgen wartet ein neuer Bauplan.') : tx('schneemann.karte.weihnachten', 'Frohe Weihnachten!')) + '</p>' +
+          '<div class="knoepfe"><button type="button" class="knopf knopf-wolle" data-aktion="ansehen" data-tag="' + h + '"><svg aria-hidden="true"><use href="#i-gross"/></svg><span>' + tx('schneemann.karte.fotoHeute', 'Foto von heute') + '</span></button>' +
+          '<button type="button" class="knopf knopf-schnee" data-aktion="bauen" data-tag="' + h + '">' + tx('schneemann.bau.nochmal', 'Nochmal bauen') + '</button></div>';
       } else {
         var st = stil(h), d = figur(h, st, F.format && F.format(h) === 'hoch' ? 2 / 3 : 1);
-        html = '<div class="karte-plan"><div class="mini" aria-hidden="true">' + planSVG(d, farben(st)) + '</div><p class="karte-zeile"><strong>Heute ist ' + K.datumText(h) + '.</strong>Auf dem Bauplan steht ' + info.ein + (h === 24 ? ' – die festlichste Figur von allen.' : '.') + '</p></div>' +
-          '<div class="knoepfe"><button type="button" class="knopf knopf-wolle" data-aktion="bauen" data-tag="' + h + '"><svg aria-hidden="true"><use href="#i-kugel"/></svg><span>' + info.name + ' bauen</span></button>' +
-          '<button type="button" class="knopf knopf-schnee" data-aktion="zeigen" data-tag="' + h + '">Wo ist der Platz?</button></div>';
+        html = '<div class="karte-plan"><div class="mini" aria-hidden="true">' + planSVG(d, farben(st)) + '</div><p class="karte-zeile"><strong>' + tx('schneemann.karte.heute', 'Heute ist {datum}.', { datum: K.datumText(h) }) + '</strong>' +
+          (h === 24 ? tx('schneemann.karte.planFest', 'Auf dem Bauplan steht {figur} – die festlichste Figur von allen.', { figur: info.ein }) : tx('schneemann.karte.plan', 'Auf dem Bauplan steht {figur}.', { figur: info.ein })) + '</p></div>' +
+          '<div class="knoepfe"><button type="button" class="knopf knopf-wolle" data-aktion="bauen" data-tag="' + h + '"><svg aria-hidden="true"><use href="#i-kugel"/></svg><span>' + tx('schneemann.karte.bauen', '{figur} bauen', { figur: info.name }) + '</span></button>' +
+          '<button type="button" class="knopf knopf-schnee" data-aktion="zeigen" data-tag="' + h + '">' + tx('schneemann.karte.wo', 'Wo ist der Platz?') + '</button></div>';
       }
     }
     if (v.length) {
       var chips = '', liste = v.slice(-6);
-      liste.forEach(function (t) { chips += '<button type="button" class="chip" data-aktion="bauen" data-tag="' + t + '" aria-label="Tag ' + t + ' nachholen: ' + figInfo(t).name + ', ' + K.datumText(t) + '">' + t + '</button>'; });
-      html += '<p class="karte-verpasst"><span>' + (h >= 25 ? 'Noch nicht gebaut:' : 'Verpasst, noch nicht gebaut:') + '</span>' + chips + (v.length > liste.length ? '<span>und ' + (v.length - liste.length) + ' weitere</span>' : '') + '</p>';
+      liste.forEach(function (t) { chips += '<button type="button" class="chip" data-aktion="bauen" data-tag="' + t + '" aria-label="' + tx('schneemann.karte.chip', 'Tag {n} nachholen: {figur}, {datum}', { n: t, figur: figInfo(t).name, datum: K.datumText(t) }) + '">' + t + '</button>'; });
+      html += '<p class="karte-verpasst"><span>' + (h >= 25 ? tx('schneemann.karte.nochNicht', 'Noch nicht gebaut:') : tx('schneemann.karte.verpasst', 'Verpasst, noch nicht gebaut:')) + '</span>' + chips + (v.length > liste.length ? '<span>' + tx('schneemann.karte.weitere', 'und {n} weitere', { n: v.length - liste.length }) + '</span>' : '') + '</p>';
     }
     el.karte.innerHTML = html;
   }
   function hilfeText() {
     var h = K.heute(), n = K.geoeffnet().length, v = verpassteListe().length, teile = [];
-    el.zaehler.textContent = h === 0 ? '24 Plätze warten' : n === 0 ? 'Noch steht keine Figur' : n === 1 ? '1 Figur steht' : n + ' Figuren stehen';
-    if (h === 0) teile.push('Die Holzpflöcke markieren die 24 Bauplätze. Ab 1. Dezember geht es los.');
+    if (h === 0) teile.push(tx('schneemann.hilfe.november', 'Die Holzpflöcke markieren die 24 Bauplätze. Ab 1. Dezember geht es los.'));
     else {
-      teile.push(n ? 'Tippe eine Figur an, um ihr Foto zu sehen.' : h >= 25 ? 'Alle Bauplätze sind offen – such dir einen Schneehaufen aus.' : 'Der leuchtende Bauplatz ist für heute.');
-      if (v && (n || h < 25)) teile.push(h >= 25 ? 'Schneehaufen mit Schaufel kannst du jetzt noch bauen.' : 'Schneehaufen mit Schaufel sind verpasst und warten noch.');
-      if (h < 24) teile.push('Holzpflöcke kommen erst.');
+      teile.push(n ? tx('schneemann.hilfe.ansehen', 'Tippe eine Figur an, um ihr Foto zu sehen.') : h >= 25 ? tx('schneemann.hilfe.alleOffen', 'Alle Bauplätze sind offen – such dir einen Schneehaufen aus.') : tx('schneemann.hilfe.heute', 'Der leuchtende Bauplatz ist für heute.'));
+      if (v && (n || h < 25)) teile.push(h >= 25 ? tx('schneemann.hilfe.nachBauen', 'Schneehaufen mit Schaufel kannst du jetzt noch bauen.') : tx('schneemann.hilfe.verpasst', 'Schneehaufen mit Schaufel sind verpasst und warten noch.'));
+      if (h < 24) teile.push(tx('schneemann.hilfe.pfloecke', 'Holzpflöcke kommen erst.'));
     }
     el.hilfe.textContent = teile.join(' ');
-    el.unterzeile.textContent = h >= 25 ? 'Alle Bauplätze sind offen – frohe Weihnachten!' : 'Jeden Tag eine andere Schneefigur – und jede hält ein Foto.';
+    el.unterzeile.textContent = h >= 25 ? tx('schneemann.unterzeile.weihnachten', 'Alle Bauplätze sind offen – frohe Weihnachten!') : tx('schneemann.unterzeile.advent', 'Jeden Tag eine andere Schneefigur – und jede hält ein Foto.');
   }
 
   /* ---------- Sprechblase für gesperrte Tage ---------- */
@@ -1601,7 +1614,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
   }
   function sperre(btn, t) {
     btn.classList.remove('wackelt'); void btn.offsetWidth; btn.classList.add('wackelt');
-    zeigeBlase(btn, K.sperrText(t), 'Bauplatz ' + t + ' ist am ' + K.datumText(t) + ' dran.');
+    zeigeBlase(btn, K.sperrText(t), tx('schneemann.blase.dran', 'Bauplatz {n} ist am {datum} dran.', { n: t, datum: K.datumText(t) }));
   }
   el.plaetze.addEventListener('animationend', function (e) {
     var b = e.target.closest && e.target.closest('.platz');
@@ -1641,7 +1654,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     sichtbarMachen(b);
     b.classList.remove('zeigen'); void b.offsetWidth; b.classList.add('zeigen');
     try { b.focus({ preventScroll: true }); } catch (x) { b.focus(); }
-    sage('Der Bauplatz für Tag ' + t + ' ist markiert.');
+    sage(tx('schneemann.sage.markiert', 'Der Bauplatz für Tag {n} ist markiert.', { n: t }));
     setTimeout(function () { b.classList.remove('zeigen'); }, 3200);
   }
   function popKachel(t) {
@@ -2029,8 +2042,8 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     var r = zufall(liste.length + B.versuch * 7);
     for (i = liste.length - 1; i > 0; i--) { var j = (r() * (i + 1)) | 0, t = liste[i]; liste[i] = liste[j]; liste[j] = t; }
     B.neuschnee = { liste: liste, i: 0, t: 0, dauer: RED ? .01 : 2.2 };
-    hinweis('Es schneit frischen Schnee – roll weiter!');
-    sage('Es schneit frischen Schnee.');
+    hinweis(tx('schneemann.hinweis.neuschnee', 'Es schneit frischen Schnee – roll weiter!'));
+    sage(tx('schneemann.sage.neuschnee', 'Es schneit frischen Schnee.'));
     return true;
   }
   function neuschneeSchritt(dt) {
@@ -2072,7 +2085,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
   function offeneKugeln() { var o = []; for (var i = 0; i < B.def.kugeln.length; i++) if (!B.platziert[i]) o.push(i); return o; }
   function groesse(k) {
     k.R = k.r0 + (k.rT - k.r0) * Math.pow(Math.max(0, k.p), .9);
-    if (k.p >= .5 && !k.halb) { k.halb = true; if (!B.auto) hinweis(offeneKugeln().length === B.def.kugeln.length ? 'Schon halb so groß – weiter so!' : 'Halb geschafft!'); }
+    if (k.p >= .5 && !k.halb) { k.halb = true; if (!B.auto) hinweis(offeneKugeln().length === B.def.kugeln.length ? tx('schneemann.hinweis.halbErste', 'Schon halb so groß – weiter so!') : tx('schneemann.hinweis.halb', 'Halb geschafft!')); }
     if (k.p >= 1 && !k.fertig) kugelFertig(k);
   }
   // Wände (Steine, Bäume, Warnzaun) und der Bauplatz der Figur schieben die Kugel weg
@@ -2125,8 +2138,8 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
       var a = Math.random() * TAU, v = 50 + Math.random() * 90;
       B.partikel.push({ x: s.x, y: s.y - B.E * .5, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 30, r: 1.8 + Math.random() * 1.8, leben: .6 + Math.random() * .3, art: 'stern' });
     }
-    hinweis(SACHE[s.id].name + ' gefunden! Die kommt nachher an die Figur.');
-    sage(SACHE[s.id].name + ' gefunden.');
+    hinweis(tx('schneemann.hinweis.gefunden', '{sache} gefunden! Die kommt nachher an die Figur.', { sache: gross1(SACHE[s.id].name) }));
+    sage(tx('schneemann.sage.gefunden', '{sache} gefunden.', { sache: gross1(SACHE[s.id].name) }));
   }
   function bewege(k, dx, dy, wachsen) {
     var d = Math.sqrt(dx * dx + dy * dy);
@@ -2162,15 +2175,15 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     zisch(); vibriere(60);
     B.pfuetzen.push({ x: k.gx, y: k.gy, R: k.R });   // Schmelzwasser (auf der Szene, über dem warmen Boden)
     markiere(k.gx, k.gy, k.R, k.R * Q, 1, true);
-    B.texte.push({ x: k.gx, y: k.gy - k.R * 1.9, t: 0, text: 'Zisch – geschmolzen!' });
+    B.texte.push({ x: k.gx, y: k.gy - k.R * 1.9, t: 0, text: tx('schneemann.schmelzen.zisch', 'Zisch – geschmolzen!') });
     for (var i = 0; i < (RED ? 0 : 16); i++) B.partikel.push({ x: k.gx + (Math.random() - .5) * k.R * 1.2, y: k.gy - Math.random() * k.R * 1.4, vx: (Math.random() - .5) * 40, vy: -30 - Math.random() * 50, r: k.R * (.18 + Math.random() * .2), leben: .9 + Math.random() * .6, art: 'dampf' });
-    var w = WARM[o.typ] || WARM.feuer, txt = 'Zisch – geschmolzen! Die Kugel fängt neu an. Roll im Bogen ' + w.um + '.';
+    var w = WARM[o.typ] || WARM.feuer, txt = tx('schneemann.schmelzen.bogen', 'Zisch – geschmolzen! Die Kugel fängt neu an. Roll im Bogen {um}.', { um: w.um });
     if (B.schmelzZahl >= 2 && !B.zaun) {
-      if (B.schmelzZahl >= 3) { zaunAn(true); txt = 'Zisch! Ab jetzt hält ein Warnzaun die Kugel vom Warmen fern.'; }
-      else { el.zaunKnopf.hidden = false; txt = 'Zweimal geschmolzen! Ein Warnzaun hilft – oder roll im großen Bogen herum.'; }
+      if (B.schmelzZahl >= 3) { zaunAn(true); txt = tx('schneemann.schmelzen.zaunAuto', 'Zisch! Ab jetzt hält ein Warnzaun die Kugel vom Warmen fern.'); }
+      else { el.zaunKnopf.hidden = false; txt = tx('schneemann.schmelzen.zweimal', 'Zweimal geschmolzen! Ein Warnzaun hilft – oder roll im großen Bogen herum.'); }
     }
     hinweis(txt, true);
-    sage('Die Kugel ist geschmolzen und fängt neu an.' + (B.schmelzZahl === 2 && !B.zaun ? ' Du kannst einen Warnzaun aufstellen.' : ''));
+    sage(tx('schneemann.sage.geschmolzen', 'Die Kugel ist geschmolzen und fängt neu an.') + (B.schmelzZahl === 2 && !B.zaun ? ' ' + tx('schneemann.sage.zaunTipp', 'Du kannst einen Warnzaun aufstellen.') : ''));
     starte();
   }
   function schmelzSchritt(dt) {
@@ -2185,8 +2198,8 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     if (B.zaun) return;
     B.zaun = true; el.zaunKnopf.hidden = true;
     vibriere(12); klang([523, 659], .2, .08);
-    if (!auto) hinweis('Der Warnzaun steht. Jetzt kann die Kugel nicht mehr ins Warme rollen.');
-    sage('Warnzaun aufgestellt.');
+    if (!auto) hinweis(tx('schneemann.hinweis.zaun', 'Der Warnzaun steht. Jetzt kann die Kugel nicht mehr ins Warme rollen.'));
+    sage(tx('schneemann.sage.zaun', 'Warnzaun aufgestellt.'));
     if (B.aktiv) { var p = schiebeRaus(B.aktiv, B.aktiv.gx, B.aktiv.gy); B.aktiv.gx = p[0]; B.aktiv.gy = p[1]; }
     if (B.phase === 'schmelzen' || B.phase === 'rollen' || B.phase === 'plan') { male(); starte(); }
   }
@@ -2198,14 +2211,14 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     hudSetzen(); vibriere(24); klang([660, 990], .22, .1);
     kruemelStoss(k.gx, k.gy - k.R * .9, k.R, 12, k.gy + k.R * .1);
     var rest = offeneKugeln().length - 1;
-    if (!B.auto) hinweis(rest ? 'Groß genug! Hopp – ab zum Bauplatz.' : 'Die letzte Kugel ist fertig!');
-    sage('Kugel ' + (k.i + 1) + ' von ' + B.def.kugeln.length + ' ist fertig.');
+    if (!B.auto) hinweis(rest ? tx('schneemann.hinweis.grossGenug', 'Groß genug! Hopp – ab zum Bauplatz.') : tx('schneemann.hinweis.letzte', 'Die letzte Kugel ist fertig!'));
+    sage(tx('schneemann.sage.kugelFertig', 'Kugel {n} von {gesamt} ist fertig.', { n: k.i + 1, gesamt: B.def.kugeln.length }));
   }
   function starteHopp(k) {
     var slot = B.def.kugeln[k.i], x1 = B.FX + slot.x * B.fu, y1 = B.FY + slot.y * B.fu, x0 = k.gx, y0 = k.gy - .92 * k.R, d = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
     B.phase = 'hopp';
     B.hopp = { k: k, x0: x0, y0: y0, x: x0, y: y0, x1: x1, y1: y1, t: 0, dauer: RED ? .2 : klemm(.4 + d / 1400, .45, .85), bogen: RED ? 0 : Math.max(50, d * .35), sx: k.gx, sy: k.gy, syZiel: slot.sy || 1 };
-    if (!B.auto) hinweis('Hopp!');
+    if (!B.auto) hinweis(tx('schneemann.hinweis.hopp', 'Hopp!'));
   }
   function hoppSchritt(dt) {
     var h = B.hopp, u;
@@ -2248,7 +2261,11 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     B.aktiv = k; B.phase = 'rollen';
     if (B.auto) { B.auto.t = 0; B.auto.ax = p.x; B.auto.ay = p.y; }
     hudSetzen();
-    if (!B.auto && !nachSchmelzen) hinweis('Kugel ' + (i + 1) + ' von ' + n + ': ' + (groessenWort(B.def.kugeln[i].r) === 'winzig' ? 'eine ganz kleine.' : 'eine ' + { 'groß': 'große', mittel: 'mittlere', klein: 'kleine' }[groessenWort(B.def.kugeln[i].r)] + '.'));
+    if (!B.auto && !nachSchmelzen) {
+      var kw = { n: i + 1, gesamt: n };
+      hinweis({ 'groß': tx('schneemann.kugel.gross', 'Kugel {n} von {gesamt}: eine große.', kw), mittel: tx('schneemann.kugel.mittel', 'Kugel {n} von {gesamt}: eine mittlere.', kw),
+        klein: tx('schneemann.kugel.klein', 'Kugel {n} von {gesamt}: eine kleine.', kw), winzig: tx('schneemann.kugel.winzig', 'Kugel {n} von {gesamt}: eine ganz kleine.', kw) }[groessenWort(B.def.kugeln[i].r)]);
+    }
     B.hinweisBis = RED || B.auto ? 0 : B.zeit + (nachSchmelzen ? 3 : B.beruehrt ? 2.4 : 5);
     kruemelStoss(p.x, p.y - k.R, k.R * 2, 6, p.y + 4);
     starte();
@@ -2284,7 +2301,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     B.phase = 'zoom'; B.aktiv = null; B.zug = null; B.auto = null; B.hinweisBis = 0;
     el.lassen.setAttribute('aria-disabled', 'true'); el.zaunKnopf.hidden = true;
     B.camVon = { s: B.cam.s, x: B.cam.x, y: B.cam.y }; B.camZiel = kameraZiel(); B.camT = 0; kopfFrei();
-    hinweis(B.tag === null ? 'Fertig gerollt! Jetzt wird geschmückt …' : 'Fertig gerollt! Jetzt wird geschmückt – dann kommt das Foto.');
+    hinweis(B.tag === null ? tx('schneemann.hinweis.schmueckenUeben', 'Fertig gerollt! Jetzt wird geschmückt …') : tx('schneemann.hinweis.schmuecken', 'Fertig gerollt! Jetzt wird geschmückt – dann kommt das Foto.'));
     layoutSchild();
     if (RED) { setzeKamera(B.camZiel); starteSchmuck(); }
     starte();
@@ -2330,12 +2347,12 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     var voll = t !== null && neu && K.geoeffnet().length === 24;
     el.fussBauen.hidden = true; el.fussFertig.hidden = false;
     if (t === null) {
-      el.fertigTitel.textContent = 'Gut geübt!';
-      el.fertigDatum.textContent = 'Ab 1. Dezember hält jede Figur ein Foto.';
+      el.fertigTitel.textContent = tx('schneemann.fertig.ueben', 'Gut geübt!');
+      el.fertigDatum.textContent = tx('schneemann.fertig.uebenText', 'Ab 1. Dezember hält jede Figur ein Foto.');
       el.gross.hidden = true;
     } else {
-      el.fertigTitel.textContent = ti || gross1(info.ein) + ' – fertig!';
-      el.fertigDatum.textContent = voll ? 'Alle 24 Schneefiguren stehen – die Wiese ist voll!' : info.name + ' für den ' + t + '. Dezember';
+      el.fertigTitel.textContent = ti || tx('schneemann.fertig.titel', '{figur} – fertig!', { figur: gross1(info.ein) });
+      el.fertigDatum.textContent = voll ? tx('schneemann.fertig.voll', 'Alle 24 Schneefiguren stehen – die Wiese ist voll!') : tx('schneemann.fertig.datum', '{figur} für den {n}. Dezember', { figur: info.name, n: t });
       el.gross.hidden = false;
     }
     el.schild.tabIndex = t === null ? -1 : 0;
@@ -2349,8 +2366,9 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
       B.partikel.push({ x: cx + Math.cos(a) * s.w * fu * .4, y: cy + Math.sin(a) * s.h * fu * .4, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, r: 2 + Math.random() * 2.5, leben: .9 + Math.random() * .5, art: 'stern' });
     }
     var gef = Object.keys(B.gefunden).map(function (id) { return SACHE[id].name; });
-    sage((t === null ? 'Der Übungs-Schneemann ist fertig.' : gross1(info.ein) + ' ist fertig' + (ti ? ' und zeigt das Foto: ' + ti : '') + '.') +
-      (gef.length ? ' Gefunden: ' + gef.join(', ') + '.' : '') + (voll ? ' Alle 24 Figuren stehen!' : '') + (B.def.hut || B.def.schal ? ' Hut oder Schal kannst du antippen und tauschen.' : ''));
+    sage((t === null ? tx('schneemann.sage.uebenFertig', 'Der Übungs-Schneemann ist fertig.') : ti ? tx('schneemann.sage.fertigFoto', '{figur} ist fertig und zeigt das Foto: {titel}.', { figur: gross1(info.ein), titel: ti })
+      : tx('schneemann.sage.fertig', '{figur} ist fertig.', { figur: gross1(info.ein) })) + (gef.length ? ' ' + tx('schneemann.sage.gefundenListe', 'Gefunden: {liste}.', { liste: gef.join(', ') }) : '') +
+      (voll ? ' ' + tx('schneemann.sage.alle', 'Alle 24 Figuren stehen!') : '') + (B.def.hut || B.def.schal ? ' ' + tx('schneemann.sage.tauschen', 'Hut oder Schal kannst du antippen und tauschen.') : ''));
     var z = t === null ? el.zurWiese : el.gross;
     try { z.focus({ preventScroll: true }); } catch (x) { z.focus(); }
     starte();
@@ -2502,7 +2520,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
       rundRechteck(g, sc.x, sc.y, sc.w, sc.h, 1.6); g.fill(); g.stroke();
       g.setLineDash([]); g.fillStyle = hell ? 'rgba(255,255,255,.55)' : 'rgba(37,48,90,.34)';
       g.font = '700 ' + n2(Math.max(11 / fu, Math.min(sc.w * .22, 7))) + 'px "Atkinson Hyperlegible", "Segoe UI", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText('Foto', sc.x + sc.w / 2, sc.y + sc.h / 2);
+      g.fillText(tx('schneemann.foto.platzhalter', 'Foto'), sc.x + sc.w / 2, sc.y + sc.h / 2);
       g.restore();
     }
     g.restore();
@@ -2769,7 +2787,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
       k.vx = (zx - k.gx) * 10; k.vy = (zy - k.gy) * 10;
       if (!k.fertig) { k.p = Math.min(1, k.p + dt / autoDauer(k.i)); k.weg = k.p * k.bedarf; }
     } else if (B.zug && wachsen) {
-      var tx = B.zug.x + B.zug.ox, ty = B.zug.y + B.zug.oy, griff = k.eis ? 2.4 : 16, wx = (tx - k.gx) * 13, wy = (ty - k.gy) * 13, l = Math.sqrt(wx * wx + wy * wy);
+      var zielX = B.zug.x + B.zug.ox, zielY = B.zug.y + B.zug.oy, griff = k.eis ? 2.4 : 16, wx = (zielX - k.gx) * 13, wy = (zielY - k.gy) * 13, l = Math.sqrt(wx * wx + wy * wy);
       if (l > 1700) { wx *= 1700 / l; wy *= 1700 / l; }
       a = Math.min(1, dt * griff); k.vx += (wx - k.vx) * a; k.vy += (wy - k.vy) * a;
     } else if (tr && wachsen && !B.auto) {
@@ -2786,13 +2804,13 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     if (!dx && !dy && pruefeWarm(k)) return;
     if (B.auto) { groesse(k); return; }
     var gerollt = Math.sqrt(dx * dx + dy * dy);
-    if (k.eis && !B.tippEis) { B.tippEis = true; hinweis('Eis! Hier rutscht die Kugel – und wächst nicht.'); }
+    if (k.eis && !B.tippEis) { B.tippEis = true; hinweis(tx('schneemann.hinweis.eis', 'Eis! Hier rutscht die Kugel – und wächst nicht.')); }
     if (k.inGlut) {
       if (k.p > 0) {
         k.p = Math.max(0, k.p - dt * .3); k.weg = k.p * k.bedarf; groesse(k);
         if (!RED && Math.random() < dt * 16) B.partikel.push({ x: k.gx + (Math.random() - .5) * k.R, y: k.gy - k.R * .3, vx: 0, vy: 30, r: 1.6 + Math.random(), leben: .4, boden: k.gy + 3, art: 'tropfen' });
       }
-      if (B.zeit > B.tippHeiss) { B.tippHeiss = B.zeit + 4; hinweis('Heiß! Schnell weg ' + (WARM[k.inGlut.typ] || WARM.feuer).vom + '!', true); sage('Achtung, warm!'); }
+      if (B.zeit > B.tippHeiss) { B.tippHeiss = B.zeit + 4; hinweis(tx('schneemann.hinweis.heiss', 'Heiß! Schnell weg {vom}!', { vom: (WARM[k.inGlut.typ] || WARM.feuer).vom }), true); sage(tx('schneemann.sage.warm', 'Achtung, warm!')); }
     }
     if (!k.fertig && (B.zug || tr) && gerollt > .15 && !k.inGlut) {
       k.rollZeit += dt;
@@ -2802,7 +2820,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     if (!B.lassenWink) {
       var nK = B.def.kugeln.length, fertigK = B.platziert.filter(Boolean).length, dauer = B.zeit - B.startZeit;
       var soll = 24 + 18 * nK + (B.schmelzZahl >= 2 ? -10 : 0), stockt = dauer > 18 * (fertigK + 1) + 22 + k.p * 10;
-      if (dauer > soll && stockt) { B.lassenWink = true; el.lassen.classList.add('winkt'); hinweis('Puh, ganz schön knifflig? Du kannst die Figur auch bauen lassen.'); }
+      if (dauer > soll && stockt) { B.lassenWink = true; el.lassen.classList.add('winkt'); hinweis(tx('schneemann.hinweis.knifflig', 'Puh, ganz schön knifflig? Du kannst die Figur auch bauen lassen.')); }
     }
     var v = Math.sqrt(k.vx * k.vx + k.vy * k.vy);
     if (!k.fertig && v > 60 && B.frischJetzt > .25 && Math.random() < Math.min(.9, v / 900) * B.frischJetzt) {
@@ -2811,7 +2829,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     }
     if ((B.zug || tr) && gerollt > .2 && !k.eis) {
       if (B.frischMittel < .3) B.trocken += dt; else B.trocken = Math.max(0, B.trocken - dt * 2);
-      if (B.trocken > 1.2 && B.zeit > B.tippGras && !B.neuschnee) { B.tippGras = B.zeit + 9; hinweis('Hier liegt kein Schnee mehr – such frischen, weißen Schnee!'); }
+      if (B.trocken > 1.2 && B.zeit > B.tippGras && !B.neuschnee) { B.tippGras = B.zeit + 9; hinweis(tx('schneemann.hinweis.gras', 'Hier liegt kein Schnee mehr – such frischen, weißen Schnee!')); }
       if (B.trocken > 4 && !B.neuschnee && B.zeit > B.neuschneeBis) { if (!starteNeuschnee()) B.neuschneeBis = B.zeit + 5; }
     }
   }
@@ -2866,7 +2884,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     else if (B.offen) starte();
   });
   function hinweis(text, warm) { el.hinweis.textContent = text; el.hinweis.classList.toggle('warm', !!warm); }
-  function startHinweis() { return MAUS ? 'Zieh die Kugel mit der Maus (oder mit den Pfeiltasten) durch frischen Schnee – so wächst sie.' : 'Roll die Kugel mit dem Finger durch frischen Schnee – so wächst sie.'; }
+  function startHinweis() { return MAUS ? tx('schneemann.hinweis.startMaus', 'Zieh die Kugel mit der Maus (oder mit den Pfeiltasten) durch frischen Schnee – so wächst sie.') : tx('schneemann.hinweis.startFinger', 'Roll die Kugel mit dem Finger durch frischen Schnee – so wächst sie.'); }
 
   /* --- Fortschritt oben rechts --- */
   function hudBauen() {
@@ -2890,27 +2908,27 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
       e.classList.toggle('voll', !!(k && k.fertig)); e.classList.toggle('jetzt', !!(k && !k.fertig));
     }
     el.hudZahl.textContent = fertig + '/' + ks.length;
-    el.hud.setAttribute('aria-label', 'Bauplan zeigen – ' + fertig + ' von ' + ks.length + ' Kugeln stehen');
+    el.hud.setAttribute('aria-label', tx('schneemann.hud.stand', 'Bauplan zeigen – {n} von {gesamt} Kugeln stehen', { n: fertig, gesamt: ks.length }));
   }
 
   /* --- Bauplan des Tages --- */
-  function aufzaehlen(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' und ' + a[a.length - 1]; }
+  function aufzaehlen(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' ' + tx('schneemann.und', 'und') + ' ' + a[a.length - 1]; }
   function zeigePlan(start) {
     var d = B.def, info = d.info, li = [], typen = [], hatEis = false;
     el.plan.hidden = false;
     el.planBild.innerHTML = planSVG(d, B.f, el.planBild.clientWidth || 120);
-    el.planTitel.textContent = B.tag === null ? 'Übungs-Schneemann' : gross1(info.ein);
-    el.planKugeln.textContent = d.kugeln.length + ' Kugeln: ' + d.kugeln.map(function (k) { return groessenWort(k.r); }).join(', ') + '.';
+    el.planTitel.textContent = B.tag === null ? tx('schneemann.plan.ueben', 'Übungs-Schneemann') : gross1(info.ein);
+    el.planKugeln.textContent = tx('schneemann.plan.kugeln', '{n} Kugeln: {liste}.', { n: d.kugeln.length, liste: d.kugeln.map(function (k) { return GROESSE[groessenWort(k.r)]; }).join(', ') });
     el.planReihe.innerHTML = d.kugeln.map(function (k, i) { var px = Math.round(klemm(k.r * 1.3, 20, 30)); return '<i style="width:' + px + 'px;height:' + px + 'px">' + (i + 1) + '</i>'; }).join('');
     // Liste aus dem, was heute wirklich im Schneefeld liegt
     B.hind.forEach(function (o) { if (o.warm && typen.indexOf(o.typ) < 0) typen.push(o.typ); if (o.typ === 'eis') hatEis = true; });
-    if (typen.length) li.push('<li class="warm"><svg aria-hidden="true"><use href="#h-' + typen[0] + '"/></svg><span><b>Warm = schmilzt!</b> ' + gross1(aufzaehlen(typen.map(function (t) { return WARM[t].name; }))) + '</span></li>');
-    if (hatEis) li.push('<li><svg aria-hidden="true"><use href="#h-eis"/></svg><span><b>Eis = rutscht.</b> Da wächst nichts.</span></li>');
-    li.push('<li><svg aria-hidden="true"><use href="#h-gras"/></svg><span><b>Grün = kein Schnee.</b> Roll durch Weißes.</span></li>');
+    if (typen.length) li.push('<li class="warm"><svg aria-hidden="true"><use href="#h-' + typen[0] + '"/></svg><span><b>' + tx('schneemann.plan.warm', 'Warm = schmilzt!') + '</b> ' + gross1(aufzaehlen(typen.map(function (t) { return WARM[t].name; }))) + '</span></li>');
+    if (hatEis) li.push('<li><svg aria-hidden="true"><use href="#h-eis"/></svg><span><b>' + tx('schneemann.plan.eis', 'Eis = rutscht.') + '</b> ' + tx('schneemann.plan.eisText', 'Da wächst nichts.') + '</span></li>');
+    li.push('<li><svg aria-hidden="true"><use href="#h-gras"/></svg><span><b>' + tx('schneemann.plan.gras', 'Grün = kein Schnee.') + '</b> ' + tx('schneemann.plan.grasText', 'Roll durch Weißes.') + '</span></li>');
     var sachen = info.sachen.filter(function (id) { return B.sachen.some(function (s) { return s.id === id && !s.weg; }); });
-    if (sachen.length) li.push('<li><svg aria-hidden="true"><use href="#h-finden"/></svg><span><b>Extra:</b> ' + aufzaehlen(sachen.map(function (id) { return SACHE[id].name; })) + ' finden.</span></li>');
+    if (sachen.length) li.push('<li><svg aria-hidden="true"><use href="#h-finden"/></svg><span><b>' + tx('schneemann.plan.extra', 'Extra:') + '</b> ' + tx('schneemann.plan.extraText', '{liste} finden.', { liste: aufzaehlen(sachen.map(function (id) { return SACHE[id].name; })) }) + '</span></li>');
     el.planListe.innerHTML = li.join('');
-    el.planLos.lastChild.textContent = start ? 'Los geht’s' : 'Weiter bauen';
+    el.planLos.lastChild.textContent = start ? tx('schneemann.plan.los', 'Los geht’s') : tx('schneemann.plan.weiter', 'Weiter bauen');
     el.plan.hidden = false; B.planOffen = true;
     if (!start) { B.zug = null; B.finger = null; }
     try { el.planLos.focus({ preventScroll: true }); } catch (x) { el.planLos.focus(); }
@@ -2953,8 +2971,8 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
         var a = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : B.bildAspekt;
         el.schildBild.src = img.src;
         var ti = titelVon(t);
-        el.schildBild.alt = 'Foto von Tag ' + t + (ti ? ': ' + ti : '');
-        el.schild.classList.remove('laedt'); el.schild.classList.add('ok'); el.schild.setAttribute('aria-label', 'Foto groß ansehen');
+        el.schildBild.alt = ti ? tx('schneemann.schild.altTitel', 'Foto von Tag {n}: {titel}', { n: t, titel: ti }) : tx('schneemann.schild.alt', 'Foto von Tag {n}', { n: t });
+        el.schild.classList.remove('laedt'); el.schild.classList.add('ok'); el.schild.setAttribute('aria-label', tx('schneemann.foto.gross', 'Foto groß ansehen'));
         if (Math.abs(a - B.bildAspekt) > .01) {
           B.bildAspekt = a; B.def = figur(B.tag, B.st, a);
           if (B.phase === 'ende' || B.phase === 'schmuck' || B.phase === 'zoom') { B.camZiel = kameraZiel(); if (B.phase !== 'zoom') setzeKamera(B.camZiel); }
@@ -2962,8 +2980,8 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
         }
       }, function () {
         if (mein !== B.bildToken) return;
-        el.schild.classList.remove('laedt'); el.schild.classList.add('fehler'); el.schild.setAttribute('aria-label', 'Foto nochmal laden');
-        el.schildStatus.innerHTML = '<span>Foto kommt später</span><span class="knopf knopf-schnee" role="presentation" style="min-height:36px;padding:.3rem .7rem;font-size:.85rem">Nochmal versuchen</span>';
+        el.schild.classList.remove('laedt'); el.schild.classList.add('fehler'); el.schild.setAttribute('aria-label', tx('schneemann.schild.neuLaden', 'Foto nochmal laden'));
+        el.schildStatus.innerHTML = '<span>' + tx('schneemann.schild.spaeter', 'Foto kommt später') + '</span><span class="knopf knopf-schnee" role="presentation" style="min-height:36px;padding:.3rem .7rem;font-size:.85rem">' + tx('schneemann.ansicht.nochmal', 'Nochmal versuchen') + '</span>';
       });
     }, 90);
   }
@@ -3012,7 +3030,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     }
     vibriere(10);
     if (B.tag) fuelleKachel(B.tag);
-    sage(was === 'hut' ? 'Neuer Hut.' : 'Neue Schalfarbe.');
+    sage(was === 'hut' ? tx('schneemann.sage.hut', 'Neuer Hut.') : tx('schneemann.sage.schal', 'Neue Schalfarbe.'));
     male(); starte();
   }
   el.wHut.addEventListener('click', function () { wechsle('hut'); });
@@ -3030,18 +3048,19 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     B.st = stil(t, null); B.f = farben(B.st); B.def = figur(t, B.st, B.bildAspekt);
     el.bau.classList.toggle('dunkel', !!B.thema.dunkel);
     el.buehne.style.background = B.thema.himmel[0];
-    el.bauTitel.textContent = t === null ? 'Zum Üben' : B.def.info.name;
+    el.bauTitel.textContent = t === null ? tx('schneemann.bau.ueben', 'Zum Üben') : B.def.info.name;
     // Auf schmalen Handys ein kurzes Datum („Do, 24. Dez.“), damit nichts abgeschnitten wird
-    if (t === null) el.bauDatum.innerHTML = '<span class="d-lang">Ab 1. Dezember mit Foto</span><span class="d-kurz" aria-hidden="true">Übungsrunde</span>';
+    if (t === null) el.bauDatum.innerHTML = '<span class="d-lang">' + tx('schneemann.bau.uebenLang', 'Ab 1. Dezember mit Foto') + '</span><span class="d-kurz" aria-hidden="true">' + tx('schneemann.bau.uebenKurz', 'Übungsrunde') + '</span>';
     else {
-      var nochmalTxt = K.istGeoeffnet(t) ? ' · nochmal' : '';
+      var nochmalTxt = K.istGeoeffnet(t) ? ' · ' + tx('schneemann.bau.nochmalKurz', 'nochmal') : '';
       el.bauDatum.innerHTML = '<span class="d-lang"></span><span class="d-kurz" aria-hidden="true"></span>';
       el.bauDatum.firstChild.textContent = K.datumText(t) + nochmalTxt;
       el.bauDatum.lastChild.innerHTML = '<span></span><span class="d-nochmal"></span>';
-      el.bauDatum.lastChild.firstChild.textContent = K.wochentag(t).slice(0, 2) + ', ' + t + '. Dez.';
+      el.bauDatum.lastChild.firstChild.textContent = tx('schneemann.bau.datumKurz', '{wt}, {n}. Dez.', { wt: I18N.datum(t, 'wochentagKurz').replace(/\.$/, ''), n: t });
       el.bauDatum.lastChild.lastChild.textContent = nochmalTxt;
     }
-    el.szene.setAttribute('aria-label', 'Schneefeld für ' + (t === null ? 'den Übungs-Schneemann' : B.def.info.ein) + ': Kugel mit den Pfeiltasten rollen');
+    el.szene.setAttribute('aria-label', t === null ? tx('schneemann.szene.ueben', 'Schneefeld für den Übungs-Schneemann: Kugel mit den Pfeiltasten rollen')
+      : tx('schneemann.szene.figur', 'Schneefeld für {figur}: Kugel mit den Pfeiltasten rollen', { figur: B.def.info.ein }));
     el.schild.hidden = true; el.schild.classList.remove('da', 'frei'); el.schild.tabIndex = -1;
     ladeSchild(t);
     el.fussBauen.hidden = false; el.fussFertig.hidden = true; el.lassen.hidden = false; el.lassen.removeAttribute('aria-disabled'); el.zaunKnopf.hidden = true;
@@ -3069,7 +3088,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     hudBauen();
     var zw = B.tag !== null ? ZWISCHEN[B.tag] : null;
     if (zw) { delete ZWISCHEN[B.tag]; fortsetzen(zw); }
-    else { hinweis('Schau dir den Bauplan an – dann geht’s los.'); zeigePlan(true); }
+    else { hinweis(tx('schneemann.hinweis.plan', 'Schau dir den Bauplan an – dann geht’s los.')); zeigePlan(true); }
     male();
   }
   // Halb gebaute Figur wiederherstellen (fertige Kugeln stehen schon, die aktuelle behält ihre Größe)
@@ -3087,8 +3106,8 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     if (B.schmelzZahl >= 2 && !B.zaun) el.zaunKnopf.hidden = false;
     hudSetzen();
     var n = (zw.fertig || []).length;
-    hinweis('Weiter geht’s – ' + (n ? (n === 1 ? 'eine Kugel steht schon.' : n + ' Kugeln stehen schon.') : 'deine Kugel hat auf dich gewartet.'));
-    sage('Deine Figur hat auf dich gewartet. Es geht weiter.');
+    hinweis(n ? tx('schneemann.hinweis.weiterKugeln', { one: 'Weiter geht’s – eine Kugel steht schon.', other: 'Weiter geht’s – {n} Kugeln stehen schon.' }, { n: n }) : tx('schneemann.hinweis.weiterWartet', 'Weiter geht’s – deine Kugel hat auf dich gewartet.'));
+    sage(tx('schneemann.sage.weiter', 'Deine Figur hat auf dich gewartet. Es geht weiter.'));
   }
   function merkeZwischenstand() {
     if (B.tag === null || B.phase === 'ende' || !B.def) return;
@@ -3137,7 +3156,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     }
     B.auto = { t: 0, ax: k ? k.gx : B.start.x, ay: k ? k.gy : B.start.y }; B.zug = null; B.hinweisBis = 0;
     el.lassen.setAttribute('aria-disabled', 'true'); el.zaunKnopf.hidden = true; el.lassen.classList.remove('winkt');
-    hinweis('Schau zu: Die Figur baut sich fast von selbst.');
+    hinweis(tx('schneemann.hinweis.lassen', 'Schau zu: Die Figur baut sich fast von selbst.'));
     starte();
   });
   function sofortFertig() {
@@ -3190,7 +3209,7 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
     if (B.auto || !k || B.phase !== 'rollen') return;
     if (!greift(k, w)) {
       B.hinweisBis = B.zeit + 2.4;
-      hinweis(MAUS ? 'Fass die Kugel an und zieh sie durch den Schnee.' : 'Leg den Finger auf die Kugel und roll sie durch den Schnee.');
+      hinweis(MAUS ? tx('schneemann.hinweis.greifenMaus', 'Fass die Kugel an und zieh sie durch den Schnee.') : tx('schneemann.hinweis.greifenFinger', 'Leg den Finger auf die Kugel und roll sie durch den Schnee.'));
       starte(); return;
     }
     starteZug(w, e.pointerId);
@@ -3349,11 +3368,11 @@ html.tastatur #szene:focus-visible{outline:3px solid var(--karotte);outline-offs
   function zeigeAnsichtsBild(richtung) {
     function setze() {
       var t = A.liste[A.i], ti = titelVon(t), name = figInfo(t).name;
-      el.aBild.alt = 'Fotocollage von Tag ' + t + (ti ? ': ' + ti : '');
+      el.aBild.alt = ti ? tx('schneemann.ansicht.altTitel', 'Fotocollage von Tag {n}: {titel}', { n: t, titel: ti }) : tx('schneemann.ansicht.alt', 'Fotocollage von Tag {n}', { n: t });
       el.aTitel.textContent = ti || name;
-      el.aDatum.textContent = (ti ? name + ' – ' : '') + K.datumText(t);
-      el.aZaehler.textContent = 'Foto ' + (A.i + 1) + ' von ' + A.liste.length;
-      el.aNochmal.setAttribute('aria-label', name + ' (Tag ' + t + ') nochmal bauen');
+      el.aDatum.textContent = ti ? tx('schneemann.ansicht.figurDatum', '{figur} – {datum}', { figur: name, datum: K.datumText(t) }) : K.datumText(t);
+      el.aZaehler.textContent = tx('schneemann.ansicht.zaehler', 'Foto {n} von {gesamt}', { n: A.i + 1, gesamt: A.liste.length });
+      el.aNochmal.setAttribute('aria-label', tx('schneemann.ansicht.nochmalLabel', '{figur} (Tag {n}) nochmal bauen', { figur: name, n: t }));
       el.aZurueck.disabled = A.i <= 0; el.aWeiter.disabled = A.i >= A.liste.length - 1;
       ladeAnsicht(t);
     }

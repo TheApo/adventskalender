@@ -3,84 +3,72 @@
     "id": "tueren",
     "name": "Türchenwand",
     "titel": "Die Türchenwand",
-    "satz": "Der Klassiker: 24 Kartontürchen, die aufschwingen – dahinter wartet das Foto des Tages.",
     "kurz": "24 Kartontürchen zum Aufklappen"
   },
   {
     "id": "girlande",
     "name": "Kugel-Girlanden",
     "titel": "Kugel-Girlanden",
-    "satz": "Tannengirlanden mit 24 Christbaumkugeln. Jede geöffnete Kugel zeigt ihr Foto wie durch gewölbtes Glas.",
     "kurz": "Christbaumkugeln an Tannengirlanden"
   },
   {
     "id": "kranz",
     "name": "Lichterkranz",
     "titel": "Der Lichterkranz",
-    "satz": "Ein Adventskranz mit 24 Kerzen: Jeden Tag brennt eine mehr, und der Raum wird heller.",
     "kurz": "jeden Tag brennt eine Kerze mehr"
   },
   {
     "id": "rubbellos",
     "name": "Weihnachtslotterie",
     "titel": "Die Weihnachtslotterie",
-    "satz": "Jeden Tag ein Rubbellos. Mit dem Finger die Silberfolie freirubbeln, darunter liegt das Foto.",
     "kurz": "jeden Tag ein Rubbellos freirubbeln"
   },
   {
     "id": "fotoleine",
     "name": "Fotoleine",
     "titel": "Die Fotoleine",
-    "satz": "Briefumschläge an der Lichterkette – darin ein Sofortbild, das sich vor deinen Augen entwickelt.",
     "kurz": "Umschläge mit Sofortbild an der Lichterkette"
   },
   {
     "id": "stories",
     "name": "Advent-Stories",
     "titel": "Advent-Stories",
-    "satz": "Jeder Tag ist eine kleine Story aus mehreren Fotos, durchgetippt wie am Handy.",
     "kurz": "mehrere Fotos je Tag, durchgetippt wie am Handy"
   },
   {
     "id": "schneekugel",
     "name": "Schneekugel",
     "titel": "Die Schneekugel",
-    "satz": "Schütteln, bis der Schnee sich legt – dann taucht das Foto in der Kugel auf.",
     "kurz": "schütteln, bis das Foto auftaucht"
   },
   {
     "id": "baum",
     "name": "Drehbaum",
     "titel": "Der Drehbaum",
-    "satz": "Einen Tannenbaum in 3D mit dem Finger drehen, bis die leuchtende Kugel des Tages auftaucht.",
     "kurz": "Tannenbaum in 3D drehen, Kugel finden"
   },
   {
     "id": "geschenk",
     "name": "Geschenke auspacken",
     "titel": "Der Gabentisch",
-    "satz": "Schleife aufziehen, Papier aufreißen – und das Foto steigt mit Konfetti aus der Schachtel.",
     "kurz": "Schleife ziehen, Papier aufreißen"
   },
   {
     "id": "nuss",
     "name": "Nussknacker",
     "titel": "Der Nussknacker",
-    "satz": "Jeden Tag eine goldene Nuss: am Hebel ziehen, bis sie knackt und ein Foto herausrollt.",
     "kurz": "am Hebel ziehen, bis die Nuss knackt"
   },
   {
     "id": "sterne",
     "name": "Sternbilder",
     "titel": "Der Sternenhimmel",
-    "satz": "Die nummerierten Sterne mit dem Finger verbinden, bis das Sternbild leuchtet und das Foto zeigt.",
     "kurz": "Sterne zum Sternbild verbinden"
   },
   {
     "id": "schneemann",
     "name": "Schneefiguren bauen",
     "titel": "Schneefiguren bauen",
-    "satz": "Jeden Tag eine andere Figur aus Schneekugeln rollen – aber Vorsicht vor warmen Stellen. Die fertige Figur hält das Foto.",
     "kurz": "jeden Tag eine andere Schneefigur rollen"
   }
 ]

@@ -313,7 +313,7 @@ html.gesperrt #kalender-reset{display:none}
 <div class="zimmer">
   <div class="raum">
     <header class="kopf">
-      <h1 id="titel">Dein Adventskalender</h1>
+      <h1 id="titel" data-titel="ganz">Dein Adventskalender</h1>
       <p class="heute-zeile" id="heuteZeile"></p>
     </header>
 
@@ -324,30 +324,30 @@ html.gesperrt #kalender-reset{display:none}
         <div class="fensterbank" id="bank" aria-hidden="true"></div>
         <div class="kugel-schatten" id="schatten" aria-hidden="true"></div>
         <div class="kugel-huelle" id="huelle">
-          <canvas class="kugel-innen" id="innen" role="img" aria-label="Schneekugel"></canvas>
+          <canvas class="kugel-innen" id="innen" role="img" aria-label="Schneekugel" data-i18n-attr="aria-label:schneekugel.kugel"></canvas>
           <canvas class="kugel-glas" id="glas" aria-hidden="true"></canvas>
           <div class="schild" id="schild" aria-hidden="true">Tag 1</div>
-          <div class="kugel-laden" id="laden" aria-hidden="true"><span class="dreher"></span>Foto lädt …</div>
+          <div class="kugel-laden" id="laden" aria-hidden="true"><span class="dreher"></span><span data-i18n="schneekugel.laedt">Foto lädt …</span></div>
           <div class="kugel-griff" id="griff" aria-hidden="true"></div>
         </div>
       </div>
       <div class="kugel-text" id="kugelText">
         <div class="knoepfe">
-          <button type="button" class="knopf knopf-messing" id="schuetteln"><svg aria-hidden="true"><use href="#i-schuetteln"/></svg><span>Schütteln</span></button>
-          <button type="button" class="knopf knopf-glas" id="ansehen" aria-disabled="true"><svg aria-hidden="true"><use href="#i-gross"/></svg><span>Foto groß ansehen</span></button>
+          <button type="button" class="knopf knopf-messing" id="schuetteln"><svg aria-hidden="true"><use href="#i-schuetteln"/></svg><span data-i18n="schneekugel.schuetteln">Schütteln</span></button>
+          <button type="button" class="knopf knopf-glas" id="ansehen" aria-disabled="true"><svg aria-hidden="true"><use href="#i-gross"/></svg><span data-i18n="schneekugel.ansehen">Foto groß ansehen</span></button>
         </div>
-        <h2 id="kugelTitel">Die Schneekugel</h2>
+        <h2 id="kugelTitel" data-i18n="schneekugel.titel">Die Schneekugel</h2>
         <p id="kugelInfo"></p>
         <div class="handy-hinweis" id="handyHinweis" hidden>
-          <button type="button" class="handy-an" id="handyAn"><svg aria-hidden="true"><use href="#i-handy"/></svg><span>Handy schütteln erlauben</span></button>
-          <button type="button" class="handy-weg" id="handyWeg" aria-label="Hinweis ausblenden"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+          <button type="button" class="handy-an" id="handyAn"><svg aria-hidden="true"><use href="#i-handy"/></svg><span data-i18n="schneekugel.handy.erlauben">Handy schütteln erlauben</span></button>
+          <button type="button" class="handy-weg" id="handyWeg" aria-label="Hinweis ausblenden" data-i18n-attr="aria-label:schneekugel.handy.weg"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
         </div>
         <button type="button" class="nachholen" id="nachholen" hidden></button>
       </div>
     </section>
 
     <section class="regal" id="regal" aria-labelledby="regalTitel">
-      <h2 id="regalTitel">Alle <span class="ziffer">24</span> Kugeln</h2>
+      <h2 id="regalTitel"><span data-i18n="schneekugel.regal.alle">Alle</span> <span class="ziffer">24</span> <span data-i18n="schneekugel.regal.kugeln">Kugeln</span></h2>
       <p class="regal-hilfe" id="regalHilfe"></p>
       <div class="bretter" id="bretter"></div>
       <div class="blase" id="blase" hidden></div>
@@ -360,26 +360,29 @@ html.gesperrt #kalender-reset{display:none}
   <div class="ansicht-innen">
     <div class="ansicht-kopf">
       <p class="ansicht-zaehler" id="ansichtZaehler"></p>
-      <button type="button" class="knopf-rund" id="schliessen" aria-label="Bildansicht schließen"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+      <button type="button" class="knopf-rund" id="schliessen" aria-label="Bildansicht schließen" data-i18n-attr="aria-label:schneekugel.ansicht.schliessen"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
     </div>
     <div class="ansicht-buehne" id="ansichtBuehne">
       <div class="spur" id="spur"><img id="ansichtBild" alt="" draggable="false"></div>
-      <div class="ansicht-laden" id="ansichtLaden" aria-hidden="true"><span class="dreher"></span>Foto lädt …</div>
+      <div class="ansicht-laden" id="ansichtLaden" aria-hidden="true"><span class="dreher"></span><span data-i18n="schneekugel.laedt">Foto lädt …</span></div>
     </div>
     <div class="ansicht-fuss">
-      <button type="button" class="knopf-rund" id="zurueck" aria-label="Vorheriger Tag"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
+      <button type="button" class="knopf-rund" id="zurueck" aria-label="Vorheriger Tag" data-i18n-attr="aria-label:schneekugel.ansicht.zurueck"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
       <div class="ansicht-text"><h2 id="ansichtTitel"></h2><p id="ansichtDatum"></p></div>
-      <button type="button" class="knopf-rund" id="weiter" aria-label="Nächster Tag"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
+      <button type="button" class="knopf-rund" id="weiter" aria-label="Nächster Tag" data-i18n-attr="aria-label:schneekugel.ansicht.weiter"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
     </div>
   </div>
 </dialog>
 
 <script src="../shared/start.js" data-ansicht="schneekugel"></script>
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „schneekugel“ (t ist hier die Tageszahl)
   var K = window.Kalender.init('schneekugel');
   var F = window.Fotos;
   var TAU = Math.PI * 2;
@@ -868,7 +871,7 @@ html.gesperrt #kalender-reset{display:none}
     aktualisiereText();
     if (kugelTag !== null) {
       var ti = titelVon(kugelTag);
-      sage('Tag ' + kugelTag + ' ist offen' + (ti ? ': ' + ti : '.'));
+      sage(ti ? tx('schneekugel.sage.offenTitel', 'Tag {n} ist offen: {titel}', { n: kugelTag, titel: ti }) : tx('schneekugel.sage.offen', 'Tag {n} ist offen.', { n: kugelTag }));
       grossVorladen(kugelTag, 500);
     }
   }
@@ -1439,7 +1442,7 @@ html.gesperrt #kalender-reset{display:none}
     feder.vx += FAHRT_ENDE * f.S / FAHRT_DAUER;
     ruhigBis = zeit + 2.2;
     starte();
-    sage('Kugel ' + kugelTag + ' steht jetzt auf dem Sockel.');
+    sage(tx('schneekugel.sage.sockel', 'Kugel {n} steht jetzt auf dem Sockel.', { n: kugelTag }));
     if (f.fokus) el.schuetteln.focus({ preventScroll: true });
     var w = fahrtWunsch; fahrtWunsch = null;
     if (w && w.t !== kugelTag) { markiereAktiv(w.t); starteFahrt(w.t, w.fokus); }
@@ -1619,8 +1622,8 @@ html.gesperrt #kalender-reset{display:none}
     h.hidden = false; h.classList.remove('weg'); h.classList.toggle('frage', art === 'frage');
     if (art === 'frei') {
       h.classList.add('fertig');
-      el.handyAn.lastChild.textContent = 'Jetzt das Handy schütteln!';
-      sage('Jetzt kannst du dein Handy schütteln.');
+      el.handyAn.lastChild.textContent = tx('schneekugel.handy.jetzt', 'Jetzt das Handy schütteln!');
+      sage(tx('schneekugel.handy.kannst', 'Jetzt kannst du dein Handy schütteln.'));
       setTimeout(function () { h.classList.add('weg'); setTimeout(function () { h.hidden = true; }, 420); }, 3200);
     }
   }
@@ -1762,29 +1765,29 @@ html.gesperrt #kalender-reset{display:none}
 
   function aktualisiereText() {
     var h = K.heute(), t = kugelTag, titel, info;
-    el.schild.innerHTML = mitZiffern(t === null ? 'Advent ' + K.JAHR : 'Tag ' + t);
+    el.schild.innerHTML = mitZiffern(t === null ? tx('schneekugel.schildJahr', 'Advent {jahr}', { jahr: K.JAHR }) : tx('schneekugel.schild', 'Tag {n}', { n: t }));
     if (t === null) {
-      titel = 'Bald ist Advent';
-      info = 'Am 1. Dezember steht hier die erste Kugel mit einem Foto. Schütteln darfst du schon jetzt.';
+      titel = tx('schneekugel.november.titel', 'Bald ist Advent');
+      info = tx('schneekugel.november.info', 'Am 1. Dezember steht hier die erste Kugel mit einem Foto. Schütteln darfst du schon jetzt.');
       knoepfe(false);
-      el.innen.setAttribute('aria-label', 'Schneekugel mit einem verschneiten Häuschen');
+      el.innen.setAttribute('aria-label', tx('schneekugel.november.kugel', 'Schneekugel mit einem verschneiten Häuschen'));
     } else if (kugelOffen) {
       // Ohne Bildunterschrift wird das Datum zur Überschrift (nie eine leere Zeile)
       var bu = titelVon(t), folgt = fotoFolgt(t);
       titel = bu || K.datumText(t);
-      if (h >= 25 && t === 24 && !folgt) info = 'Alle 24 Kugeln sind offen. Schüttle sie, so oft du magst.';
-      else if (folgt) info = (bu ? K.datumText(t) + ' – ' : '') + (bu ? 'das' : 'Das') + ' Foto für diesen Tag kommt bald.';
-      else if (bu) info = K.datumText(t) + (t === h ? ' – das Foto von heute.' : '.');
-      else info = t === h ? 'Das Foto von heute.' : 'Das Foto von Tag ' + t + '.';
+      if (h >= 25 && t === 24 && !folgt) info = tx('schneekugel.info.alleOffen', 'Alle 24 Kugeln sind offen. Schüttle sie, so oft du magst.');
+      else if (folgt) info = bu ? tx('schneekugel.info.folgtDatum', '{datum} – das Foto für diesen Tag kommt bald.', { datum: K.datumText(t) }) : tx('schneekugel.info.folgt', 'Das Foto für diesen Tag kommt bald.');
+      else if (bu) info = t === h ? tx('schneekugel.info.heuteDatum', '{datum} – das Foto von heute.', { datum: K.datumText(t) }) : K.datumText(t) + '.';
+      else info = t === h ? tx('schneekugel.info.heute', 'Das Foto von heute.') : tx('schneekugel.info.tag', 'Das Foto von Tag {n}.', { n: t });
       knoepfe(true);
-      el.innen.setAttribute('aria-label', 'Schneekugel Tag ' + t + (bu ? ', Foto: ' + bu : ', Foto vom ' + K.datumText(t)));
+      el.innen.setAttribute('aria-label', bu ? tx('schneekugel.kugelFoto', 'Schneekugel Tag {n}, Foto: {titel}', { n: t, titel: bu }) : tx('schneekugel.kugelDatum', 'Schneekugel Tag {n}, Foto vom {datum}', { n: t, datum: K.datumText(t) }));
     } else {
-      titel = t === h ? 'Tag ' + t + ' ist zugeschneit' : 'Tag ' + t + ' wartet noch auf dich';
-      if (textStufe === 2) info = 'Weiter schütteln – das Foto taucht schon auf.';
-      else if (textStufe === 1) info = 'Weiter kräftig schütteln – der Schnee sitzt noch fest!';
-      else info = (t === h ? K.datumText(t) + '. ' : 'Verpasst? Kein Problem. ') + (handyDa ? 'Schüttel dein Handy, zieh die Kugel kräftig hin und her oder drück auf „Schütteln“.' : 'Zieh die Kugel kräftig hin und her oder rauf und runter – oder drück auf „Schütteln“.');
+      titel = t === h ? tx('schneekugel.zu.heute', 'Tag {n} ist zugeschneit', { n: t }) : tx('schneekugel.zu.verpasst', 'Tag {n} wartet noch auf dich', { n: t });
+      if (textStufe === 2) info = tx('schneekugel.zu.stufe2', 'Weiter schütteln – das Foto taucht schon auf.');
+      else if (textStufe === 1) info = tx('schneekugel.zu.stufe1', 'Weiter kräftig schütteln – der Schnee sitzt noch fest!');
+      else info = (t === h ? K.datumText(t) + '. ' : tx('schneekugel.zu.keinProblem', 'Verpasst? Kein Problem.') + ' ') + (handyDa ? tx('schneekugel.zu.handy', 'Schüttel dein Handy, zieh die Kugel kräftig hin und her oder drück auf „Schütteln“.') : tx('schneekugel.zu.ziehen', 'Zieh die Kugel kräftig hin und her oder rauf und runter – oder drück auf „Schütteln“.'));
       knoepfe(false);
-      el.innen.setAttribute('aria-label', 'Schneekugel Tag ' + t + ', noch zugeschneit');
+      el.innen.setAttribute('aria-label', tx('schneekugel.kugelZu', 'Schneekugel Tag {n}, noch zugeschneit', { n: t }));
     }
     el.titel.innerHTML = mitZiffern(titel); el.info.textContent = info;
     aktualisiereNachholen();
@@ -1799,7 +1802,7 @@ html.gesperrt #kalender-reset{display:none}
     nachholTag = t;
     if (!t || (kugelTag !== null && !kugelOffen)) { el.nachholen.hidden = true; return; }
     el.nachholen.hidden = false;
-    el.nachholen.textContent = (t === K.heute() - 1 ? 'Gestern verpasst: Kugel ' : 'Verpasst: Kugel ') + t + ' holen';
+    el.nachholen.textContent = t === K.heute() - 1 ? tx('schneekugel.nachholen.gestern', 'Gestern verpasst: Kugel {n} holen', { n: t }) : tx('schneekugel.nachholen.verpasst', 'Verpasst: Kugel {n} holen', { n: t });
   }
 
   // Titel aus den Einstellungen, falls der Server ihn mitliefert; Zahlen mit Versalziffern
@@ -1810,9 +1813,9 @@ html.gesperrt #kalender-reset{display:none}
     var h = K.heute();
     document.body.classList.toggle('november', h === 0);
     document.body.classList.toggle('fest', h >= 25);
-    el.heuteZeile.textContent = h === 0 ? 'Noch ist November. Am 1. Dezember geht’s los.'
-      : h >= 25 ? 'Frohe Weihnachten! Alle 24 Kugeln stehen im Regal.'
-      : 'Heute ist ' + K.datumText(h) + '.';
+    el.heuteZeile.textContent = h === 0 ? tx('schneekugel.kopf.november', 'Noch ist November. Am 1. Dezember geht’s los.')
+      : h >= 25 ? tx('schneekugel.kopf.weihnachten', 'Frohe Weihnachten! Alle 24 Kugeln stehen im Regal.')
+      : tx('schneekugel.kopf.heute', 'Heute ist {datum}.', { datum: K.datumText(h) });
   }
 
   /* ================================================================
@@ -1838,11 +1841,11 @@ html.gesperrt #kalender-reset{display:none}
     var h = K.heute(), verpasst = false;
     for (var t = 1; t <= 24; t++) if (zustand(t) === 'verpasst') verpasst = true;
     var text;
-    if (h === 0) text = 'Alle Kugeln sind noch eingepackt. Ab 1. Dezember darfst du jeden Tag eine auspacken.';
-    else if (h >= 25 && !verpasst) text = 'Alle Kugeln sind offen. Tippe eine an, um sie auf den großen Sockel zu stellen.';
-    else if (h >= 25) text = 'Ein paar Kugeln sind noch zugeschneit – tippe sie an und schüttle sie frei. Roter Punkt: noch nicht geöffnet.';
-    else text = 'Tippe eine Kugel an, dann kommt sie auf den Sockel. Weiße sind zugeschneit, eingepackte kommen noch.' +
-      (verpasst ? ' Roter Punkt: verpasst, jetzt nachholen.' : '');
+    if (h === 0) text = tx('schneekugel.hilfe.november', 'Alle Kugeln sind noch eingepackt. Ab 1. Dezember darfst du jeden Tag eine auspacken.');
+    else if (h >= 25 && !verpasst) text = tx('schneekugel.hilfe.alleOffen', 'Alle Kugeln sind offen. Tippe eine an, um sie auf den großen Sockel zu stellen.');
+    else if (h >= 25) text = tx('schneekugel.hilfe.festZu', 'Ein paar Kugeln sind noch zugeschneit – tippe sie an und schüttle sie frei. Roter Punkt: noch nicht geöffnet.');
+    else text = tx('schneekugel.hilfe.advent', 'Tippe eine Kugel an, dann kommt sie auf den Sockel. Weiße sind zugeschneit, eingepackte kommen noch.') +
+      (verpasst ? ' ' + tx('schneekugel.hilfe.punkt', 'Roter Punkt: verpasst, jetzt nachholen.') : '');
     el.hilfe.textContent = text;
   }
 
@@ -1855,12 +1858,12 @@ html.gesperrt #kalender-reset{display:none}
     if (z === 'offen') kugel = '<span class="mini-kugel mk-offen"></span>';
     else if (z === 'zu') kugel = '<span class="mini-kugel mk-zu mk-papier-' + (t % 2 ? 'a' : 'b') + '"><svg class="schleife" viewBox="0 0 24 16" aria-hidden="true"><use href="#schleife"/></svg></span>';
     else kugel = '<span class="mini-kugel mk-schnee"></span>';
-    b.innerHTML = (istHeute ? '<span class="mini-heute" aria-hidden="true">Heute</span>' : '') +
+    b.innerHTML = (istHeute ? '<span class="mini-heute" aria-hidden="true">' + tx('schneekugel.mini.heute', 'Heute') + '</span>' : '') +
       '<span class="mini-figur">' + kugel + '<span class="mini-sockel"><span class="mini-zahl">' + t + '</span></span></span>' +
       (z === 'verpasst' ? '<span class="mini-punkt" aria-hidden="true"></span>' : '');
     if (z === 'offen') miniFoto(b, t);
-    var status = z === 'offen' ? 'geöffnet' : z === 'zu' ? 'noch eingepackt' : z === 'heute' ? 'heute, noch zugeschneit' : 'verpasst, jetzt nachholen';
-    b.setAttribute('aria-label', 'Tag ' + t + ', ' + K.datumText(t) + ' – ' + status + (aktiv ? ', steht auf dem Sockel' : ''));
+    var status = z === 'offen' ? tx('schneekugel.mini.offen', 'geöffnet') : z === 'zu' ? tx('schneekugel.mini.zu', 'noch eingepackt') : z === 'heute' ? tx('schneekugel.mini.heuteZu', 'heute, noch zugeschneit') : tx('schneekugel.mini.verpasst', 'verpasst, jetzt nachholen');
+    b.setAttribute('aria-label', tx('schneekugel.mini.tag', 'Tag {n}, {datum}', { n: t, datum: K.datumText(t) }) + ' – ' + status + (aktiv ? ', ' + tx('schneekugel.mini.sockel', 'steht auf dem Sockel') : ''));
     if (aktiv) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
   }
 
@@ -1948,7 +1951,7 @@ html.gesperrt #kalender-reset{display:none}
   function sperre(btn, t) {
     var fig = btn.querySelector('.mini-figur');
     if (fig) { fig.classList.remove('wackelt'); void fig.offsetWidth; fig.classList.add('wackelt'); }
-    zeigeBlase(btn, K.sperrText(t), 'Kugel ' + t + ' ist am ' + K.datumText(t) + ' dran.');
+    zeigeBlase(btn, K.sperrText(t), tx('schneekugel.dran', 'Kugel {n} ist am {datum} dran.', { n: t, datum: K.datumText(t) }));
   }
 
   el.bretter.addEventListener('animationend', function (e) { if (e.target.classList) e.target.classList.remove('wackelt'); });
@@ -2027,7 +2030,7 @@ html.gesperrt #kalender-reset{display:none}
       anzeigeAktiv = null;
       zeigeTag(t, true);
       el.huelle.classList.remove('blendet');
-      sage('Kugel ' + t + ' steht jetzt auf dem Sockel.');
+      sage(tx('schneekugel.sage.sockel', 'Kugel {n} steht jetzt auf dem Sockel.', { n: t }));
       if (fokus) el.schuetteln.focus({ preventScroll: true });
     }, 170);
   }
@@ -2036,7 +2039,7 @@ html.gesperrt #kalender-reset{display:none}
   el.ansehen.addEventListener('pointerdown', function () { if (kugelOffen && kugelTag !== null) grossVorladen(kugelTag, 0); });
   el.ansehen.addEventListener('click', function () {
     if (kugelTag !== null && kugelOffen) { oeffneAnsicht(kugelTag, el.ansehen); return; }
-    if (kugelTag !== null) { el.info.textContent = 'Erst schütteln – das Foto ist noch zugeschneit.'; feder.vy -= G.W * 0.6; starte(); }
+    if (kugelTag !== null) { el.info.textContent = tx('schneekugel.erstSchuetteln', 'Erst schütteln – das Foto ist noch zugeschneit.'); feder.vy -= G.W * 0.6; starte(); }
   });
 
   /* ================================================================
@@ -2097,11 +2100,11 @@ html.gesperrt #kalender-reset{display:none}
     function setze() {
       ansichtBildSetzen(t);
       var bu = titelVon(t);
-      el.bild.alt = 'Fotocollage von Tag ' + t + (bu ? ': ' + bu : ', ' + K.datumText(t));
+      el.bild.alt = bu ? tx('schneekugel.ansicht.altTitel', 'Fotocollage von Tag {n}: {titel}', { n: t, titel: bu }) : tx('schneekugel.ansicht.alt', 'Fotocollage von Tag {n}, {datum}', { n: t, datum: K.datumText(t) });
       // ohne Bildunterschrift: „Tag 12“ als Überschrift, darunter nur das Datum
-      el.aTitel.innerHTML = mitZiffern(bu || 'Tag ' + t);
-      el.aDatum.textContent = bu ? 'Tag ' + t + ' – ' + K.datumText(t) : K.datumText(t);
-      el.aZaehler.textContent = A.liste.length === 1 ? '1 Foto geöffnet' : A.liste.length + ' Fotos geöffnet';
+      el.aTitel.innerHTML = mitZiffern(bu || tx('schneekugel.tag', 'Tag {n}', { n: t }));
+      el.aDatum.textContent = bu ? tx('schneekugel.tag', 'Tag {n}', { n: t }) + ' – ' + K.datumText(t) : K.datumText(t);
+      el.aZaehler.textContent = tx('schneekugel.ansicht.zaehler', { one: '1 Foto geöffnet', other: '{n} Fotos geöffnet' }, { n: A.liste.length });
       el.zurueck.disabled = A.i <= 0; el.weiter.disabled = A.i >= A.liste.length - 1;
       clearTimeout(vorladeTimer);
       vorladeTimer = setTimeout(function () {

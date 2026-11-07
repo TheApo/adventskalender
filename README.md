@@ -1,5 +1,7 @@
 # Dein Adventskalender
 
+*Deutsch · [English](README.en.md)*
+
 **Ein Foto-Adventskalender für die Familie: jeden Tag im Advent ein Foto – und zwölf verspielte Arten, es zu öffnen.**
 
 <p align="center">
@@ -28,7 +30,7 @@ made by Dirk Aporius · [www.apo-games.de](https://www.apo-games.de)
 | Sternbilder | `sterne` | Sterne zum Sternbild verbinden |
 | Schneefiguren bauen | `schneemann` | jeden Tag eine andere Schneefigur rollen |
 
-Unten links sitzt in jeder Ansicht eine Schneeflocke: das Menü zum Umschalten der Ansicht.
+Unten links sitzt in jeder Ansicht eine Schneeflocke: das Menü zum Umschalten der Ansicht und der Sprache (Deutsch/Englisch).
 
 ## Deinen eigenen Kalender veröffentlichen
 
@@ -60,16 +62,20 @@ Mehr dazu: [`bilder/LIES-MICH.md`](bilder/LIES-MICH.md).
   "jahr": 2026,
   "ansichten": "alle",
   "standard_ansicht": "tueren",
+  "sprachen": ["de", "en"],
+  "sprache": "auto",
   "testschluessel": "tannenbaum-7341"
 }
 ```
 
 | Feld | Bedeutung |
 |---|---|
-| `titel` | Überschrift – kurz halten, z. B. zwei Wörter |
+| `titel` | Überschrift – kurz halten, z. B. zwei Wörter; je Sprache: `{ "de": "Omas Adventskalender", "en": "Grandma’s Advent Calendar" }` |
 | `jahr` | der Advent, für den der Kalender gilt |
 | `ansichten` | `"alle"` = alle 12, umschaltbar über die Schneeflocke<br>`["kranz"]` = nur diese eine Ansicht, ohne Umschalten<br>`["tueren", "kranz", "schneekugel"]` = deine Auswahl |
 | `standard_ansicht` | damit startet der Kalender – muss in `ansichten` vorkommen |
+| `sprachen` | `["de", "en"]` = umschaltbar über die Schneeflocke, `["de"]` = nur Deutsch |
+| `sprache` | `"auto"` = beim ersten Besuch die Sprache des Browsers, sonst z. B. `"de"` |
 | `testschluessel` | zum Ausprobieren vor Dezember (leer = kein Testmodus) |
 
 **5. Bauen und ansehen**
@@ -101,6 +107,8 @@ Ordner, z. B. `/advent/`. Fertig: `https://deine-seite.de/advent/` an die Famili
   gegen neugierige Kinder reicht es.
 - **Nicht per Doppelklick öffnen** (`file://`), sondern immer über einen Webserver (`npm run ansehen`).
 - **Nächstes Jahr:** `jahr` ändern, neue Bilder hinein, neu bauen – alle Tage sind dann wieder zu.
+- **Weitere Sprache:** `kalender/i18n/en.json` nach z. B. `fr.json` kopieren, die Texte übersetzen und `"fr"` bei
+  `sprachen` eintragen. Fehlende Texte erscheinen auf Deutsch; `npm run bauen` sagt, wie viele fehlen.
 
 ## Die Demo (`docs/`)
 
@@ -112,7 +120,7 @@ Online stellen: auf GitHub **Settings → Pages → Deploy from a branch**, Bran
 | Ordner | Inhalt |
 |---|---|
 | `bilder/` | deine Bilder (bleiben privat) |
-| `kalender/` | die Ansichten, Bausteine, Schriften und Vorlagen |
+| `kalender/` | die Ansichten, Bausteine, Schriften, Vorlagen und Texte je Sprache (`kalender/i18n/`) |
 | `werkzeuge/` | `bauen.mjs`, `ansehen.mjs`, `demo-bauen.mjs` |
 | `ausgabe/` | dein fertiger Kalender – das lädst du hoch |
 | `docs/` | die Demo für GitHub Pages |

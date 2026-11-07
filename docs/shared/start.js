@@ -5,8 +5,9 @@
  * shared/kalender.js geladen wird. Bilddaten gibt es keine – shared/fotos.js malt die Platzhalter-Fotos selbst.
  * Das Ausprobieren von Daten ist in der Demo immer eingeschaltet.
  *
- * Einbinden in jeder Ansicht VOR kalender.js:  <script src="../shared/start.js" data-ansicht="tueren"></script>
- * Ohne data-ansicht (Startseite) stellt der Baustein nur Helfer bereit: window.DeinAdventskalender.
+ * Einbinden in jeder Ansicht VOR sprachen.js/i18n.js/kalender.js:  <script src="../shared/start.js" data-ansicht="tueren"></script>
+ * Ohne data-ansicht (Startseite) stellt der Baustein Helfer bereit (window.DeinAdventskalender) und setzt nur Titel
+ * und Sprachen in window.ADVENTSKALENDER.
  *
  * „Heute“ (0 = noch November, 1–24 = Dezembertag, 25 = ab dem 25. Dezember) kommt aus:
  *   1. ?tag=N in der Adresse (Link von der Startseite) → wird gemerkt, ?tag verschwindet aus der Adresse
@@ -21,7 +22,7 @@
 (function () {
   'use strict';
 
-  var K = {"titel":"Dein Adventskalender","speicher":"dein-adventskalender","zeitzone":"Europe/Berlin","standardTag":12,"varianten":[{"id":"tueren","name":"Türchenwand"},{"id":"girlande","name":"Kugel-Girlanden"},{"id":"kranz","name":"Lichterkranz"},{"id":"rubbellos","name":"Weihnachtslotterie"},{"id":"fotoleine","name":"Fotoleine"},{"id":"stories","name":"Advent-Stories"},{"id":"schneekugel","name":"Schneekugel"},{"id":"baum","name":"Drehbaum"},{"id":"geschenk","name":"Geschenke auspacken"},{"id":"nuss","name":"Nussknacker"},{"id":"sterne","name":"Sternbilder"},{"id":"schneemann","name":"Schneefiguren bauen"}],"startUrl":"../index.html","startText":"Zur Startseite","testTitel":"Datum ausprobieren","testHinweis":"Stell ein beliebiges Datum ein – so siehst du, wie sich der Kalender bis Weihnachten füllt.","fusszeile":{"text":"Dein Adventskalender – made by Dirk Aporius","link":"www.apo-games.de","url":"https://www.apo-games.de"}};
+  var K = {"titel":"Dein Adventskalender","titelJeSprache":{"de":"Dein Adventskalender","en":"Your Advent Calendar"},"sprachen":["de","en"],"sprache":"auto","speicher":"dein-adventskalender","zeitzone":"Europe/Berlin","standardTag":12,"varianten":[{"id":"tueren","name":"Türchenwand"},{"id":"girlande","name":"Kugel-Girlanden"},{"id":"kranz","name":"Lichterkranz"},{"id":"rubbellos","name":"Weihnachtslotterie"},{"id":"fotoleine","name":"Fotoleine"},{"id":"stories","name":"Advent-Stories"},{"id":"schneekugel","name":"Schneekugel"},{"id":"baum","name":"Drehbaum"},{"id":"geschenk","name":"Geschenke auspacken"},{"id":"nuss","name":"Nussknacker"},{"id":"sterne","name":"Sternbilder"},{"id":"schneemann","name":"Schneefiguren bauen"}],"startUrl":"../index.html","startText":"Zur Startseite","testTitel":"Datum ausprobieren","testHinweis":"Stell ein beliebiges Datum ein – so siehst du, wie sich der Kalender bis Weihnachten füllt.","fusszeile":{"text":"Dein Adventskalender – made by Dirk Aporius","link":"www.apo-games.de","url":"https://www.apo-games.de"}};
   if (!K) return;
 
   var KEKS = 'adventskalender_testtag';     // gleicher Name wie in shared/kalender.js (Menü)
@@ -94,10 +95,12 @@
     return null;
   }
 
+  // Texte in der aktiven Sprache (shared/i18n.js lädt auf der Startseite nach diesem Baustein – daher erst beim Aufruf)
   function datumText(n) {
-    if (n <= 0) return 'Noch November';
-    if (n >= 25) return 'Ab dem 25. Dezember';
-    return WOCHENTAGE[new Date(JAHR, 11, n).getDay()] + ', ' + n + '. Dezember';
+    var I = window.I18N;
+    if (n <= 0) return I ? I.t('start.datum.november', 'Noch November') : 'Noch November';
+    if (n >= 25) return I ? I.t('start.datum.weihnachten', 'Ab dem 25. Dezember') : 'Ab dem 25. Dezember';
+    return I ? I.datum(n, 'lang') : WOCHENTAGE[new Date(JAHR, 11, n).getDay()] + ', ' + n + '. Dezember';
   }
 
   // Jahreszahl in die Seite schreiben (Rubbellos-Siegel u. Ä.)
@@ -127,7 +130,11 @@
   }
   var bekannt = false;
   for (var i = 0; i < K.varianten.length; i++) if (K.varianten[i].id === ansicht) bekannt = true;
-  if (!bekannt) return;   // Startseite o. Ä.
+  if (!bekannt) {
+    // Startseite: nur Titel und Sprachen für shared/i18n.js
+    window.ADVENTSKALENDER = { jahr: JAHR, titel: K.titel, titelJeSprache: K.titelJeSprache, sprachen: K.sprachen, sprache: K.sprache };
+    return;
+  }
 
   var heute = null, ausAdresse = null;
   try { ausAdresse = new URLSearchParams(location.search).get('tag'); } catch (e) { ausAdresse = null; }
@@ -147,6 +154,9 @@
     modus: 'statisch',
     jahr: JAHR,
     titel: K.titel,
+    titelJeSprache: K.titelJeSprache,
+    sprachen: K.sprachen,
+    sprache: K.sprache,
     heute: heute,
     echtHeute: ECHT,
     testmodus: true,

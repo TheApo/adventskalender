@@ -252,41 +252,41 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
 
 <div class="app" id="app">
   <header class="kopf" id="kopf">
-    <button type="button" class="ton-knopf" id="ton" aria-label="Glöckchen-Ton" aria-pressed="true" title="Glöckchen-Ton an oder aus"><svg class="i" aria-hidden="true"><use href="#i-ton"/></svg></button>
+    <button type="button" class="ton-knopf" id="ton" aria-label="Glöckchen-Ton" aria-pressed="true" title="Glöckchen-Ton an oder aus" data-i18n-attr="aria-label:baum.ton.label;title:baum.ton.titel"><svg class="i" aria-hidden="true"><use href="#i-ton"/></svg></button>
     <div class="titel">
-      <h1>Dein Adventskalender</h1>
+      <h1 data-titel="ganz">Dein Adventskalender</h1>
       <p class="datum" id="datum"></p>
     </div>
-    <button type="button" class="listen-knopf" id="listeAuf" aria-label="Alle Kugeln als Liste zeigen" aria-controls="liste" aria-expanded="false"><svg class="i" aria-hidden="true"><use href="#i-liste"/></svg></button>
+    <button type="button" class="listen-knopf" id="listeAuf" aria-label="Alle Kugeln als Liste zeigen" data-i18n-attr="aria-label:baum.liste.auf" aria-controls="liste" aria-expanded="false"><svg class="i" aria-hidden="true"><use href="#i-liste"/></svg></button>
   </header>
 
   <main class="buehne" id="buehne">
-    <div class="baum-platz" id="platz" tabindex="0" role="application" aria-roledescription="Drehbaum" aria-describedby="hinweis"></div>
-    <p class="pfeil" id="pfeil" hidden aria-hidden="true"><svg class="i"><use href="#i-links"/></svg><span>Dreh nach links</span></p>
+    <div class="baum-platz" id="platz" tabindex="0" role="application" aria-roledescription="Drehbaum" data-i18n-attr="aria-roledescription:baum.rolle" aria-describedby="hinweis"></div>
+    <p class="pfeil" id="pfeil" hidden aria-hidden="true"><svg class="i"><use href="#i-links"/></svg><span data-i18n="baum.pfeil.links">Dreh nach links</span></p>
   </main>
 
-  <section class="steuer" id="steuer" aria-label="Baum bedienen">
+  <section class="steuer" id="steuer" aria-label="Baum bedienen" data-i18n-attr="aria-label:baum.steuer">
     <p class="hinweis" id="hinweis"></p>
     <div class="knoepfe">
-      <button type="button" class="knopf-rund" id="links" aria-label="Baum nach links drehen"><svg class="i" aria-hidden="true"><use href="#i-links"/></svg></button>
-      <button type="button" class="knopf-haupt" id="haupt"><svg class="i" aria-hidden="true"><use href="#i-stern"/></svg><span>Heute finden</span></button>
-      <button type="button" class="knopf-rund" id="rechts" aria-label="Baum nach rechts drehen"><svg class="i" aria-hidden="true"><use href="#i-rechts"/></svg></button>
+      <button type="button" class="knopf-rund" id="links" aria-label="Baum nach links drehen" data-i18n-attr="aria-label:baum.knopf.links"><svg class="i" aria-hidden="true"><use href="#i-links"/></svg></button>
+      <button type="button" class="knopf-haupt" id="haupt"><svg class="i" aria-hidden="true"><use href="#i-stern"/></svg><span data-i18n="baum.haupt.finden">Heute finden</span></button>
+      <button type="button" class="knopf-rund" id="rechts" aria-label="Baum nach rechts drehen" data-i18n-attr="aria-label:baum.knopf.rechts"><svg class="i" aria-hidden="true"><use href="#i-rechts"/></svg></button>
     </div>
   </section>
 
   <div class="schleier" id="schleier"></div>
   <aside class="liste" id="liste" aria-labelledby="listeTitel">
     <div class="liste-kopf">
-      <h2 id="listeTitel">Alle Kugeln</h2>
-      <button type="button" class="knopf-rund klein" id="listeZu" aria-label="Liste schließen"><svg class="i" aria-hidden="true"><use href="#i-zu"/></svg></button>
+      <h2 id="listeTitel" data-i18n="baum.liste.titel">Alle Kugeln</h2>
+      <button type="button" class="knopf-rund klein" id="listeZu" aria-label="Liste schließen" data-i18n-attr="aria-label:baum.liste.zu"><svg class="i" aria-hidden="true"><use href="#i-zu"/></svg></button>
     </div>
     <p class="liste-hilfe" id="listeHilfe"></p>
     <div class="gitter" id="gitter"></div>
     <ul class="legende" id="legende" aria-hidden="true">
-      <li data-art="glas">glänzend: darf auf</li>
-      <li data-art="frost">bereift: kommt noch</li>
-      <li data-art="schleife">rote Schleife: verpasst</li>
-      <li data-art="foto">mit Foto: schon offen</li>
+      <li data-art="glas" data-i18n="baum.legende.glas">glänzend: darf auf</li>
+      <li data-art="frost" data-i18n="baum.legende.frost">bereift: kommt noch</li>
+      <li data-art="schleife" data-i18n="baum.legende.schleife">rote Schleife: verpasst</li>
+      <li data-art="foto" data-i18n="baum.legende.foto">mit Foto: schon offen</li>
     </ul>
   </aside>
 </div>
@@ -297,30 +297,33 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
   <div class="ansicht-innen">
     <div class="ansicht-kopf">
       <p class="zaehler" id="aZaehler"></p>
-      <button type="button" class="knopf-rund" id="aZu" aria-label="Bildansicht schließen"><svg class="i" aria-hidden="true"><use href="#i-zu"/></svg></button>
+      <button type="button" class="knopf-rund" id="aZu" aria-label="Bildansicht schließen" data-i18n-attr="aria-label:baum.ansicht.schliessen"><svg class="i" aria-hidden="true"><use href="#i-zu"/></svg></button>
     </div>
     <div class="ansicht-buehne" id="aBuehne">
       <div class="spur" id="spur">
         <div class="vorbild" id="aVor" aria-hidden="true"></div>
         <img id="aBild" alt="" draggable="false">
-        <div class="lader" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16l-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg><span>Foto wird geholt …</span></div>
-        <div class="fehlbild"><p>Dieses Foto lässt sich gerade nicht laden.</p><button type="button" class="knopf-text" id="aNochmal">Nochmal versuchen</button></div>
+        <div class="lader" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16l-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg><span data-i18n="baum.ansicht.laden">Foto wird geholt …</span></div>
+        <div class="fehlbild"><p data-i18n="baum.ansicht.fehler">Dieses Foto lässt sich gerade nicht laden.</p><button type="button" class="knopf-text" id="aNochmal" data-i18n="baum.ansicht.nochmal">Nochmal versuchen</button></div>
       </div>
     </div>
     <div class="ansicht-fuss">
-      <button type="button" class="knopf-rund" id="aZurueck" aria-label="Vorheriges Foto"><svg class="i" aria-hidden="true"><use href="#i-links"/></svg></button>
+      <button type="button" class="knopf-rund" id="aZurueck" aria-label="Vorheriges Foto" data-i18n-attr="aria-label:baum.ansicht.zurueck"><svg class="i" aria-hidden="true"><use href="#i-links"/></svg></button>
       <div class="ansicht-text"><h2 id="aTitel"></h2><p id="aDatum"></p></div>
-      <button type="button" class="knopf-rund" id="aWeiter" aria-label="Nächstes Foto"><svg class="i" aria-hidden="true"><use href="#i-rechts"/></svg></button>
+      <button type="button" class="knopf-rund" id="aWeiter" aria-label="Nächstes Foto" data-i18n-attr="aria-label:baum.ansicht.weiter"><svg class="i" aria-hidden="true"><use href="#i-rechts"/></svg></button>
     </div>
   </div>
 </dialog>
 
 <script src="../shared/start.js" data-ansicht="baum"></script>
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „baum“ (t ist hier die Tageszahl)
   var K = window.Kalender.init('baum');
   var F = window.Fotos;
   var TAU = Math.PI * 2;
@@ -453,12 +456,12 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
   function zeigeTon() {
     el.ton.setAttribute('aria-pressed', tonAn ? 'true' : 'false');
     el.ton.querySelector('use').setAttribute('href', tonAn ? '#i-ton' : '#i-stumm');
-    el.ton.title = tonAn ? 'Glöckchen-Ton ist an' : 'Glöckchen-Ton ist aus';
+    el.ton.title = tonAn ? tx('baum.ton.an', 'Glöckchen-Ton ist an') : tx('baum.ton.aus', 'Glöckchen-Ton ist aus');
   }
   el.ton.addEventListener('click', function () {
     tonAn = !tonAn;
     try { window.localStorage.setItem(TON_KEY, tonAn ? '1' : '0'); } catch (e) { /* egal */ }
-    zeigeTon(); sage(tonAn ? 'Ton an' : 'Ton aus');
+    zeigeTon(); sage(tonAn ? tx('baum.ton.kurzAn', 'Ton an') : tx('baum.ton.kurzAus', 'Ton aus'));
     if (tonAn) ton('ting');
   });
   zeigeTon();
@@ -472,7 +475,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
   }
   function zustandText(t) {
     var z = zustand(t);
-    return z === 'offen' ? 'geöffnet' : z === 'zu' ? 'noch zu' : z === 'heute' ? 'heute, noch zu' : 'verpasst, jetzt nachholen';
+    return z === 'offen' ? tx('baum.zustand.offen', 'geöffnet') : z === 'zu' ? tx('baum.zustand.zu', 'noch zu') : z === 'heute' ? tx('baum.zustand.heute', 'heute, noch zu') : tx('baum.zustand.verpasst', 'verpasst, jetzt nachholen');
   }
   function anordnung() {
     var r = K.reihenfolge ? K.reihenfolge() : null, ok = r && r.length === 24, i, gesehen = {};
@@ -1599,8 +1602,8 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
     var h = K.heute();
     if (!REDUZIERT) { gs.hopV = -G.R * 2.5; gs.kippV += (Math.random() < 0.5 ? -1 : 1) * (3 + Math.random() * 2); }
     ton('rassel'); brumm(10); anstossen();
-    var s = h >= 24 ? [['Hohoho!', 'Schon alles ausgepackt?'], ['Raschel, raschel …', 'Für wen das wohl ist?']]
-      : [['Psst!', 'Geschenke gibt es erst an Heiligabend.'], ['Da raschelt was …', h === 23 ? 'Morgen ist Heiligabend!' : 'Noch ' + (24 - h) + '× schlafen bis Heiligabend.'], ['Nicht schütteln!', 'Da ist vielleicht was Zerbrechliches drin.']];
+    var s = h >= 24 ? [[tx('baum.geschenk.hohoho', 'Hohoho!'), tx('baum.geschenk.ausgepackt', 'Schon alles ausgepackt?')], [tx('baum.geschenk.raschel', 'Raschel, raschel …'), tx('baum.geschenk.fuerWen', 'Für wen das wohl ist?')]]
+      : [[tx('baum.geschenk.psst', 'Psst!'), tx('baum.geschenk.erstHeiligabend', 'Geschenke gibt es erst an Heiligabend.')], [tx('baum.geschenk.raschelt', 'Da raschelt was …'), h === 23 ? tx('baum.geschenk.morgen', 'Morgen ist Heiligabend!') : tx('baum.geschenk.schlafen', 'Noch {n}× schlafen bis Heiligabend.', { n: 24 - h })], [tx('baum.geschenk.nichtSchuetteln', 'Nicht schütteln!'), tx('baum.geschenk.zerbrechlich', 'Da ist vielleicht was Zerbrechliches drin.')]];
     var sp = s[geschenkSpruch++ % s.length];
     zeigeBlase(gs.x, gs.by + gs.hop, gs.boden, sp[0], sp[1]);
   }
@@ -1617,7 +1620,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
   function bimmeln(k) {
     k.psiV += (k.psi >= 0 ? -1 : 1) * 5.5;
     ton('bimmel'); brumm(12); anstossen();
-    zeigeBlase(k.sx, k.sy - k.sr * 1.7, k.sy + k.sr * 1.3, K.sperrText(k.tag), 'Kugel ' + k.tag + ' ist am ' + K.datumText(k.tag) + ' dran.');
+    zeigeBlase(k.sx, k.sy - k.sr * 1.7, k.sy + k.sr * 1.3, K.sperrText(k.tag), tx('baum.blase.kugel', 'Kugel {n} ist am {datum} dran.', { n: k.tag, datum: K.datumText(k.tag) }));
   }
   function starteFlug(k, erstes, opener) {
     var r1 = Math.min(G.W, G.H) * 0.24;
@@ -1654,7 +1657,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
     versteckeBlase(); versteckePfeil();
     if (!K.darfOeffnen(24)) {
       sternWackelV += 7; ton('bimmel'); brumm(12); anstossen();
-      zeigeBlase(G.cx, G.starY - G.starR * 1.3, G.starY + G.starR * 1.2, K.sperrText(24), 'Den Stern knipst du am ' + K.datumText(24) + ' an.');
+      zeigeBlase(G.cx, G.starY - G.starR * 1.3, G.starY + G.starR * 1.2, K.sperrText(24), tx('baum.blase.stern', 'Den Stern knipst du am {datum} an.', { datum: K.datumText(24) }));
       return;
     }
     if ((sternAnim && !sternAnim.fertig) || A.offen) return;
@@ -1674,7 +1677,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
     if (kugelVon[t]) baueKugelBild(kugelVon[t]);
     ladeKugelFotos();
     hauptAlt = ''; nachRahmen();
-    sage((t === 24 ? 'Der Stern leuchtet. ' : 'Kugel ' + t + ' ist offen. ') + (titelVon(t) || K.datumText(t)));
+    sage((t === 24 ? tx('baum.sage.stern', 'Der Stern leuchtet.') : tx('baum.sage.kugel', 'Kugel {n} ist offen.', { n: t })) + ' ' + (titelVon(t) || K.datumText(t)));
   }
 
   /* ---------------- Drehen per Knopf und Tastatur ---------------- */
@@ -1695,7 +1698,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
   }
   function meldeVorne() {
     var v = vorneKugel();
-    if (v) sage('Vorne hängt Kugel ' + v.tag + ', ' + K.datumText(v.tag) + ' – ' + zustandText(v.tag) + '.');
+    if (v) sage(tx('baum.sage.vorne', 'Vorne hängt Kugel {n}, {datum} – {zustand}.', { n: v.tag, datum: K.datumText(v.tag), zustand: zustandText(v.tag) }));
   }
   el.links.addEventListener('click', function () { dreheSchritt(-1); });
   el.rechts.addEventListener('click', function () { dreheSchritt(1); });
@@ -1746,7 +1749,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
     var links = a > 0;
     el.pfeil.classList.toggle('rechts', !links);
     el.pfeil.querySelector('use').setAttribute('href', links ? '#i-links' : '#i-rechts');
-    el.pfeil.querySelector('span').textContent = links ? 'Dreh nach links' : 'Dreh nach rechts';
+    el.pfeil.querySelector('span').textContent = links ? tx('baum.pfeil.links', 'Dreh nach links') : tx('baum.pfeil.rechts', 'Dreh nach rechts');
     el.pfeil.hidden = false;
   }
   function versteckePfeil() { el.pfeil.hidden = true; planePfeil(); }
@@ -1787,7 +1790,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
     if (gefundenBlase) {
       gefundenBlase = false;
       var h = K.heute(), k = kugelVon[h];
-      if (k && zustand(h) === 'heute' && !A.offen && Math.abs(wrap(k.th + phi)) < 0.35) zeigeBlase(k.sx, k.sy - k.sr * 1.8, k.sy + k.sr * 1.4, 'Da ist sie!', 'Tipp Kugel ' + h + ' an.');
+      if (k && zustand(h) === 'heute' && !A.offen && Math.abs(wrap(k.th + phi)) < 0.35) zeigeBlase(k.sx, k.sy - k.sr * 1.8, k.sy + k.sr * 1.4, tx('baum.blase.daIstSie', 'Da ist sie!'), tx('baum.blase.tipp', 'Tipp Kugel {n} an.', { n: h }));
     }
     planePfeil();
   }
@@ -1796,56 +1799,56 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
   var hinweisAlt = '', hauptAlt = '', hauptM = null, suchStart = 0, SUCH_MS = 9000, hilfeUhr = 0;
   function kopfText() {
     var h = K.heute();
-    el.datum.textContent = h === 0 ? 'Noch ist November' : h >= 25 ? 'Frohe Weihnachten!' : h === 24 ? 'Heiligabend, 24. Dezember' : 'Heute: ' + K.datumText(h);
-    el.platz.setAttribute('aria-label', 'Weihnachtsbaum mit 23 Kugeln und einem Stern. Pfeiltasten links und rechts drehen den Baum, die Eingabetaste öffnet die vordere Kugel, Pfeil nach oben den Stern.');
+    el.datum.textContent = h === 0 ? tx('baum.kopf.november', 'Noch ist November') : h >= 25 ? tx('baum.kopf.weihnachten', 'Frohe Weihnachten!') : h === 24 ? tx('baum.kopf.heiligabend', 'Heiligabend, 24. Dezember') : tx('baum.kopf.heute', 'Heute: {datum}', { datum: K.datumText(h) });
+    el.platz.setAttribute('aria-label', tx('baum.platz', 'Weihnachtsbaum mit 23 Kugeln und einem Stern. Pfeiltasten links und rechts drehen den Baum, die Eingabetaste öffnet die vordere Kugel, Pfeil nach oben den Stern.'));
   }
   function verpassteTage() { var r = [], h = Math.min(24, K.heute()); for (var t = 1; t <= h; t++) if (zustand(t) === 'verpasst') r.push(t); return r; }
   function hinweisBerechnen() {
     var h = K.heute();
-    if (h === 0) return 'Noch ist November. Ab 1. Dezember hängt hier jeden Tag eine Kugel mit Foto.';
+    if (h === 0) return tx('baum.hinweis.november', 'Noch ist November. Ab 1. Dezember hängt hier jeden Tag eine Kugel mit Foto.');
     if (h <= 23 && zustand(h) === 'heute') {
       var a = Math.abs(wrap(kugelVon[h].th + phi));
-      if (a < 0.35) return 'Gefunden! Tipp die leuchtende Kugel ' + h + ' an.';
-      if (a < 1.45) return 'Da schimmert Kugel ' + h + ' schon! Noch ein Stück drehen.';
-      return 'Irgendwo leuchtet Kugel ' + h + ' … Dreh den Baum ' + (GROB ? 'mit dem Finger' : 'mit der Maus oder den Pfeiltasten') + ', bis du sie findest.';
+      if (a < 0.35) return tx('baum.hinweis.gefunden', 'Gefunden! Tipp die leuchtende Kugel {n} an.', { n: h });
+      if (a < 1.45) return tx('baum.hinweis.schimmert', 'Da schimmert Kugel {n} schon! Noch ein Stück drehen.', { n: h });
+      return GROB ? tx('baum.hinweis.suchenFinger', 'Irgendwo leuchtet Kugel {n} … Dreh den Baum mit dem Finger, bis du sie findest.', { n: h }) : tx('baum.hinweis.suchenMaus', 'Irgendwo leuchtet Kugel {n} … Dreh den Baum mit der Maus oder den Pfeiltasten, bis du sie findest.', { n: h });
     }
-    if (zustand(24) === 'heute') return 'Heiligabend! Tipp den Stern an der Spitze an und knipse ihn an.';
+    if (zustand(24) === 'heute') return tx('baum.hinweis.heiligabend', 'Heiligabend! Tipp den Stern an der Spitze an und knipse ihn an.');
     var v = verpassteTage();
     if (h >= 24) {
       var nK = v.filter(function (t) { return t !== 24; }).length, sternZu = v.indexOf(24) >= 0;
-      var rest = nK === 1 ? 'Eine Kugel mit roter Schleife wartet noch.' : nK + ' Kugeln mit roter Schleife warten noch.';
+      var rest = tx('baum.hinweis.rest', { one: 'Eine Kugel mit roter Schleife wartet noch.', other: '{n} Kugeln mit roter Schleife warten noch.' }, { n: nK });
       if (h >= 25) {
-        if (sternZu) return 'Alles darf auf! Knips den Stern an' + (nK ? ' – und ' + (nK === 1 ? 'eine Kugel wartet' : nK + ' Kugeln warten') + ' auch noch.' : '.');
-        if (nK) return 'Alles darf auf! ' + rest;
-        return 'Alle 24 Fotos hängen am Baum – dreh ihn und schau sie dir noch einmal an.';
+        if (sternZu) return nK ? tx('baum.hinweis.sternUndKugeln', { one: 'Alles darf auf! Knips den Stern an – und eine Kugel wartet auch noch.', other: 'Alles darf auf! Knips den Stern an – und {n} Kugeln warten auch noch.' }, { n: nK }) : tx('baum.hinweis.stern', 'Alles darf auf! Knips den Stern an.');
+        if (nK) return tx('baum.hinweis.allesDarfAuf', 'Alles darf auf!') + ' ' + rest;
+        return tx('baum.hinweis.alleFotos', 'Alle 24 Fotos hängen am Baum – dreh ihn und schau sie dir noch einmal an.');
       }
-      if (nK) return 'Der Stern leuchtet! ' + rest;
-      return 'Frohe Weihnachten! Alle 24 Fotos hängen am Baum – dreh ihn und schau sie an.';
+      if (nK) return tx('baum.hinweis.sternLeuchtet', 'Der Stern leuchtet!') + ' ' + rest;
+      return tx('baum.hinweis.weihnachten', 'Frohe Weihnachten! Alle 24 Fotos hängen am Baum – dreh ihn und schau sie an.');
     }
-    if (v.length === 1) { var t = v[0]; return 'Kugel ' + h + ' ist offen. ' + (t === h - 1 ? 'Kugel ' + t + ' von gestern' : 'Kugel ' + t) + ' wartet noch – mit roter Schleife.'; }
+    if (v.length === 1) { var t = v[0]; return t === h - 1 ? tx('baum.hinweis.gestern', 'Kugel {h} ist offen. Kugel {n} von gestern wartet noch – mit roter Schleife.', { h: h, n: t }) : tx('baum.hinweis.eineVerpasst', 'Kugel {h} ist offen. Kugel {n} wartet noch – mit roter Schleife.', { h: h, n: t }); }
     // mehrere verpasst (z. B. Erstbesuch am 12.): ehrlich zählen; welche als Nächstes dran ist, sagt der Hauptknopf
     // („Kugel 11 finden“ bzw. „Kugel 6 nachholen“, wenn gerade eine verpasste vorn hängt)
-    if (v.length) return 'Kugel ' + h + ' ist offen. Noch ' + v.length + ' Kugeln mit roter Schleife warten aufs Nachholen.';
-    return 'Kugel ' + h + ' ist offen. Tipp eine Foto-Kugel an – morgen hängt die nächste.';
+    if (v.length) return tx('baum.hinweis.mehrereVerpasst', 'Kugel {h} ist offen. Noch {n} Kugeln mit roter Schleife warten aufs Nachholen.', { h: h, n: v.length });
+    return tx('baum.hinweis.offen', 'Kugel {h} ist offen. Tipp eine Foto-Kugel an – morgen hängt die nächste.', { h: h });
   }
   function hauptModus() {
     var h = K.heute(), v = vorneKugel();
-    if (h === 0) return { m: 'nov', text: 'Ab 1. Dezember', icon: 'i-stern', stil: 'ruhig' };
+    if (h === 0) return { m: 'nov', text: tx('baum.haupt.november', 'Ab 1. Dezember'), icon: 'i-stern', stil: 'ruhig' };
     if (h <= 23 && zustand(h) === 'heute') {
-      if (v && v.tag === h) return { m: 'auf', k: v, text: 'Kugel ' + h + ' aufmachen', icon: 'i-kugel', stil: '' };
+      if (v && v.tag === h) return { m: 'auf', k: v, text: tx('baum.haupt.aufmachen', 'Kugel {n} aufmachen', { n: h }), icon: 'i-kugel', stil: '' };
       // Erst darf gesucht werden: die Hilfe ist da, leuchtet aber erst nach ein paar Sekunden golden
-      return { m: 'finden', text: 'Heute finden', icon: 'i-stern', stil: jetzt() - suchStart < SUCH_MS && !REDUZIERT ? 'ruhig' : '' };
+      return { m: 'finden', text: tx('baum.haupt.finden', 'Heute finden'), icon: 'i-stern', stil: jetzt() - suchStart < SUCH_MS && !REDUZIERT ? 'ruhig' : '' };
     }
-    if (zustand(24) === 'heute' || (h >= 24 && zustand(24) === 'verpasst')) return { m: 'stern', text: 'Stern anknipsen', icon: 'i-stern', stil: '' };
-    if (v && zustand(v.tag) === 'verpasst') return { m: 'auf', k: v, text: 'Kugel ' + v.tag + ' nachholen', icon: 'i-kugel', stil: '' };
+    if (zustand(24) === 'heute' || (h >= 24 && zustand(24) === 'verpasst')) return { m: 'stern', text: tx('baum.haupt.stern', 'Stern anknipsen'), icon: 'i-stern', stil: '' };
+    if (v && zustand(v.tag) === 'verpasst') return { m: 'auf', k: v, text: tx('baum.haupt.nachholen', 'Kugel {n} nachholen', { n: v.tag }), icon: 'i-kugel', stil: '' };
     var vp = verpassteTage().filter(function (t) { return t !== 24; });
-    if (vp.length) { var tv = vp[vp.length - 1]; return { m: 'suche', k: kugelVon[tv], text: 'Kugel ' + tv + ' finden', icon: 'i-kugel', stil: '' }; }
+    if (vp.length) { var tv = vp[vp.length - 1]; return { m: 'suche', k: kugelVon[tv], text: tx('baum.haupt.kugelFinden', 'Kugel {n} finden', { n: tv }), icon: 'i-kugel', stil: '' }; }
     if (v) {
-      if (zustand(v.tag) === 'offen') return { m: 'auf', k: v, text: 'Foto ' + v.tag + ' ansehen', icon: 'i-bild', stil: 'kupfer' };
-      return { m: 'zu', k: v, text: 'Kugel ' + v.tag + ' ist noch zu', icon: 'i-kugel', stil: 'ruhig' };
+      if (zustand(v.tag) === 'offen') return { m: 'auf', k: v, text: tx('baum.haupt.foto', 'Foto {n} ansehen', { n: v.tag }), icon: 'i-bild', stil: 'kupfer' };
+      return { m: 'zu', k: v, text: tx('baum.haupt.nochZu', 'Kugel {n} ist noch zu', { n: v.tag }), icon: 'i-kugel', stil: 'ruhig' };
     }
-    if (K.geoeffnet().length) return { m: 'fotos', text: 'Fotos ansehen', icon: 'i-bild', stil: 'kupfer' };
-    return { m: 'finden', text: 'Heute finden', icon: 'i-stern', stil: '' };
+    if (K.geoeffnet().length) return { m: 'fotos', text: tx('baum.haupt.fotos', 'Fotos ansehen'), icon: 'i-bild', stil: 'kupfer' };
+    return { m: 'finden', text: tx('baum.haupt.finden', 'Heute finden'), icon: 'i-stern', stil: '' };
   }
   function aktualisiereHaupt(m) {
     hauptM = m;
@@ -1864,7 +1867,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
   el.haupt.addEventListener('click', function () {
     var m = hauptModus(); aktualisiereHaupt(m);
     letzteAktion = jetzt(); versteckePfeil();
-    if (m.m === 'nov') { ton('bimmel'); var r = el.haupt.getBoundingClientRect(); zeigeBlase(r.left + r.width / 2, r.top, r.bottom, K.sperrText(1), 'Bis dahin darfst du den Baum schon drehen.'); return; }
+    if (m.m === 'nov') { ton('bimmel'); var r = el.haupt.getBoundingClientRect(); zeigeBlase(r.left + r.width / 2, r.top, r.bottom, K.sperrText(1), tx('baum.blase.drehen', 'Bis dahin darfst du den Baum schon drehen.')); return; }
     if (m.m === 'finden') { heuteFinden(); return; }
     if (m.m === 'suche') { setzeZiel(m.k, 14, meldeVorne); return; }
     if (m.m === 'stern') { sternAntippen(el.haupt); return; }
@@ -1892,8 +1895,8 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
   function fuelleListe() {
     for (var t = 1; t <= 24; t++) fuelleMini(t);
     var h = K.heute();
-    el.listeHilfe.textContent = h === 0 ? 'Alle Kugeln sind noch bereift. Ab 1. Dezember darf jeden Tag eine auf.'
-      : 'Durcheinander wie am Baum. Tipp eine an – der Baum dreht sich zu ihr und sie macht sich auf.';
+    el.listeHilfe.textContent = h === 0 ? tx('baum.liste.november', 'Alle Kugeln sind noch bereift. Ab 1. Dezember darf jeden Tag eine auf.')
+      : tx('baum.liste.hilfe', 'Durcheinander wie am Baum. Tipp eine an – der Baum dreht sich zu ihr und sie macht sich auf.');
   }
   function fuelleMini(t) {
     var b = minis[t];
@@ -1904,7 +1907,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
       inner = '<span class="mk mk-stern"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.7 5.8 6.3.7-4.7 4.3 1.3 6.2L12 16.4l-5.6 3.1 1.3-6.2L3 9l6.3-.7z" fill="' + (z === 'zu' ? '#b9ad93' : z === 'offen' ? '#ffd877' : '#e9b85a') + '" stroke="#5a4419" stroke-width="1"/></svg></span>';
     } else inner = '<span class="mk"></span>';
     b.innerHTML = inner + '<span class="mz">' + t + '</span>';
-    b.setAttribute('aria-label', (t === 24 ? 'Stern, ' : 'Kugel, ') + 'Tag ' + t + ', ' + K.datumText(t) + ' – ' + zustandText(t));
+    b.setAttribute('aria-label', (t === 24 ? tx('baum.mini.stern', 'Stern, Tag {n}, {datum}', { n: t, datum: K.datumText(t) }) : tx('baum.mini.kugel', 'Kugel, Tag {n}, {datum}', { n: t, datum: K.datumText(t) })) + ' – ' + zustandText(t));
     if (t === 24) return;
     // dieselbe Kugel wie am Baum: glänzend (darf auf), bereift (kommt noch), rote Schleife (verpasst), mit Foto (offen)
     var kg = kugelVon[t], farbe = kg ? kg.farbe : '#cf7446', c = miniLeinwand(36, 44);
@@ -1975,7 +1978,7 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
       b.classList.remove('wackelt'); void b.offsetWidth; b.classList.add('wackelt');
       ton('bimmel');
       var r = b.getBoundingClientRect();
-      zeigeBlase(r.left + r.width / 2, r.top, r.bottom, K.sperrText(t), (t === 24 ? 'Den Stern knipst du' : 'Kugel ' + t + ' ist') + ' am ' + K.datumText(t) + (t === 24 ? ' an.' : ' dran.'));
+      zeigeBlase(r.left + r.width / 2, r.top, r.bottom, K.sperrText(t), t === 24 ? tx('baum.blase.stern', 'Den Stern knipst du am {datum} an.', { datum: K.datumText(t) }) : tx('baum.blase.kugel', 'Kugel {n} ist am {datum} dran.', { n: t, datum: K.datumText(t) }));
       return;
     }
     var opener = istPanel() ? b : el.listeAuf;
@@ -2065,10 +2068,10 @@ html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
   function setzeAnsichtsInhalt() {
     var t = A.liste[A.i], mein = ++A.token, ti = titelVon(t);
     el.aTitel.textContent = ti || K.datumText(t);
-    el.aDatum.textContent = ti ? 'Tag ' + t + ' · ' + K.datumText(t) : (t === 24 ? 'Heiligabend · Tag 24' : 'Tag ' + t);
-    el.aZaehler.textContent = A.liste.length === 1 ? 'Dein erstes Foto' : 'Foto ' + (A.i + 1) + ' von ' + A.liste.length;
+    el.aDatum.textContent = ti ? tx('baum.ansicht.tagDatum', 'Tag {n} · {datum}', { n: t, datum: K.datumText(t) }) : (t === 24 ? tx('baum.ansicht.heiligabend', 'Heiligabend · Tag 24') : tx('baum.ansicht.tag', 'Tag {n}', { n: t }));
+    el.aZaehler.textContent = A.liste.length === 1 ? tx('baum.ansicht.erstes', 'Dein erstes Foto') : tx('baum.ansicht.zaehler', 'Foto {n} von {gesamt}', { n: A.i + 1, gesamt: A.liste.length });
     el.aZurueck.disabled = A.i <= 0; el.aWeiter.disabled = A.i >= A.liste.length - 1;
-    el.aBild.alt = 'Fotocollage von Tag ' + t + (ti ? ': ' + ti : '');
+    el.aBild.alt = ti ? tx('baum.ansicht.altTitel', 'Fotocollage von Tag {n}: {titel}', { n: t, titel: ti }) : tx('baum.ansicht.alt', 'Fotocollage von Tag {n}', { n: t });
     el.spur.classList.add('laedt'); el.spur.classList.remove('fehler');
     // Vorschau dieses Tages (Kugel, Liste oder Flug haben sie meist schon geholt) als unscharfer Platzhalter, bis das
     // große Bild da ist; ist sie noch unterwegs, kommt sie nach. Für die Ansicht allein wird keine extra geholt.

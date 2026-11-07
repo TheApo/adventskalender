@@ -1,0 +1,1597 @@
+{
+  "allgemein": {
+    "ansicht": {
+      "baum": "Drehbaum",
+      "fotoleine": "Fotoleine",
+      "geschenk": "Geschenke auspacken",
+      "girlande": "Kugel-Girlanden",
+      "kranz": "Lichterkranz",
+      "nuss": "Nussknacker",
+      "rubbellos": "Weihnachtslotterie",
+      "schneekugel": "Schneekugel",
+      "schneemann": "Schneefiguren bauen",
+      "sterne": "Sternbilder",
+      "stories": "Advent-Stories",
+      "tueren": "Türchenwand"
+    },
+    "demo": {
+      "testHinweis": "Stell ein beliebiges Datum ein – so siehst du, wie sich der Kalender bis Weihnachten füllt.",
+      "testTitel": "Datum ausprobieren"
+    },
+    "fotoFolgt": "Foto folgt",
+    "knopf": {
+      "kurz": "Ansicht & Einstellungen",
+      "lang": "Ansicht wechseln und Einstellungen",
+      "menue": "Menü",
+      "testdatum": "Testdatum: {datum}",
+      "testdatumAktiv": "Testdatum aktiv: {datum}"
+    },
+    "menue": {
+      "ansichtWaehlen": "Ansicht wählen",
+      "bleibtErhalten": "Was schon geöffnet ist, bleibt beim Wechseln erhalten.",
+      "credit": "Dein Adventskalender – made by Dirk Aporius",
+      "schliessen": "Menü schließen",
+      "sprache": "Sprache",
+      "startseite": "Zur Startseite"
+    },
+    "sperre": {
+      "ersterDezember": "Ab 1. Dezember geht’s los!",
+      "morgen": "Morgen ist es so weit!",
+      "november": "Noch ist November – Geduld!",
+      "schlafen": "Noch {n}× schlafen!"
+    },
+    "status": {
+      "alleOffen": "Alle 24 Tage sind geöffnet.",
+      "allesZu": "Alle Tage sind wieder zu.",
+      "bisGestern": {
+        "one": "Tag 1 ist geöffnet, heute ist noch zu.",
+        "other": "Tag 1 bis {n} sind geöffnet, heute ist noch zu."
+      },
+      "ersterTag": "Heute ist der erste Tag – davor gibt es nichts.",
+      "vorDezember": "Vor Dezember gibt es noch nichts zu öffnen."
+    },
+    "tag": {
+      "ab25": "ab 25. Dezember",
+      "ab25Lang": "ab 25. Dezember (alles offen)",
+      "vorDezember": "vor Dezember",
+      "vorDezemberLang": "vor Dezember (alles zu)"
+    },
+    "test": {
+      "allesNochZu": "alles noch zu",
+      "allesOffen": "alles offen",
+      "allesZu": "Alle wieder zu",
+      "anzeigen": "Dieses Datum anzeigen",
+      "bisGestern": "Bis gestern öffnen",
+      "echt": "Echtes Datum ({datum})",
+      "endet": "Testmodus endet automatisch am {datum}.",
+      "frueher": "Einen Tag früher",
+      "getrennt": "Ein Testdatum wird getrennt vom echten Stand gemerkt.",
+      "hinweisStatisch": "Testdatum einstellen – nur in diesem Browser, getrennt vom echten Stand. „?test=aus“ beendet den Testmodus.",
+      "marke": "Testdatum aktiv",
+      "schluessel": "Testmodus über Testschlüssel aktiv.",
+      "spaeter": "Einen Tag später",
+      "titel": "Testmodus",
+      "waehlen": "Testdatum wählen",
+      "zeigtEcht": "Angezeigt wird das echte Datum: {datum}.",
+      "zeigtTest": "Angezeigt wird das Testdatum {datum}."
+    }
+  },
+  "baum": {
+    "ansicht": {
+      "alt": "Fotocollage von Tag {n}",
+      "altTitel": "Fotocollage von Tag {n}: {titel}",
+      "erstes": "Dein erstes Foto",
+      "fehler": "Dieses Foto lässt sich gerade nicht laden.",
+      "heiligabend": "Heiligabend · Tag 24",
+      "laden": "Foto wird geholt …",
+      "nochmal": "Nochmal versuchen",
+      "schliessen": "Bildansicht schließen",
+      "tag": "Tag {n}",
+      "tagDatum": "Tag {n} · {datum}",
+      "weiter": "Nächstes Foto",
+      "zaehler": "Foto {n} von {gesamt}",
+      "zurueck": "Vorheriges Foto"
+    },
+    "blase": {
+      "daIstSie": "Da ist sie!",
+      "drehen": "Bis dahin darfst du den Baum schon drehen.",
+      "kugel": "Kugel {n} ist am {datum} dran.",
+      "stern": "Den Stern knipst du am {datum} an.",
+      "tipp": "Tipp Kugel {n} an."
+    },
+    "geschenk": {
+      "ausgepackt": "Schon alles ausgepackt?",
+      "erstHeiligabend": "Geschenke gibt es erst an Heiligabend.",
+      "fuerWen": "Für wen das wohl ist?",
+      "hohoho": "Hohoho!",
+      "morgen": "Morgen ist Heiligabend!",
+      "nichtSchuetteln": "Nicht schütteln!",
+      "psst": "Psst!",
+      "raschel": "Raschel, raschel …",
+      "raschelt": "Da raschelt was …",
+      "schlafen": "Noch {n}× schlafen bis Heiligabend.",
+      "zerbrechlich": "Da ist vielleicht was Zerbrechliches drin."
+    },
+    "haupt": {
+      "aufmachen": "Kugel {n} aufmachen",
+      "finden": "Heute finden",
+      "foto": "Foto {n} ansehen",
+      "fotos": "Fotos ansehen",
+      "kugelFinden": "Kugel {n} finden",
+      "nachholen": "Kugel {n} nachholen",
+      "nochZu": "Kugel {n} ist noch zu",
+      "november": "Ab 1. Dezember",
+      "stern": "Stern anknipsen"
+    },
+    "hinweis": {
+      "alleFotos": "Alle 24 Fotos hängen am Baum – dreh ihn und schau sie dir noch einmal an.",
+      "allesDarfAuf": "Alles darf auf!",
+      "eineVerpasst": "Kugel {h} ist offen. Kugel {n} wartet noch – mit roter Schleife.",
+      "gefunden": "Gefunden! Tipp die leuchtende Kugel {n} an.",
+      "gestern": "Kugel {h} ist offen. Kugel {n} von gestern wartet noch – mit roter Schleife.",
+      "heiligabend": "Heiligabend! Tipp den Stern an der Spitze an und knipse ihn an.",
+      "mehrereVerpasst": "Kugel {h} ist offen. Noch {n} Kugeln mit roter Schleife warten aufs Nachholen.",
+      "november": "Noch ist November. Ab 1. Dezember hängt hier jeden Tag eine Kugel mit Foto.",
+      "offen": "Kugel {h} ist offen. Tipp eine Foto-Kugel an – morgen hängt die nächste.",
+      "rest": {
+        "one": "Eine Kugel mit roter Schleife wartet noch.",
+        "other": "{n} Kugeln mit roter Schleife warten noch."
+      },
+      "schimmert": "Da schimmert Kugel {n} schon! Noch ein Stück drehen.",
+      "stern": "Alles darf auf! Knips den Stern an.",
+      "sternLeuchtet": "Der Stern leuchtet!",
+      "sternUndKugeln": {
+        "one": "Alles darf auf! Knips den Stern an – und eine Kugel wartet auch noch.",
+        "other": "Alles darf auf! Knips den Stern an – und {n} Kugeln warten auch noch."
+      },
+      "suchenFinger": "Irgendwo leuchtet Kugel {n} … Dreh den Baum mit dem Finger, bis du sie findest.",
+      "suchenMaus": "Irgendwo leuchtet Kugel {n} … Dreh den Baum mit der Maus oder den Pfeiltasten, bis du sie findest.",
+      "weihnachten": "Frohe Weihnachten! Alle 24 Fotos hängen am Baum – dreh ihn und schau sie an."
+    },
+    "knopf": {
+      "links": "Baum nach links drehen",
+      "rechts": "Baum nach rechts drehen"
+    },
+    "kopf": {
+      "heiligabend": "Heiligabend, 24. Dezember",
+      "heute": "Heute: {datum}",
+      "november": "Noch ist November",
+      "weihnachten": "Frohe Weihnachten!"
+    },
+    "legende": {
+      "foto": "mit Foto: schon offen",
+      "frost": "bereift: kommt noch",
+      "glas": "glänzend: darf auf",
+      "schleife": "rote Schleife: verpasst"
+    },
+    "liste": {
+      "auf": "Alle Kugeln als Liste zeigen",
+      "hilfe": "Durcheinander wie am Baum. Tipp eine an – der Baum dreht sich zu ihr und sie macht sich auf.",
+      "november": "Alle Kugeln sind noch bereift. Ab 1. Dezember darf jeden Tag eine auf.",
+      "titel": "Alle Kugeln",
+      "zu": "Liste schließen"
+    },
+    "mini": {
+      "kugel": "Kugel, Tag {n}, {datum}",
+      "stern": "Stern, Tag {n}, {datum}"
+    },
+    "pfeil": {
+      "links": "Dreh nach links",
+      "rechts": "Dreh nach rechts"
+    },
+    "platz": "Weihnachtsbaum mit 23 Kugeln und einem Stern. Pfeiltasten links und rechts drehen den Baum, die Eingabetaste öffnet die vordere Kugel, Pfeil nach oben den Stern.",
+    "rolle": "Drehbaum",
+    "sage": {
+      "kugel": "Kugel {n} ist offen.",
+      "stern": "Der Stern leuchtet.",
+      "vorne": "Vorne hängt Kugel {n}, {datum} – {zustand}."
+    },
+    "steuer": "Baum bedienen",
+    "ton": {
+      "an": "Glöckchen-Ton ist an",
+      "aus": "Glöckchen-Ton ist aus",
+      "kurzAn": "Ton an",
+      "kurzAus": "Ton aus",
+      "label": "Glöckchen-Ton",
+      "titel": "Glöckchen-Ton an oder aus"
+    },
+    "zustand": {
+      "heute": "heute, noch zu",
+      "offen": "geöffnet",
+      "verpasst": "verpasst, jetzt nachholen",
+      "zu": "noch zu"
+    }
+  },
+  "fotoleine": {
+    "ansicht": {
+      "alt": "Collage vom {n}. Dezember",
+      "altTitel": "Collage vom {n}. Dezember: {titel}",
+      "schliessen": "Schließen",
+      "weiter": "Nächstes Foto",
+      "wischen": "wischen zum Blättern",
+      "zaehler": "Foto {n} von {gesamt}",
+      "zurueck": "Vorheriges Foto"
+    },
+    "buehne": {
+      "collage": "Collage ansehen",
+      "foto": "Foto vom {n}. Dezember. Antippen zeigt die ganze Collage.",
+      "fotoTitel": "Foto vom {n}. Dezember: {titel}. Antippen zeigt die ganze Collage.",
+      "haengen": "An die Leine hängen",
+      "titel": "Umschlag {n}, {datum}",
+      "zu": "Foto an die Leine hängen und schließen"
+    },
+    "entwickelt": "Das Foto ist fertig entwickelt.",
+    "hinweis": {
+      "heute": "Heute: Umschlag",
+      "zeigen": "Heute: Umschlag {n} zeigen"
+    },
+    "hinweisText": {
+      "fertig": "Fertig entwickelt! Tipp aufs Foto, dann siehst du die ganze Collage.",
+      "finger": "Das Foto entwickelt sich noch. Halt es fest und schüttel es, dann geht’s schneller.",
+      "laedt": "Einen Moment – das Foto ist gleich da.",
+      "maus": "Das Foto entwickelt sich noch. Halt es mit der Maus fest und schüttel es, dann geht’s schneller.",
+      "weiter": "Gut so, weiter schütteln!"
+    },
+    "kommtAm": "Umschlag {n} kommt am {datum}.",
+    "kopf": {
+      "alle": "Alle 24 Fotos hängen an der Leine. Tipp eins an und blättere durchs Jahr.",
+      "fotos": {
+        "one": "Ein Foto hängt schon an der Leine.",
+        "other": "{n} Fotos hängen schon an der Leine."
+      },
+      "heute": "Heute ist {datum}.",
+      "keinFoto": "Noch hängt kein Foto an der Leine.",
+      "lichterkette": "Dann geht auch die Lichterkette an.",
+      "nachholen": "Umschläge mit Zettel kannst du nachholen.",
+      "november": "Noch ist November. Ab dem 1. Dezember hängt jeden Morgen ein neuer Umschlag an der Leine.",
+      "offen": "Der Umschlag von heute ist offen, morgen kommt neue Post.",
+      "siegel": "Der Umschlag mit dem roten Siegel ist von heute.",
+      "warten": {
+        "one": "Ein Umschlag wartet noch – mach ihn ruhig jetzt auf.",
+        "other": "{n} Umschläge warten noch – mach sie ruhig jetzt auf."
+      },
+      "weihnachten": "Frohe Weihnachten!"
+    },
+    "status": {
+      "heute": "heute, Umschlag öffnen",
+      "offen": "geöffnet, Foto ansehen",
+      "verpasst": "noch nicht geöffnet, Umschlag öffnen",
+      "zu": "noch verschlossen. {sperre}"
+    },
+    "stempel": "Zustellung am",
+    "tag": "Tag {n}, {datum}",
+    "tagDezember": "{n}. Dezember",
+    "umschlag": "Umschlag {n}",
+    "wand": "Die Fotoleine mit 24 Umschlägen",
+    "zettel": "noch nicht<br>geöffnet"
+  },
+  "geschenk": {
+    "ansicht": {
+      "alt": "Fotocollage von Tag {n}",
+      "altTitel": "Fotocollage von Tag {n}: {titel}",
+      "fehler": "Dieses Foto kommt gerade nicht an.",
+      "laden": "Foto wird ausgepackt …",
+      "nochmal": "Nochmal auspacken",
+      "schliessen": "Bildansicht schließen",
+      "tagDatum": "Tag {n} – {datum}",
+      "weiter": "Nächstes Foto",
+      "wiederholen": "Nochmal versuchen",
+      "zaehler": "{n} von {gesamt}",
+      "zurueck": "Vorheriges Foto"
+    },
+    "blase": {
+      "ansehen": "Tippe es an, um das Foto zu sehen.",
+      "ansehenMaus": "Klick es an, um das Foto zu sehen.",
+      "auspacken": "Tippe es an und pack es aus.",
+      "auspackenMaus": "Klick es an und pack es aus.",
+      "daIstEs": "Da ist es!",
+      "dran": "Geschenk {n} ist am {datum} dran."
+    },
+    "etikett": {
+      "heute": "Heute"
+    },
+    "fokus": {
+      "auspacken": "Auspacken",
+      "fotoGross": "Foto groß ansehen",
+      "fotoKommt": "Foto kommt …",
+      "schritt": {
+        "foto": "Foto",
+        "papier": "Papier",
+        "schleife": "Schleife"
+      },
+      "zu": "Zurück zum Gabentisch",
+      "zurueck": "Zum Gabentisch"
+    },
+    "fuss": {
+      "advent": "Jeden Tag ein Geschenk. Ausgepackte kannst du jederzeit wieder ansehen.",
+      "weihnachten": "Frohe Weihnachten – und danke fürs Mitauspacken!"
+    },
+    "gabe": "Tag {n}, {datum} – {status}",
+    "hilfe": {
+      "alleOffen": "Alle 24 Geschenke sind ausgepackt. Tippe eins an, um sein Foto wieder anzusehen.",
+      "alleOffenMaus": "Alle 24 Geschenke sind ausgepackt. Klick eins an, um sein Foto wieder anzusehen.",
+      "alleWarten": "Alle 24 Geschenke warten noch auf dich – tippe eins an und pack es aus.",
+      "alleWartenMaus": "Alle 24 Geschenke warten noch auf dich – klick eins an und pack es aus.",
+      "andere": "Alle anderen kannst du antippen und ihr Foto wieder ansehen.",
+      "andereMaus": "Alle anderen kannst du anklicken und ihr Foto wieder ansehen.",
+      "heuteOffen": "Dein Geschenk von heute ist ausgepackt – tippe es an, um das Foto wieder anzusehen.",
+      "heuteOffenMaus": "Dein Geschenk von heute ist ausgepackt – klick es an, um das Foto wieder anzusehen.",
+      "nachholen": "Geschenke mit Zettel darfst du nachholen.",
+      "november": "Die Geschenke liegen schon bereit – aber alle sind zugeklebt. Ab dem 1. Dezember darfst du jeden Tag eins auspacken.",
+      "rest": {
+        "one": "Ein Geschenk mit Zettel wartet noch auf dich.",
+        "other": "{n} Geschenke mit Zettel warten noch auf dich."
+      },
+      "suchen": "Irgendwo leuchtet dein Geschenk von heute. Findest du es?"
+    },
+    "hinweis": {
+      "ausgepackt": "Ausgepackt!",
+      "deckel": "Der Deckel springt auf …",
+      "fast": "<b>Fast geschafft!</b>Nur noch ein paar Fetzen&nbsp;– vor&nbsp;allem {wo}.",
+      "fastZiehen": "<b>Fast!</b>Zieh noch ein Stück weiter.",
+      "fotoAnsehen": "Tippe aufs Foto, um es groß zu sehen.",
+      "fotoAnsehenMaus": "Klick aufs Foto, um es groß zu sehen.",
+      "genau": "<b>Ja, genau so!</b>Reiß weiter, bis die Leiste bei der Schleife ist.",
+      "geschafft": "<b>Geschafft!</b>Der Deckel springt auf …",
+      "gleich": "<b>Gleich geht sie auf!</b>",
+      "papier": "<b>Die Schleife ist ab!</b>Jetzt reiß das ganze Papier ab&nbsp;– wisch kreuz und quer drüber.",
+      "papierMaus": "<b>Die Schleife ist ab!</b>Jetzt reiß das ganze Papier ab&nbsp;– Maustaste halten und wischen.",
+      "schleife": "Zieh an der Schleife – kräftig, bis sie aufgeht.",
+      "schleifeAb": "<b>Die Schleife ist ab!</b>Und jetzt das Papier …",
+      "schleifeMaus": "Zieh mit der Maus an der Schleife – kräftig, bis sie aufgeht.",
+      "weiterSo": "<b>Weiter so!</b>Man sieht schon die Schachtel.",
+      "wischen": "<b>Nicht nur tippen – wischen!</b>Zieh den Finger kräftig übers Papier.",
+      "wischenMaus": "<b>Nicht nur klicken – wischen!</b>Maustaste halten und übers Papier ziehen.",
+      "woanders": "<b>Da ist schon alles ab!</b>Reiß mal woanders&nbsp;– vor&nbsp;allem {wo}.",
+      "ziehen": "Weiter ziehen …"
+    },
+    "kopf": {
+      "ansehen": "Heute ansehen",
+      "finden": "Heute finden",
+      "heute": "Heute ist {datum}.",
+      "nachholen": "Nachholen: {n}",
+      "nachholenLang": "Verpasstes Geschenk {n} auspacken",
+      "november": "Noch ist November.",
+      "weihnachten": "Frohe Weihnachten!"
+    },
+    "ort": {
+      "links": "links",
+      "linksRechts": "links und rechts",
+      "mitte": "in der Mitte",
+      "oben": "oben",
+      "obenLinks": "oben links",
+      "obenRechts": "oben rechts",
+      "obenUnten": "oben und unten",
+      "raender": "an den Rändern",
+      "rechts": "rechts",
+      "unten": "unten",
+      "untenLinks": "unten links",
+      "untenRechts": "unten rechts"
+    },
+    "sage": {
+      "ausgepackt": "Ausgepackt! {datum}.",
+      "ausgepacktTitel": "Ausgepackt! {datum}: {titel}.",
+      "schleifeAb": "Die Schleife ist ab. Jetzt das Papier aufreißen.",
+      "start": "Geschenk {n}. {hinweis} Oder drück auf Auspacken."
+    },
+    "schachtel": "Für dich",
+    "status": {
+      "heute": "heute, noch eingepackt",
+      "offen": "ausgepackt, Foto ansehen",
+      "verpasst": "verpasst, jetzt auspacken",
+      "zu": "noch zugeklebt, nicht vor dem {n}. Dezember öffnen"
+    },
+    "tag": "Tag {n}",
+    "tisch": "Alle 24 Geschenke",
+    "weiterUnten": "Dein Geschenk liegt weiter unten",
+    "zettel": {
+      "datum": "{n}.12.",
+      "fuerDich": "für dich",
+      "oben": "Nicht vor dem",
+      "unten": "öffnen!"
+    }
+  },
+  "girlande": {
+    "ansicht": {
+      "bild": "Bild von Kugel {n} – {datum}",
+      "kugel": "Kugel {n}",
+      "schliessen": "Bildansicht schließen",
+      "weiter": "Nächstes Bild",
+      "zaehler": "{n} von {gesamt} geöffnet",
+      "zurueck": "Vorheriges Bild"
+    },
+    "baum": "24 Christbaumkugeln, eine für jeden Tag bis Heiligabend",
+    "etikett": {
+      "advent": "{n}. Advent",
+      "heiligabend": "Heiligabend",
+      "heute": "heute",
+      "nachholen": "nachholen"
+    },
+    "hinweis": {
+      "advent": "Grüne Kugeln verraten, wie oft ihr noch schlafen müsst",
+      "heiligabend": "Frohe Weihnachten, ihr Lieben",
+      "november": "Öffnet am 1. Dezember",
+      "weihnachten": "Frohe Weihnachten und ein gutes neues Jahr"
+    },
+    "jahr": "Das ganze Jahr ansehen",
+    "kugel": "Tag {n}, {datum} – {status}",
+    "pille": {
+      "heute": "Heute: Kugel {n}",
+      "nachholen": "Nachholen: Kugel {n}"
+    },
+    "sprung": "Zu Kugel {n}",
+    "sprungLang": "Zur goldenen Kugel {n} springen",
+    "status": {
+      "gesperrt": "gesperrt. {sperre}",
+      "heute": "heute, noch nicht geöffnet",
+      "offen": "geöffnet, Bild ansehen",
+      "verpasst": "verpasst, jetzt nachholen"
+    },
+    "unterzeile": {
+      "jahr": "ein ganzes Jahr",
+      "kugeln": "24 Kugeln",
+      "momente": "24 Momente"
+    },
+    "zahlwoerter": "null,eine,zwei,drei,vier,fünf,sechs,sieben,acht,neun,zehn,elf,zwölf",
+    "zeile": {
+      "alleOffen": "Alle Kugeln hängen voller Erinnerungen – schaut sie euch noch einmal an.",
+      "festWarten": {
+        "one": "Eine goldene Kugel wartet darauf, geöffnet zu werden.",
+        "other": "Noch {wort} goldene Kugeln warten darauf, geöffnet zu werden."
+      },
+      "heiligabend": "Heiligabend! Die letzte rote Kugel ist dran.",
+      "heuteDran": "Die rote Kugel ist heute dran – tipp sie an.",
+      "heuteOffen": "Die Kugel von heute ist offen. Morgen kommt die nächste.",
+      "letzteOffen": "Die letzte Kugel ist offen – frohe Weihnachten!",
+      "nachholen": {
+        "one": "Eine goldene Kugel wartet aufs Nachholen.",
+        "other": "{wortGross} goldene Kugeln warten aufs Nachholen."
+      },
+      "november": "Noch ist November. Ab dem <strong>1. Dezember</strong> füllt sich jeden Tag eine Kugel mit einem Bild aus unserem Jahr.",
+      "weihnachten": "Frohe Weihnachten!"
+    }
+  },
+  "kranz": {
+    "advent": "{n}. Advent",
+    "aktion": {
+      "anzuenden": "Kerze anzünden",
+      "foto": "Foto ansehen",
+      "zuHeute": "Zur Kerze von heute"
+    },
+    "ansicht": {
+      "alt": "Foto vom {n}. Dezember",
+      "altTitel": "Foto vom {n}. Dezember: {titel}",
+      "keinWeiter": "Kein nächstes Foto",
+      "keinZurueck": "Kein vorheriges Foto",
+      "laden": "Foto wird geholt …",
+      "schliessen": "Bildansicht schließen",
+      "weiter": "Nächstes Foto, Tag {n}",
+      "zurueck": "Vorheriges Foto, Tag {n}"
+    },
+    "buehne": "Adventskranz mit 24 Kerzen. Zum Drehen seitlich wischen.",
+    "heiligabend": "Heiligabend",
+    "heute": "Heute",
+    "hinweis": {
+      "wischen": "Zum Drehen seitlich wischen",
+      "ziehen": "Zum Drehen den Kranz ziehen"
+    },
+    "kerze": {
+      "brennt": "geöffnet, die Kerze brennt",
+      "heute": "heute, Kerze noch nicht angezündet",
+      "leer": "noch gesperrt",
+      "mitte": "große Kerze in der Mitte",
+      "tag": "Tag {n}, {datum}",
+      "verpasst": "verpasst, kann nachgeholt werden"
+    },
+    "kerzen": "Kerzen vom 1. bis 24. Dezember",
+    "nachholenTag": "Nachholen · Tag {n}",
+    "naechste": "Nächste Kerze",
+    "nochLeer": "noch leer",
+    "panel": "Ausgewählte Kerze",
+    "status": {
+      "alleBrennen": "Frohe Weihnachten! Alle Kerzen brennen.",
+      "anzuenden": "Zünde die Kerzen an.",
+      "brennen": {
+        "one": "1 Kerze brennt",
+        "other": "{n} von 24 Kerzen brennen"
+      },
+      "festBrennen": {
+        "one": "1 Kerze brennt.",
+        "other": "{n} von 24 Kerzen brennen."
+      },
+      "keine": "noch brennt keine Kerze",
+      "november": "Noch ist November. Der Kranz wartet auf seine Kerzen.",
+      "weihnachten": "Frohe Weihnachten!"
+    },
+    "tag": "Tag {n}",
+    "text": {
+      "anzuenden": "Die Kerze wird angezündet …",
+      "brennt": "Die Kerze brennt – schau dir das Foto an!",
+      "gesperrt": "{sperre} Dann kommt hier eine Kerze dazu.",
+      "heute": "Eine neue Kerze ist dazugekommen. Zünde die Kerze von heute an!",
+      "heute24": "Die große Kerze in der Mitte ist da. Zünde die Kerze von heute an!",
+      "november": "Ab dem 1. Dezember kommt jeden Tag eine Kerze dazu, bis an Heiligabend alle 24 brennen.",
+      "verpasst": "Diese Kerze wartet noch darauf, angezündet zu werden."
+    },
+    "vorherige": "Vorherige Kerze",
+    "wichern": "Wie bei Wicherns erstem Adventskranz (Hamburg, 1839): kleine rote Kerzen für die Werktage, große weiße für die Sonntage.",
+    "zuHeute": "Zu heute"
+  },
+  "lader": {
+    "datei": {
+      "text": "Per Doppelklick (file://) kann der Browser die Kalenderdaten nicht laden. Lade den Ordner auf deinen Webspace hoch oder starte lokal „npm run ansehen“.",
+      "titel": "Bitte über einen Webserver öffnen"
+    },
+    "fehler": {
+      "knopf": "Noch einmal versuchen",
+      "offline": "Keine Internetverbindung. Bitte prüfen und noch einmal versuchen.",
+      "text": "Bitte gleich noch einmal versuchen. ({fehler})",
+      "titel": "Der Kalender lädt gerade nicht",
+      "unbekannt": "unbekannter Fehler"
+    },
+    "laedt": "Der Kalender wird geladen …",
+    "vorlage": {
+      "text": "Diese Datei befüllt „npm run bauen“. Bitte bauen und dann den Ordner ausgabe/ ansehen bzw. hochladen.",
+      "titel": "Nur die Vorlage"
+    }
+  },
+  "nuss": {
+    "ansicht": {
+      "alt": "Fotocollage von Tag {n}",
+      "altTitel": "Fotocollage von Tag {n}: {titel}",
+      "fehler": "Dieses Foto lässt sich gerade nicht laden.",
+      "fehlerKurz": "Das Foto lässt sich gerade nicht laden.",
+      "laden": "Das Foto wird geladen …",
+      "nochmal": "Nochmal versuchen",
+      "schliessen": "Bildansicht schließen",
+      "tag": "Tag {n}",
+      "tagDatum": "Tag {n} · {datum}",
+      "weiter": "Nächstes Foto",
+      "zaehler": "{n} von {gesamt}",
+      "zaehlerLang": "Foto {n} von {gesamt}",
+      "zurueck": "Vorheriges Foto"
+    },
+    "blase": {
+      "dran": "Nuss {n} ist am {datum} dran."
+    },
+    "knopf": {
+      "alleFotos": "Alle Fotos ansehen",
+      "einlegen": "Goldene Nuss einlegen",
+      "finden": "Heute finden",
+      "foto": "Foto ansehen",
+      "gestern": "Gestern verpasst: Nuss {n} holen",
+      "knacken": "Knacken",
+      "nochmal": "Nochmal knacken",
+      "uebung": "Neue Übungsnuss",
+      "verpasst": "Verpasst: Nuss {n} holen",
+      "weglegen": "Weglegen",
+      "zuruecklegen": "Zurücklegen"
+    },
+    "kopf": {
+      "feiertage": "Frohe Weihnachten und schöne Feiertage!",
+      "heute": "Heute ist {datum}.",
+      "november": "Noch ist November – am 1. Dezember geht’s los.",
+      "weihnachten": "Frohe Weihnachten!",
+      "weihnachtenNachholen": "Frohe Weihnachten! Jetzt darf jede Nuss geknackt werden."
+    },
+    "label": "Tag {n}, {datum} – {status}",
+    "legende": {
+      "heute": "Heute",
+      "nachholen": "Nachholen",
+      "offen": "Offen",
+      "titel": "Zeichenerklärung",
+      "zu": "Kommt noch"
+    },
+    "lw": {
+      "brett": "Daneben auf dem Brett wartet die goldene Nuss {n}",
+      "gold": "die goldene Nuss {n}",
+      "kerne": {
+        "one": "Im Schälchen liegt ein Kern",
+        "other": "Im Schälchen liegen {n} Kerne"
+      },
+      "leer": "Hölzerner Nussknacker, leer",
+      "nuss": "Nuss {n}",
+      "risse": {
+        "one": "{art} mit {n} Riss",
+        "other": "{art} mit {n} Rissen"
+      },
+      "uebung": "eine Übungsnuss",
+      "voll": "Hölzerner Nussknacker, im Knacker liegt {art}"
+    },
+    "sage": {
+      "drin": "Nuss {n} liegt im Nussknacker.",
+      "eingelegt": "Nuss {n} liegt im Nussknacker. Drück den Hebel nach unten oder tipp auf „Knacken“.",
+      "fast": "Knack! Noch einmal kräftig drücken.",
+      "gefunden": "Da ist sie: die goldene Nuss von Tag {n}. Tipp sie an.",
+      "offen": "Geschafft! Die Nuss ist offen, ein Foto rollt heraus.",
+      "riss": "Knack! Ein Riss in der Schale. Noch einmal drücken.",
+      "uebungDrin": "Eine Übungsnuss liegt im Nussknacker.",
+      "uebungOffen": "Geschafft! Drinnen war eine Haselnuss, der Kern liegt jetzt im Schälchen."
+    },
+    "sagt": {
+      "fast": "Fast! Noch einmal!",
+      "fester": "Fester!",
+      "kerne": "Schon {n} Kerne!",
+      "lecker": "Lecker!",
+      "nochmal": "Noch einmal!",
+      "schonGeknackt": "Heute schon geknackt!",
+      "weihnachten": "Frohe Weihnachten!",
+      "weiter": "Weiter so!"
+    },
+    "schild": "Dein Advent",
+    "status": {
+      "brett": "heute – die goldene Nuss liegt schon beim Nussknacker bereit",
+      "heute": "heute, die goldene Nuss – zum Knacken antippen",
+      "offen": "geöffnet, Foto ansehen",
+      "unterwegs": "liegt gerade im Nussknacker",
+      "verpasst": "verpasst, jetzt nachholen",
+      "zu": "noch zu"
+    },
+    "tafel": {
+      "abDezember": "Ab 1. Dezember rollt aus jeder Nuss ein Foto.",
+      "alleGeknackt": "Alle 24 Nüsse sind geknackt",
+      "alleGeknacktText": "Tipp eine offene Nuss auf dem Tuch an – oder schau dir alle Fotos nacheinander an.",
+      "brett": "Sie liegt schon neben dem Nussknacker. Tipp sie an oder zieh am roten Griff – dann hüpft sie hinein.",
+      "ersterKern": "Der erste Kern liegt im Schälchen.",
+      "ersterRiss": "Knack! Ein erster Riss. Hebel hoch – und gleich nochmal!",
+      "gleich": "Gleich ist sie offen – noch einmal kräftig!",
+      "gleichDrin": "Gleich liegt sie im Nussknacker.",
+      "gutGeknackt": "Gut geknackt!",
+      "heute": "Knack die goldene Nuss!",
+      "hilfe": "Zieh den roten Griff nach unten – oder tipp auf die Nuss. Jeder Druck gibt einen Riss.",
+      "kernHuepft": "Der Kern hüpft ins Schälchen.",
+      "kerne": "Schon {n} Kerne im Schälchen.",
+      "knirscht": "Es knirscht schon ordentlich – weiter!",
+      "kommt": "Die goldene Nuss kommt",
+      "nachholen": "Nuss {n} nachholen",
+      "nochmal": "Nuss {n} nochmal knacken",
+      "november": "Noch ist November",
+      "novemberText": "Ab 1. Dezember liegt jeden Tag eine goldene Nuss bereit.",
+      "nussDatum": "Nuss {n} · {datum}.",
+      "offen": "Nuss {n} ist offen",
+      "schaelchen": {
+        "one": "Im Schälchen liegt schon ein Kern.",
+        "other": "Im Schälchen liegen schon {n} Kerne."
+      },
+      "schleife": "Tipp eine Nuss mit Schleife an, um sie nachzuholen.",
+      "schonOffen": "Die Nuss von heute ist schon offen. Morgen wartet die nächste – oder knack sie einfach nochmal.",
+      "suchen": "Irgendwo auf dem Tuch liegt die goldene Nuss von heute. Tipp sie an oder zieh am roten Griff – dann rollt sie in den Nussknacker.",
+      "titel": "Der Nussknacker",
+      "uebung": "Eine Nuss zum Üben",
+      "uebungText": "Ab 1. Dezember steckt in jeder Nuss ein Foto. Bis dahin darfst du üben: zieh den roten Griff nach unten – oder tipp auf die Nuss. Jeder Druck gibt einen Riss.",
+      "warten": "Ein paar Nüsse warten noch",
+      "wartenText": "Die Nüsse mit Schleife darfst du jetzt in Ruhe nachholen.",
+      "wartet": "Die goldene Nuss wartet"
+    },
+    "ton": {
+      "an": "Knackgeräusch ist an – zum Ausschalten tippen",
+      "aus": "Knackgeräusch ist aus – zum Einschalten tippen",
+      "kurzAn": "Knackgeräusch an.",
+      "kurzAus": "Knackgeräusch aus.",
+      "label": "Knackgeräusch",
+      "titel": "Knackgeräusch an oder aus"
+    },
+    "tuch": "Das Nusstuch",
+    "wort": {
+      "geschafft": "Geschafft!",
+      "knack": "Knack!",
+      "knirsch": "Knirsch!",
+      "krrk": "Krrk!"
+    }
+  },
+  "rubbellos": {
+    "alt": {
+      "datum": "Bild zu Los {n}, {datum}",
+      "titel": "Bild zu Los {n}: {titel}"
+    },
+    "anlass": {
+      "1": "Der Advent beginnt",
+      "4": "Barbaratag",
+      "6": "Nikolaus",
+      "13": "3. Advent",
+      "20": "4. Advent",
+      "21": "Wintersonnenwende",
+      "24": "Heiligabend",
+      "6lang": "Nikolaus und 2. Advent"
+    },
+    "aria": {
+      "basis": "Los {n}, {datum}",
+      "gesperrt": "gesperrt. {sperre}",
+      "heute": "heute, noch nicht gerubbelt",
+      "offen": "geöffnet",
+      "verpasst": "noch nicht gerubbelt"
+    },
+    "aufdecken": "Aufdecken",
+    "aufgedeckt": "Los {n} ist aufgedeckt",
+    "bild": {
+      "laden": "Bild wird geladen …",
+      "schliessen": "Bildansicht schließen",
+      "weiter": "Nächstes Bild",
+      "zaehler": "Bild {n} von {gesamt}",
+      "zurueck": "Vorheriges Bild"
+    },
+    "bildAnsehen": "Bild ansehen",
+    "dezember": "Dezember",
+    "enthuellt": "Enthüllt",
+    "feld": {
+      "gesperrt": "Noch nicht<br>gezogen",
+      "heute": "Heute dran",
+      "verpasst": "Noch nicht gerubbelt"
+    },
+    "fokus": {
+      "titel": "Los vom {datum}",
+      "zu": "Los weglegen und schließen"
+    },
+    "folie": "Hier rubbeln",
+    "gerubbelt": "Gerubbelt",
+    "held": {
+      "alleBilder": "Alle Bilder ansehen",
+      "alleGerubbelt": "Ihr habt alle 24 Lose gerubbelt. Was für ein Jahr!",
+      "bald": "Bald geht’s los",
+      "davon": "{n} davon habt ihr schon gerubbelt.",
+      "festBand": "Frohe Weihnachten",
+      "festStempel": "Frohe<br>Weihnachten!",
+      "festTitel": "Frohe Weihnachten!",
+      "frisch": "Frisch gezogen",
+      "gold": "Rubbel die Goldfolie frei. Darunter wartet das Bild von heute.",
+      "grosseZiehung": "Heute ist die große Ziehung",
+      "hauptziehung": "Hauptziehung",
+      "heute": "Das Los für heute",
+      "jetztRubbeln": "Jetzt rubbeln",
+      "letztes": "Das war das letzte Los. Frohe Weihnachten!",
+      "losEins": "Fangt einfach mit Los 1 an.",
+      "losbude": "Die Losbude öffnet am 1. Dezember",
+      "morgen": "Morgen wird das nächste Los gezogen.",
+      "naechstes": "Nächstes Los rubbeln",
+      "nochNicht": "Noch nicht gerubbelt:",
+      "schonFrei": "Heute schon freigerubbelt",
+      "silber": "Rubbel die Silberfolie frei. Darunter wartet das Bild von heute.",
+      "vorfreude": "Dann wird jeden Morgen ein neues Los gezogen. Bis dahin heißt es: Vorfreude.",
+      "weitere": "und {n} weitere, im Raster am gelben Etikett zu erkennen.",
+      "ziehungVorbei": "Die Ziehung ist vorbei, alle 24 Lose gehören euch."
+    },
+    "hinweis": {
+      "fast": "Fast! Noch die Ränder.",
+      "finger": "Mit dem Finger rubbeln",
+      "maus": "Mit gedrückter Maustaste rubbeln"
+    },
+    "kurzDatum": "{wt}, {n}. Dez.",
+    "los": "Los {n}",
+    "lostopf": "Der Lostopf",
+    "marke": "Weihnachtslotterie",
+    "nochNichtDran": "Noch nicht dran!",
+    "stand": {
+      "november": "Ab 1. Dezember wird jeden Tag ein Los gezogen.",
+      "zahl": "{n} von {gezogen} gezogenen Losen gerubbelt"
+    },
+    "stempel": {
+      "1a": "Der Advent",
+      "1b": "beginnt",
+      "21a": "Winter-",
+      "21b": "sonnenwende",
+      "6zusatz": "und 2. Advent",
+      "enthuellt": "Enthüllt!"
+    },
+    "unterzeile": "Deine Weihnachtslotterie: jeden Tag ein Los zum Rubbeln.",
+    "von24": "von 24",
+    "vorlesen": {
+      "gesperrt": "Los {n}: {text}",
+      "start": "Los {n}. {hinweis} oder Aufdecken drücken."
+    }
+  },
+  "schneekugel": {
+    "ansehen": "Foto groß ansehen",
+    "ansicht": {
+      "alt": "Fotocollage von Tag {n}, {datum}",
+      "altTitel": "Fotocollage von Tag {n}: {titel}",
+      "schliessen": "Bildansicht schließen",
+      "weiter": "Nächster Tag",
+      "zaehler": {
+        "one": "1 Foto geöffnet",
+        "other": "{n} Fotos geöffnet"
+      },
+      "zurueck": "Vorheriger Tag"
+    },
+    "dran": "Kugel {n} ist am {datum} dran.",
+    "erstSchuetteln": "Erst schütteln – das Foto ist noch zugeschneit.",
+    "handy": {
+      "erlauben": "Handy schütteln erlauben",
+      "jetzt": "Jetzt das Handy schütteln!",
+      "kannst": "Jetzt kannst du dein Handy schütteln.",
+      "weg": "Hinweis ausblenden"
+    },
+    "hilfe": {
+      "advent": "Tippe eine Kugel an, dann kommt sie auf den Sockel. Weiße sind zugeschneit, eingepackte kommen noch.",
+      "alleOffen": "Alle Kugeln sind offen. Tippe eine an, um sie auf den großen Sockel zu stellen.",
+      "festZu": "Ein paar Kugeln sind noch zugeschneit – tippe sie an und schüttle sie frei. Roter Punkt: noch nicht geöffnet.",
+      "november": "Alle Kugeln sind noch eingepackt. Ab 1. Dezember darfst du jeden Tag eine auspacken.",
+      "punkt": "Roter Punkt: verpasst, jetzt nachholen."
+    },
+    "info": {
+      "alleOffen": "Alle 24 Kugeln sind offen. Schüttle sie, so oft du magst.",
+      "folgt": "Das Foto für diesen Tag kommt bald.",
+      "folgtDatum": "{datum} – das Foto für diesen Tag kommt bald.",
+      "heute": "Das Foto von heute.",
+      "heuteDatum": "{datum} – das Foto von heute.",
+      "tag": "Das Foto von Tag {n}."
+    },
+    "kopf": {
+      "heute": "Heute ist {datum}.",
+      "november": "Noch ist November. Am 1. Dezember geht’s los.",
+      "weihnachten": "Frohe Weihnachten! Alle 24 Kugeln stehen im Regal."
+    },
+    "kugel": "Schneekugel",
+    "kugelDatum": "Schneekugel Tag {n}, Foto vom {datum}",
+    "kugelFoto": "Schneekugel Tag {n}, Foto: {titel}",
+    "kugelZu": "Schneekugel Tag {n}, noch zugeschneit",
+    "laedt": "Foto lädt …",
+    "mini": {
+      "heute": "Heute",
+      "heuteZu": "heute, noch zugeschneit",
+      "offen": "geöffnet",
+      "sockel": "steht auf dem Sockel",
+      "tag": "Tag {n}, {datum}",
+      "verpasst": "verpasst, jetzt nachholen",
+      "zu": "noch eingepackt"
+    },
+    "nachholen": {
+      "gestern": "Gestern verpasst: Kugel {n} holen",
+      "verpasst": "Verpasst: Kugel {n} holen"
+    },
+    "november": {
+      "info": "Am 1. Dezember steht hier die erste Kugel mit einem Foto. Schütteln darfst du schon jetzt.",
+      "kugel": "Schneekugel mit einem verschneiten Häuschen",
+      "titel": "Bald ist Advent"
+    },
+    "regal": {
+      "alle": "Alle",
+      "kugeln": "Kugeln"
+    },
+    "sage": {
+      "offen": "Tag {n} ist offen.",
+      "offenTitel": "Tag {n} ist offen: {titel}",
+      "sockel": "Kugel {n} steht jetzt auf dem Sockel."
+    },
+    "schild": "Tag {n}",
+    "schildJahr": "Advent {jahr}",
+    "schuetteln": "Schütteln",
+    "tag": "Tag {n}",
+    "titel": "Die Schneekugel",
+    "zu": {
+      "handy": "Schüttel dein Handy, zieh die Kugel kräftig hin und her oder drück auf „Schütteln“.",
+      "heute": "Tag {n} ist zugeschneit",
+      "keinProblem": "Verpasst? Kein Problem.",
+      "stufe1": "Weiter kräftig schütteln – der Schnee sitzt noch fest!",
+      "stufe2": "Weiter schütteln – das Foto taucht schon auf.",
+      "verpasst": "Tag {n} wartet noch auf dich",
+      "ziehen": "Zieh die Kugel kräftig hin und her oder rauf und runter – oder drück auf „Schütteln“."
+    }
+  },
+  "schneemann": {
+    "ansicht": {
+      "alt": "Fotocollage von Tag {n}",
+      "altTitel": "Fotocollage von Tag {n}: {titel}",
+      "fehler": "Das Foto lässt sich gerade nicht laden.",
+      "figurDatum": "{figur} – {datum}",
+      "laden": "Foto wird geholt …",
+      "nochmal": "Nochmal versuchen",
+      "nochmalLabel": "{figur} (Tag {n}) nochmal bauen",
+      "nochmalTitel": "Diese Figur nochmal bauen",
+      "schliessen": "Bildansicht schließen",
+      "weiter": "Nächstes Foto",
+      "zaehler": "Foto {n} von {gesamt}",
+      "zurueck": "Vorheriges Foto"
+    },
+    "bau": {
+      "datumKurz": "{wt}, {n}. Dez.",
+      "lassen": "Bauen lassen",
+      "nochmal": "Nochmal bauen",
+      "nochmalKurz": "nochmal",
+      "titel": "Schneefigur bauen",
+      "ueben": "Zum Üben",
+      "uebenKurz": "Übungsrunde",
+      "uebenLang": "Ab 1. Dezember mit Foto",
+      "zu": "Bauen beenden, zurück zur Wiese",
+      "zurWiese": "Zur Wiese"
+    },
+    "blase": {
+      "dran": "Bauplatz {n} ist am {datum} dran."
+    },
+    "fertig": {
+      "datum": "{figur} für den {n}. Dezember",
+      "titel": "{figur} – fertig!",
+      "ueben": "Gut geübt!",
+      "uebenText": "Ab 1. Dezember hält jede Figur ein Foto.",
+      "voll": "Alle 24 Schneefiguren stehen – die Wiese ist voll!"
+    },
+    "figur": {
+      "burg": {
+        "ein": "eine Schneeburg",
+        "name": "Schneeburg"
+      },
+      "dackel": {
+        "ein": "ein Dackel",
+        "name": "Dackel"
+      },
+      "drache": {
+        "ein": "ein kleiner Schneedrache",
+        "name": "Schneedrache"
+      },
+      "eisbaer": {
+        "ein": "ein Eisbär",
+        "name": "Eisbär"
+      },
+      "elefant": {
+        "ein": "ein Elefant mit Baby",
+        "name": "Elefant"
+      },
+      "engel": {
+        "ein": "ein Engel",
+        "name": "Engel"
+      },
+      "eule": {
+        "ein": "eine Schneeeule",
+        "name": "Schneeeule"
+      },
+      "familie": {
+        "ein": "eine Schneemann-Familie",
+        "name": "Schneemann-Familie"
+      },
+      "hase": {
+        "ein": "ein Schneehase",
+        "name": "Schneehase"
+      },
+      "igel": {
+        "ein": "ein Igel",
+        "name": "Igel"
+      },
+      "iglu": {
+        "ein": "ein Iglu",
+        "name": "Iglu"
+      },
+      "katze": {
+        "ein": "eine Katze",
+        "name": "Katze"
+      },
+      "maus": {
+        "ein": "eine Maus",
+        "name": "Maus"
+      },
+      "nikolaus": {
+        "ein": "der Nikolaus",
+        "name": "Nikolaus"
+      },
+      "pinguin": {
+        "ein": "ein Pinguin",
+        "name": "Pinguin"
+      },
+      "raupe": {
+        "ein": "eine Raupe",
+        "name": "Raupe"
+      },
+      "rentier": {
+        "ein": "ein Rentier",
+        "name": "Rentier"
+      },
+      "robbe": {
+        "ein": "eine Robbe mit Ball",
+        "name": "Robbe"
+      },
+      "schaf": {
+        "ein": "ein Schaf",
+        "name": "Schaf"
+      },
+      "schildkroete": {
+        "ein": "eine Schildkröte",
+        "name": "Schildkröte"
+      },
+      "schneemann": {
+        "ein": "ein Schneemann",
+        "name": "Schneemann"
+      },
+      "tanne": {
+        "ein": "eine Schneetanne",
+        "name": "Schneetanne"
+      },
+      "teddy": {
+        "ein": "ein Teddybär",
+        "name": "Teddybär"
+      },
+      "wichtel": {
+        "ein": "ein Wichtel",
+        "name": "Wichtel"
+      }
+    },
+    "foto": {
+      "gross": "Foto groß ansehen",
+      "platzhalter": "Foto"
+    },
+    "groesse": {
+      "gross": "groß",
+      "klein": "klein",
+      "mittel": "mittel",
+      "winzig": "winzig"
+    },
+    "hilfe": {
+      "alleOffen": "Alle Bauplätze sind offen – such dir einen Schneehaufen aus.",
+      "ansehen": "Tippe eine Figur an, um ihr Foto zu sehen.",
+      "heute": "Der leuchtende Bauplatz ist für heute.",
+      "nachBauen": "Schneehaufen mit Schaufel kannst du jetzt noch bauen.",
+      "november": "Die Holzpflöcke markieren die 24 Bauplätze. Ab 1. Dezember geht es los.",
+      "pfloecke": "Holzpflöcke kommen erst.",
+      "verpasst": "Schneehaufen mit Schaufel sind verpasst und warten noch."
+    },
+    "hinweis": {
+      "eis": "Eis! Hier rutscht die Kugel – und wächst nicht.",
+      "gefunden": "{sache} gefunden! Die kommt nachher an die Figur.",
+      "gras": "Hier liegt kein Schnee mehr – such frischen, weißen Schnee!",
+      "greifenFinger": "Leg den Finger auf die Kugel und roll sie durch den Schnee.",
+      "greifenMaus": "Fass die Kugel an und zieh sie durch den Schnee.",
+      "grossGenug": "Groß genug! Hopp – ab zum Bauplatz.",
+      "halb": "Halb geschafft!",
+      "halbErste": "Schon halb so groß – weiter so!",
+      "heiss": "Heiß! Schnell weg {vom}!",
+      "hopp": "Hopp!",
+      "knifflig": "Puh, ganz schön knifflig? Du kannst die Figur auch bauen lassen.",
+      "lassen": "Schau zu: Die Figur baut sich fast von selbst.",
+      "letzte": "Die letzte Kugel ist fertig!",
+      "neuschnee": "Es schneit frischen Schnee – roll weiter!",
+      "plan": "Schau dir den Bauplan an – dann geht’s los.",
+      "schmuecken": "Fertig gerollt! Jetzt wird geschmückt – dann kommt das Foto.",
+      "schmueckenUeben": "Fertig gerollt! Jetzt wird geschmückt …",
+      "startFinger": "Roll die Kugel mit dem Finger durch frischen Schnee – so wächst sie.",
+      "startMaus": "Zieh die Kugel mit der Maus (oder mit den Pfeiltasten) durch frischen Schnee – so wächst sie.",
+      "weiterKugeln": {
+        "one": "Weiter geht’s – eine Kugel steht schon.",
+        "other": "Weiter geht’s – {n} Kugeln stehen schon."
+      },
+      "weiterWartet": "Weiter geht’s – deine Kugel hat auf dich gewartet.",
+      "zaun": "Der Warnzaun steht. Jetzt kann die Kugel nicht mehr ins Warme rollen."
+    },
+    "hud": {
+      "label": "Bauplan zeigen",
+      "stand": "Bauplan zeigen – {n} von {gesamt} Kugeln stehen"
+    },
+    "karte": {
+      "alleFotos": "Alle Fotos ansehen",
+      "alleOffen": "Alle Bauplätze sind offen – such dir einen Schneehaufen aus und bau los.",
+      "alleStehen": "Alle 24 Schneefiguren stehen auf der Wiese.",
+      "bauen": "{figur} bauen",
+      "chip": "Tag {n} nachholen: {figur}, {datum}",
+      "fotoHeute": "Foto von heute",
+      "heute": "Heute ist {datum}.",
+      "morgen": "Morgen wartet ein neuer Bauplan.",
+      "nochNicht": "Noch nicht gebaut:",
+      "november": "Noch ist November.",
+      "novemberText": "Ab 1. Dezember liegt hier jeden Tag ein neuer Bauplan: Schneemann, Pinguin, Iglu … und jede Figur hält ein Foto.",
+      "plan": "Auf dem Bauplan steht {figur}.",
+      "planFest": "Auf dem Bauplan steht {figur} – die festlichste Figur von allen.",
+      "steht": "{figur} steht schon.",
+      "teil": "{n} von 24 Schneefiguren stehen auf der Wiese.",
+      "ueben": "Schon mal üben",
+      "verpasst": "Verpasst, noch nicht gebaut:",
+      "weihnachten": "Frohe Weihnachten!",
+      "weitere": "und {n} weitere",
+      "wo": "Wo ist der Platz?"
+    },
+    "kugel": {
+      "gross": "Kugel {n} von {gesamt}: eine große.",
+      "klein": "Kugel {n} von {gesamt}: eine kleine.",
+      "mittel": "Kugel {n} von {gesamt}: eine mittlere.",
+      "winzig": "Kugel {n} von {gesamt}: eine ganz kleine."
+    },
+    "plan": {
+      "eis": "Eis = rutscht.",
+      "eisText": "Da wächst nichts.",
+      "extra": "Extra:",
+      "extraText": "{liste} finden.",
+      "gras": "Grün = kein Schnee.",
+      "grasText": "Roll durch Weißes.",
+      "kugeln": "{n} Kugeln: {liste}.",
+      "los": "Los geht’s",
+      "ueben": "Übungs-Schneemann",
+      "warm": "Warm = schmilzt!",
+      "weiter": "Weiter bauen"
+    },
+    "platz": {
+      "heute": "Heute",
+      "heuteBauen": "heute bauen",
+      "label": "Tag {n}, {datum} – {status}",
+      "labelFigur": "Tag {n} ({figur}), {datum} – {status}",
+      "offen": "gebaut, Foto ansehen",
+      "verpasst": "verpasst, jetzt nachholen",
+      "zu": "noch nicht dran"
+    },
+    "sache": {
+      "apfel": "Apfel",
+      "besen": "Besen",
+      "brille": "Brille",
+      "fahne": "Fahne",
+      "fisch": "Fisch",
+      "geschenk": "Geschenk",
+      "glocke": "Glöckchen",
+      "kaese": "Käse",
+      "karotte": "Karotte",
+      "knochen": "Knochen",
+      "krone": "Krone",
+      "sack": "Geschenksack",
+      "schleife": "Schleife",
+      "stern": "Stern"
+    },
+    "sage": {
+      "alle": "Alle 24 Figuren stehen!",
+      "fertig": "{figur} ist fertig.",
+      "fertigFoto": "{figur} ist fertig und zeigt das Foto: {titel}.",
+      "gefunden": "{sache} gefunden.",
+      "gefundenListe": "Gefunden: {liste}.",
+      "geschmolzen": "Die Kugel ist geschmolzen und fängt neu an.",
+      "hut": "Neuer Hut.",
+      "kugelFertig": "Kugel {n} von {gesamt} ist fertig.",
+      "markiert": "Der Bauplatz für Tag {n} ist markiert.",
+      "neuschnee": "Es schneit frischen Schnee.",
+      "schal": "Neue Schalfarbe.",
+      "tauschen": "Hut oder Schal kannst du antippen und tauschen.",
+      "uebenFertig": "Der Übungs-Schneemann ist fertig.",
+      "warm": "Achtung, warm!",
+      "weiter": "Deine Figur hat auf dich gewartet. Es geht weiter.",
+      "zaun": "Warnzaun aufgestellt.",
+      "zaunTipp": "Du kannst einen Warnzaun aufstellen."
+    },
+    "schild": {
+      "ab": "Ab 1. Dezember!",
+      "alt": "Foto von Tag {n}",
+      "altTitel": "Foto von Tag {n}: {titel}",
+      "neuLaden": "Foto nochmal laden",
+      "spaeter": "Foto kommt später"
+    },
+    "schmelzen": {
+      "bogen": "Zisch – geschmolzen! Die Kugel fängt neu an. Roll im Bogen {um}.",
+      "zaunAuto": "Zisch! Ab jetzt hält ein Warnzaun die Kugel vom Warmen fern.",
+      "zisch": "Zisch – geschmolzen!",
+      "zweimal": "Zweimal geschmolzen! Ein Warnzaun hilft – oder roll im großen Bogen herum."
+    },
+    "szene": {
+      "figur": "Schneefeld für {figur}: Kugel mit den Pfeiltasten rollen",
+      "label": "Schneefeld: Kugel mit den Pfeiltasten rollen",
+      "rolle": "Schneefeld",
+      "ueben": "Schneefeld für den Übungs-Schneemann: Kugel mit den Pfeiltasten rollen"
+    },
+    "ton": {
+      "an": "Geräusche an.",
+      "aus": "Geräusche aus.",
+      "label": "Geräusche",
+      "titel": "Geräusche an oder aus"
+    },
+    "und": "und",
+    "unterzeile": {
+      "advent": "Jeden Tag eine andere Schneefigur – und jede hält ein Foto.",
+      "weihnachten": "Alle Bauplätze sind offen – frohe Weihnachten!"
+    },
+    "wahl": {
+      "hut": "Anderen Hut aufsetzen",
+      "schal": "Andere Schalfarbe"
+    },
+    "warm": {
+      "feuer": {
+        "name": "Lagerfeuer",
+        "um": "um das Lagerfeuer",
+        "vom": "vom Lagerfeuer"
+      },
+      "gitter": {
+        "name": "Heizungsgitter",
+        "um": "um das Gitter",
+        "vom": "vom Heizungsgitter"
+      },
+      "kakao": {
+        "name": "Kakao-Ofen",
+        "um": "um den Kakao-Ofen",
+        "vom": "vom Kakao-Ofen"
+      },
+      "sonne": {
+        "name": "Sonnenfleck",
+        "um": "um den Sonnenfleck",
+        "vom": "vom Sonnenfleck"
+      },
+      "tee": {
+        "name": "heiße Teepfütze",
+        "um": "um die Teepfütze",
+        "vom": "von der Teepfütze"
+      }
+    },
+    "wiese": "Die Schneewiese",
+    "zaun": {
+      "kurz": "Warnzaun",
+      "lang": "Warnzaun um die warmen Stellen aufstellen"
+    }
+  },
+  "start": {
+    "datum": {
+      "frueher": "Einen Tag früher",
+      "nov": "Nov.",
+      "november": "Noch November",
+      "regler": "Datum",
+      "skalaTag": "{n}.",
+      "spaeter": "Einen Tag später",
+      "titel": "Datum wählen",
+      "weihnachten": "Ab dem 25. Dezember"
+    },
+    "eigen": {
+      "anleitung": "Die Anleitung steht",
+      "github": "auf GitHub",
+      "text": "24 eigene Fotos in einen Ordner legen, einmal bauen, auf den eigenen Webspace hochladen – kostenlos und ohne fremde Server.",
+      "titel": "Deinen eigenen Kalender machen"
+    },
+    "einleitung": "Jeden Tag im Advent ein neues Foto – und zwölf verschiedene Arten, es zu öffnen.",
+    "fuss": {
+      "datenschutz": "Datenschutz",
+      "impressum": "Impressum",
+      "text": "Ohne Tracker, ohne Werbung, ohne fremde Server. Dein Browser merkt sich nur das gewählte Datum, die Sprache und was du schon geöffnet hast."
+    },
+    "hinweis": {
+      "flocke": "<strong>Im Kalender sitzt unten links diese Schneeflocke.</strong> Darüber wechselst du die Ansicht, die Sprache, stellst ein anderes Datum ein oder klappst mit „Alle wieder zu“ alles wieder zu.",
+      "platzhalter": "Die Fotos sind gemalte Platzhalter – im eigenen Kalender stehen dort deine Bilder.",
+      "titel": "So geht’s"
+    },
+    "info": {
+      "erstes": "Das erste Foto ist dran.",
+      "heiligabend": "Heiligabend: alle 24 Tage lassen sich öffnen.",
+      "november": "Noch ist alles zu – am 1. Dezember geht es los.",
+      "standard": "So sieht der Kalender an diesem Tag aus.",
+      "tage": "Tag 1 bis {n} lassen sich öffnen.",
+      "weihnachten": "Weihnachten ist da – alles ist offen."
+    },
+    "satz": {
+      "baum": "Einen Tannenbaum in 3D mit dem Finger drehen, bis die leuchtende Kugel des Tages auftaucht.",
+      "fotoleine": "Briefumschläge an der Lichterkette – darin ein Sofortbild, das sich vor deinen Augen entwickelt.",
+      "geschenk": "Schleife aufziehen, Papier aufreißen – und das Foto steigt mit Konfetti aus der Schachtel.",
+      "girlande": "Tannengirlanden mit 24 Christbaumkugeln. Jede geöffnete Kugel zeigt ihr Foto wie durch gewölbtes Glas.",
+      "kranz": "Ein Adventskranz mit 24 Kerzen: Jeden Tag brennt eine mehr, und der Raum wird heller.",
+      "nuss": "Jeden Tag eine goldene Nuss: am Hebel ziehen, bis sie knackt und ein Foto herausrollt.",
+      "rubbellos": "Jeden Tag ein Rubbellos. Mit dem Finger die Silberfolie freirubbeln, darunter liegt das Foto.",
+      "schneekugel": "Schütteln, bis der Schnee sich legt – dann taucht das Foto in der Kugel auf.",
+      "schneemann": "Jeden Tag eine andere Figur aus Schneekugeln rollen – aber Vorsicht vor warmen Stellen. Die fertige Figur hält das Foto.",
+      "sterne": "Die nummerierten Sterne mit dem Finger verbinden, bis das Sternbild leuchtet und das Foto zeigt.",
+      "stories": "Jeder Tag ist eine kleine Story aus mehreren Fotos, durchgetippt wie am Handy.",
+      "tueren": "Der Klassiker: 24 Kartontürchen, die aufschwingen – dahinter wartet das Foto des Tages."
+    },
+    "seitentitel": "Dein Adventskalender – jeden Tag im Advent ein Foto",
+    "sprache": "Sprache",
+    "wahl": "Kalender wählen"
+  },
+  "sterne": {
+    "advent": "{n}. Advent",
+    "auto": {
+      "kurz": "Verbinden lassen",
+      "lang": "Sterne verbinden lassen"
+    },
+    "blase": {
+      "erst": "Sternbild {n} leuchtet erst am {datum}.",
+      "november": "Sternbild {n} leuchtet am {datum}."
+    },
+    "feld": "Sternenhimmel mit 24 Sternbildern",
+    "fenster": {
+      "alt": "Fotocollage von Tag {n}",
+      "altTitel": "Fotocollage von Tag {n}: {titel}",
+      "buehne": "{name} zum Verbinden. Leertaste oder Pfeil nach rechts verbindet den nächsten Stern.",
+      "folgt": "Das Foto von Tag {n} folgt noch",
+      "leuchten": {
+        "one": "Ein Sternbild leuchtet",
+        "other": "{n} Sternbilder leuchten"
+      },
+      "nochmal": "Sterne nochmal verbinden",
+      "tag": "Tag {n}",
+      "tagDatum": "Tag {n}, {datum}",
+      "weiter": "Nächstes Foto",
+      "zaehler": "Foto {n} von {gesamt}",
+      "zu": "Zurück zum Himmel",
+      "zumFoto": "Foto groß ansehen",
+      "zurueck": "Vorheriges Foto"
+    },
+    "form": {
+      "kerze": {
+        "fertig": "Geschafft! Die Adventskerze brennt.",
+        "hilfe": "Such die funkelnde Adventskerze, tipp sie an und verbinde ihre Sterne.",
+        "name": "Adventskerze"
+      },
+      "stern": {
+        "fertig": "Geschafft! Der Weihnachtsstern leuchtet.",
+        "hilfe": "Such den funkelnden Weihnachtsstern, tipp ihn an und verbinde seine Sterne.",
+        "name": "Weihnachtsstern"
+      },
+      "stiefel": {
+        "fertig": "Geschafft! Der Nikolausstiefel leuchtet.",
+        "hilfe": "Such den funkelnden Nikolausstiefel, tipp ihn an und verbinde seine Sterne.",
+        "name": "Nikolausstiefel"
+      },
+      "tanne": {
+        "fertig": "Geschafft! Der Tannenbaum leuchtet.",
+        "hilfe": "Such den funkelnden Tannenbaum, tipp ihn an und verbinde seine Sterne.",
+        "name": "Tannenbaum"
+      }
+    },
+    "foto": {
+      "fehler": "Das Foto ist gerade nicht durchgekommen. Ist das Internet an? Dann versuch es einfach noch einmal.",
+      "laden": "Das Foto wird geladen …",
+      "neu": "Noch einmal laden"
+    },
+    "heuteFinden": "Heute finden",
+    "hilfe": {
+      "alleFrei": "Alle Sternbilder sind frei – tipp eins an.",
+      "alleOffen": "Alle 24 Sternbilder leuchten. Tipp eins an, um sein Foto zu sehen.",
+      "heuteOffen": "Das Sternbild von heute leuchtet schon. Morgen kommt das nächste.",
+      "november": "Ab dem 1. Dezember leuchtet jeden Tag ein neues Sternbild auf. Dann verbindest du seine Sterne, und ein Foto erscheint am Himmel.",
+      "sternOffen": "Der Weihnachtsstern leuchtet schon. Frohe Weihnachten!",
+      "suchen": "Such das funkelnde Sternbild mit der {n}, tipp es an und verbinde seine Sterne."
+    },
+    "hinweis": {
+      "erst": "Erst Stern {n} – der leuchtende Ring zeigt ihn.",
+      "fertig": "Geschafft! Das Sternbild leuchtet.",
+      "gleichFoto": "Gleich erscheint das Foto am Himmel.",
+      "kreis": "Und jetzt den Kreis schließen!",
+      "leertaste": "Leertaste verbindet",
+      "linien": {
+        "one": "noch eine Linie",
+        "other": "noch {n} Linien"
+      },
+      "profiFinger": "Profi: Leg den Finger auf Stern 1 und schreib die {n} mit den Sternen.",
+      "profiMaus": "Profi: Fang bei Stern 1 an und schreib die {n} mit den Sternen.",
+      "profiModus": "Profi-Modus",
+      "startFinger": "Leg den Finger auf Stern 1 und zieh von Stern zu Stern.",
+      "startMaus": "Zieh mit der Maus von Stern 1 aus von Stern zu Stern.",
+      "tasteFinger": "Drück die Leertaste oder zieh mit dem Finger von Stern zu Stern.",
+      "tasteMaus": "Drück die Leertaste oder zieh mit der Maus von Stern zu Stern.",
+      "warten": "{n} Sterne warten",
+      "weiter": "Weiter zu Stern {n}.",
+      "welcher": "Weiter so – welcher Stern kommt jetzt?",
+      "ziffer": "Jetzt rüber zur zweiten Ziffer.",
+      "zifferStern": "Jetzt rüber zur zweiten Ziffer: Stern {n}.",
+      "zurueck": "Und zurück zu Stern {n}!"
+    },
+    "kopf": {
+      "heute": "Heute ist {datum}.",
+      "november": "Noch ist November.",
+      "weihnachten": "Frohe Weihnachten!"
+    },
+    "label": "Tag {n}, {datum} – {status}",
+    "labelForm": "Tag {n}, {datum}, {name} – {status}",
+    "profi": {
+      "an": "Profi-Modus an: ohne Ring, bei Zahlen ohne Nummern ab Stern 3.",
+      "aus": "Profi-Modus aus.",
+      "kurz": "Profi",
+      "titel": "Profi-Modus: ohne Ring, bei Zahlen nur Stern 1 und 2 nummeriert"
+    },
+    "sage": {
+      "fertig": "Geschafft! Sternbild {n} leuchtet.",
+      "gleichFoto": "Gleich kommt das Foto."
+    },
+    "schild": {
+      "heute": "Heute",
+      "nachholen": "Nachholen"
+    },
+    "stand": {
+      "alle": "Alle {n} Sternbilder bis heute leuchten.",
+      "erstes": "Das erste Sternbild leuchtet.",
+      "keins": "Noch leuchtet kein Sternbild.",
+      "nachholen": "Sternbild {n} nachholen",
+      "teil": {
+        "one": "{n} von {gesamt} Sternbildern leuchtet.",
+        "other": "{n} von {gesamt} Sternbildern leuchten."
+      },
+      "verpasst": "Noch nicht verbunden:",
+      "weitere": "und {n} weitere"
+    },
+    "sternbild": "Sternbild {name}",
+    "ton": {
+      "an": "Glockentöne an.",
+      "aus": "Glockentöne aus.",
+      "label": "Glockentöne beim Verbinden",
+      "titel": "Glockentöne an oder aus"
+    },
+    "zustand": {
+      "heute": "heute dran, Sterne verbinden",
+      "offen": "geöffnet, Foto ansehen",
+      "verpasst": "verpasst, Sterne verbinden",
+      "zu": "noch zu"
+    }
+  },
+  "stories": {
+    "anleitung": {
+      "ab": "Ab Dezember sammeln sich hier alle Tage, die du angesehen hast.",
+      "kreis": "Kreis antippen",
+      "kreisText": "Jeden Tag leuchtet ein neuer Kreis auf. Antippen, und die Story startet.",
+      "titel": "So funktioniert’s",
+      "wischen": "Wischen",
+      "wischenText": "Zur Seite geht’s zum nächsten oder vorigen Tag, nach unten zurück zur Übersicht.",
+      "zuschauen": "Zuschauen oder anhalten",
+      "zuschauenText": "Die Fotos laufen von selbst weiter. Gedrückt halten hält sie an."
+    },
+    "ansage": {
+      "titel": "Tag {n}, {datum}: {titel}"
+    },
+    "beispiel": {
+      "1": "Frisch gefallen über Nacht|Die ersten Spuren im Garten|Mützen auf, raus geht’s|Wer baut den größten Schneemann?",
+      "2": "Oben angekommen|Und los!|Fast bis zum Zaun gerutscht|Noch eine Runde, bitte|Kakao zum Aufwärmen",
+      "3": "Wer steckt unter der Maske?|Die Parade zieht los|Konfetti überall",
+      "4": "Die Würfel liegen bereit|Wer gewinnt diesmal?|Knapp verloren|Revanche am Sonntag",
+      "5": "Endlich wieder draußen|Die ersten Blüten|Jacken aus, Sonne an|Picknick auf der Decke|Barfuß im Gras",
+      "6": "Wo hat der Hase sie versteckt?|Eins im Blumenbeet!|Der Korb wird voll",
+      "7": "Helme auf, Sattel hoch|Kurze Pause am Feldweg|Da vorne glitzert der See|Füße ins Wasser",
+      "8": "Kerzen zählen|Einmal kräftig pusten|Wünsch dir was!|Das erste Stück|Krümel auf dem Teller",
+      "9": "Ein Tag am Wasser|Steine flitschen|Bis zum Abend geblieben",
+      "10": "Endlich Ferien!|Die erste Welle|Muscheln sammeln|Eis mit Meerblick",
+      "11": "Der Plan steht|Graben, graben, graben|Der Wassergraben hält|Fast fertig|Unsere Burg!",
+      "12": "Die Sonne geht baden|Alle schauen aufs Meer|Noch fünf Minuten",
+      "13": "Die Schultüte ist fast so groß wie du|Vor dem Schultor|Der erste Platz im Klassenzimmer|Geschafft: der erste Tag!",
+      "14": "Ab in den Wald|Wer findet den dicksten Baum?|Pilze nur anschauen|Rast auf dem Baumstamm|Zurück mit vollen Taschen",
+      "15": "Der Wind ist perfekt|Höher, höher!|Er fliegt!",
+      "16": "Welcher Kürbis wird’s?|Erst mal aushöhlen|Gruselig oder lustig?|Fertig zum Leuchten",
+      "17": "Ein riesiger Blätterhaufen|Achtung, Angriff!|Laub in der Kapuze|Alle liegen im Laub|Nochmal von vorn",
+      "18": "Die Laternen sind fertig|Laterne, Laterne …|Durch die dunkle Straße",
+      "19": "Teig ausrollen|Sterne, Herzen, Monde|Nur einmal naschen|Das erste Blech ist fertig",
+      "20": "Zwischen den Buden|Es duftet nach Mandeln|Einmal Karussell|Warme Hände am Becher|Lichter über dem Platz",
+      "21": "Schlittschuhe an|Erste wackelige Runde|Hand in Hand übers Eis",
+      "22": "Ein Tunnel aus Licht|Alles glitzert|Kalte Nasen, warme Herzen|Der schönste Baum im Park",
+      "23": "Der Baum steht|Erst die Lichterkette|Kugel für Kugel|Wer darf den Stern aufsetzen?|Licht an!",
+      "24": "Endlich Heiligabend|Alle zusammen unterm Baum|Danke für dieses schöne Jahr"
+    },
+    "dez": "Dez",
+    "dezember": "Dezember",
+    "foto": {
+      "text": "Foto {n} von {gesamt}: {text}",
+      "zahl": "Foto {n} von {gesamt}"
+    },
+    "frueher": "Frühere Tage zeigen",
+    "grenze": {
+      "erster": "Das ist der erste Tag.",
+      "letzter": "Das war der letzte Tag."
+    },
+    "herz": "Herz schicken",
+    "herzGeschickt": "Herz für Tag {n} geschickt",
+    "herzNochmal": "Noch ein Herz schicken",
+    "heute": "Heute",
+    "heuteKarte": {
+      "ab1": "Ab dem 1. Dezember wartet hier jeden Morgen eine neue Story mit Fotos aus unserem Jahr.",
+      "alleOffen": "Alle 24 Tage sind offen. Schau dir den ganzen Advent noch einmal am Stück an.",
+      "bald": "Bald geht’s los",
+      "deine": "Deine Story von heute",
+      "fotos": "{n} Fotos",
+      "fotosGesehen": "{n} Fotos, schon angesehen",
+      "ganzerAdvent": "Den ganzen Advent ansehen",
+      "heuteIst": "Heute ist {datum}",
+      "letzte": "Die letzte Story vor Weihnachten",
+      "neu": "Eine neue Story wartet",
+      "november": "Wir haben noch November",
+      "schlafen": "Noch {n}× schlafen!"
+    },
+    "kerzen": {
+      "0": "Noch brennt keine Adventskerze",
+      "1": "Eine Adventskerze brennt",
+      "2": "Zwei Adventskerzen brennen",
+      "3": "Drei Adventskerzen brennen",
+      "4": "Alle vier Adventskerzen brennen",
+      "titel": "Adventskerzen"
+    },
+    "kommtAm": "Tag {n} kommt am {datum}.",
+    "kreis": {
+      "gesperrt": "gesperrt. {sperre}",
+      "heuteNeu": "heute, neu",
+      "heuteOffen": "heute, geöffnet",
+      "nichtAngesehen": "noch nicht angesehen",
+      "offen": "geöffnet",
+      "tag": "Tag {n}, {datum}",
+      "verpasst": "verpasst, jetzt nachholen"
+    },
+    "laeuft": "Läuft weiter",
+    "leiste": "Alle 24 Tage als Stories. Mit den Pfeiltasten von Tag zu Tag.",
+    "marke": {
+      "heute": "Heute",
+      "nachholen": "Nachholen"
+    },
+    "nachholen": {
+      "gestern": "Gestern verpasst? Kein Problem.",
+      "titel": "Noch nicht angesehen",
+      "warten": {
+        "one": "Ein Tag wartet noch auf dich.",
+        "other": "{n} Tage warten noch auf dich."
+      }
+    },
+    "naechstes": "Nächstes Foto",
+    "pause": "Pause",
+    "pausiert": "Pausiert",
+    "pfeil": {
+      "beenden": "Story beenden",
+      "zurueckLetztes": "Zurück zum letzten Foto"
+    },
+    "player": {
+      "titel": "Story Tag {n}, {datum}",
+      "titelText": "Story Tag {n}, {datum}: {titel}"
+    },
+    "playerName": "Story",
+    "rueckblick": {
+      "alle": "Alle 24 Tage angesehen.",
+      "landet": "Jede Story, die du ansiehst, landet hier.",
+      "leer": "Noch nichts angesehen. Fang mit Tag {n} an!",
+      "titel": "Rückblick",
+      "zahl": "{n} von 24 Tagen angesehen"
+    },
+    "schliessen": "Story schließen",
+    "spaeter": "Spätere Tage zeigen",
+    "tag": "Tag {n}",
+    "tagAnsehen": "Tag {n} ansehen",
+    "tagNochmal": "Tag {n} nochmal ansehen",
+    "voriges": "Voriges Foto",
+    "weihnachten": "Frohe Weihnachten!",
+    "weiterAbspielen": "Weiter abspielen",
+    "zw": {
+      "danke": "Frohe Weihnachten und danke fürs Zuschauen!",
+      "ganzerAdvent": "Das war der ganze Advent",
+      "heuteText": "Tag {n} ist noch eine Überraschung. Willst du sie jetzt ansehen?",
+      "heuteTitel": "Und jetzt: dein Tag von heute",
+      "letzte": "Das war die letzte Story vor Weihnachten.",
+      "morgenText": "Morgen früh wartet Tag {n} auf dich.",
+      "morgenTitel": "Bis morgen!",
+      "spaeter": "Später",
+      "uebersicht": "Zur Übersicht"
+    }
+  },
+  "tueren": {
+    "ansage": {
+      "gesperrt": "Tag {n}: {text}",
+      "offen": "Türchen {n} ist offen.",
+      "offenTitel": "Türchen {n} ist offen: {titel}"
+    },
+    "ansicht": {
+      "alt": "Fotocollage vom {n}. Dezember",
+      "altTitel": "Fotocollage vom {n}. Dezember: {titel}",
+      "schliessen": "Bildansicht schließen",
+      "titel": "Bildansicht",
+      "weiter": "Nächstes Bild",
+      "wischen": "Wischen zum Blättern",
+      "zaehler": "Bild {n} von {gesamt}",
+      "zurueck": "Vorheriges Bild"
+    },
+    "fahne": {
+      "heute": "Heute",
+      "nachholen": "Nachholen",
+      "nochZu": "Noch zu"
+    },
+    "fusszeile": "Jeden Tag ein Türchen, jeden Tag ein Stück von unserem Jahr.",
+    "geduld": "Noch ein bisschen Geduld!",
+    "leiste": {
+      "alleBilder1": "Alle 24 Bilder ansehen",
+      "alleBilder2": "Alle Bilder ansehen",
+      "ansehen": "Ansehen",
+      "bildAnsehen": "Bild ansehen",
+      "heute": "Heute: Türchen {n}",
+      "jetztOeffnen": "Jetzt öffnen",
+      "letztes1": "Das letzte Türchen öffnen",
+      "letztes2": "Letztes Türchen öffnen",
+      "nachholen": "{aktion} · {n} nachholen",
+      "november": "Noch ist November",
+      "oeffnen": "Öffnen",
+      "rest1": "Alle {n} restlichen Türchen öffnen",
+      "rest2": "Alle {n} Türchen öffnen",
+      "rest3": "{n} Türchen öffnen",
+      "start1": "Am 1. Dezember geht’s los",
+      "start2": "Ab 1. Dezember geht’s los",
+      "start3": "Ab 1. Dezember",
+      "weihnachten": "Frohe Weihnachten!",
+      "zumNachholen": "{aktion} · {n} zum Nachholen"
+    },
+    "status": {
+      "heute": "heute dran, noch zu",
+      "nachholen": "noch zu, darf nachgeholt werden",
+      "offen": "geöffnet",
+      "zu": "noch gesperrt"
+    },
+    "tuer": "Tag {n}, {datum} – {status}",
+    "unterzeile": {
+      "heiligabend": "Heute ist Heiligabend!",
+      "heute": "Heute ist {datum}",
+      "heuteAdvent": "Heute ist {datum} – {n}. Advent",
+      "november": "Noch ist November – bald geht’s los!",
+      "weihnachtenAlle": "Frohe Weihnachten! Alle Türchen sind offen.",
+      "weihnachtenRest": "Frohe Weihnachten! Jetzt dürfen alle Türchen auf."
+    }
+  }
+}

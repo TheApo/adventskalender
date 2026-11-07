@@ -7,30 +7,91 @@
 (function () {
   'use strict';
 
-  var TITEL = [
-    '', 'Neujahrsmorgen im Schnee', 'Schlittenberg am Wochenende', 'Fasching: Kostümparade',
-    'Spieleabend im Wohnzimmer', 'Erste Frühlingssonne', 'Ostereiersuche im Garten',
-    'Radtour an den See', 'Geburtstagskuchen mit Kerzen', 'Pfingsten am Wasser',
-    'Sommerferien an der Ostsee', 'Sandburg-Wettbewerb', 'Sonnenuntergang am Strand',
-    'Erster Schultag', 'Spätsommer im Wald', 'Drachensteigen auf dem Feld',
-    'Kürbisse schnitzen', 'Herbstlaub-Schlacht', 'Laternenumzug',
-    'Plätzchen backen', 'Weihnachtsmarkt', 'Eislaufen', 'Lichterpark bei Nacht',
-    'Baum schmücken', 'Frohe Weihnachten!'
-  ];
+  var M = (window.ADVENTSKALENDER && typeof window.ADVENTSKALENDER === 'object') ? window.ADVENTSKALENDER : null;
+  var TAGE_DATEN = (M && M.tage && typeof M.tage === 'object') ? M.tage : {};
+  var BILD_URL = (M && typeof M.bildUrl === 'string') ? M.bildUrl : '';
+  var EINZEL_URL = (M && typeof M.einzelUrl === 'string') ? M.einzelUrl : '';
 
-  // Szenentyp je Tag
+  function ganzzahl(x) {
+    var n = typeof x === 'number' ? x : parseInt(x, 10);
+    return isFinite(n) ? Math.round(n) : NaN;
+  }
+
+  // ---------- Daten & Freigabe ----------
+  function daten(t) {
+    if (!(t >= 1 && t <= 24)) return null;
+    var d = TAGE_DATEN[String(t)];
+    return (d && typeof d === 'object') ? d : null;
+  }
+  function freigegeben(t) {
+    if (!(t >= 1 && t <= 24)) return false;
+    var K = window.Kalender;
+    if (K && typeof K.darfOeffnen === 'function') return !!K.darfOeffnen(t);
+    var h = M ? ganzzahl(M.heute) : 0;
+    return h >= 25 || t <= h;
+  }
+  // Daten nur, wenn der Tag (auch laut Kalender) freigegeben ist
+  function freieDaten(t) { return freigegeben(t) ? daten(t) : null; }
+  function mitBild(t) { var d = freieDaten(t); return (d && d.bild === true && BILD_URL) ? d : null; }
+  function einzelAnzahl(d) { var n = d ? ganzzahl(d.einzel) : 0; return n > 0 ? Math.min(60, n) : 0; }
+
+  function grossG() {
+    return (window.innerWidth || 0) * (window.devicePixelRatio || 1) >= 1100 ? 'l' : 'm';
+  }
+
+  // {h}: nicht erratbarer Namensteil (statisch). Achtung: tage[t].h ist sonst die Bildhöhe (Zahl) –
+  // Zahlen werden deshalb nie als Namensteil benutzt; Vorrang hat ein eigenes Feld „hash“.
+  function namensteil(d, g, i) {
+    var x = i ? (d.he && d.he.length ? d.he[i - 1] : null) : (d.hash !== undefined ? d.hash : d.h);
+    if (x && typeof x === 'object') x = x[g];
+    return (typeof x === 'string' && /^[A-Za-z0-9_-]+$/.test(x)) ? x : '';
+  }
+
+  function urlBauen(vorlage, t, g, i, d) {
+    var h = '';
+    if (vorlage.indexOf('{h}') >= 0) { h = namensteil(d, g, i); if (!h) return ''; }
+    return vorlage
+      .replace(/\{t\}/g, String(t))
+      .replace(/\{g\}/g, g)
+      .replace(/\{i\}/g, String(i || ''))
+      .replace(/\{v\}/g, encodeURIComponent(d.v === undefined || d.v === null ? '' : String(d.v)))
+      .replace(/\{h\}/g, encodeURIComponent(h));
+  }
+
+  // Erzeugte URLs merken (für den automatischen Ersatz bei Ladefehlern)
+  var bekannt = {};
+  var anker = document.createElement('a');
+  function absolut(u) { anker.href = u; return anker.href; }
+  function merken(u, info) { bekannt[absolut(u)] = info; return u; }
+
+  // Vorladen (wie im Prototyp: bild(t) „bereitet vor“), Referenz halten bis geladen
+  var imFlug = [];
+  function vorladen(u) {
+    for (var i = 0; i < imFlug.length; i++) if (imFlug[i].u === u) return;
+    if (imFlug.length >= 6) return;
+    var im = new Image(), eintrag = { u: u, im: im };
+    im.decoding = 'async';
+    im.onload = im.onerror = function () {
+      var j = imFlug.indexOf(eintrag);
+      if (j >= 0) imFlug.splice(j, 1);
+    };
+    imFlug.push(eintrag);
+    im.src = u;
+  }
+
+  // ======================================================================================
+  // Platzhalter-Maler (aus dem Prototyp übernommen): deterministische, gemalte Szenen per Canvas
+  // ======================================================================================
   var SZENE = [
     '', 'schnee', 'schnee', 'innen', 'innen', 'fruehling', 'wiese', 'see', 'innen', 'see',
     'strand', 'strand', 'abend', 'stadt', 'wald', 'feld', 'herbst', 'herbst', 'nacht',
     'innen', 'markt', 'schnee', 'markt', 'innen', 'nacht'
   ];
-
   var FARBE = {
     schnee: '#7fb4d9', innen: '#e3a35a', fruehling: '#9fcf6a', wiese: '#6fbf4a', see: '#3f9fc6',
     strand: '#f2c76a', abend: '#f07a4a', stadt: '#d98c5f', wald: '#4f8f3a', feld: '#e0b84a',
     herbst: '#e0742c', nacht: '#f4c35a', markt: '#ffb347'
   };
-
   var JACKEN = ['#2f6fd0', '#e8557a', '#7ccf3a', '#f2a93b', '#d63a3a', '#3fb6a8', '#8b5cf6', '#f4f1e8'];
 
   function rng(seed) {
@@ -43,19 +104,16 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
-
   function canvas(w, h) {
     var c = document.createElement('canvas');
     c.width = w; c.height = h;
     return c;
   }
-
   function verlauf(g, x0, y0, x1, y1, stops) {
     var v = g.createLinearGradient(x0, y0, x1, y1);
     for (var i = 0; i < stops.length; i++) v.addColorStop(stops[i][0], stops[i][1]);
     return v;
   }
-
   function huegel(g, w, h, basis, amp, farbe, r, glatt) {
     g.fillStyle = farbe;
     g.beginPath();
@@ -70,7 +128,6 @@
     g.closePath();
     g.fill();
   }
-
   function tanne(g, x, y, s, farbe, schnee) {
     g.fillStyle = '#4a3324';
     g.fillRect(x - s * 0.06, y - s * 0.12, s * 0.12, s * 0.14);
@@ -84,7 +141,6 @@
       }
     }
   }
-
   function laubbaum(g, x, y, s, farbe) {
     g.fillStyle = '#5a3d29';
     g.fillRect(x - s * 0.05, y - s * 0.5, s * 0.1, s * 0.5);
@@ -93,7 +149,6 @@
     g.beginPath(); g.arc(x - s * 0.22, y - s * 0.55, s * 0.24, 0, 6.29); g.fill();
     g.beginPath(); g.arc(x + s * 0.22, y - s * 0.56, s * 0.25, 0, 6.29); g.fill();
   }
-
   function rundRechteck(g, x, y, w, h, r) {
     g.beginPath();
     g.moveTo(x + r, y); g.lineTo(x + w - r, y); g.quadraticCurveTo(x + w, y, x + w, y + r);
@@ -101,7 +156,6 @@
     g.lineTo(x + r, y + h); g.quadraticCurveTo(x, y + h, x, y + h - r);
     g.lineTo(x, y + r); g.quadraticCurveTo(x, y, x + r, y); g.closePath();
   }
-
   // Eine Familie: 2–4 Figuren mit bunten Jacken und Mützen
   function familie(g, cx, boden, groesse, r, winter, nacht) {
     var n = 2 + Math.floor(r() * 3);
@@ -114,14 +168,11 @@
       var x = start + i * abstand + (r() - 0.5) * abstand * 0.2;
       var jacke = JACKEN[Math.floor(r() * JACKEN.length)];
       var bw = hh * 0.34, bh = hh * 0.52;
-      // Beine
       g.fillStyle = nacht ? '#1d2230' : '#2b3040';
       g.fillRect(x - bw * 0.32, boden - hh * 0.26, bw * 0.26, hh * 0.26);
       g.fillRect(x + bw * 0.06, boden - hh * 0.26, bw * 0.26, hh * 0.26);
-      // Körper / Jacke
       g.fillStyle = jacke;
       rundRechteck(g, x - bw / 2, boden - hh * 0.26 - bh, bw, bh, bw * 0.3); g.fill();
-      // Kopf
       var kr = hh * 0.13, ky = boden - hh * 0.26 - bh - kr * 0.85;
       g.fillStyle = '#e8c4a0';
       g.beginPath(); g.arc(x, ky, kr, 0, 6.29); g.fill();
@@ -140,7 +191,6 @@
       }
     }
   }
-
   function bokeh(g, w, h, r, anzahl, farben, maxR) {
     for (var i = 0; i < anzahl; i++) {
       var x = r() * w, y = r() * h * 0.85, rad = (0.3 + r() * 0.7) * maxR;
@@ -151,21 +201,18 @@
       g.beginPath(); g.arc(x, y, rad, 0, 6.29); g.fill();
     }
   }
-
   function flocken(g, w, h, r, n) {
     g.fillStyle = 'rgba(255,255,255,0.85)';
     for (var i = 0; i < n; i++) {
       g.beginPath(); g.arc(r() * w, r() * h, 1 + r() * Math.max(2, w / 260), 0, 6.29); g.fill();
     }
   }
-
   function sonne(g, x, y, rad, kern, schein) {
     var v = g.createRadialGradient(x, y, rad * 0.2, x, y, rad * 3.2);
     v.addColorStop(0, schein); v.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = v; g.beginPath(); g.arc(x, y, rad * 3.2, 0, 6.29); g.fill();
     g.fillStyle = kern; g.beginPath(); g.arc(x, y, rad, 0, 6.29); g.fill();
   }
-
   function wasser(g, w, y0, h, oben, unten, r) {
     g.fillStyle = verlauf(g, 0, y0, 0, h, [[0, oben], [1, unten]]);
     g.fillRect(0, y0, w, h - y0);
@@ -176,7 +223,6 @@
       g.beginPath(); g.moveTo(x, y); g.lineTo(x + l, y); g.stroke();
     }
   }
-
   function lichterkette(g, w, y, r, durchhang) {
     g.strokeStyle = 'rgba(40,30,20,0.6)'; g.lineWidth = Math.max(1, w / 500);
     g.beginPath(); g.moveTo(0, y); g.quadraticCurveTo(w / 2, y + durchhang * 2, w, y); g.stroke();
@@ -190,18 +236,17 @@
     }
   }
 
-  // ---- Szenen ----------------------------------------------------------
   function szene(typ, w, h, seed) {
     var c = canvas(w, h), g = c.getContext('2d'), r = rng(seed);
     var m = Math.min(w, h), boden = h * (0.78 + r() * 0.08);
     var fig = m * (0.42 + r() * 0.2), fx = w * (0.3 + r() * 0.4);
-
+    var i, j, k, s;
     switch (typ) {
       case 'schnee':
         g.fillStyle = verlauf(g, 0, 0, 0, h, [[0, '#9cc7ea'], [0.6, '#dcecf7'], [1, '#ffffff']]); g.fillRect(0, 0, w, h);
         sonne(g, w * (0.2 + r() * 0.6), h * 0.18, m * 0.05, '#fffbe8', 'rgba(255,255,240,0.6)');
         huegel(g, w, h, h * 0.55, h * 0.05, '#c9dbea', r);
-        for (var i = 0; i < 9; i++) tanne(g, r() * w, h * (0.6 + r() * 0.06), m * (0.14 + r() * 0.1), '#2f5a48', true);
+        for (i = 0; i < 9; i++) tanne(g, r() * w, h * (0.6 + r() * 0.06), m * (0.14 + r() * 0.1), '#2f5a48', true);
         huegel(g, w, h, h * 0.72, h * 0.04, '#f4f8fc', r);
         familie(g, fx, boden, fig, r, true, false);
         flocken(g, w, h, r, 90);
@@ -225,9 +270,9 @@
         g.fillStyle = verlauf(g, 0, 0, 0, h, [[0, '#6fb6f0'], [0.7, '#cfe9fb'], [1, '#e8f6ff']]); g.fillRect(0, 0, w, h);
         sonne(g, w * (0.65 + r() * 0.25), h * 0.15, m * 0.06, '#fff6c8', 'rgba(255,245,190,0.7)');
         huegel(g, w, h, h * 0.58, h * 0.05, '#8cc46a', r);
-        for (var j = 0; j < 5; j++) laubbaum(g, r() * w, h * 0.64, m * (0.2 + r() * 0.12), typ === 'fruehling' ? '#f3b6c9' : '#4f9a3a');
+        for (j = 0; j < 5; j++) laubbaum(g, r() * w, h * 0.64, m * (0.2 + r() * 0.12), typ === 'fruehling' ? '#f3b6c9' : '#4f9a3a');
         huegel(g, w, h, h * 0.7, h * 0.03, '#6fb24a', r);
-        for (var k = 0; k < 70; k++) {
+        for (k = 0; k < 70; k++) {
           g.fillStyle = ['#ffffff', '#ffd84a', '#ff7aa8', '#9fd7ff'][k % 4];
           g.beginPath(); g.arc(r() * w, h * (0.74 + r() * 0.26), m * 0.006 + r() * m * 0.006, 0, 6.29); g.fill();
         }
@@ -245,7 +290,7 @@
         wasser(g, w, h * 0.5, h, '#2f86c0', '#5fb7d9', r);
         if (typ === 'strand') {
           huegel(g, w, h, h * 0.74, h * 0.02, '#f1d79a', r, 0.3);
-          for (var s = 0; s < 4; s++) {
+          for (s = 0; s < 4; s++) {
             g.fillStyle = ['#e94b3c', '#ffffff', '#2f6fd0', '#f2c400'][s];
             g.fillRect(w * (0.05 + s * 0.08), h * 0.66, w * 0.05, h * 0.07);
           }
@@ -306,8 +351,7 @@
         g.beginPath(); g.moveTo(dx, dy); g.lineTo(dx + m * 0.06, dy + m * 0.08); g.lineTo(dx, dy + m * 0.08); g.closePath(); g.fill();
         familie(g, fx, boden, fig, r, false, false);
         break;
-      case 'nacht':
-      case 'markt':
+      default: // 'nacht', 'markt'
         g.fillStyle = verlauf(g, 0, 0, 0, h, [[0, '#0b1430'], [0.7, '#1c2450'], [1, '#2a1f3a']]); g.fillRect(0, 0, w, h);
         bokeh(g, w, h, r, typ === 'markt' ? 60 : 40,
           ['rgba(255,200,110,0.9)', 'rgba(255,150,90,0.8)', 'rgba(140,220,190,0.7)', 'rgba(160,170,255,0.7)', 'rgba(255,120,170,0.7)'], m * 0.07);
@@ -335,15 +379,14 @@
         flocken(g, w, h, r, 40);
         break;
     }
-
-    // Foto-Anmutung: Vignette + leichte Körnung
+    // Foto-Anmutung: Vignette
     var vg = g.createRadialGradient(w / 2, h / 2, m * 0.35, w / 2, h / 2, m * 0.85);
     vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.28)');
     g.fillStyle = vg; g.fillRect(0, 0, w, h);
     return c;
   }
 
-  // Collage-Raster (Einheiten 0..1), angelehnt an die 2025er-Collagen
+  // Collage-Raster (Einheiten 0..1), angelehnt an die 2025er-Collagen (Platzhalter immer quadratisch)
   var RASTER_Q = [
     [[0, 0, .5, .5], [.5, 0, .5, .5], [0, .5, .5, .5], [.5, .5, .5, .5]],
     [[0, 0, .333, .333], [.333, 0, .334, .27], [.667, 0, .333, .333], [0, .333, .333, .334], [.333, .27, .334, .25],
@@ -351,63 +394,202 @@
     [[0, 0, .667, .667], [.667, 0, .333, .333], [.667, .333, .333, .334], [0, .667, .333, .333], [.333, .667, .334, .333], [.667, .667, .333, .333]],
     [[0, 0, .5, .62], [.5, 0, .5, .38], [.5, .38, .5, .62], [0, .62, .5, .38]]
   ];
-  var RASTER_H = [
-    [[0, 0, .5, .333], [.5, 0, .5, .32], [0, .333, .5, .25], [.5, .32, .5, .2], [0, .583, .5, .417], [.5, .52, .5, .48]],
-    [[0, 0, 1, .5], [0, .5, .5, .5], [.5, .5, .5, .5]]
-  ];
-
-  var cache = {};
-
-  function format(tag) { return (tag % 5 === 1 || tag === 23) ? 'hoch' : 'quadrat'; }
-
-  function szenenFuer(tag, idx) {
-    // leichte Variation: Nachbarszenen mischen
-    var basis = SZENE[tag];
-    if (idx % 4 === 3 && tag > 1) return SZENE[tag - 1];
+  function szenenTyp(tag, idx) {
+    var basis = SZENE[tag] || 'innen';
+    if (idx % 4 === 3 && tag > 1) return SZENE[tag - 1] || basis;
     return basis;
   }
 
-  function bild(tag) {
-    var key = 'b' + tag;
+  // dezente Beschriftung „Foto folgt“
+  // anteil: Schriftgröße relativ zur Bildkante (Collage klein, Vorschau größer, damit es lesbar bleibt)
+  function beschriften(g, w, h, anteil) {
+    var m = Math.min(w, h), fs = Math.max(11, Math.round(m * (anteil || 0.038)));
+    g.font = '600 ' + fs + 'px system-ui, -apple-system, "Segoe UI", sans-serif';
+    var text = window.I18N ? window.I18N.t('allgemein.fotoFolgt', 'Foto folgt') : 'Foto folgt', tw = g.measureText(text).width;
+    var ph = Math.round(fs * 1.9), pw = Math.round(tw + fs * 1.7);
+    var x = Math.round((w - pw) / 2), y = Math.round(h - ph - m * 0.05);
+    g.fillStyle = 'rgba(14,18,26,0.55)';
+    rundRechteck(g, x, y, pw, ph, ph / 2); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.92)';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(text, w / 2, y + ph / 2 + fs * 0.05);
+  }
+
+  var cache = {};
+  var PLATZ = 1000; // Kantenlänge der Platzhalter-Collage
+
+  function platzhalterBild(tag) {
+    var t = ganzzahl(tag);
+    if (!(t >= 1 && t <= 24)) t = 1;
+    var key = 'b' + t;
     if (cache[key]) return cache[key];
-    var hoch = format(tag) === 'hoch';
-    var W = hoch ? 800 : 1200, H = 1200, rand = 6;
-    var raster = hoch ? RASTER_H[tag % RASTER_H.length] : RASTER_Q[tag % RASTER_Q.length];
-    var c = canvas(W, H), g = c.getContext('2d');
-    g.fillStyle = '#16181c'; g.fillRect(0, 0, W, H);
-    for (var i = 0; i < raster.length; i++) {
-      var q = raster[i];
-      var x = Math.round(q[0] * W) + rand / 2, y = Math.round(q[1] * H) + rand / 2;
-      var w = Math.round(q[2] * W) - rand, h = Math.round(q[3] * H) - rand;
-      g.drawImage(szene(szenenFuer(tag, i), w, h, tag * 101 + i * 7), x, y);
-    }
-    cache[key] = c.toDataURL('image/jpeg', 0.84);
+    try {
+      var W = PLATZ, H = PLATZ, rand = 6, raster = RASTER_Q[t % RASTER_Q.length];
+      var c = canvas(W, H), g = c.getContext('2d');
+      g.fillStyle = '#16181c'; g.fillRect(0, 0, W, H);
+      for (var i = 0; i < raster.length; i++) {
+        var q = raster[i];
+        var x = Math.round(q[0] * W) + rand / 2, y = Math.round(q[1] * H) + rand / 2;
+        var w = Math.round(q[2] * W) - rand, h = Math.round(q[3] * H) - rand;
+        g.drawImage(szene(szenenTyp(t, i), w, h, t * 101 + i * 7), x, y);
+      }
+      beschriften(g, W, H);
+      cache[key] = c.toDataURL('image/jpeg', 0.84);
+    } catch (e) { cache[key] = leer(); }
     return cache[key];
+  }
+
+  function platzhalterVorschau(tag, px) {
+    var t = ganzzahl(tag);
+    if (!(t >= 1 && t <= 24)) t = 1;
+    px = Math.max(16, Math.min(960, ganzzahl(px) || 320));
+    var key = 'v' + t + '_' + px;
+    if (cache[key]) return cache[key];
+    try {
+      var c = szene(SZENE[t], px, px, t * 101);
+      if (px >= 120) beschriften(c.getContext('2d'), px, px, 0.075);
+      cache[key] = c.toDataURL('image/jpeg', 0.86);
+    } catch (e) { cache[key] = leer(); }
+    return cache[key];
+  }
+
+  // Neutraler Platzhalter für gesperrte Tage: warmes Leuchten auf Nachtblau, kleiner Stern, für alle Tage gleich
+  function neutral(px) {
+    px = Math.max(16, Math.min(1000, ganzzahl(px) || 320));
+    var key = 'n' + px;
+    if (cache[key]) return cache[key];
+    try {
+      var c = canvas(px, px), g = c.getContext('2d'), r = rng(2026);
+      g.fillStyle = verlauf(g, 0, 0, 0, px, [[0, '#2c3a55'], [1, '#1a2236']]); g.fillRect(0, 0, px, px);
+      var v = g.createRadialGradient(px / 2, px * 0.46, 0, px / 2, px * 0.46, px * 0.62);
+      v.addColorStop(0, 'rgba(244,195,90,0.30)'); v.addColorStop(1, 'rgba(244,195,90,0)');
+      g.fillStyle = v; g.fillRect(0, 0, px, px);
+      g.fillStyle = 'rgba(255,255,255,0.5)';
+      for (var i = 0; i < 26; i++) {
+        g.globalAlpha = 0.25 + r() * 0.5;
+        g.beginPath(); g.arc(r() * px, r() * px, Math.max(0.6, px / 260) * (0.6 + r()), 0, 6.29); g.fill();
+      }
+      g.globalAlpha = 1;
+      if (px >= 48) { // Stern
+        var cx = px / 2, cy = px * 0.46, ra = px * 0.085, ri = ra * 0.42;
+        g.beginPath();
+        for (var k = 0; k < 10; k++) {
+          var w = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? ri : ra;
+          g[k ? 'lineTo' : 'moveTo'](cx + Math.cos(w) * rr, cy + Math.sin(w) * rr);
+        }
+        g.closePath();
+        g.fillStyle = 'rgba(255,226,150,0.85)'; g.fill();
+      }
+      cache[key] = c.toDataURL('image/jpeg', 0.8);
+    } catch (e) { cache[key] = leer(); }
+    return cache[key];
+  }
+
+  // Notnagel, falls Canvas nicht geht: 1×1-GIF in Nachtblau
+  function leer() { return 'data:image/gif;base64,R0lGODlhAQABAIAAACw6VQAAACwAAAAAAQABAAACAkQBADs='; }
+
+  // ======================================================================================
+  // Öffentliche Funktionen
+  // ======================================================================================
+  function bild(tag) {
+    var t = ganzzahl(tag), d = mitBild(t);
+    if (d) {
+      var u = urlBauen(BILD_URL, t, grossG(), 0, d);
+      if (u) { merken(u, { t: t, art: 'bild' }); vorladen(u); return u; }
+    }
+    return freigegeben(t) ? platzhalterBild(t) : neutral(800);
   }
 
   function vorschau(tag, px) {
-    px = px || 320;
-    var key = 'v' + tag + '_' + px;
-    if (cache[key]) return cache[key];
-    cache[key] = szene(SZENE[tag], px, px, tag * 101).toDataURL('image/jpeg', 0.86);
-    return cache[key];
+    var t = ganzzahl(tag), groesse = ganzzahl(px) || 320, d = mitBild(t);
+    if (d) {
+      var u = urlBauen(BILD_URL, t, groesse <= 480 ? 'k' : 'q', 0, d);
+      if (u) return merken(u, { t: t, art: 'vorschau', px: groesse });
+    }
+    return freigegeben(t) ? platzhalterVorschau(t, groesse) : neutral(groesse);
   }
 
   function einzelbilder(tag) {
-    var key = 'e' + tag;
-    if (cache[key]) return cache[key];
-    var n = 3 + (tag % 3), r = [];
-    for (var i = 0; i < n; i++) r.push(szene(szenenFuer(tag, i), 720, 1280, tag * 101 + i * 7).toDataURL('image/jpeg', 0.84));
-    cache[key] = r;
-    return r;
+    var t = ganzzahl(tag), d = freieDaten(t), n = einzelAnzahl(d), r = [];
+    if (d && n && EINZEL_URL) {
+      var g = grossG();
+      for (var i = 1; i <= n; i++) {
+        var u = urlBauen(EINZEL_URL, t, g, i, d);
+        if (u) r.push(merken(u, { t: t, art: 'einzel' }));
+      }
+      if (r.length) { vorladen(r[0]); return r; }
+    }
+    return [bild(t)];
   }
+
+  function format(tag) {
+    var d = mitBild(ganzzahl(tag)), w = d ? +d.w : 0, h = d ? +d.h : 0;
+    if (d && (d.format === 'hoch' || d.format === 'quadrat')) return d.format;
+    return (w > 0 && h > 0 && h / w > 1.22) ? 'hoch' : 'quadrat';
+  }
+
+  function masse(tag) {
+    var d = mitBild(ganzzahl(tag)), w = d ? +d.w : 0, h = d ? +d.h : 0;
+    return (w > 0 && h > 0) ? { w: w, h: h } : { w: PLATZ, h: PLATZ };
+  }
+
+  function titel(tag) {
+    var d = freieDaten(ganzzahl(tag));
+    return (d && typeof d.titel === 'string') ? d.titel : '';
+  }
+
+  function farbe(tag) {
+    var t = ganzzahl(tag), d = freieDaten(t);
+    if (d && typeof d.farbe === 'string' && /^#[0-9a-f]{6}$/i.test(d.farbe)) return d.farbe;
+    return FARBE[SZENE[t]] || '#f4c35a';
+  }
+
+  function ersatzFuer(info) {
+    if (!info) return platzhalterBild(1);
+    return info.art === 'vorschau' ? platzhalterVorschau(info.t, info.px) : platzhalterBild(info.t);
+  }
+
+  function laden(u, tag) {
+    var info = bekannt[absolut(u)] || (tag ? { t: ganzzahl(tag), art: 'bild' } : null);
+    return new Promise(function (ok) {
+      var im = new Image();
+      im.decoding = 'async';
+      im.onload = function () {
+        if (im.decode) im.decode().then(function () { ok(im); }, function () { ok(im); });
+        else ok(im);
+      };
+      im.onerror = function () {
+        if (/^data:/.test(u)) { ok(im); return; }
+        var p = new Image();
+        p.onload = p.onerror = function () { ok(p); };
+        p.setAttribute('data-platzhalter', '1');
+        p.src = ersatzFuer(info);
+      };
+      im.src = u;
+    });
+  }
+
+  // Ladefehler bei <img> mit unseren URLs → Platzhalter statt kaputtem Bild
+  window.addEventListener('error', function (e) {
+    var el = e.target;
+    if (!el || el.tagName !== 'IMG' || el.hasAttribute('data-kein-ersatz')) return;
+    var info = bekannt[el.src];
+    if (!info) return;
+    el.setAttribute('data-platzhalter', '1');
+    el.src = ersatzFuer(info);
+  }, true);
 
   window.Fotos = {
     bild: bild,
     format: format,
     vorschau: vorschau,
     einzelbilder: einzelbilder,
-    titel: function (tag) { return TITEL[tag] || ''; },
-    farbe: function (tag) { return FARBE[SZENE[tag]] || '#f4c35a'; }
+    titel: titel,
+    farbe: farbe,
+    hatBild: function (tag) { return !!mitBild(ganzzahl(tag)); },
+    masse: masse,
+    platzhalter: function (tag, px) { return px ? platzhalterVorschau(tag, px) : platzhalterBild(tag); },
+    istPlatzhalter: function (u) { return typeof u === 'string' && u.indexOf('data:') === 0; },
+    laden: laden
   };
 })();

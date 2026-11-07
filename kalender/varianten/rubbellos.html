@@ -447,14 +447,14 @@ html.ruhig #kalender-reset { display: none !important; }
 <div class="seite" id="seite">
   <aside class="leiste">
     <header class="kopf">
-      <h1 class="titel"><span class="titel__a">{{TITEL_A}}</span> <span class="titel__b">{{TITEL_B}}</span></h1>
-      <p class="unterzeile">Deine Weihnachtslotterie: jeden Tag ein Los zum Rubbeln.</p>
+      <h1 class="titel"><span class="titel__a" data-titel="a">{{TITEL_A}}</span> <span class="titel__b" data-titel="b">{{TITEL_B}}</span></h1>
+      <p class="unterzeile" data-i18n="rubbellos.unterzeile">Deine Weihnachtslotterie: jeden Tag ein Los zum Rubbeln.</p>
     </header>
     <section class="held" id="held" aria-labelledby="held-titel"></section>
   </aside>
   <section class="alle" aria-labelledby="alle-titel">
     <div class="alle__kopf">
-      <h2 id="alle-titel">Der Lostopf</h2>
+      <h2 id="alle-titel" data-i18n="rubbellos.lostopf">Der Lostopf</h2>
       <p id="stand"></p>
     </div>
     <ol class="raster" id="raster"></ol>
@@ -465,7 +465,7 @@ html.ruhig #kalender-reset { display: none !important; }
 
 <div class="fokus" id="fokus" role="dialog" aria-modal="true" aria-labelledby="fokus-titel" hidden>
   <div class="fokus__dunkel"></div>
-  <button type="button" class="rund-knopf fokus__zu" id="fokus-zu" aria-label="Los weglegen und schließen">
+  <button type="button" class="rund-knopf fokus__zu" id="fokus-zu" aria-label="Los weglegen und schließen" data-i18n-attr="aria-label:rubbellos.fokus.zu">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
   </button>
   <div class="fokus__mitte">
@@ -473,8 +473,8 @@ html.ruhig #kalender-reset { display: none !important; }
       <div class="karte">
         <div class="fokus__kopf los__kopf">
           <div>
-            <p class="fokus__marke">Weihnachtslotterie<span class="fokus__jahr"> <span data-kalender-jahr>{{JAHR}}</span></span></p>
-            <h2 class="fokus__datum" id="fokus-titel"><span class="vh" id="fokus-titel-text"></span><span class="fokus__nr" id="fokus-nr" aria-hidden="true">12</span><span class="fokus__wt" aria-hidden="true"><span id="fokus-wt">Samstag</span><span>Dezember</span></span></h2>
+            <p class="fokus__marke"><span data-i18n="rubbellos.marke">Weihnachtslotterie</span><span class="fokus__jahr"> <span data-kalender-jahr>{{JAHR}}</span></span></p>
+            <h2 class="fokus__datum" id="fokus-titel"><span class="vh" id="fokus-titel-text"></span><span class="fokus__nr" id="fokus-nr" aria-hidden="true">12</span><span class="fokus__wt" aria-hidden="true"><span id="fokus-wt"></span><span data-i18n="rubbellos.dezember">Dezember</span></span></h2>
           </div>
           <div class="siegel" aria-hidden="true" data-kalender-jahr>{{JAHR}}</div>
         </div>
@@ -484,7 +484,7 @@ html.ruhig #kalender-reset { display: none !important; }
           <div class="stempel stempel--gewinn" id="fokus-stempel" aria-hidden="true"><span class="stempel__haupt" id="stempel-haupt"></span><span class="stempel__zusatz" id="stempel-zusatz"></span></div>
         </div>
         <div class="fokus__fuss">
-          <span id="fokus-hinweis">Mit dem Finger rubbeln</span>
+          <span id="fokus-hinweis" data-i18n="rubbellos.hinweis.finger">Mit dem Finger rubbeln</span>
           <span class="los__serie" id="fokus-serie"></span>
         </div>
       </div>
@@ -496,18 +496,18 @@ html.ruhig #kalender-reset { display: none !important; }
 <div class="gewinn" id="gewinn" role="dialog" aria-modal="true" aria-labelledby="gewinn-titel" hidden>
   <div class="gewinn__leiste">
     <p class="gewinn__zaehler" id="gewinn-zaehler"></p>
-    <button type="button" class="rund-knopf" id="gewinn-zu" aria-label="Bildansicht schließen">
+    <button type="button" class="rund-knopf" id="gewinn-zu" aria-label="Bildansicht schließen" data-i18n-attr="aria-label:rubbellos.bild.schliessen">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
     </button>
   </div>
   <div class="gewinn__buehne" id="gewinn-buehne">
     <div class="gewinn__rahmen" id="gewinn-rahmen">
       <img class="gewinn__bild" id="gewinn-bild" alt="" draggable="false">
-      <span class="gewinn__laden" aria-hidden="true"><span class="muenze"></span>Bild wird geladen …</span>
+      <span class="gewinn__laden" aria-hidden="true"><span class="muenze"></span><span data-i18n="rubbellos.bild.laden">Bild wird geladen …</span></span>
     </div>
   </div>
   <div class="gewinn__schein">
-    <button type="button" class="rund-knopf rund-knopf--rot" id="gewinn-zurueck" aria-label="Vorheriges Bild">
+    <button type="button" class="rund-knopf rund-knopf--rot" id="gewinn-zurueck" aria-label="Vorheriges Bild" data-i18n-attr="aria-label:rubbellos.bild.zurueck">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="gewinn__text">
@@ -515,7 +515,7 @@ html.ruhig #kalender-reset { display: none !important; }
       <h2 class="gewinn__titel" id="gewinn-titel"></h2>
       <p class="gewinn__datum" id="gewinn-datum"></p>
     </div>
-    <button type="button" class="rund-knopf rund-knopf--rot" id="gewinn-vor" aria-label="Nächstes Bild">
+    <button type="button" class="rund-knopf rund-knopf--rot" id="gewinn-vor" aria-label="Nächstes Bild" data-i18n-attr="aria-label:rubbellos.bild.weiter">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
@@ -524,11 +524,14 @@ html.ruhig #kalender-reset { display: none !important; }
 <canvas class="partikel" id="partikel" aria-hidden="true"></canvas>
 <div class="vh" id="vorlesen" aria-live="polite"></div>
 
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „rubbellos“ (t ist hier die Tageszahl)
   var K = window.Kalender.init('rubbellos');
   var F = window.Fotos;
   var TAU = Math.PI * 2;
@@ -550,19 +553,19 @@ html.ruhig #kalender-reset { display: none !important; }
     };
   }
   function cv(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
-  function kurzDatum(t) { return K.wochentag(t).slice(0, 2) + ', ' + t + '. Dez.'; }
+  function kurzDatum(t) { return tx('rubbellos.kurzDatum', '{wt}, {n}. Dez.', { wt: K.wochentag(t).slice(0, 2), n: t }); }
   function serie(t) { return 'A' + String(K.JAHR).slice(-2) + ' ' + (1000 + ((t * 7919 + 263) % 9000)); }
   function losArt(t) { if (t === 24) return 'haupt'; if (K.istSonntag(t)) return 'advent'; return 'normal'; }
   function folienArt(t) { return losArt(t) === 'normal' ? 'silber' : 'gold'; }
   function karton(t) { var a = losArt(t); return a === 'advent' ? 'los--gruen los--advent' : (a === 'haupt' ? 'los--rot los--haupt' : 'los--rot'); }
   // Was am Tag passiert: steht im Stempel nach dem Aufdecken und in der Bildansicht
-  var ANLASS = { 1: 'Der Advent beginnt', 4: 'Barbaratag', 6: 'Nikolaus', 13: '3. Advent', 20: '4. Advent', 21: 'Wintersonnenwende', 24: 'Heiligabend' };
-  var STEMPEL_ZEILEN = { 1: ['Der Advent', 'beginnt'], 21: ['Winter-', 'sonnenwende'] };
+  var ANLASS = { 1: tx('rubbellos.anlass.1', 'Der Advent beginnt'), 4: tx('rubbellos.anlass.4', 'Barbaratag'), 6: tx('rubbellos.anlass.6', 'Nikolaus'), 13: tx('rubbellos.anlass.13', '3. Advent'), 20: tx('rubbellos.anlass.20', '4. Advent'), 21: tx('rubbellos.anlass.21', 'Wintersonnenwende'), 24: tx('rubbellos.anlass.24', 'Heiligabend') };
+  var STEMPEL_ZEILEN = { 1: [tx('rubbellos.stempel.1a', 'Der Advent'), tx('rubbellos.stempel.1b', 'beginnt')], 21: [tx('rubbellos.stempel.21a', 'Winter-'), tx('rubbellos.stempel.21b', 'sonnenwende')] };
   function stempelInhalt(t) {
-    var zeilen = STEMPEL_ZEILEN[t] || [ANLASS[t] || 'Enthüllt!'];
-    return { zeilen: zeilen, zusatz: t === 6 ? 'und 2. Advent' : kurzDatum(t) };
+    var zeilen = STEMPEL_ZEILEN[t] || [ANLASS[t] || tx('rubbellos.stempel.enthuellt', 'Enthüllt!')];
+    return { zeilen: zeilen, zusatz: t === 6 ? tx('rubbellos.stempel.6zusatz', 'und 2. Advent') : kurzDatum(t) };
   }
-  function anlassText(t) { return t === 6 ? 'Nikolaus und 2. Advent' : (ANLASS[t] || ''); }
+  function anlassText(t) { return t === 6 ? tx('rubbellos.anlass.6lang', 'Nikolaus und 2. Advent') : (ANLASS[t] || ''); }
   function zustand(t) {
     if (!K.darfOeffnen(t)) return 'gesperrt';
     if (K.istGeoeffnet(t)) return 'offen';
@@ -570,11 +573,11 @@ html.ruhig #kalender-reset { display: none !important; }
     return 'verpasst';
   }
   function ariaText(t) {
-    var z = zustand(t), basis = 'Los ' + t + ', ' + K.datumText(t);
-    if (z === 'offen') return basis + ' – geöffnet';
-    if (z === 'heute') return basis + ' – heute, noch nicht gerubbelt';
-    if (z === 'verpasst') return basis + ' – noch nicht gerubbelt';
-    return basis + ' – gesperrt. ' + K.sperrText(t);
+    var z = zustand(t), basis = tx('rubbellos.aria.basis', 'Los {n}, {datum}', { n: t, datum: K.datumText(t) });
+    if (z === 'offen') return basis + ' – ' + tx('rubbellos.aria.offen', 'geöffnet');
+    if (z === 'heute') return basis + ' – ' + tx('rubbellos.aria.heute', 'heute, noch nicht gerubbelt');
+    if (z === 'verpasst') return basis + ' – ' + tx('rubbellos.aria.verpasst', 'noch nicht gerubbelt');
+    return basis + ' – ' + tx('rubbellos.aria.gesperrt', 'gesperrt. {sperre}', { sperre: K.sperrText(t) });
   }
   function vorlesen(text) {
     var v = $('#vorlesen');
@@ -583,7 +586,7 @@ html.ruhig #kalender-reset { display: none !important; }
   }
   // Bildunterschrift kann leer sein (echte Bilder ohne Eintrag in texte.txt)
   function bildTitel(t) { var s = F.titel(t); return typeof s === 'string' ? s.trim() : ''; }
-  function altText(t) { var ti = bildTitel(t); return 'Bild zu Los ' + t + (ti ? ': ' + ti : ', ' + K.datumText(t)); }
+  function altText(t) { var ti = bildTitel(t); return ti ? tx('rubbellos.alt.titel', 'Bild zu Los {n}: {titel}', { n: t, titel: ti }) : tx('rubbellos.alt.datum', 'Bild zu Los {n}, {datum}', { n: t, datum: K.datumText(t) }); }
 
   /* ================= Bilder laden (asynchron, mit Ersatz bei Fehlern) ================= */
   // Setzt url in ein <img> und ruft fertig(ok) genau einmal, sobald etwas Sichtbares da ist: das Bild oder –
@@ -973,10 +976,10 @@ html.ruhig #kalender-reset { display: none !important; }
           '<span class="los__reste reste-' + (t % 3) + (t % 2 ? ' gespiegelt' : (t % 4 === 0 ? ' gespiegelt-v' : '')) + '"></span>';
     } else {
       h = '<span class="los__folie"></span>';
-      if (z === 'gesperrt') h += '<span class="stempel stempel--sperre">Noch nicht<br>gezogen</span>';
-      else if (gross) h += '<span class="quer__hinweis">Hier rubbeln</span>';
-      else if (z === 'verpasst') h += '<span class="etikett">Noch nicht gerubbelt</span>';
-      else h += '<span class="etikett etikett--heute">Heute dran</span>';
+      if (z === 'gesperrt') h += '<span class="stempel stempel--sperre">' + tx('rubbellos.feld.gesperrt', 'Noch nicht<br>gezogen') + '</span>';
+      else if (gross) h += '<span class="quer__hinweis">' + tx('rubbellos.folie', 'Hier rubbeln') + '</span>';
+      else if (z === 'verpasst') h += '<span class="etikett">' + tx('rubbellos.feld.verpasst', 'Noch nicht gerubbelt') + '</span>';
+      else h += '<span class="etikett etikett--heute">' + tx('rubbellos.feld.heute', 'Heute dran') + '</span>';
     }
     return h;
   }
@@ -994,42 +997,42 @@ html.ruhig #kalender-reset { display: none !important; }
       (o.tag ? ' data-tag="' + o.tag + '"' : '') + ' tabindex="-1" aria-hidden="true">' +
       '<span class="karte karte--quer">' +
         '<span class="quer__stub"><span class="quer__nrlabel">' + o.label + '</span><span class="quer__nr">' + o.nr + '</span><span class="quer__datum">' + o.datum + '</span></span>' +
-        '<span class="quer__rechts"><span class="quer__marke"><span>Weihnachtslotterie</span><span>' + o.serie + '</span></span>' +
+        '<span class="quer__rechts"><span class="quer__marke"><span>' + tx('rubbellos.marke', 'Weihnachtslotterie') + '</span><span>' + o.serie + '</span></span>' +
         '<span class="los__feld quer__feld' + (o.offen ? feldKlasse(o.tag, 'offen', true) : '') + '"' + (o.offen ? ' style="background-color:' + attr(F.farbe(o.tag)) + '"' : '') + '>' + o.feld + '</span></span>' +
       '</span></button>';
   }
   function renderHeld() {
     var h = K.heute(), html = '', z, t;
     if (h === 0) {
-      html = '<div class="held__buehne"><span class="band">Bald geht’s los</span>' +
-        querLos({ tag: 1, karton: 'los--rot', folie: 'silber', klasse: 'ist-gesperrt', label: K.wochentag(1), nr: '1', datum: 'Dezember', serie: serie(1), feld: feldInhalt(1, 'gesperrt', true) }) +
-        '</div><div class="held__text"><h2 id="held-titel">Die Losbude öffnet am 1. Dezember</h2>' +
-        '<p>Dann wird jeden Morgen ein neues Los gezogen. Bis dahin heißt es: Vorfreude.</p></div>';
+      html = '<div class="held__buehne"><span class="band">' + tx('rubbellos.held.bald', 'Bald geht’s los') + '</span>' +
+        querLos({ tag: 1, karton: 'los--rot', folie: 'silber', klasse: 'ist-gesperrt', label: K.wochentag(1), nr: '1', datum: tx('rubbellos.dezember', 'Dezember'), serie: serie(1), feld: feldInhalt(1, 'gesperrt', true) }) +
+        '</div><div class="held__text"><h2 id="held-titel">' + tx('rubbellos.held.losbude', 'Die Losbude öffnet am 1. Dezember') + '</h2>' +
+        '<p>' + tx('rubbellos.held.vorfreude', 'Dann wird jeden Morgen ein neues Los gezogen. Bis dahin heißt es: Vorfreude.') + '</p></div>';
     } else if (h >= 25) {
       var offen = K.geoeffnet().length, rest = 24 - offen;
-      html = '<div class="held__buehne"><span class="band">Frohe Weihnachten</span>' +
-        querLos({ tag: 0, karton: 'los--gruen', folie: 'gold', label: 'Gerubbelt', nr: String(offen), datum: 'von 24', serie: 'A' + String(K.JAHR).slice(-2) + ' 2512',
-          feld: '<span class="los__folie"></span><span class="stempel stempel--fest">Frohe<br>Weihnachten!</span>' }) +
-        '</div><div class="held__text"><h2 id="held-titel">Frohe Weihnachten!</h2>' +
-        '<p>' + (!rest ? 'Ihr habt alle 24 Lose gerubbelt. Was für ein Jahr!' : 'Die Ziehung ist vorbei, alle 24 Lose gehören euch. ' + (offen ? offen + ' davon habt ihr schon gerubbelt.' : 'Fangt einfach mit Los 1 an.')) + '</p>' +
-        '<button type="button" class="knopf" id="held-knopf">' + (rest ? 'Nächstes Los rubbeln' : 'Alle Bilder ansehen') + '</button></div>';
+      html = '<div class="held__buehne"><span class="band">' + tx('rubbellos.held.festBand', 'Frohe Weihnachten') + '</span>' +
+        querLos({ tag: 0, karton: 'los--gruen', folie: 'gold', label: tx('rubbellos.gerubbelt', 'Gerubbelt'), nr: String(offen), datum: tx('rubbellos.von24', 'von 24'), serie: 'A' + String(K.JAHR).slice(-2) + ' 2512',
+          feld: '<span class="los__folie"></span><span class="stempel stempel--fest">' + tx('rubbellos.held.festStempel', 'Frohe<br>Weihnachten!') + '</span>' }) +
+        '</div><div class="held__text"><h2 id="held-titel">' + tx('rubbellos.held.festTitel', 'Frohe Weihnachten!') + '</h2>' +
+        '<p>' + (!rest ? tx('rubbellos.held.alleGerubbelt', 'Ihr habt alle 24 Lose gerubbelt. Was für ein Jahr!') : tx('rubbellos.held.ziehungVorbei', 'Die Ziehung ist vorbei, alle 24 Lose gehören euch.') + ' ' + (offen ? tx('rubbellos.held.davon', '{n} davon habt ihr schon gerubbelt.', { n: offen }) : tx('rubbellos.held.losEins', 'Fangt einfach mit Los 1 an.'))) + '</p>' +
+        '<button type="button" class="knopf" id="held-knopf">' + (rest ? tx('rubbellos.held.naechstes', 'Nächstes Los rubbeln') : tx('rubbellos.held.alleBilder', 'Alle Bilder ansehen')) + '</button></div>';
     } else {
       z = zustand(h);
       var neu = z !== 'offen', haupt = h === 24;
-      html = '<div class="held__buehne"><span class="band">' + (neu ? (haupt ? 'Hauptziehung' : 'Frisch gezogen') : 'Gerubbelt') + '</span>' +
-        querLos({ tag: h, karton: karton(h), folie: folienArt(h), label: K.wochentag(h), nr: String(h), datum: 'Dezember', serie: serie(h), feld: feldInhalt(h, z, true), offen: !neu, rubbelbar: neu }) +
-        '</div><div class="held__text"><h2 id="held-titel">' + (neu ? (haupt ? 'Heute ist die große Ziehung' : 'Das Los für heute') : 'Heute schon freigerubbelt') + '</h2>' +
-        '<p>' + (neu ? 'Rubbel die ' + (folienArt(h) === 'gold' ? 'Goldfolie' : 'Silberfolie') + ' frei. Darunter wartet das Bild von heute.'
-          : (h < 24 ? 'Morgen wird das nächste Los gezogen.' : 'Das war das letzte Los. Frohe Weihnachten!')) + '</p>' +
-        '<button type="button" class="knopf" id="held-knopf">' + (neu ? 'Jetzt rubbeln' : 'Bild ansehen') + '</button>';
+      html = '<div class="held__buehne"><span class="band">' + (neu ? (haupt ? tx('rubbellos.held.hauptziehung', 'Hauptziehung') : tx('rubbellos.held.frisch', 'Frisch gezogen')) : tx('rubbellos.gerubbelt', 'Gerubbelt')) + '</span>' +
+        querLos({ tag: h, karton: karton(h), folie: folienArt(h), label: K.wochentag(h), nr: String(h), datum: tx('rubbellos.dezember', 'Dezember'), serie: serie(h), feld: feldInhalt(h, z, true), offen: !neu, rubbelbar: neu }) +
+        '</div><div class="held__text"><h2 id="held-titel">' + (neu ? (haupt ? tx('rubbellos.held.grosseZiehung', 'Heute ist die große Ziehung') : tx('rubbellos.held.heute', 'Das Los für heute')) : tx('rubbellos.held.schonFrei', 'Heute schon freigerubbelt')) + '</h2>' +
+        '<p>' + (neu ? (folienArt(h) === 'gold' ? tx('rubbellos.held.gold', 'Rubbel die Goldfolie frei. Darunter wartet das Bild von heute.') : tx('rubbellos.held.silber', 'Rubbel die Silberfolie frei. Darunter wartet das Bild von heute.'))
+          : (h < 24 ? tx('rubbellos.held.morgen', 'Morgen wird das nächste Los gezogen.') : tx('rubbellos.held.letztes', 'Das war das letzte Los. Frohe Weihnachten!'))) + '</p>' +
+        '<button type="button" class="knopf" id="held-knopf">' + (neu ? tx('rubbellos.held.jetztRubbeln', 'Jetzt rubbeln') : tx('rubbellos.bildAnsehen', 'Bild ansehen')) + '</button>';
       var verpasst = [];
       for (t = 1; t < h; t++) if (zustand(t) === 'verpasst') verpasst.push(t);
       if (verpasst.length) {
-        html += '<div class="nachholen"><p>Noch nicht gerubbelt:</p><ul class="nachholen__liste">';
+        html += '<div class="nachholen"><p>' + tx('rubbellos.held.nochNicht', 'Noch nicht gerubbelt:') + '</p><ul class="nachholen__liste">';
         verpasst.slice(-4).forEach(function (v) {
-          html += '<li><button type="button" class="chip' + (losArt(v) === 'advent' ? ' chip--gruen' : '') + '" data-tag="' + v + '" aria-label="' + ariaText(v) + '">Los ' + v + '</button></li>';
+          html += '<li><button type="button" class="chip' + (losArt(v) === 'advent' ? ' chip--gruen' : '') + '" data-tag="' + v + '" aria-label="' + ariaText(v) + '">' + tx('rubbellos.los', 'Los {n}', { n: v }) + '</button></li>';
         });
-        html += '</ul>' + (verpasst.length > 4 ? '<p>und ' + (verpasst.length - 4) + ' weitere, im Raster am gelben Etikett zu erkennen.</p>' : '') + '</div>';
+        html += '</ul>' + (verpasst.length > 4 ? '<p>' + tx('rubbellos.held.weitere', 'und {n} weitere, im Raster am gelben Etikett zu erkennen.', { n: verpasst.length - 4 }) + '</p>' : '') + '</div>';
       }
       html += '</div>';
     }
@@ -1055,8 +1058,8 @@ html.ruhig #kalender-reset { display: none !important; }
     formenBeobachten(raster);
     bilderBeobachten(raster);
     var n = K.geoeffnet().length;
-    $('#stand').textContent = h === 0 ? 'Ab 1. Dezember wird jeden Tag ein Los gezogen.'
-      : n + ' von ' + Math.min(24, h) + ' gezogenen Losen gerubbelt';
+    $('#stand').textContent = h === 0 ? tx('rubbellos.stand.november', 'Ab 1. Dezember wird jeden Tag ein Los gezogen.')
+      : tx('rubbellos.stand.zahl', '{n} von {gezogen} gezogenen Losen gerubbelt', { n: n, gezogen: Math.min(24, h) });
     if (h >= 25 && !festGezeigt) { festGezeigt = true; festTimer = setTimeout(function () { if (K.heute() >= 25) konfettiRegen(70); }, 450); }
     if (h < 25) { festGezeigt = false; clearTimeout(festTimer); }
     letzterTag = h;
@@ -1091,10 +1094,10 @@ html.ruhig #kalender-reset { display: none !important; }
     blasenTimer = setTimeout(function () { blase.hidden = true; }, 2600);
   }
   function gesperrt(t, el) {
-    var text = K.sperrText(t) || 'Noch nicht dran!';
+    var text = K.sperrText(t) || tx('rubbellos.nochNichtDran', 'Noch nicht dran!');
     if (!ruhe) { el.classList.remove('wackelt'); void el.offsetWidth; el.classList.add('wackelt'); }
     zeigeBlase(el, text);
-    vorlesen('Los ' + t + ': ' + text);
+    vorlesen(tx('rubbellos.vorlesen.gesperrt', 'Los {n}: {text}', { n: t, text: text }));
   }
   function tippe(t, el, bereich) {
     var z = zustand(t);
@@ -1198,7 +1201,7 @@ html.ruhig #kalender-reset { display: none !important; }
     fctx.setTransform(1, 0, 0, 1, 0, 0);
     fctx.globalCompositeOperation = 'source-over';
     fctx.clearRect(0, 0, folie.width, folie.height);
-    maleFolie(fctx, folie.width, folie.height, FK.art, DPR, FK.tag * 13 + 5, 'Hier rubbeln');
+    maleFolie(fctx, folie.width, folie.height, FK.art, DPR, FK.tag * 13 + 5, tx('rubbellos.folie', 'Hier rubbeln'));
   }
   function oeffneFokus(t, quelle, ziel) {
     clearTimeout(FK.schliess); clearTimeout(FK.timer); clearTimeout(FK.vorbereitung); cancelAnimationFrame(FK.auto); FK.auto = 0;
@@ -1207,10 +1210,10 @@ html.ruhig #kalender-reset { display: none !important; }
     fokusLos.className = 'fokus__los ' + karton(t) + ' folie--' + FK.art;
     $('#fokus-nr').textContent = t;
     $('#fokus-wt').textContent = K.wochentag(t);
-    $('#fokus-titel-text').textContent = 'Los vom ' + K.datumText(t);
+    $('#fokus-titel-text').textContent = tx('rubbellos.fokus.titel', 'Los vom {datum}', { datum: K.datumText(t) });
     FK.gemessen = 0; FK.fastHinweis = false; folie.dataset.frei = '0';
     $('#fokus-serie').textContent = 'Serie ' + serie(t);
-    $('#fokus-hinweis').textContent = grob ? 'Mit dem Finger rubbeln' : 'Mit gedrückter Maustaste rubbeln';
+    $('#fokus-hinweis').textContent = grob ? tx('rubbellos.hinweis.finger', 'Mit dem Finger rubbeln') : tx('rubbellos.hinweis.maus', 'Mit gedrückter Maustaste rubbeln');
     stempelEl.classList.remove('landet');
     var si = stempelInhalt(t), laengste = 0;
     si.zeilen.forEach(function (z) { laengste = Math.max(laengste, z.length); });
@@ -1218,7 +1221,7 @@ html.ruhig #kalender-reset { display: none !important; }
     $('#stempel-haupt').style.fontSize = Math.min(10.5, 60 / (laengste * 0.85)).toFixed(2) + 'cqi';
     $('#stempel-zusatz').textContent = si.zusatz;
     folie.classList.remove('weg');
-    aufdeckKnopf.textContent = 'Aufdecken';
+    aufdeckKnopf.textContent = tx('rubbellos.aufdecken', 'Aufdecken');
     fokus.classList.remove('geht', 'da');
     fokus.hidden = false;
     void fokus.offsetWidth;
@@ -1243,7 +1246,7 @@ html.ruhig #kalender-reset { display: none !important; }
     hebeAn(quelle);
     if (quelle && quelle.classList.contains('los') && !quelle.classList.contains('held__los')) quelle.classList.add('ist-gehoben');
     try { aufdeckKnopf.focus({ preventScroll: true }); } catch (e) { aufdeckKnopf.focus(); }
-    vorlesen('Los ' + t + '. ' + $('#fokus-hinweis').textContent + ' oder Aufdecken drücken.');
+    vorlesen(tx('rubbellos.vorlesen.start', 'Los {n}. {hinweis} oder Aufdecken drücken.', { n: t, hinweis: $('#fokus-hinweis').textContent }));
   }
   function hebeAn(quelle) {
     if (ruhe || !quelle || !fokusLos.animate) return;
@@ -1314,7 +1317,7 @@ html.ruhig #kalender-reset { display: none !important; }
     var a = freiAnteil();
     folie.dataset.frei = (Math.round(a * 1000) / 10).toFixed(1);
     if (a >= 0.95) aufloesen();
-    else if (a >= 0.8 && !FK.fastHinweis) { FK.fastHinweis = true; $('#fokus-hinweis').textContent = 'Fast! Noch die Ränder.'; }
+    else if (a >= 0.8 && !FK.fastHinweis) { FK.fastHinweis = true; $('#fokus-hinweis').textContent = tx('rubbellos.hinweis.fast', 'Fast! Noch die Ränder.'); }
   }
   // Ein Münzabdruck: harter Kern + ausgefranster Rand; am Rand etwas größer, damit die letzten Reste leicht weggehen
   function rubbel(x, y) {
@@ -1432,10 +1435,10 @@ html.ruhig #kalender-reset { display: none !important; }
     var t = FK.tag;
     K.oeffne(t);
     render();
-    aufdeckKnopf.textContent = 'Bild ansehen';
+    aufdeckKnopf.textContent = tx('rubbellos.bildAnsehen', 'Bild ansehen');
     var ti = bildTitel(t);
-    $('#fokus-hinweis').textContent = ti || anlassText(t) || 'Los ' + t + ' ist aufgedeckt';
-    vorlesen((anlassText(t) || 'Enthüllt') + '! ' + K.datumText(t) + (ti ? ': ' + ti : '') + '.');
+    $('#fokus-hinweis').textContent = ti || anlassText(t) || tx('rubbellos.aufgedeckt', 'Los {n} ist aufgedeckt', { n: t });
+    vorlesen((anlassText(t) || tx('rubbellos.enthuellt', 'Enthüllt')) + '! ' + K.datumText(t) + (ti ? ': ' + ti : '') + '.');
     var gleichBild = function () { if (FK.offen && FK.tag === t) zumBild(); };
     if (ruhe) {
       fctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -1538,11 +1541,11 @@ html.ruhig #kalender-reset { display: none !important; }
   function setzeTexte(t) {
     var ti = bildTitel(t), an = anlassText(t);
     // Ohne Bildunterschrift wird das Datum zur Überschrift, darüber steht die Losnummer
-    $('#gewinn-nr').textContent = ti ? K.datumText(t) : 'Los ' + t;
+    $('#gewinn-nr').textContent = ti ? K.datumText(t) : tx('rubbellos.los', 'Los {n}', { n: t });
     $('#gewinn-titel').textContent = ti || K.datumText(t);
     $('#gewinn-datum').textContent = an;
     $('#gewinn-datum').hidden = !an;
-    $('#gewinn-zaehler').textContent = 'Bild ' + (BV.i + 1) + ' von ' + BV.liste.length;
+    $('#gewinn-zaehler').textContent = tx('rubbellos.bild.zaehler', 'Bild {n} von {gesamt}', { n: BV.i + 1, gesamt: BV.liste.length });
     knopfZurueck.disabled = BV.i <= 0;
     knopfVor.disabled = BV.i >= BV.liste.length - 1;
     var a = document.activeElement;

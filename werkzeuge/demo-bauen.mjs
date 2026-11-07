@@ -23,7 +23,7 @@ import path from 'node:path';
 import {
   REPO_ORDNER, KALENDER_ORDNER, CREDIT, abbrechen, gruen, grau, fett, groesseText, nodePruefen, htmlText,
   jsonFuerScript, liegtIn, istOrdner, istDatei, lesen, schreiben, ordnerKopieren, alleDateien, ansichtenLaden,
-  platzhalterEinsetzen, zielPruefen, bauordnerAnlegen, zielErsetzen, ausfuehren
+  platzhalterEinsetzen, zielPruefen, bauordnerAnlegen, zielErsetzen, ausfuehren, sprachpaketeLaden, sprachenJs
 } from './gemeinsam.mjs';
 
 const KENNUNG = 'DEIN-ADVENTSKALENDER-DEMO';
@@ -31,6 +31,9 @@ const DEMO = path.join(KALENDER_ORDNER, 'demo');
 
 const EINSTELLUNGEN = {
   titel: 'Dein Adventskalender',
+  titelJeSprache: { de: 'Dein Adventskalender', en: 'Your Advent Calendar' },
+  sprachen: ['de', 'en'],                 // Sprachknopf auf der Startseite und im Menü jeder Ansicht
+  sprache: 'auto',                        // beim ersten Besuch die Sprache des Browsers
   speicher: 'dein-adventskalender',       // localStorage-Schlüssel (gemeinsam für alle Ansichten der Demo)
   zeitzone: 'Europe/Berlin',
   standardTag: 12,                        // ohne gewähltes Datum (außerhalb des Dezembers)
@@ -91,16 +94,25 @@ function webpMasse(buf) {
   return null;
 }
 
-function kartenHtml(ansichten, vorschauen) {
+/** Name der Sprache in ihr selbst („Deutsch“, „English“) */
+function sprachName(c) {
+  try { const n = new Intl.DisplayNames([c], { type: 'language' }).of(c); if (n && n !== c) return n.charAt(0).toLocaleUpperCase(c) + n.slice(1); } catch { /* alt */ }
+  return c.toUpperCase();
+}
+
+function kartenHtml(ansichten, vorschauen, de) {
   return ansichten.map((a) => {
     const v = vorschauen[a.id];
     const bild = v
-      ? `<img src="vorschau/${a.id}.webp" width="${v.w}" height="${v.h}" alt="" loading="lazy" decoding="async">`
+      ? `<img src="vorschau/${a.id}.webp"` +
+        // Vorschau je Sprache (vorschau/<id>-en.webp …) – shared/i18n.js tauscht sie vor dem Laden
+        EINSTELLUNGEN.sprachen.filter((c) => c !== 'de' && vorschauen[`${a.id}-${c}`]).map((c) => ` data-src-${c}="vorschau/${a.id}-${c}.webp"`).join('') +
+        ` width="${v.w}" height="${v.h}" alt="" loading="lazy" decoding="async">`
       : '<span class="ohne-bild" aria-hidden="true"></span>';
     return `      <li class="karte">\n        <a class="karte-link" href="kalender/${a.id}.html?tag=${EINSTELLUNGEN.standardTag}" data-id="${a.id}">\n` +
       `          <span class="karte-bild">${bild}</span>\n` +
-      `          <span class="karte-name">${weich(a.name)}</span>\n` +
-      `          <span class="karte-satz">${htmlText(a.satz || '')}</span>\n        </a>\n      </li>`;
+      `          <span class="karte-name" data-i18n="allgemein.ansicht.${a.id}">${weich(a.name)}</span>\n` +
+      `          <span class="karte-satz" data-i18n="start.satz.${a.id}">${htmlText(de[`start.satz.${a.id}`] || '')}</span>\n        </a>\n      </li>`;
   }).join('\n');
 }
 
@@ -126,24 +138,26 @@ async function bauen() {
   console.log(`  Ziel:   ${grau(ziel)}`);
 
   for (const p of ['index.html', 'start.js']) if (!istDatei(path.join(DEMO, p))) abbrechen(`Datei fehlt: kalender/demo/${p}`);
-  for (const p of ['kalender.js', 'platzhalter-fotos.js']) if (!istDatei(path.join(KALENDER_ORDNER, 'shared', p))) abbrechen(`Datei fehlt: kalender/shared/${p}`);
+  for (const p of ['kalender.js', 'platzhalter-fotos.js', 'i18n.js']) if (!istDatei(path.join(KALENDER_ORDNER, 'shared', p))) abbrechen(`Datei fehlt: kalender/shared/${p}`);
   if (!istOrdner(path.join(KALENDER_ORDNER, 'fonts'))) abbrechen('Ordner fehlt: kalender/fonts/');
   if (liegtIn(KALENDER_ORDNER, ziel) || liegtIn(REPO_ORDNER, ziel) || liegtIn(ziel, KALENDER_ORDNER)) abbrechen('Das Ziel darf weder in kalender/ liegen noch den Projektordner enthalten.');
   zielPruefen(ziel, KENNUNG);
 
   const ansichten = ansichtenLaden();
+  const { pakete, fehlend } = sprachpaketeLaden(EINSTELLUNGEN.sprachen);
+  for (const [c, f] of Object.entries(fehlend)) if (f.length) console.log(`  Hinweis: kalender/i18n/${c}.json – ${f.length} Text(e) fehlen (dort erscheint Deutsch)`);
   const jahr = new Date().getFullYear();        // Vorgabe; im Browser setzt start.js das laufende Jahr ein
   const bau = await bauordnerAnlegen(ziel);
   bauOrdner = bau;
   const ausgaben = {};
 
-  // --- Ansichten: start.js vor kalender.js, Icons in den Kopf ---
+  // --- Ansichten: start.js vor den Bausteinen (sprachen.js, i18n.js, kalender.js), Icons in den Kopf ---
   for (const a of ansichten) {
     let html = lesen(path.join(KALENDER_ORDNER, 'varianten', `${a.id}.html`));
     html = platzhalterEinsetzen(html, { titel: EINSTELLUNGEN.titel, jahr }, `varianten/${a.id}.html`);
-    const kalenderTag = /<script\s+src="\.\.\/shared\/kalender\.js"><\/script>/g;
-    if ((html.match(kalenderTag) || []).length !== 1) abbrechen(`varianten/${a.id}.html: erwartet genau ein <script src="../shared/kalender.js">.`);
-    html = html.replace(kalenderTag, (t) => `<script src="../shared/start.js" data-ansicht="${a.id}"></script>\n${t}`);
+    const ersterBaustein = /<script\s+src="\.\.\/shared\/sprachen\.js"><\/script>/g;
+    if ((html.match(ersterBaustein) || []).length !== 1) abbrechen(`varianten/${a.id}.html: erwartet genau ein <script src="../shared/sprachen.js">.`);
+    html = html.replace(ersterBaustein, (t) => `<script src="../shared/start.js" data-ansicht="${a.id}"></script>\n${t}`);
     const ende = html.search(/<\/head\s*>/i);
     if (ende < 0) abbrechen(`varianten/${a.id}.html: kein </head>.`);
     html = html.slice(0, ende) + '<link rel="icon" href="../icon.svg" type="image/svg+xml">\n<link rel="apple-touch-icon" href="../apple-touch-icon.png">\n' + html.slice(ende);
@@ -152,11 +166,14 @@ async function bauen() {
 
   // --- Bausteine ---
   ausgaben['shared/kalender.js'] = lesen(path.join(KALENDER_ORDNER, 'shared', 'kalender.js'));
+  ausgaben['shared/i18n.js'] = lesen(path.join(KALENDER_ORDNER, 'shared', 'i18n.js'));
+  ausgaben['shared/sprachen.js'] = sprachenJs(pakete);
   ausgaben['shared/fotos.js'] = lesen(path.join(KALENDER_ORDNER, 'shared', 'platzhalter-fotos.js'));
   let startJs = lesen(path.join(DEMO, 'start.js'));
   if (!startJs.includes('/*@@KONFIG@@*/null')) abbrechen('kalender/demo/start.js ist beschädigt (Platzhalter fehlt).');
   startJs = startJs.replace('/*@@KONFIG@@*/null', () => jsonFuerScript({
-    titel: EINSTELLUNGEN.titel, speicher: EINSTELLUNGEN.speicher, zeitzone: EINSTELLUNGEN.zeitzone,
+    titel: EINSTELLUNGEN.titel, titelJeSprache: EINSTELLUNGEN.titelJeSprache, sprachen: EINSTELLUNGEN.sprachen, sprache: EINSTELLUNGEN.sprache,
+    speicher: EINSTELLUNGEN.speicher, zeitzone: EINSTELLUNGEN.zeitzone,
     standardTag: EINSTELLUNGEN.standardTag, varianten: ansichten.map((a) => ({ id: a.id, name: a.name })),
     startUrl: '../index.html', startText: EINSTELLUNGEN.startText, testTitel: EINSTELLUNGEN.testTitel,
     testHinweis: EINSTELLUNGEN.testHinweis, fusszeile: { ...CREDIT }
@@ -179,12 +196,20 @@ async function bauen() {
 
   // --- Startseite ---
   let index = lesen(path.join(DEMO, 'index.html'));
-  for (const p of ['<!--@@KARTEN@@-->', '<!--@@FUSS@@-->', KENNUNG]) if (!index.includes(p)) abbrechen(`kalender/demo/index.html ist beschädigt (${p} fehlt).`);
-  const links = [];
-  if (arg.impressum) links.push(`<a href="${htmlText(arg.impressum)}" rel="noopener">Impressum</a>`);
-  if (arg.datenschutz) links.push(`<a href="${htmlText(arg.datenschutz)}" rel="noopener">Datenschutz</a>`);
-  index = index.replace('<!--@@KARTEN@@-->', () => kartenHtml(ansichten, vorschauen))
-    .replace('<!--@@FUSS@@-->', () => (links.length ? `<p class="fuss-links">${links.join('\n        ')}</p>` : ''))
+  for (const p of ['<!--@@KARTEN@@-->', '<!--@@SPRACHEN@@-->', '<!--@@FUSS-->', '<!--/@@FUSS-->', KENNUNG]) if (!index.includes(p)) abbrechen(`kalender/demo/index.html ist beschädigt (${p} fehlt).`);
+  // Fußlinks Impressum/Datenschutz: nur die mit Adresse bleiben, ohne beide entfällt die Zeile
+  index = index.replace(/<!--@@FUSS-->([\s\S]*?)<!--\/@@FUSS-->/, (_, block) => {
+    if (!arg.impressum && !arg.datenschutz) return '';
+    let b = block;
+    for (const [platz, url] of [['@@IMPRESSUM@@', arg.impressum], ['@@DATENSCHUTZ@@', arg.datenschutz]]) {
+      b = url ? b.split(platz).join(htmlText(url)) : b.replace(new RegExp(`\\s*<a href="${platz}"[^>]*>[^<]*</a>`), '');
+    }
+    return b.trim();
+  });
+  const sprachKnoepfe = EINSTELLUNGEN.sprachen.map((c) =>
+    `          <button type="button" lang="${c}" data-sprache="${c}" aria-pressed="false">${htmlText(sprachName(c))}</button>`).join('\n');
+  index = index.replace('<!--@@KARTEN@@-->', () => kartenHtml(ansichten, vorschauen, pakete.de))
+    .replace('<!--@@SPRACHEN@@-->', () => sprachKnoepfe)
     .split('@@STANDARDTAG@@').join(String(EINSTELLUNGEN.standardTag));
   ausgaben['index.html'] = index;
   ausgaben['.nojekyll'] = '';

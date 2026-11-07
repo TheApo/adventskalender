@@ -795,15 +795,15 @@ html.gesperrt #kalender-reset { display: none; }
 
 <main id="haupt">
   <header class="kopf">
-    <h1 class="titel"><span class="band band-1">{{TITEL_A}}</span> <span class="band band-2">{{TITEL_B}}</span></h1>
+    <h1 class="titel"><span class="band band-1" data-titel="a">{{TITEL_A}}</span> <span class="band band-2" data-titel="b">{{TITEL_B}}</span></h1>
     <p class="unterzeile" id="unterzeile"></p>
   </header>
-  <section class="wand" id="wand" aria-label="Die Fotoleine mit 24 Umschlägen"></section>
+  <section class="wand" id="wand" aria-label="Die Fotoleine mit 24 Umschlägen" data-i18n-attr="aria-label:fotoleine.wand"></section>
 </main>
 
 <button type="button" class="heute-hinweis" id="heuteHinweis" hidden>
   <svg class="hh-siegel" viewBox="0 0 40 40" aria-hidden="true"><use href="#s-siegel"/></svg>
-  <span>Heute: Umschlag <b>12</b></span>
+  <span><span data-i18n="fotoleine.hinweis.heute">Heute: Umschlag</span> <b>12</b></span>
   <svg class="hh-pfeil" viewBox="0 0 24 24" aria-hidden="true"><use href="#s-runter"/></svg>
 </button>
 <div class="blase" id="blase" aria-hidden="true" hidden></div>
@@ -812,7 +812,7 @@ html.gesperrt #kalender-reset { display: none; }
 <div class="album" id="album" role="dialog" aria-modal="true" aria-labelledby="a-datum" tabindex="-1" hidden>
   <div class="a-kopf">
     <p class="a-datum" id="a-datum"></p>
-    <button type="button" class="a-zu"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-x"/></svg><span>Schließen</span></button>
+    <button type="button" class="a-zu"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-x"/></svg><span data-i18n="fotoleine.ansicht.schliessen">Schließen</span></button>
   </div>
   <div class="a-buehne">
     <figure class="a-seite">
@@ -820,17 +820,20 @@ html.gesperrt #kalender-reset { display: none; }
     </figure>
   </div>
   <div class="a-fuss">
-    <button type="button" class="a-nav a-zurueck" aria-label="Vorheriges Foto"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-links"/></svg></button>
+    <button type="button" class="a-nav a-zurueck" aria-label="Vorheriges Foto" data-i18n-attr="aria-label:fotoleine.ansicht.zurueck"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-links"/></svg></button>
     <div class="a-unterschrift"><p class="a-titel"></p><p class="a-zahl"></p></div>
-    <button type="button" class="a-nav a-weiter" aria-label="Nächstes Foto"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-rechts"/></svg></button>
+    <button type="button" class="a-nav a-weiter" aria-label="Nächstes Foto" data-i18n-attr="aria-label:fotoleine.ansicht.weiter"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-rechts"/></svg></button>
   </div>
 </div>
 
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „fotoleine“ (tag ist hier die Tageszahl)
   var K = window.Kalender.init('fotoleine');
   var F = window.Fotos;
   var RUHIG = !!K.bewegungReduziert;
@@ -1007,22 +1010,29 @@ html.gesperrt #kalender-reset { display: none; }
     return 'verpasst';
   }
   function label(tag, z) {
-    var s = 'Tag ' + tag + ', ' + K.datumText(tag) + ' – ';
-    if (z === 'offen') return s + 'geöffnet, Foto ansehen';
-    if (z === 'heute') return s + 'heute, Umschlag öffnen';
-    if (z === 'verpasst') return s + 'noch nicht geöffnet, Umschlag öffnen';
-    return s + 'noch verschlossen. ' + K.sperrText(tag);
+    var s = tx('fotoleine.tag', 'Tag {n}, {datum}', { n: tag, datum: K.datumText(tag) }) + ' – ';
+    if (z === 'offen') return s + tx('fotoleine.status.offen', 'geöffnet, Foto ansehen');
+    if (z === 'heute') return s + tx('fotoleine.status.heute', 'heute, Umschlag öffnen');
+    if (z === 'verpasst') return s + tx('fotoleine.status.verpasst', 'noch nicht geöffnet, Umschlag öffnen');
+    return s + tx('fotoleine.status.zu', 'noch verschlossen. {sperre}', { sperre: K.sperrText(tag) });
   }
 
   /* ---------- Leinen bauen ---------- */
-  function spaltenZahl() { var w = root.clientWidth; return w < 600 ? 3 : (w < 1000 ? 4 : 6); }
+  function spaltenZahl() { var w = root.clientWidth; return w < 600 ? 3 : (w < 1000 ? 4 : (w < 1180 ? 6 : 8)); }  // breiter Desktop: 8 je Leine = 3 Leinen, kein Scrollen
 
   function masseBerechnen() {
     var cs = getComputedStyle(wand);
     var innen = wand.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     var n = spaltenZahl(), slot = innen / n;
-    var envW = Math.min(slot * 0.87, 150), envH = envW / 1.42;
-    var fotoW = Math.min(slot * 0.7, 120), fotoH = fotoW * 1.2159;
+    var envW = Math.min(slot * 0.87, 150);
+    // Desktop: so groß, dass alle Leinen ohne Scrollen ins Fenster passen (Kopf + Leinen + Platz unten)
+    if (root.clientWidth >= 1000) {
+      var kopfH = (doc.querySelector('.kopf') || {}).offsetHeight || 150, zeilenN = Math.ceil(24 / n);
+      var frei = window.innerHeight - kopfH - 10 - 96 - zeilenN * 54;
+      envW = Math.max(84, Math.min(envW, frei / (zeilenN * 1.17)));
+    }
+    var envH = envW / 1.42;
+    var fotoW = Math.min(slot * 0.7, 120, envW * 0.82), fotoH = fotoW * 1.2159;
     var sag = klemm(innen * 0.026, 10, 18);
     var y0 = Math.round(envW * 0.2232 + 4);
     var nurU = K.heute() === 0;   // November: nur verschlossene Umschläge, Zeilen kompakter
@@ -1061,9 +1071,9 @@ html.gesperrt #kalender-reset { display: none; }
     } else {
       inhalt = '<span class="gegenstand umschlag"><svg class="u-svg" viewBox="0 0 142 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><use href="#s-umschlag"/></svg><span class="u-nr">' + tag + '</span>';
       if (z === 'heute') inhalt += '<svg class="siegel" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><use href="#s-siegel"/></svg>';
-      if (z === 'zu') inhalt += '<svg class="marke" viewBox="0 0 56 40" aria-hidden="true" focusable="false"><use href="#s-marke"/></svg><span class="stempel"><small>Zustellung am</small>' + tag + '.12.</span>';
+      if (z === 'zu') inhalt += '<svg class="marke" viewBox="0 0 56 40" aria-hidden="true" focusable="false"><use href="#s-marke"/></svg><span class="stempel"><small>' + tx('fotoleine.stempel', 'Zustellung am') + '</small>' + tag + '.12.</span>';
       inhalt += '</span>';
-      if (z === 'verpasst') inhalt += '<span class="zettel">noch nicht<br>geöffnet</span>';
+      if (z === 'verpasst') inhalt += '<span class="zettel">' + tx('fotoleine.zettel', 'noch nicht<br>geöffnet') + '</span>';
       if (z === 'heute') inhalt = '<span class="schein"></span>' + inhalt;
     }
     b.innerHTML = '<span class="schwinger"><span class="wackler">' + inhalt + KLAMMER + '</span></span>';
@@ -1135,17 +1145,17 @@ html.gesperrt #kalender-reset { display: none; }
     var h = K.heute(), n = K.geoeffnet().length, verpasst = 0, eins, zwei;
     for (var t = 1; t <= 24; t++) if (zustand(t) === 'verpasst') verpasst++;
     if (h === 0) {
-      eins = 'Noch ist November. Ab dem 1. Dezember hängt jeden Morgen ein neuer Umschlag an der Leine.';
-      zwei = 'Dann geht auch die Lichterkette an.';
+      eins = tx('fotoleine.kopf.november', 'Noch ist November. Ab dem 1. Dezember hängt jeden Morgen ein neuer Umschlag an der Leine.');
+      zwei = tx('fotoleine.kopf.lichterkette', 'Dann geht auch die Lichterkette an.');
     } else if (h >= 25) {
-      eins = 'Frohe Weihnachten!';
-      zwei = n === 24 ? 'Alle 24 Fotos hängen an der Leine. Tipp eins an und blättere durchs Jahr.' :
-        (verpasst === 1 ? 'Ein Umschlag wartet noch – mach ihn ruhig jetzt auf.' : verpasst + ' Umschläge warten noch – mach sie ruhig jetzt auf.');
+      eins = tx('fotoleine.kopf.weihnachten', 'Frohe Weihnachten!');
+      zwei = n === 24 ? tx('fotoleine.kopf.alle', 'Alle 24 Fotos hängen an der Leine. Tipp eins an und blättere durchs Jahr.') :
+        tx('fotoleine.kopf.warten', { one: 'Ein Umschlag wartet noch – mach ihn ruhig jetzt auf.', other: '{n} Umschläge warten noch – mach sie ruhig jetzt auf.' }, { n: verpasst });
     } else {
-      eins = 'Heute ist ' + K.datumText(h) + '. ' + (zustand(h) === 'heute' ? 'Der Umschlag mit dem roten Siegel ist von heute.' :
-        (h === 24 ? 'Frohe Weihnachten!' : 'Der Umschlag von heute ist offen, morgen kommt neue Post.'));
-      zwei = (n === 0 ? 'Noch hängt kein Foto an der Leine.' : n === 1 ? 'Ein Foto hängt schon an der Leine.' : n + ' Fotos hängen schon an der Leine.') +
-        (verpasst ? ' Umschläge mit Zettel kannst du nachholen.' : '');
+      eins = tx('fotoleine.kopf.heute', 'Heute ist {datum}.', { datum: K.datumText(h) }) + ' ' + (zustand(h) === 'heute' ? tx('fotoleine.kopf.siegel', 'Der Umschlag mit dem roten Siegel ist von heute.') :
+        (h === 24 ? tx('fotoleine.kopf.weihnachten', 'Frohe Weihnachten!') : tx('fotoleine.kopf.offen', 'Der Umschlag von heute ist offen, morgen kommt neue Post.')));
+      zwei = (n === 0 ? tx('fotoleine.kopf.keinFoto', 'Noch hängt kein Foto an der Leine.') : tx('fotoleine.kopf.fotos', { one: 'Ein Foto hängt schon an der Leine.', other: '{n} Fotos hängen schon an der Leine.' }, { n: n })) +
+        (verpasst ? ' ' + tx('fotoleine.kopf.nachholen', 'Umschläge mit Zettel kannst du nachholen.') : '');
     }
     unterzeile.innerHTML = '<span class="eins"></span><span class="zwei"></span>';
     unterzeile.firstChild.textContent = eins;
@@ -1176,7 +1186,7 @@ html.gesperrt #kalender-reset { display: none; }
     if (an) {
       hinweis.querySelector('b').textContent = h;
       hinweis.classList.toggle('oben', heuteOben);
-      hinweis.setAttribute('aria-label', 'Heute: Umschlag ' + h + ' zeigen');
+      hinweis.setAttribute('aria-label', tx('fotoleine.hinweis.zeigen', 'Heute: Umschlag {n} zeigen', { n: h }));
     }
     hinweis.hidden = !an;
   }
@@ -1242,7 +1252,7 @@ html.gesperrt #kalender-reset { display: none; }
   var blaseTimer = 0;
   function gesperrt(b, tag) {
     b.classList.remove('wackelt'); void b.offsetWidth; b.classList.add('wackelt');
-    var text = K.sperrText(tag), zusatz = 'Umschlag ' + tag + ' kommt am ' + K.datumText(tag) + '.';
+    var text = K.sperrText(tag), zusatz = tx('fotoleine.kommtAm', 'Umschlag {n} kommt am {datum}.', { n: tag, datum: K.datumText(tag) });
     blase.innerHTML = '<strong></strong><span></span>';
     blase.firstChild.textContent = text;
     blase.lastChild.textContent = zusatz;
@@ -1320,7 +1330,7 @@ html.gesperrt #kalender-reset { display: none; }
     var mitSiegel = zustand(tag) === 'heute';
     var neig = parseFloat(knopf.style.getPropertyValue('--neig')) || 0;
     // Ohne Bildunterschrift schreibt der Filzstift das Datum auf den Rand
-    var titel = titelVon(tag), aufschrift = titel || tag + '. Dezember';
+    var titel = titelVon(tag), aufschrift = titel || tx('fotoleine.tagDezember', '{n}. Dezember', { n: tag });
     var laenge = aufschrift.length, titelKlasse = laenge > 50 ? ' sehr-lang' : laenge > 26 ? ' lang' : '';
     blaseWeg();
 
@@ -1328,27 +1338,27 @@ html.gesperrt #kalender-reset { display: none; }
     el.className = 'buehne' + (RUHIG ? ' still' : '');
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
-    el.setAttribute('aria-label', 'Umschlag ' + tag + ', ' + K.datumText(tag));
+    el.setAttribute('aria-label', tx('fotoleine.buehne.titel', 'Umschlag {n}, {datum}', { n: tag, datum: K.datumText(tag) }));
     el.tabIndex = -1;
     el.innerHTML =
       '<div class="b-grund"><div class="b-farbe" style="--farbe:' + farbeVon(tag) + '"></div></div>' +
-      '<div class="b-kopf"><p class="b-datum"><span class="b-nr">Umschlag ' + tag + '</span><span class="b-tag">' + K.datumText(tag) + '</span></p>' +
-      '<button type="button" class="rund b-zu" aria-label="Foto an die Leine hängen und schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-x"/></svg></button></div>' +
+      '<div class="b-kopf"><p class="b-datum"><span class="b-nr">' + tx('fotoleine.umschlag', 'Umschlag {n}', { n: tag }) + '</span><span class="b-tag">' + K.datumText(tag) + '</span></p>' +
+      '<button type="button" class="rund b-zu" aria-label="' + esc(tx('fotoleine.buehne.zu', 'Foto an die Leine hängen und schließen')) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-x"/></svg></button></div>' +
       '<div class="b-mitte"><div class="b-szene">' +
         '<div class="b-teil b-rueck"></div>' +
         '<div class="b-teil b-klappe"><div class="k-aussen"><svg viewBox="0 0 142 100" preserveAspectRatio="none" aria-hidden="true">' +
           '<path d="M0 0L71 58L142 0Z" fill="currentColor"/><path d="M0 0L71 58L142 0Z" fill="#fff" fill-opacity=".06"/>' +
           '<path d="M0 .6L71 58L142 .6" fill="none" stroke="#3a2614" stroke-opacity=".32" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg></div>' +
           '<div class="k-innen"></div></div>' +
-        '<button type="button" class="b-foto sofort gross" aria-label="Foto vom ' + tag + '. Dezember' + (titel ? ': ' + esc(titel) : '') + '. Antippen zeigt die ganze Collage.">' +
+        '<button type="button" class="b-foto sofort gross" aria-label="' + esc(titel ? tx('fotoleine.buehne.fotoTitel', 'Foto vom {n}. Dezember: {titel}. Antippen zeigt die ganze Collage.', { n: tag, titel: titel }) : tx('fotoleine.buehne.foto', 'Foto vom {n}. Dezember. Antippen zeigt die ganze Collage.', { n: tag })) + '">' +
           '<span class="s-bild" style="--farbe:' + farbeVon(tag) + '"><img alt="" draggable="false" decoding="async" src="' + esc(F.vorschau(tag, 720)) + '"><span class="milch"></span><span class="glanz"></span></span>' +
           '<span class="s-titel' + titelKlasse + '"><span>' + esc(aufschrift) + '</span></span></button>' +
         '<div class="b-teil b-front"><svg viewBox="0 0 142 100" preserveAspectRatio="none" aria-hidden="true"><use href="#s-tasche"/></svg></div>' +
         (mitSiegel ? '<svg class="b-siegel" viewBox="0 0 40 40" aria-hidden="true"><use href="#s-siegel"/></svg>' : '') +
       '</div></div>' +
       '<p class="b-hinweis"></p>' +
-      '<div class="b-knoepfe"><button type="button" class="knopf haupt b-collage">Collage ansehen</button>' +
-      '<button type="button" class="knopf zweit b-haengen">An die Leine hängen</button></div>';
+      '<div class="b-knoepfe"><button type="button" class="knopf haupt b-collage">' + tx('fotoleine.buehne.collage', 'Collage ansehen') + '</button>' +
+      '<button type="button" class="knopf zweit b-haengen">' + tx('fotoleine.buehne.haengen', 'An die Leine hängen') + '</button></div>';
     doc.body.appendChild(el);
 
     B = {
@@ -1475,7 +1485,7 @@ html.gesperrt #kalender-reset { display: none; }
       }
       b.energie *= Math.pow(0.5, dt / 380);
       if (b.p < 1) requestAnimationFrame(lauf);
-      else { b.fertig = true; hinweisText(); ansage.textContent = 'Das Foto ist fertig entwickelt.'; }
+      else { b.fertig = true; hinweisText(); ansage.textContent = tx('fotoleine.entwickelt', 'Das Foto ist fertig entwickelt.'); }
     }
     requestAnimationFrame(lauf);
   }
@@ -1495,11 +1505,11 @@ html.gesperrt #kalender-reset { display: none; }
   function hinweisText(schuettelt) {
     if (!B) return;
     var h = B.el.querySelector('.b-hinweis');
-    var t = B.fertig ? 'Fertig entwickelt! Tipp aufs Foto, dann siehst du die ganze Collage.' :
-      !B.geladen ? 'Einen Moment – das Foto ist gleich da.' :
-      schuettelt ? 'Gut so, weiter schütteln!' :
-      (GROB ? 'Das Foto entwickelt sich noch. Halt es fest und schüttel es, dann geht’s schneller.' :
-        'Das Foto entwickelt sich noch. Halt es mit der Maus fest und schüttel es, dann geht’s schneller.');
+    var t = B.fertig ? tx('fotoleine.hinweisText.fertig', 'Fertig entwickelt! Tipp aufs Foto, dann siehst du die ganze Collage.') :
+      !B.geladen ? tx('fotoleine.hinweisText.laedt', 'Einen Moment – das Foto ist gleich da.') :
+      schuettelt ? tx('fotoleine.hinweisText.weiter', 'Gut so, weiter schütteln!') :
+      (GROB ? tx('fotoleine.hinweisText.finger', 'Das Foto entwickelt sich noch. Halt es fest und schüttel es, dann geht’s schneller.') :
+        tx('fotoleine.hinweisText.maus', 'Das Foto entwickelt sich noch. Halt es mit der Maus fest und schüttel es, dann geht’s schneller.'));
     if (h.textContent !== t) h.textContent = t;
   }
 
@@ -1683,7 +1693,7 @@ html.gesperrt #kalender-reset { display: none; }
     // Jedes Mal ein frisches <img>: sonst stünde beim Blättern kurz die alte Collage unter dem neuen Datum
     var img = doc.createElement('img');
     img.className = 'a-bild';
-    img.alt = 'Collage vom ' + tag + '. Dezember' + (titel ? ': ' + titel : '');
+    img.alt = titel ? tx('fotoleine.ansicht.altTitel', 'Collage vom {n}. Dezember: {titel}', { n: tag, titel: titel }) : tx('fotoleine.ansicht.alt', 'Collage vom {n}. Dezember', { n: tag });
     img.draggable = false;
     img.decoding = 'async';
     img.src = F.bild(tag);
@@ -1703,7 +1713,7 @@ html.gesperrt #kalender-reset { display: none; }
     A.titel.hidden = !titel;
     A.titel.classList.toggle('lang', titel.length > 40);
     A.datum.textContent = K.datumText(tag);
-    A.zahl.textContent = 'Foto ' + (A.i + 1) + ' von ' + A.liste.length + (GROB && A.liste.length > 1 ? ' – wischen zum Blättern' : '');
+    A.zahl.textContent = tx('fotoleine.ansicht.zaehler', 'Foto {n} von {gesamt}', { n: A.i + 1, gesamt: A.liste.length }) + (GROB && A.liste.length > 1 ? ' – ' + tx('fotoleine.ansicht.wischen', 'wischen zum Blättern') : '');
     A.zurueck.disabled = A.i <= 0;
     A.weiter.disabled = A.i >= A.liste.length - 1;
     albumMasse();

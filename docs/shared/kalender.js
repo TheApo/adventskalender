@@ -44,6 +44,10 @@
  *   ADVENTSKALENDER.fusszeile { text, url, link }  dezente Zeile ganz unten im Menü: „text · <a href=url>link</a>“
  *                                     (nur die öffentliche Version setzt sie; link fehlt → url ohne https://)
  * Mit nur einer Ansicht in ADVENTSKALENDER.varianten entfällt der Bereich „Ansicht wählen“ im Menü.
+ * Sprache: Alle Texte laufen über shared/i18n.js (window.I18N, vorher einbinden) mit deutschem Standard –
+ * Schlüssel „allgemein.…“. wochentag()/datumText()/sperrText() liefern Texte in der aktiven Sprache.
+ * Bei mehr als einer Sprache (ADVENTSKALENDER.sprachen) zeigt das Menü den Bereich „Sprache / Language“.
+ * Ohne i18n.js bleibt alles deutsch.
  */
 (function () {
   'use strict';
@@ -51,6 +55,29 @@
   var TAGE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
   var MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September',
     'Oktober', 'November', 'Dezember'];
+
+  // ---------- Sprache (shared/i18n.js); ohne den Baustein: Deutsch ----------
+  var I = (window.I18N && typeof window.I18N.t === 'function') ? window.I18N : null;
+  function t(schluessel, deutsch, werte) {
+    if (I) return I.t(schluessel, deutsch, werte);
+    var text = (deutsch && typeof deutsch === 'object') ? ((werte && werte.n === 1 && deutsch.one) || deutsch.other || '') : String(deutsch);
+    return text.replace(/\{(\w+)\}/g, function (a, n) { return werte && werte[n] !== undefined ? String(werte[n]) : a; });
+  }
+  var SPRACHE = I ? I.sprache() : 'de';
+  var SPRACHEN = I ? I.sprachen() : ['de'];
+  // Namen der Ansichten (Menü, Startseite der Demo) – in der Quellsprache gilt der Name aus den Daten
+  var ANSICHT_NAMEN = {
+    tueren: t('allgemein.ansicht.tueren', 'Türchenwand'), girlande: t('allgemein.ansicht.girlande', 'Kugel-Girlanden'),
+    kranz: t('allgemein.ansicht.kranz', 'Lichterkranz'), rubbellos: t('allgemein.ansicht.rubbellos', 'Weihnachtslotterie'),
+    fotoleine: t('allgemein.ansicht.fotoleine', 'Fotoleine'), stories: t('allgemein.ansicht.stories', 'Advent-Stories'),
+    schneekugel: t('allgemein.ansicht.schneekugel', 'Schneekugel'), baum: t('allgemein.ansicht.baum', 'Drehbaum'),
+    geschenk: t('allgemein.ansicht.geschenk', 'Geschenke auspacken'), nuss: t('allgemein.ansicht.nuss', 'Nussknacker'),
+    sterne: t('allgemein.ansicht.sterne', 'Sternbilder'), schneemann: t('allgemein.ansicht.schneemann', 'Schneefiguren bauen')
+  };
+  function ansichtName(vid, name) {
+    if (SPRACHE !== 'de' && I && I.hat('allgemein.ansicht.' + vid)) return ANSICHT_NAMEN[vid] || I.t('allgemein.ansicht.' + vid, name);
+    return name || ANSICHT_NAMEN[vid] || vid;
+  }
   // Feste "durcheinander"-Reihenfolge wie bei einem echten Adventskalender.
   // Identisch mit der Handy-Anordnung des Kalenders 2025 (3 Spalten, zeilenweise gelesen).
   var REIHENFOLGE = [23, 20, 12, 2, 14, 4, 5, 22, 16, 1, 7, 9, 10, 11, 18, 13, 3, 15, 6, 17, 8, 19, 24, 21];
@@ -89,10 +116,18 @@
     : (OHNE_DATEN ? '{id}.html' : '?v={id}');
   // Optionale Zusätze (Werbeversion): Link zur Startseite, freundlichere Texte im Testbereich
   function textFeld(name) { return (M && typeof M[name] === 'string' && M[name]) ? M[name] : ''; }
+  // Text aus den Daten; ist er leer oder der deutsche Standardtext, kommt die Übersetzung (t mit Schlüssel)
+  function datenText(wert, deutsch, uebersetzt) { return (!wert || wert === deutsch) ? uebersetzt : wert; }
   var START_URL = textFeld('startUrl');
-  var START_TEXT = textFeld('startText') || 'Zur Startseite';
-  var TEST_TITEL = textFeld('testTitel') || 'Testmodus';
-  var TEST_HINWEIS = textFeld('testHinweis');
+  var START_TEXT = datenText(textFeld('startText'), 'Zur Startseite', t('allgemein.menue.startseite', 'Zur Startseite'));
+  var TEST_TITEL = textFeld('testTitel') ? datenText(textFeld('testTitel'), 'Datum ausprobieren', t('allgemein.demo.testTitel', 'Datum ausprobieren'))
+    : t('allgemein.test.titel', 'Testmodus');
+  var TEST_HINWEIS = textFeld('testHinweis');   // leer = kein Hinweis
+  if (TEST_HINWEIS === 'Stell ein beliebiges Datum ein – so siehst du, wie sich der Kalender bis Weihnachten füllt.') {
+    TEST_HINWEIS = t('allgemein.demo.testHinweis', 'Stell ein beliebiges Datum ein – so siehst du, wie sich der Kalender bis Weihnachten füllt.');
+  } else if (TEST_HINWEIS === 'Testdatum einstellen – nur in diesem Browser, getrennt vom echten Stand. „?test=aus“ beendet den Testmodus.') {
+    TEST_HINWEIS = t('allgemein.test.hinweisStatisch', 'Testdatum einstellen – nur in diesem Browser, getrennt vom echten Stand. „?test=aus“ beendet den Testmodus.');
+  }
   // Optional (öffentliche Version): Fußzeile im Menü; ohne das Feld bleibt das Menü wie bisher
   var FUSS = (M && M.fusszeile && typeof M.fusszeile === 'object' && typeof M.fusszeile.text === 'string' && M.fusszeile.text) ? M.fusszeile : null;
   var FUSS_URL = (FUSS && typeof FUSS.url === 'string' && /^https?:\/\//.test(FUSS.url)) ? FUSS.url : '';
@@ -190,6 +225,8 @@
 
     init: function (variantenId) {
       id = variantenId || (M && M.variante) || 'demo';
+      // Seitentitel: Deutsch steht fest im <title> jeder Ansicht, andere Sprachen setzen ihn hier
+      if (SPRACHE !== 'de' && ANSICHT_NAMEN[id]) document.title = ANSICHT_NAMEN[id] + ' – ' + TITEL;
       if (!oberflaecheGeplant) {
         oberflaecheGeplant = true;
         if (document.body) oberflaecheEinbauen();
@@ -214,14 +251,14 @@
       return r;
     },
     sperrText: function (tag) {
-      if (heuteWert === 0) return tag === 1 ? 'Ab 1. Dezember geht’s los!' : 'Noch ist November – Geduld!';
+      if (heuteWert === 0) return tag === 1 ? t('allgemein.sperre.ersterDezember', 'Ab 1. Dezember geht’s los!') : t('allgemein.sperre.november', 'Noch ist November – Geduld!');
       var diff = tag - heuteWert;
       if (diff <= 0) return '';
-      if (diff === 1) return 'Morgen ist es so weit!';
-      return 'Noch ' + diff + '× schlafen!';
+      if (diff === 1) return t('allgemein.sperre.morgen', 'Morgen ist es so weit!');
+      return t('allgemein.sperre.schlafen', 'Noch {n}× schlafen!', { n: diff });
     },
-    wochentag: function (tag) { return TAGE[new Date(JAHR, 11, tag).getDay()]; },
-    datumText: function (tag) { return K.wochentag(tag) + ', ' + tag + '. Dezember'; },
+    wochentag: function (tag) { return I ? I.datum(tag, 'wochentag') : TAGE[new Date(JAHR, 11, tag).getDay()]; },
+    datumText: function (tag) { return I ? I.datum(tag, 'lang') : K.wochentag(tag) + ', ' + tag + '. Dezember'; },
     istSonntag: function (tag) { return new Date(JAHR, 11, tag).getDay() === 0; },
     adventsSonntag: function (tag) {
       // 2026: 1. Advent = 29. November; danach 6., 13., 20. Dezember
@@ -330,22 +367,23 @@
   }
 
   function tagKurz(n) {
-    if (n <= 0) return 'vor Dezember';
-    if (n >= 25) return 'ab 25. Dezember';
-    return n + '. Dezember';
+    if (n <= 0) return t('allgemein.tag.vorDezember', 'vor Dezember');
+    if (n >= 25) return t('allgemein.tag.ab25', 'ab 25. Dezember');
+    return I ? I.datum(n, 'kurz') : n + '. Dezember';
   }
   function tagLang(n) {
-    if (n <= 0) return 'vor Dezember (alles zu)';
-    if (n >= 25) return 'ab 25. Dezember (alles offen)';
+    if (n <= 0) return t('allgemein.tag.vorDezemberLang', 'vor Dezember (alles zu)');
+    if (n >= 25) return t('allgemein.tag.ab25Lang', 'ab 25. Dezember (alles offen)');
     return K.datumText(n);
   }
   function testEndeText() {
     var m = M && typeof M.testBis === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(M.testBis) : null;
-    if (!m) return 'Ein Testdatum wird getrennt vom echten Stand gemerkt.';
+    if (!m) return t('allgemein.test.getrennt', 'Ein Testdatum wird getrennt vom echten Stand gemerkt.');
     var ende = new Date(+m[1], +m[2] - 1, +m[3] + 1);
     var jetzt = new Date();
-    if (jetzt.getTime() > ende.getTime()) return 'Testmodus über Testschlüssel aktiv.';
-    return 'Testmodus endet automatisch am ' + ende.getDate() + '. ' + MONATE[ende.getMonth()] + '.';
+    if (jetzt.getTime() > ende.getTime()) return t('allgemein.test.schluessel', 'Testmodus über Testschlüssel aktiv.');
+    return t('allgemein.test.endet', 'Testmodus endet automatisch am {datum}.',
+      { datum: I ? I.datum(ende, 'kurz') : ende.getDate() + '. ' + MONATE[ende.getMonth()] });
   }
 
   var KNOPF_STIL =
@@ -433,6 +471,13 @@
     '.haupt{margin-top:8px;background:#f4c35a;border-color:#f4c35a;color:#231b08}' +
     '.haupt:hover{background:#f7cf74}' +
     '.reihe{display:grid;grid-template-columns:1fr 1fr;grid-gap:8px;margin-top:8px}' +
+    '.sprachen{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}' +
+    '.sprach-reihe{display:grid;grid-template-columns:1fr 1fr;grid-gap:8px}' +
+    '.sprache{min-height:44px;padding:6px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.09);' +
+    'color:inherit;font:inherit;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer}' +
+    '.sprache:hover{background:rgba(255,255,255,.15)}' +
+    '.sprache[aria-pressed="true"]{background:rgba(244,195,90,.16);border-color:#f4c35a;color:#f7d98f}' +
+    '.sprache:focus-visible{outline:3px solid #f4c35a;outline-offset:2px}' +
     '.leise{margin-top:8px;background:transparent}' +
     '.stand{margin:10px 2px 0;font-size:12.5px;color:rgba(244,241,234,.6)}' +
     '.status{min-height:1.4em;margin:6px 2px 0;font-size:13px;color:#ffd98a}' +
@@ -501,11 +546,11 @@
   function knopfBeschriften() {
     if (!menue) return;
     var b = menue.knopf, test = testdatumAnzeigen();
-    var was = MEHRERE ? 'Ansicht wechseln und Einstellungen' : 'Menü';
-    var kurz = MEHRERE ? 'Ansicht & Einstellungen' : 'Menü';
-    var text = was + (test ? ' (Testdatum aktiv: ' + tagKurz(heuteWert) + ')' : '');
+    var was = MEHRERE ? t('allgemein.knopf.lang', 'Ansicht wechseln und Einstellungen') : t('allgemein.knopf.menue', 'Menü');
+    var kurz = MEHRERE ? t('allgemein.knopf.kurz', 'Ansicht & Einstellungen') : t('allgemein.knopf.menue', 'Menü');
+    var text = was + (test ? ' (' + t('allgemein.knopf.testdatumAktiv', 'Testdatum aktiv: {datum}', { datum: tagKurz(heuteWert) }) + ')' : '');
     b.setAttribute('aria-label', text);
-    b.title = test ? kurz + ' – Testdatum: ' + tagKurz(heuteWert) : kurz;
+    b.title = test ? kurz + ' – ' + t('allgemein.knopf.testdatum', 'Testdatum: {datum}', { datum: tagKurz(heuteWert) }) : kurz;
     if (test) b.classList.add('kr-test'); else b.classList.remove('kr-test');
   }
   function punktAktualisieren() { knopfBeschriften(); }
@@ -538,7 +583,7 @@
     var huelle = document.createElement('div');
     huelle.className = 'huelle';
     huelle.hidden = true;
-    huelle.setAttribute('lang', 'de');
+    huelle.setAttribute('lang', SPRACHE);
 
     var aktuell = (M && M.variante) || id;
     var liste = '';
@@ -549,29 +594,46 @@
       liste += '<li><a class="v" href="' + esc(WECHSEL_URL.replace('{id}', encodeURIComponent(vid))) + '" data-id="' + esc(vid) + '"' +
         (istAktuell ? ' aria-current="page"' : '') + '>' +
         '<span class="v-icon">' + svg(ICON[vid] || ICON_ERSATZ) + '<span class="v-haken">' + svg(ICON.haken) + '</span></span>' +
-        '<span class="v-name">' + weich(v.name || vid) + '</span></a></li>';
+        '<span class="v-name">' + weich(ansichtName(vid, v.name)) + '</span></a></li>';
     }
 
     var test = '';
     if (TESTMODUS) {
       test = '<section class="test" aria-labelledby="km-test">' +
-        '<h3 id="km-test">' + esc(TEST_TITEL) + (TESTDATUM_AKTIV ? '<span class="marke">Testdatum aktiv</span>' : '') + '</h3>' +
+        '<h3 id="km-test">' + esc(TEST_TITEL) + (TESTDATUM_AKTIV ? '<span class="marke">' + esc(t('allgemein.test.marke', 'Testdatum aktiv')) + '</span>' : '') + '</h3>' +
         '<p class="fein">' + esc(TEST_HINWEIS || testEndeText()) + '</p>' +
-        '<div class="stepper" role="group" aria-label="Testdatum wählen">' +
-        '<button type="button" class="schritt" data-schritt="-1" aria-label="Einen Tag früher">' + svg(ICON.links) + '</button>' +
+        '<div class="stepper" role="group" aria-label="' + esc(t('allgemein.test.waehlen', 'Testdatum wählen')) + '">' +
+        '<button type="button" class="schritt" data-schritt="-1" aria-label="' + esc(t('allgemein.test.frueher', 'Einen Tag früher')) + '">' + svg(ICON.links) + '</button>' +
         '<output class="wert" aria-live="polite"><strong></strong><small></small></output>' +
-        '<button type="button" class="schritt" data-schritt="1" aria-label="Einen Tag später">' + svg(ICON.rechts) + '</button>' +
+        '<button type="button" class="schritt" data-schritt="1" aria-label="' + esc(t('allgemein.test.spaeter', 'Einen Tag später')) + '">' + svg(ICON.rechts) + '</button>' +
         '</div>' +
-        '<button type="button" class="knopf haupt" data-aktion="setzen">Dieses Datum anzeigen</button>' +
+        '<button type="button" class="knopf haupt" data-aktion="setzen">' + esc(t('allgemein.test.anzeigen', 'Dieses Datum anzeigen')) + '</button>' +
         '<div class="reihe">' +
-        '<button type="button" class="knopf" data-aktion="zu">Alle wieder zu</button>' +
-        '<button type="button" class="knopf" data-aktion="gestern">Bis gestern öffnen</button>' +
+        '<button type="button" class="knopf" data-aktion="zu">' + esc(t('allgemein.test.allesZu', 'Alle wieder zu')) + '</button>' +
+        '<button type="button" class="knopf" data-aktion="gestern">' + esc(t('allgemein.test.bisGestern', 'Bis gestern öffnen')) + '</button>' +
         '</div>' +
-        (TESTDATUM_AKTIV ? '<button type="button" class="knopf leise" data-aktion="echt">Echtes Datum (' + esc(tagKurz(ECHT_HEUTE)) + ')</button>' : '') +
+        (TESTDATUM_AKTIV ? '<button type="button" class="knopf leise" data-aktion="echt">' +
+          esc(t('allgemein.test.echt', 'Echtes Datum ({datum})', { datum: tagKurz(ECHT_HEUTE) })) + '</button>' : '') +
         '<p class="stand"></p>' +
         '<p class="status" role="status" aria-live="polite"></p>' +
         '</section>';
     }
+
+    // Sprache: nur bei mehr als einer verfügbaren Sprache; Überschrift immer auch englisch („Sprache / Language“)
+    var sprachen = '';
+    if (I && SPRACHEN.length > 1) {
+      var ueber = t('allgemein.menue.sprache', 'Sprache');
+      if (ueber !== 'Language') ueber += ' / Language';
+      var knoepfe = '';
+      for (var s = 0; s < SPRACHEN.length; s++) {
+        knoepfe += '<button type="button" class="sprache" data-sprache="' + esc(SPRACHEN[s]) + '" lang="' + esc(SPRACHEN[s]) + '"' +
+          ' aria-pressed="' + (SPRACHEN[s] === SPRACHE ? 'true' : 'false') + '">' + esc(I.sprachName(SPRACHEN[s])) + '</button>';
+      }
+      sprachen = '<section class="sprachen" aria-labelledby="km-sprache"><h3 id="km-sprache">' + esc(ueber) + '</h3>' +
+        '<div class="sprach-reihe" role="group" aria-labelledby="km-sprache">' + knoepfe + '</div></section>';
+    }
+
+    var fussText = FUSS ? datenText(FUSS.text, 'Dein Adventskalender – made by Dirk Aporius', t('allgemein.menue.credit', 'Dein Adventskalender – made by Dirk Aporius')) : '';
 
     huelle.innerHTML =
       '<div class="schleier"></div>' +
@@ -579,13 +641,14 @@
       '<div class="griff" aria-hidden="true"></div>' +
       '<div class="kopf"><span class="kopf-icon" aria-hidden="true">' + svg(ICON.flocke) + '</span>' +
       '<h2 id="km-titel">' + esc(TITEL) + '</h2>' +
-      '<button type="button" class="zu" aria-label="Menü schließen">' + svg(ICON.zu) + '</button></div>' +
+      '<button type="button" class="zu" aria-label="' + esc(t('allgemein.menue.schliessen', 'Menü schließen')) + '">' + svg(ICON.zu) + '</button></div>' +
       (START_URL ? '<a class="heim" href="' + esc(START_URL) + '">' + svg(ICON.haus) + '<span>' + esc(START_TEXT) + '</span></a>' : '') +
-      (MEHRERE ? '<section aria-labelledby="km-ansicht"><h3 id="km-ansicht">Ansicht wählen</h3>' +
+      (MEHRERE ? '<section aria-labelledby="km-ansicht"><h3 id="km-ansicht">' + esc(t('allgemein.menue.ansichtWaehlen', 'Ansicht wählen')) + '</h3>' +
       '<ul class="varianten">' + liste + '</ul>' +
-      '<p class="fein">Was schon geöffnet ist, bleibt beim Wechseln erhalten.</p></section>' : '') +
+      '<p class="fein">' + esc(t('allgemein.menue.bleibtErhalten', 'Was schon geöffnet ist, bleibt beim Wechseln erhalten.')) + '</p></section>' : '') +
+      sprachen +
       test +
-      (FUSS ? '<p class="fuss">' + esc(FUSS.text) + (FUSS_URL ? ' · <a href="' + esc(FUSS_URL) + '" target="_blank" rel="noopener">' +
+      (FUSS ? '<p class="fuss">' + esc(fussText) + (FUSS_URL ? ' · <a href="' + esc(FUSS_URL) + '" target="_blank" rel="noopener">' +
         esc((typeof FUSS.link === 'string' && FUSS.link) ? FUSS.link : FUSS_URL.replace(/^https?:\/\//, '').replace(/\/$/, '')) + '</a>' : '') + '</p>' : '') +
       '</div>';
     w.wurzel.appendChild(huelle);
@@ -605,6 +668,12 @@
       if (a) {
         if (a.hasAttribute('aria-current')) { e.preventDefault(); menueSchliessen(); }
         return; // sonst normal navigieren (Seite lädt neu, Stand bleibt im gemeinsamen Speicher)
+      }
+      var sp = ziel.closest('[data-sprache]');
+      if (sp) {
+        if (sp.getAttribute('data-sprache') === SPRACHE) menueSchliessen();
+        else if (I) I.setzeSprache(sp.getAttribute('data-sprache'));
+        return;
       }
       var s = ziel.closest('[data-schritt]');
       if (s) { menue.wahl = klemmen(menue.wahl + parseInt(s.getAttribute('data-schritt'), 10)); testAnzeigen(); return; }
@@ -629,10 +698,13 @@
     if (!TESTMODUS || !menue.huelle) return;
     var h = menue.huelle, n = menue.wahl;
     h.querySelector('.wert strong').textContent = tagKurz(n);
-    h.querySelector('.wert small').textContent = n >= 1 && n <= 24 ? K.wochentag(n) : (n <= 0 ? 'alles noch zu' : 'alles offen');
+    h.querySelector('.wert small').textContent = n >= 1 && n <= 24 ? K.wochentag(n)
+      : (n <= 0 ? t('allgemein.test.allesNochZu', 'alles noch zu') : t('allgemein.test.allesOffen', 'alles offen'));
     h.querySelector('[data-schritt="-1"]').disabled = n <= 0;
     h.querySelector('[data-schritt="1"]').disabled = n >= 25;
-    h.querySelector('.stand').textContent = 'Angezeigt wird ' + (testdatumAnzeigen() ? 'das Testdatum ' : 'das echte Datum: ') + tagLang(heuteWert) + '.';
+    h.querySelector('.stand').textContent = testdatumAnzeigen()
+      ? t('allgemein.test.zeigtTest', 'Angezeigt wird das Testdatum {datum}.', { datum: tagLang(heuteWert) })
+      : t('allgemein.test.zeigtEcht', 'Angezeigt wird das echte Datum: {datum}.', { datum: tagLang(heuteWert) });
   }
 
   function aktion(was) {
@@ -641,14 +713,16 @@
     if (was === 'zu') {
       K.zuruecksetzen();
       try { window.dispatchEvent(new MessageEvent('message', { data: { kalender: 'reset', ausMenue: true } })); } catch (e) { /* alt */ }
-      status('Alle Tage sind wieder zu.');
+      status(t('allgemein.status.allesZu', 'Alle Tage sind wieder zu.'));
       return;
     }
     if (was === 'gestern') {
       var n = bisGesternOeffnen();
       melden();
-      status(n > 0 ? (n === 24 ? 'Alle 24 Tage sind geöffnet.' : 'Tag 1 bis ' + n + ' sind geöffnet, heute ist noch zu.')
-        : (heuteWert <= 0 ? 'Vor Dezember gibt es noch nichts zu öffnen.' : 'Heute ist der erste Tag – davor gibt es nichts.'));
+      status(n > 0 ? (n === 24 ? t('allgemein.status.alleOffen', 'Alle 24 Tage sind geöffnet.')
+        : t('allgemein.status.bisGestern', { one: 'Tag 1 ist geöffnet, heute ist noch zu.', other: 'Tag 1 bis {n} sind geöffnet, heute ist noch zu.' }, { n: n }))
+        : (heuteWert <= 0 ? t('allgemein.status.vorDezember', 'Vor Dezember gibt es noch nichts zu öffnen.')
+          : t('allgemein.status.ersterTag', 'Heute ist der erste Tag – davor gibt es nichts.')));
     }
   }
 

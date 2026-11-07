@@ -3,12 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dein Adventskalender – jeden Tag im Advent ein Foto</title>
+<title data-i18n="start.seitentitel">Dein Adventskalender – jeden Tag im Advent ein Foto</title>
 <meta name="description" content="Ein Foto-Adventskalender zum Ausprobieren: jeden Tag im Advent ein Foto und zwölf Arten, es zu öffnen – Türchen, Kerzen, Rubbellose, Schneekugel und mehr.">
 <meta name="theme-color" content="#dde7ec">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="fonts/start.css">
+<!-- Sprache schon im Kopf: Texte und Vorschaubilder erscheinen gleich in der richtigen Sprache (kein Aufblitzen) -->
+<script src="shared/start.js"></script>
+<script src="shared/sprachen.js"></script>
+<script src="shared/i18n.js"></script>
 <!-- DEIN-ADVENTSKALENDER-DEMO · erzeugt von werkzeuge/demo-bauen.mjs – Änderungen bitte in kalender/demo/index.html -->
 <style>
   :root {
@@ -52,7 +56,17 @@
 
   /* ---------- Kopf ---------- */
   .kopf { margin: 0 0 30px; }
-  .kopf-icon { display: block; width: 52px; height: 52px; border-radius: 15px; margin: 0 0 18px; box-shadow: 0 6px 16px rgba(27, 41, 69, .18); }
+  .kopf-zeile { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 18px; }
+  .kopf-icon { display: block; width: 52px; height: 52px; border-radius: 15px; box-shadow: 0 6px 16px rgba(27, 41, 69, .18); }
+  /* Sprachwahl: immer sichtbar */
+  .sprachwahl { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .72); box-shadow: inset 0 0 0 1px var(--linie); }
+  .sprachwahl button {
+    min-width: 44px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: none; cursor: pointer;
+    font: 700 .92rem/1 var(--schrift-text); color: var(--tinte-2);
+  }
+  .sprachwahl button:hover { color: var(--tinte); }
+  .sprachwahl button[aria-pressed="true"] { background: var(--tinte); color: #fff; }
+  .sprachwahl button:focus-visible { outline: 3px solid var(--kerze); outline-offset: 2px; }
   h1 {
     margin: 0;
     font-family: var(--schrift-titel);
@@ -371,35 +385,42 @@
     .hinweis { max-width: 560px; }
   }
   @media (min-width: 1000px) {
-    .seite {
+    .seite { padding-top: max(52px, env(safe-area-inset-top)); }
+    /* Zwei Spalten in eigenem Raster – so bleibt der mitlaufende linke Kasten oberhalb der Fußzeile */
+    .spalten {
       display: grid;
       grid-template-columns: minmax(340px, 410px) minmax(0, 1fr);
       gap: 0 56px;
-      padding-top: max(52px, env(safe-area-inset-top));
     }
     .links { position: sticky; top: 36px; align-self: start; }
     .rechts { padding-top: 6px; }
-    .fuss { grid-column: 1 / -1; }
     h1 { font-size: 3.05rem; }
     .karten { grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 34px 22px; }
   }
   @media (min-width: 1400px) {
-    .seite { grid-template-columns: 440px minmax(0, 1fr); gap: 0 64px; }
+    .spalten { grid-template-columns: 440px minmax(0, 1fr); gap: 0 64px; }
     h1 { font-size: 3.3rem; }
   }
 </style>
 </head>
 <body>
 <div class="seite">
+  <div class="spalten">
   <div class="links">
     <header class="kopf">
-      <img class="kopf-icon" src="icon.svg" width="52" height="52" alt="">
-      <h1><span>Dein</span> <span>Adventskalender</span></h1>
-      <p class="einleitung">Jeden Tag im Advent ein neues Foto – und zwölf verschiedene Arten, es zu öffnen.</p>
+      <div class="kopf-zeile">
+        <img class="kopf-icon" src="icon.svg" width="52" height="52" alt="">
+        <div class="sprachwahl" role="group" aria-label="Sprache" data-i18n-attr="aria-label:start.sprache">
+          <button type="button" lang="de" data-sprache="de" aria-pressed="false">Deutsch</button>
+          <button type="button" lang="en" data-sprache="en" aria-pressed="false">English</button>
+        </div>
+      </div>
+      <h1><span data-titel="a">Dein</span> <span data-titel="b">Adventskalender</span></h1>
+      <p class="einleitung" data-i18n="start.einleitung">Jeden Tag im Advent ein neues Foto – und zwölf verschiedene Arten, es zu öffnen.</p>
     </header>
 
     <section class="datum" aria-labelledby="datum-titel">
-      <h2 id="datum-titel"><span class="nr" aria-hidden="true">1</span> Datum wählen</h2>
+      <h2 id="datum-titel"><span class="nr" aria-hidden="true">1</span> <span data-i18n="start.datum.titel">Datum wählen</span></h2>
       <div class="datum-kopf">
         <div class="tuer" id="tuer" data-art="tag" aria-hidden="true">
           <span class="tuer-blatt"><span class="tuer-zahl" id="tuer-zahl">12</span></span>
@@ -407,140 +428,142 @@
         </div>
         <div>
           <p class="datum-lang" id="datum-lang">12. Dezember</p>
-          <p class="datum-info" id="datum-info">So sieht der Kalender an diesem Tag aus.</p>
+          <p class="datum-info" id="datum-info" data-i18n="start.info.standard">So sieht der Kalender an diesem Tag aus.</p>
         </div>
       </div>
       <div class="regler">
-        <button type="button" class="pfeil" data-schritt="-1" aria-label="Einen Tag früher" aria-controls="tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
+        <button type="button" class="pfeil" data-schritt="-1" aria-label="Einen Tag früher" data-i18n-attr="aria-label:start.datum.frueher" aria-controls="tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
         <div class="spur">
-          <input type="range" id="tag" min="0" max="25" step="1" value="12" aria-label="Datum" aria-describedby="datum-info">
+          <input type="range" id="tag" min="0" max="25" step="1" value="12" aria-label="Datum" data-i18n-attr="aria-label:start.datum.regler" aria-describedby="datum-info">
           <ol class="skala" aria-hidden="true">
-            <li style="--p: 0">Nov.</li>
+            <li style="--p: 0" data-i18n="start.datum.nov">Nov.</li>
             <li style="--p: .24">6.</li>
             <li style="--p: .48">12.</li>
             <li style="--p: .72">18.</li>
             <li style="--p: .96">24.</li>
           </ol>
         </div>
-        <button type="button" class="pfeil" data-schritt="1" aria-label="Einen Tag später" aria-controls="tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
+        <button type="button" class="pfeil" data-schritt="1" aria-label="Einen Tag später" data-i18n-attr="aria-label:start.datum.spaeter" aria-controls="tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
       </div>
     </section>
 
-    <aside class="hinweis" aria-label="So geht’s">
+    <aside class="hinweis" aria-label="So geht’s" data-i18n-attr="aria-label:start.hinweis.titel">
       <span class="flocke" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5v19M3.77 7.25l16.46 9.5M3.77 16.75l16.46-9.5"/><path d="M9.4 3.4 12 6l2.6-2.6M9.4 20.6 12 18l2.6 2.6M18.15 5.45 17.2 9l3.55.95M20.75 14.05 17.2 15l.95 3.55M3.25 14.05 6.8 15l-.95 3.55M5.85 5.45 6.8 9l-3.55.95"/></svg></span>
-      <p><strong>Im Kalender sitzt unten links diese Schneeflocke.</strong> Darüber wechselst du die Ansicht, stellst ein anderes Datum ein oder klappst mit „Alle wieder zu“ alles wieder zu.</p>
-      <p>Die Fotos sind gemalte Platzhalter – im eigenen Kalender stehen dort deine Bilder.</p>
+      <p data-i18n-html="start.hinweis.flocke"><strong>Im Kalender sitzt unten links diese Schneeflocke.</strong> Darüber wechselst du die Ansicht, die Sprache, stellst ein anderes Datum ein oder klappst mit „Alle wieder zu“ alles wieder zu.</p>
+      <p data-i18n="start.hinweis.platzhalter">Die Fotos sind gemalte Platzhalter – im eigenen Kalender stehen dort deine Bilder.</p>
     </aside>
 
     <section class="eigen" aria-labelledby="eigen-titel">
-      <strong id="eigen-titel">Deinen eigenen Kalender machen</strong>
-      <p>24 eigene Fotos in einen Ordner legen, einmal bauen, auf den eigenen Webspace hochladen – kostenlos und ohne fremde Server.
-        <span id="eigen-link" hidden>Die Anleitung steht <a id="repo-link" href="#">auf GitHub</a>.</span></p>
+      <strong id="eigen-titel" data-i18n="start.eigen.titel">Deinen eigenen Kalender machen</strong>
+      <p><span data-i18n="start.eigen.text">24 eigene Fotos in einen Ordner legen, einmal bauen, auf den eigenen Webspace hochladen – kostenlos und ohne fremde Server.</span>
+        <span id="eigen-link" hidden><span data-i18n="start.eigen.anleitung">Die Anleitung steht</span> <a id="repo-link" href="#" data-i18n="start.eigen.github">auf GitHub</a>.</span></p>
     </section>
   </div>
 
   <main class="rechts" aria-labelledby="wahl-titel">
-    <h2 id="wahl-titel"><span class="nr" aria-hidden="true">2</span> Kalender wählen</h2>
+    <h2 id="wahl-titel"><span class="nr" aria-hidden="true">2</span> <span data-i18n="start.wahl">Kalender wählen</span></h2>
     <ul class="karten" id="karten">
       <li class="karte">
         <a class="karte-link" href="kalender/tueren.html?tag=12" data-id="tueren">
-          <span class="karte-bild"><img src="vorschau/tueren.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Türchen&shy;wand</span>
-          <span class="karte-satz">Der Klassiker: 24 Kartontürchen, die aufschwingen – dahinter wartet das Foto des Tages.</span>
+          <span class="karte-bild"><img src="vorschau/tueren.webp" data-src-en="vorschau/tueren-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.tueren">Türchen&shy;wand</span>
+          <span class="karte-satz" data-i18n="start.satz.tueren">Der Klassiker: 24 Kartontürchen, die aufschwingen – dahinter wartet das Foto des Tages.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/girlande.html?tag=12" data-id="girlande">
-          <span class="karte-bild"><img src="vorschau/girlande.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Kugel-Girlanden</span>
-          <span class="karte-satz">Tannengirlanden mit 24 Christbaumkugeln. Jede geöffnete Kugel zeigt ihr Foto wie durch gewölbtes Glas.</span>
+          <span class="karte-bild"><img src="vorschau/girlande.webp" data-src-en="vorschau/girlande-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.girlande">Kugel-Girlanden</span>
+          <span class="karte-satz" data-i18n="start.satz.girlande">Tannengirlanden mit 24 Christbaumkugeln. Jede geöffnete Kugel zeigt ihr Foto wie durch gewölbtes Glas.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/kranz.html?tag=12" data-id="kranz">
-          <span class="karte-bild"><img src="vorschau/kranz.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Lichter&shy;kranz</span>
-          <span class="karte-satz">Ein Adventskranz mit 24 Kerzen: Jeden Tag brennt eine mehr, und der Raum wird heller.</span>
+          <span class="karte-bild"><img src="vorschau/kranz.webp" data-src-en="vorschau/kranz-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.kranz">Lichter&shy;kranz</span>
+          <span class="karte-satz" data-i18n="start.satz.kranz">Ein Adventskranz mit 24 Kerzen: Jeden Tag brennt eine mehr, und der Raum wird heller.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/rubbellos.html?tag=12" data-id="rubbellos">
-          <span class="karte-bild"><img src="vorschau/rubbellos.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Weihnachts&shy;lotterie</span>
-          <span class="karte-satz">Jeden Tag ein Rubbellos. Mit dem Finger die Silberfolie freirubbeln, darunter liegt das Foto.</span>
+          <span class="karte-bild"><img src="vorschau/rubbellos.webp" data-src-en="vorschau/rubbellos-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.rubbellos">Weihnachts&shy;lotterie</span>
+          <span class="karte-satz" data-i18n="start.satz.rubbellos">Jeden Tag ein Rubbellos. Mit dem Finger die Silberfolie freirubbeln, darunter liegt das Foto.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/fotoleine.html?tag=12" data-id="fotoleine">
-          <span class="karte-bild"><img src="vorschau/fotoleine.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Fotoleine</span>
-          <span class="karte-satz">Briefumschläge an der Lichterkette – darin ein Sofortbild, das sich vor deinen Augen entwickelt.</span>
+          <span class="karte-bild"><img src="vorschau/fotoleine.webp" data-src-en="vorschau/fotoleine-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.fotoleine">Fotoleine</span>
+          <span class="karte-satz" data-i18n="start.satz.fotoleine">Briefumschläge an der Lichterkette – darin ein Sofortbild, das sich vor deinen Augen entwickelt.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/stories.html?tag=12" data-id="stories">
-          <span class="karte-bild"><img src="vorschau/stories.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Advent-Stories</span>
-          <span class="karte-satz">Jeder Tag ist eine kleine Story aus mehreren Fotos, durchgetippt wie am Handy.</span>
+          <span class="karte-bild"><img src="vorschau/stories.webp" data-src-en="vorschau/stories-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.stories">Advent-Stories</span>
+          <span class="karte-satz" data-i18n="start.satz.stories">Jeder Tag ist eine kleine Story aus mehreren Fotos, durchgetippt wie am Handy.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/schneekugel.html?tag=12" data-id="schneekugel">
-          <span class="karte-bild"><img src="vorschau/schneekugel.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Schnee&shy;kugel</span>
-          <span class="karte-satz">Schütteln, bis der Schnee sich legt – dann taucht das Foto in der Kugel auf.</span>
+          <span class="karte-bild"><img src="vorschau/schneekugel.webp" data-src-en="vorschau/schneekugel-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.schneekugel">Schnee&shy;kugel</span>
+          <span class="karte-satz" data-i18n="start.satz.schneekugel">Schütteln, bis der Schnee sich legt – dann taucht das Foto in der Kugel auf.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/baum.html?tag=12" data-id="baum">
-          <span class="karte-bild"><img src="vorschau/baum.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Drehbaum</span>
-          <span class="karte-satz">Einen Tannenbaum in 3D mit dem Finger drehen, bis die leuchtende Kugel des Tages auftaucht.</span>
+          <span class="karte-bild"><img src="vorschau/baum.webp" data-src-en="vorschau/baum-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.baum">Drehbaum</span>
+          <span class="karte-satz" data-i18n="start.satz.baum">Einen Tannenbaum in 3D mit dem Finger drehen, bis die leuchtende Kugel des Tages auftaucht.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/geschenk.html?tag=12" data-id="geschenk">
-          <span class="karte-bild"><img src="vorschau/geschenk.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Geschenke auspacken</span>
-          <span class="karte-satz">Schleife aufziehen, Papier aufreißen – und das Foto steigt mit Konfetti aus der Schachtel.</span>
+          <span class="karte-bild"><img src="vorschau/geschenk.webp" data-src-en="vorschau/geschenk-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.geschenk">Geschenke auspacken</span>
+          <span class="karte-satz" data-i18n="start.satz.geschenk">Schleife aufziehen, Papier aufreißen – und das Foto steigt mit Konfetti aus der Schachtel.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/nuss.html?tag=12" data-id="nuss">
-          <span class="karte-bild"><img src="vorschau/nuss.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Nussknacker</span>
-          <span class="karte-satz">Jeden Tag eine goldene Nuss: am Hebel ziehen, bis sie knackt und ein Foto herausrollt.</span>
+          <span class="karte-bild"><img src="vorschau/nuss.webp" data-src-en="vorschau/nuss-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.nuss">Nussknacker</span>
+          <span class="karte-satz" data-i18n="start.satz.nuss">Jeden Tag eine goldene Nuss: am Hebel ziehen, bis sie knackt und ein Foto herausrollt.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/sterne.html?tag=12" data-id="sterne">
-          <span class="karte-bild"><img src="vorschau/sterne.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Sternbilder</span>
-          <span class="karte-satz">Die nummerierten Sterne mit dem Finger verbinden, bis das Sternbild leuchtet und das Foto zeigt.</span>
+          <span class="karte-bild"><img src="vorschau/sterne.webp" data-src-en="vorschau/sterne-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.sterne">Sternbilder</span>
+          <span class="karte-satz" data-i18n="start.satz.sterne">Die nummerierten Sterne mit dem Finger verbinden, bis das Sternbild leuchtet und das Foto zeigt.</span>
         </a>
       </li>
       <li class="karte">
         <a class="karte-link" href="kalender/schneemann.html?tag=12" data-id="schneemann">
-          <span class="karte-bild"><img src="vorschau/schneemann.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
-          <span class="karte-name">Schnee&shy;figuren bauen</span>
-          <span class="karte-satz">Jeden Tag eine andere Figur aus Schneekugeln rollen – aber Vorsicht vor warmen Stellen. Die fertige Figur hält das Foto.</span>
+          <span class="karte-bild"><img src="vorschau/schneemann.webp" data-src-en="vorschau/schneemann-en.webp" width="585" height="780" alt="" loading="lazy" decoding="async"></span>
+          <span class="karte-name" data-i18n="allgemein.ansicht.schneemann">Schnee&shy;figuren bauen</span>
+          <span class="karte-satz" data-i18n="start.satz.schneemann">Jeden Tag eine andere Figur aus Schneekugeln rollen – aber Vorsicht vor warmen Stellen. Die fertige Figur hält das Foto.</span>
         </a>
       </li>
     </ul>
   </main>
+  </div>
 
   <footer class="fuss">
-    <p>Ohne Tracker, ohne Werbung, ohne fremde Server. Dein Browser merkt sich nur das gewählte Datum und was du schon geöffnet hast.</p>
+    <p data-i18n="start.fuss.text">Ohne Tracker, ohne Werbung, ohne fremde Server. Dein Browser merkt sich nur das gewählte Datum, die Sprache und was du schon geöffnet hast.</p>
     
     <p class="credit">made by Dirk Aporius · <a href="https://www.apo-games.de" rel="noopener">www.apo-games.de</a></p>
   </footer>
 </div>
 
-<script src="shared/start.js"></script>
 <script>
 (function () {
   'use strict';
   var DA = window.DeinAdventskalender;
+  var I = window.I18N;
+  var t = I ? I.t : function (k, deutsch) { return deutsch; };
   var regler = document.getElementById('tag');
   var tuer = document.getElementById('tuer');
   var zahl = document.getElementById('tuer-zahl');
@@ -548,14 +571,27 @@
   var info = document.getElementById('datum-info');
   var schritte = document.querySelectorAll('[data-schritt]');
   var links = document.querySelectorAll('.karte-link[data-id]');
+
+  // Sprachwahl: Knopf der aktiven Sprache gedrückt; ein Klick merkt die Wahl und lädt die Seite in der Sprache neu
+  var knoepfe = document.querySelectorAll('.sprachwahl [data-sprache]');
+  for (var k = 0; k < knoepfe.length; k++) {
+    knoepfe[k].setAttribute('aria-pressed', I && knoepfe[k].getAttribute('data-sprache') === I.sprache() ? 'true' : 'false');
+    knoepfe[k].addEventListener('click', function () {
+      if (I && this.getAttribute('aria-pressed') !== 'true') I.setzeSprache(this.getAttribute('data-sprache'));
+    });
+  }
+  // Tage der Skala: „6.“ auf Deutsch, „6“ auf Englisch
+  var skala = document.querySelectorAll('.skala li');
+  for (var s = 1; s < skala.length; s++) skala[s].textContent = t('start.datum.skalaTag', '{n}.', { n: parseInt(skala[s].textContent, 10) });
+
   if (!DA || !regler) return;
 
   function infoText(n) {
-    if (n <= 0) return 'Noch ist alles zu – am 1.\u00a0Dezember geht es los.';
-    if (n === 1) return 'Das erste Foto ist dran.';
-    if (n === 24) return 'Heiligabend: alle 24 Tage lassen sich öffnen.';
-    if (n >= 25) return 'Weihnachten ist da – alles ist offen.';
-    return 'Tag 1 bis ' + n + ' lassen sich öffnen.';
+    if (n <= 0) return t('start.info.november', 'Noch ist alles zu – am 1.\u00a0Dezember geht es los.');
+    if (n === 1) return t('start.info.erstes', 'Das erste Foto ist dran.');
+    if (n === 24) return t('start.info.heiligabend', 'Heiligabend: alle 24 Tage lassen sich öffnen.');
+    if (n >= 25) return t('start.info.weihnachten', 'Weihnachten ist da – alles ist offen.');
+    return t('start.info.tage', 'Tag 1 bis {n} lassen sich öffnen.', { n: n });
   }
 
   var aktuell = null;
@@ -569,7 +605,7 @@
     regler.setAttribute('aria-valuetext', text);
     lang.textContent = text.replace(/(\d+\.) /, '$1\u00a0');   // „12. Dezember“ nie trennen
     info.textContent = infoText(n);
-    zahl.textContent = n <= 0 ? 'Nov.' : String(n);
+    zahl.textContent = n <= 0 ? t('start.datum.nov', 'Nov.') : String(n);
     tuer.setAttribute('data-art', n <= 0 ? 'nov' : (n >= 25 ? 'fest' : (n === 24 ? 'heiligabend' : 'tag')));
     schritte[0].disabled = n <= 0;
     schritte[1].disabled = n >= 25;

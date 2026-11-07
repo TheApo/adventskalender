@@ -44,19 +44,29 @@
   @keyframes pulsieren { 0%, 100% { transform: scale(.88); opacity: .7; } 50% { transform: scale(1); opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { .lader svg { animation: none; } .lader { transition: none; } }
 </style>
+<!-- Sprache: dieselben Bausteine wie die Ansichten (Titel, Sprachen und Standard setzt werkzeuge/bauen.mjs ein) -->
+<script>window.ADVENTSKALENDER = /*@@SPRACHE@@*/null;</script>
+<script src="shared/sprachen.js"></script>
+<script src="shared/i18n.js"></script>
 </head>
 <body>
 <div class="lader" id="lader" role="status" aria-live="polite">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5l2.6 6.9 7.4.4-5.8 4.6 2 7.1L12 16.4l-6.2 4.1 2-7.1L2 8.8l7.4-.4z"/></svg>
-  <span>Der Kalender wird geladen …</span>
+  <span data-i18n="lader.laedt">Der Kalender wird geladen …</span>
 </div>
-<noscript><div class="karte"><h1>@@TITEL@@</h1><p>Bitte JavaScript einschalten – sonst lässt sich der Kalender nicht öffnen.</p></div></noscript>
+<noscript><div class="karte"><h1>@@TITEL@@</h1><p>Bitte JavaScript einschalten – sonst lässt sich der Kalender nicht öffnen.</p><p lang="en">Please turn on JavaScript – otherwise the calendar can’t open.</p></div></noscript>
 <script>
 (function () {
   'use strict';
 
   // Vom Werkzeug eingesetzt (siehe werkzeuge/bauen.mjs → „lader“)
   var K = /*@@KONFIG@@*/null;
+
+  // Texte in der aktiven Sprache (shared/i18n.js); ohne den Baustein der deutsche Text
+  function t(schluessel, deutsch, werte) {
+    if (window.I18N) return window.I18N.t(schluessel, deutsch, werte);
+    return deutsch.replace(/\{(\w+)\}/g, function (alles, name) { return werte && name in werte ? String(werte[name]) : alles; });
+  }
 
   var KEKS_TESTTAG = 'adventskalender_testtag';
   var KEKS_TEST = 'adventskalender_test';
@@ -176,12 +186,12 @@
   // ---- Start -----------------------------------------------------------------------------------
 
   if (!K) {
-    meldung('Nur die Vorlage', 'Diese Datei befüllt „npm run bauen“. Bitte bauen und dann den Ordner ausgabe/ ansehen bzw. hochladen.');
+    meldung(t('lader.vorlage.titel', 'Nur die Vorlage'), t('lader.vorlage.text', 'Diese Datei befüllt „npm run bauen“. Bitte bauen und dann den Ordner ausgabe/ ansehen bzw. hochladen.'));
     return;
   }
   if (location.protocol === 'file:') {
-    meldung('Bitte über einen Webserver öffnen',
-      'Per Doppelklick (file://) kann der Browser die Kalenderdaten nicht laden. Lade den Ordner auf deinen Webspace hoch oder starte lokal „npm run ansehen“.');
+    meldung(t('lader.datei.titel', 'Bitte über einen Webserver öffnen'),
+      t('lader.datei.text', 'Per Doppelklick (file://) kann der Browser die Kalenderdaten nicht laden. Lade den Ordner auf deinen Webspace hoch oder starte lokal „npm run ansehen“.'));
     return;
   }
 
@@ -282,6 +292,9 @@
       echtHeute: echtHeute,
       testmodus: testmodus,
       testBis: '',
+      titelJeSprache: K.titelJeSprache || null,
+      sprachen: K.sprachen || ['de'],
+      sprache: K.sprache || 'de',
       variante: id,
       varianten: K.varianten.map(function (v) { return { id: v.id, name: v.name }; }),
       wechselUrl: '?v={id}',
@@ -352,10 +365,10 @@
       anzeigen(umschreiben(erg[1], kalenderDaten(erg[0], variante)));
     }).catch(function (fehler) {
       if (window.console) console.error('Kalender konnte nicht geladen werden:', fehler);
-      meldung('Der Kalender lädt gerade nicht',
-        navigator.onLine === false ? 'Keine Internetverbindung. Bitte prüfen und noch einmal versuchen.'
-          : 'Bitte gleich noch einmal versuchen. (' + (fehler && fehler.message ? fehler.message : 'Fehler') + ')',
-        { text: 'Noch einmal versuchen', aktion: function () { location.reload(); } });
+      meldung(t('lader.fehler.titel', 'Der Kalender lädt gerade nicht'),
+        navigator.onLine === false ? t('lader.fehler.offline', 'Keine Internetverbindung. Bitte prüfen und noch einmal versuchen.')
+          : t('lader.fehler.text', 'Bitte gleich noch einmal versuchen. ({fehler})', { fehler: fehler && fehler.message ? fehler.message : t('lader.fehler.unbekannt', 'unbekannter Fehler') }),
+        { text: t('lader.fehler.knopf', 'Noch einmal versuchen'), aktion: function () { location.reload(); } });
     });
   }
 

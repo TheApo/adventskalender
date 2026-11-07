@@ -425,7 +425,7 @@
   function beschriften(g, w, h, anteil) {
     var m = Math.min(w, h), fs = Math.max(11, Math.round(m * (anteil || 0.038)));
     g.font = '600 ' + fs + 'px system-ui, -apple-system, "Segoe UI", sans-serif';
-    var text = 'Foto folgt', tw = g.measureText(text).width;
+    var text = window.I18N ? window.I18N.t('allgemein.fotoFolgt', 'Foto folgt') : 'Foto folgt', tw = g.measureText(text).width;
     var ph = Math.round(fs * 1.9), pw = Math.round(tw + fs * 1.7);
     var x = Math.round((w - pw) / 2), y = Math.round(h - ph - m * 0.05);
     g.fillStyle = 'rgba(14,18,26,0.55)';

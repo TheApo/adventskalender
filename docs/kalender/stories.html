@@ -319,19 +319,19 @@ h1{margin:0;font-weight:700;line-height:1}
 <body>
 <main class="start" id="start">
   <header class="kopf">
-    <h1><span class="m-name">Dein</span> <span class="m-sub">Adventskalender</span></h1>
-    <div class="kerzen" id="kerzen" role="img" aria-label="Adventskerzen"></div>
+    <h1><span class="m-name" data-titel="a">Dein</span> <span class="m-sub" data-titel="b">Adventskalender</span></h1>
+    <div class="kerzen" id="kerzen" role="img" aria-label="Adventskerzen" data-i18n-attr="aria-label:stories.kerzen.titel"></div>
   </header>
 
-  <section class="leiste-wrap" aria-label="Alle 24 Tage als Stories. Mit den Pfeiltasten von Tag zu Tag.">
-    <button class="leiste-pfeil links" id="l-links" type="button" tabindex="-1" aria-label="Frühere Tage zeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
+  <section class="leiste-wrap" aria-label="Alle 24 Tage als Stories. Mit den Pfeiltasten von Tag zu Tag." data-i18n-attr="aria-label:stories.leiste">
+    <button class="leiste-pfeil links" id="l-links" type="button" tabindex="-1" aria-label="Frühere Tage zeigen" data-i18n-attr="aria-label:stories.frueher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
     <div class="leiste" id="leiste"></div>
-    <button class="leiste-pfeil rechts" id="l-rechts" type="button" tabindex="-1" aria-label="Spätere Tage zeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
+    <button class="leiste-pfeil rechts" id="l-rechts" type="button" tabindex="-1" aria-label="Spätere Tage zeigen" data-i18n-attr="aria-label:stories.spaeter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
     <div class="blase" id="blase" role="status" aria-live="polite"></div>
   </section>
 
   <div class="inhalt">
-    <section class="heute-karte" id="heute" aria-label="Heute"></section>
+    <section class="heute-karte" id="heute" aria-label="Heute" data-i18n-attr="aria-label:stories.heute"></section>
     <div class="spalte">
       <section class="abschnitt" id="nachholen" aria-labelledby="nh-titel" hidden></section>
       <section class="abschnitt" id="rueckblick" aria-labelledby="rb-titel"></section>
@@ -340,7 +340,7 @@ h1{margin:0;font-weight:700;line-height:1}
 </main>
 
 
-<div class="player" id="player" role="dialog" aria-modal="true" aria-label="Story" tabindex="-1">
+<div class="player" id="player" role="dialog" aria-modal="true" aria-label="Story" data-i18n-attr="aria-label:stories.playerName" tabindex="-1">
   <div class="hinter" id="hinter" aria-hidden="true"><i id="hinter1"></i><i id="hinter2" style="opacity:0"></i></div>
   <div class="buehne" id="buehne">
     <div class="wuerfel ruhe" id="wuerfel">
@@ -366,22 +366,25 @@ h1{margin:0;font-weight:700;line-height:1}
     <div class="zwischen" id="zwischen" role="group" aria-labelledby="zw-titel" hidden></div>
     <div class="pause-hinweis" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg>Pausiert</div>
     <div class="steuer" id="steuer">
-      <button class="knopf k-pause" id="k-pause" type="button" aria-label="Pause"></button>
-      <button class="knopf k-zu" id="k-zu" type="button" aria-label="Story schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-      <button class="k-herz" id="k-herz" type="button" aria-label="Herz schicken"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.4s-7.4-4.5-9.2-9.1C1.6 8 3.4 4.7 6.7 4.5c2.1-.1 3.7 1 5.3 3 1.6-2 3.2-3.1 5.3-3 3.3.2 5.1 3.5 3.9 6.8-1.8 4.6-9.2 9.1-9.2 9.1z"/></svg></button>
+      <button class="knopf k-pause" id="k-pause" type="button" aria-label="Pause" data-i18n-attr="aria-label:stories.pause"></button>
+      <button class="knopf k-zu" id="k-zu" type="button" aria-label="Story schließen" data-i18n-attr="aria-label:stories.schliessen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button class="k-herz" id="k-herz" type="button" aria-label="Herz schicken" data-i18n-attr="aria-label:stories.herz"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.4s-7.4-4.5-9.2-9.1C1.6 8 3.4 4.7 6.7 4.5c2.1-.1 3.7 1 5.3 3 1.6-2 3.2-3.1 5.3-3 3.3.2 5.1 3.5 3.9 6.8-1.8 4.6-9.2 9.1-9.2 9.1z"/></svg></button>
     </div>
   </div>
-  <button class="pfeil pfeil-l" id="pfeil-l" type="button" aria-label="Voriges Foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
-  <button class="pfeil pfeil-r" id="pfeil-r" type="button" aria-label="Nächstes Foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
+  <button class="pfeil pfeil-l" id="pfeil-l" type="button" aria-label="Voriges Foto" data-i18n-attr="aria-label:stories.voriges"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
+  <button class="pfeil pfeil-r" id="pfeil-r" type="button" aria-label="Nächstes Foto" data-i18n-attr="aria-label:stories.naechstes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
   <p class="sr" id="ansage" aria-live="polite"></p>
 </div>
 
 <script src="../shared/start.js" data-ansicht="stories"></script>
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „stories“ (t ist hier die Tageszahl)
   var K = window.Kalender.init('stories');
   var F = window.Fotos;
   var RUHIG = !!K.bewegungReduziert;
@@ -400,30 +403,30 @@ h1{margin:0;font-weight:700;line-height:1}
   /* Beispiel-Unterschriften je Foto – nur für die gemalten Platzhalter des Prototyps.
      Über echte Familienfotos gehören keine erfundenen Texte: dort gilt nur F.titel(t) (texte.txt, darf leer sein). */
   var TEXTE = [null,
-    ['Frisch gefallen über Nacht', 'Die ersten Spuren im Garten', 'Mützen auf, raus geht’s', 'Wer baut den größten Schneemann?'],
-    ['Oben angekommen', 'Und los!', 'Fast bis zum Zaun gerutscht', 'Noch eine Runde, bitte', 'Kakao zum Aufwärmen'],
-    ['Wer steckt unter der Maske?', 'Die Parade zieht los', 'Konfetti überall'],
-    ['Die Würfel liegen bereit', 'Wer gewinnt diesmal?', 'Knapp verloren', 'Revanche am Sonntag'],
-    ['Endlich wieder draußen', 'Die ersten Blüten', 'Jacken aus, Sonne an', 'Picknick auf der Decke', 'Barfuß im Gras'],
-    ['Wo hat der Hase sie versteckt?', 'Eins im Blumenbeet!', 'Der Korb wird voll'],
-    ['Helme auf, Sattel hoch', 'Kurze Pause am Feldweg', 'Da vorne glitzert der See', 'Füße ins Wasser'],
-    ['Kerzen zählen', 'Einmal kräftig pusten', 'Wünsch dir was!', 'Das erste Stück', 'Krümel auf dem Teller'],
-    ['Ein Tag am Wasser', 'Steine flitschen', 'Bis zum Abend geblieben'],
-    ['Endlich Ferien!', 'Die erste Welle', 'Muscheln sammeln', 'Eis mit Meerblick'],
-    ['Der Plan steht', 'Graben, graben, graben', 'Der Wassergraben hält', 'Fast fertig', 'Unsere Burg!'],
-    ['Die Sonne geht baden', 'Alle schauen aufs Meer', 'Noch fünf Minuten'],
-    ['Die Schultüte ist fast so groß wie du', 'Vor dem Schultor', 'Der erste Platz im Klassenzimmer', 'Geschafft: der erste Tag!'],
-    ['Ab in den Wald', 'Wer findet den dicksten Baum?', 'Pilze nur anschauen', 'Rast auf dem Baumstamm', 'Zurück mit vollen Taschen'],
-    ['Der Wind ist perfekt', 'Höher, höher!', 'Er fliegt!'],
-    ['Welcher Kürbis wird’s?', 'Erst mal aushöhlen', 'Gruselig oder lustig?', 'Fertig zum Leuchten'],
-    ['Ein riesiger Blätterhaufen', 'Achtung, Angriff!', 'Laub in der Kapuze', 'Alle liegen im Laub', 'Nochmal von vorn'],
-    ['Die Laternen sind fertig', 'Laterne, Laterne …', 'Durch die dunkle Straße'],
-    ['Teig ausrollen', 'Sterne, Herzen, Monde', 'Nur einmal naschen', 'Das erste Blech ist fertig'],
-    ['Zwischen den Buden', 'Es duftet nach Mandeln', 'Einmal Karussell', 'Warme Hände am Becher', 'Lichter über dem Platz'],
-    ['Schlittschuhe an', 'Erste wackelige Runde', 'Hand in Hand übers Eis'],
-    ['Ein Tunnel aus Licht', 'Alles glitzert', 'Kalte Nasen, warme Herzen', 'Der schönste Baum im Park'],
-    ['Der Baum steht', 'Erst die Lichterkette', 'Kugel für Kugel', 'Wer darf den Stern aufsetzen?', 'Licht an!'],
-    ['Endlich Heiligabend', 'Alle zusammen unterm Baum', 'Danke für dieses schöne Jahr']
+    tx('stories.beispiel.1', 'Frisch gefallen über Nacht|Die ersten Spuren im Garten|Mützen auf, raus geht’s|Wer baut den größten Schneemann?').split('|'),
+    tx('stories.beispiel.2', 'Oben angekommen|Und los!|Fast bis zum Zaun gerutscht|Noch eine Runde, bitte|Kakao zum Aufwärmen').split('|'),
+    tx('stories.beispiel.3', 'Wer steckt unter der Maske?|Die Parade zieht los|Konfetti überall').split('|'),
+    tx('stories.beispiel.4', 'Die Würfel liegen bereit|Wer gewinnt diesmal?|Knapp verloren|Revanche am Sonntag').split('|'),
+    tx('stories.beispiel.5', 'Endlich wieder draußen|Die ersten Blüten|Jacken aus, Sonne an|Picknick auf der Decke|Barfuß im Gras').split('|'),
+    tx('stories.beispiel.6', 'Wo hat der Hase sie versteckt?|Eins im Blumenbeet!|Der Korb wird voll').split('|'),
+    tx('stories.beispiel.7', 'Helme auf, Sattel hoch|Kurze Pause am Feldweg|Da vorne glitzert der See|Füße ins Wasser').split('|'),
+    tx('stories.beispiel.8', 'Kerzen zählen|Einmal kräftig pusten|Wünsch dir was!|Das erste Stück|Krümel auf dem Teller').split('|'),
+    tx('stories.beispiel.9', 'Ein Tag am Wasser|Steine flitschen|Bis zum Abend geblieben').split('|'),
+    tx('stories.beispiel.10', 'Endlich Ferien!|Die erste Welle|Muscheln sammeln|Eis mit Meerblick').split('|'),
+    tx('stories.beispiel.11', 'Der Plan steht|Graben, graben, graben|Der Wassergraben hält|Fast fertig|Unsere Burg!').split('|'),
+    tx('stories.beispiel.12', 'Die Sonne geht baden|Alle schauen aufs Meer|Noch fünf Minuten').split('|'),
+    tx('stories.beispiel.13', 'Die Schultüte ist fast so groß wie du|Vor dem Schultor|Der erste Platz im Klassenzimmer|Geschafft: der erste Tag!').split('|'),
+    tx('stories.beispiel.14', 'Ab in den Wald|Wer findet den dicksten Baum?|Pilze nur anschauen|Rast auf dem Baumstamm|Zurück mit vollen Taschen').split('|'),
+    tx('stories.beispiel.15', 'Der Wind ist perfekt|Höher, höher!|Er fliegt!').split('|'),
+    tx('stories.beispiel.16', 'Welcher Kürbis wird’s?|Erst mal aushöhlen|Gruselig oder lustig?|Fertig zum Leuchten').split('|'),
+    tx('stories.beispiel.17', 'Ein riesiger Blätterhaufen|Achtung, Angriff!|Laub in der Kapuze|Alle liegen im Laub|Nochmal von vorn').split('|'),
+    tx('stories.beispiel.18', 'Die Laternen sind fertig|Laterne, Laterne …|Durch die dunkle Straße').split('|'),
+    tx('stories.beispiel.19', 'Teig ausrollen|Sterne, Herzen, Monde|Nur einmal naschen|Das erste Blech ist fertig').split('|'),
+    tx('stories.beispiel.20', 'Zwischen den Buden|Es duftet nach Mandeln|Einmal Karussell|Warme Hände am Becher|Lichter über dem Platz').split('|'),
+    tx('stories.beispiel.21', 'Schlittschuhe an|Erste wackelige Runde|Hand in Hand übers Eis').split('|'),
+    tx('stories.beispiel.22', 'Ein Tunnel aus Licht|Alles glitzert|Kalte Nasen, warme Herzen|Der schönste Baum im Park').split('|'),
+    tx('stories.beispiel.23', 'Der Baum steht|Erst die Lichterkette|Kugel für Kugel|Wer darf den Stern aufsetzen?|Licht an!').split('|'),
+    tx('stories.beispiel.24', 'Endlich Heiligabend|Alle zusammen unterm Baum|Danke für dieses schöne Jahr').split('|')
   ];
   function titel(t) { var x = F.titel(t); return typeof x === 'string' ? x : ''; }
   function bildText(t, i) { return (!ECHT && TEXTE[t] && TEXTE[t][i]) || titel(t); }
@@ -497,11 +500,11 @@ h1{margin:0;font-weight:700;line-height:1}
     return ECHT ? tagDaten(t).bilder.length : 3 + (t % 3);
   }
   function ariaKreis(t) {
-    var st = status(t), basis = 'Tag ' + t + ', ' + K.datumText(t) + ' – ';
-    if (st === 'zu') return basis + 'gesperrt. ' + K.sperrText(t);
-    if (istHeute(t)) return basis + (st === 'gesehen' ? 'heute, geöffnet' : 'heute, neu');
-    if (st === 'gesehen') return basis + 'geöffnet';
-    return basis + (K.heute() >= 25 ? 'noch nicht angesehen' : 'verpasst, jetzt nachholen');
+    var st = status(t), basis = tx('stories.kreis.tag', 'Tag {n}, {datum}', { n: t, datum: K.datumText(t) }) + ' – ';
+    if (st === 'zu') return basis + tx('stories.kreis.gesperrt', 'gesperrt. {sperre}', { sperre: K.sperrText(t) });
+    if (istHeute(t)) return basis + (st === 'gesehen' ? tx('stories.kreis.heuteOffen', 'heute, geöffnet') : tx('stories.kreis.heuteNeu', 'heute, neu'));
+    if (st === 'gesehen') return basis + tx('stories.kreis.offen', 'geöffnet');
+    return basis + (K.heute() >= 25 ? tx('stories.kreis.nichtAngesehen', 'noch nicht angesehen') : tx('stories.kreis.verpasst', 'verpasst, jetzt nachholen'));
   }
   function datumsSvg() { return '<svg class="strich" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="38.5" pathLength="120"/></svg>'; }
 
@@ -569,7 +572,7 @@ h1{margin:0;font-weight:700;line-height:1}
         '<rect class="wachs" x="2" y="' + y + '" width="10" height="' + hoehe + '" rx="2"/></svg>';
     }
     el.kerzen.innerHTML = html;
-    var worte = ['Noch brennt keine Adventskerze', 'Eine Adventskerze brennt', 'Zwei Adventskerzen brennen', 'Drei Adventskerzen brennen', 'Alle vier Adventskerzen brennen'];
+    var worte = [tx('stories.kerzen.0', 'Noch brennt keine Adventskerze'), tx('stories.kerzen.1', 'Eine Adventskerze brennt'), tx('stories.kerzen.2', 'Zwei Adventskerzen brennen'), tx('stories.kerzen.3', 'Drei Adventskerzen brennen'), tx('stories.kerzen.4', 'Alle vier Adventskerzen brennen')];
     el.kerzen.setAttribute('aria-label', worte[n]);
   }
 
@@ -577,13 +580,13 @@ h1{margin:0;font-weight:700;line-height:1}
     var st = status(t), heute = istHeute(t), nachholen = st === 'neu' && !heute && K.heute() < 25;
     var innen, text = '<small>' + K.wochentag(t).slice(0, 2) + '</small> ' + t + '.';
     if (st === 'zu') {
-      innen = datumsSvg() + '<span class="k-datum" aria-hidden="true"><b>' + t + '</b><small>Dez</small></span>';
+      innen = datumsSvg() + '<span class="k-datum" aria-hidden="true"><b>' + t + '</b><small>' + tx('stories.dez', 'Dez') + '</small></span>';
       text = '<small>' + K.wochentag(t) + '</small>';
     } else {
       innen = vorschauImg(t, true);
     }
-    if (heute) innen += '<span class="k-marke" aria-hidden="true">Heute</span>';
-    else if (nachholen) innen += '<span class="k-marke gold" aria-hidden="true">Nachholen</span>';
+    if (heute) innen += '<span class="k-marke" aria-hidden="true">' + tx('stories.marke.heute', 'Heute') + '</span>';
+    else if (nachholen) innen += '<span class="k-marke gold" aria-hidden="true">' + tx('stories.marke.nachholen', 'Nachholen') + '</span>';
     return '<button type="button" class="kreis st-' + st + (heute ? ' ist-heute' : '') + (nachholen ? ' ist-nachholen' : '') + '" data-tag="' + t + '" data-quelle="leiste" aria-label="' + ariaKreis(t) + '">' +
       '<span class="ring">' + innen + '</span><span class="k-text" aria-hidden="true">' + text + '</span></button>';
   }
@@ -606,27 +609,27 @@ h1{margin:0;font-weight:700;line-height:1}
     var h = K.heute(), html;
     if (h === 0) {
       var n = tageBisDezember();
-      html = '<div class="hk-ring zu" aria-hidden="true">' + datumsSvg() + '<span class="hk-zahl">1.<small>Dezember</small></span></div>' +
-        '<div class="hk-text"><p class="hk-datum">Wir haben noch November</p>' +
-        '<h2 class="hk-titel">Bald geht’s los</h2>' +
-        '<p class="hk-absatz">Ab dem 1. Dezember wartet hier jeden Morgen eine neue Story mit Fotos aus unserem Jahr.' +
-        (n ? ' Noch ' + n + '× schlafen!' : '') + '</p></div>';
+      html = '<div class="hk-ring zu" aria-hidden="true">' + datumsSvg() + '<span class="hk-zahl">1.<small>' + tx('stories.dezember', 'Dezember') + '</small></span></div>' +
+        '<div class="hk-text"><p class="hk-datum">' + tx('stories.heuteKarte.november', 'Wir haben noch November') + '</p>' +
+        '<h2 class="hk-titel">' + tx('stories.heuteKarte.bald', 'Bald geht’s los') + '</h2>' +
+        '<p class="hk-absatz">' + tx('stories.heuteKarte.ab1', 'Ab dem 1. Dezember wartet hier jeden Morgen eine neue Story mit Fotos aus unserem Jahr.') +
+        (n ? ' ' + tx('stories.heuteKarte.schlafen', 'Noch {n}× schlafen!', { n: n }) : '') + '</p></div>';
     } else if (h >= 25) {
       html = '<div class="hk-ring lebt" data-tag="1" data-quelle="heute" aria-hidden="true"><span class="hk-foto">' + vorschauImg(24) + '</span></div>' +
         '<div class="hk-text"><p class="hk-datum">' + K.datumText(25) + '</p>' +
-        '<h2 class="hk-titel">Frohe Weihnachten!</h2>' +
-        '<p class="hk-absatz">Alle 24 Tage sind offen. Schau dir den ganzen Advent noch einmal am Stück an.</p>' +
-        '<button type="button" class="los" data-tag="1" data-quelle="heute">' + PLAY + 'Den ganzen Advent ansehen</button></div>';
+        '<h2 class="hk-titel">' + tx('stories.weihnachten', 'Frohe Weihnachten!') + '</h2>' +
+        '<p class="hk-absatz">' + tx('stories.heuteKarte.alleOffen', 'Alle 24 Tage sind offen. Schau dir den ganzen Advent noch einmal am Stück an.') + '</p>' +
+        '<button type="button" class="los" data-tag="1" data-quelle="heute">' + PLAY + tx('stories.heuteKarte.ganzerAdvent', 'Den ganzen Advent ansehen') + '</button></div>';
     } else {
       var offen = K.istGeoeffnet(h), anz = fotoAnzahl(h);
       html = '<div class="hk-ring' + (offen ? '' : ' lebt') + '" data-tag="' + h + '" data-quelle="heute" aria-hidden="true">' +
         '<span class="hk-foto' + (offen ? '' : ' verhuellt') + '">' + vorschauImg(h) + '</span>' +
         (offen ? '' : '<span class="hk-zahl">' + h + '</span>') + '</div>' +
-        '<div class="hk-text"><p class="hk-datum">Heute ist ' + K.datumText(h) + '</p>' +
-        '<h2 class="hk-titel">' + (offen ? (esc(titel(h)) || 'Deine Story von heute') : (h === 24 ? 'Die letzte Story vor Weihnachten' : 'Eine neue Story wartet')) + '</h2>' +
-        '<p class="hk-info">' + segmente(anz, offen) + '<span>' + anz + ' Fotos' + (offen ? ', schon angesehen' : '') + '</span></p>' +
+        '<div class="hk-text"><p class="hk-datum">' + tx('stories.heuteKarte.heuteIst', 'Heute ist {datum}', { datum: K.datumText(h) }) + '</p>' +
+        '<h2 class="hk-titel">' + (offen ? (esc(titel(h)) || tx('stories.heuteKarte.deine', 'Deine Story von heute')) : (h === 24 ? tx('stories.heuteKarte.letzte', 'Die letzte Story vor Weihnachten') : tx('stories.heuteKarte.neu', 'Eine neue Story wartet'))) + '</h2>' +
+        '<p class="hk-info">' + segmente(anz, offen) + '<span>' + (offen ? tx('stories.heuteKarte.fotosGesehen', '{n} Fotos, schon angesehen', { n: anz }) : tx('stories.heuteKarte.fotos', '{n} Fotos', { n: anz })) + '</span></p>' +
         '<button type="button" class="los' + (offen ? ' leise' : '') + '" data-tag="' + h + '" data-quelle="heute">' + PLAY +
-        (offen ? 'Tag ' + h + ' nochmal ansehen' : 'Tag ' + h + ' ansehen') + '</button></div>';
+        (offen ? tx('stories.tagNochmal', 'Tag {n} nochmal ansehen', { n: h }) : tx('stories.tagAnsehen', 'Tag {n} ansehen', { n: h })) + '</button></div>';
     }
     el.heute.innerHTML = html;
   }
@@ -637,32 +640,32 @@ h1{margin:0;font-weight:700;line-height:1}
     if (!liste.length) { el.nachholen.hidden = true; el.nachholen.innerHTML = ''; return; }
     el.nachholen.hidden = false;
     var h = K.heute();
-    var hinweis = (liste.length === 1 && liste[0] === h - 1) ? 'Gestern verpasst? Kein Problem.' :
-      (liste.length === 1 ? 'Ein Tag wartet noch auf dich.' : liste.length + ' Tage warten noch auf dich.');
-    var html = '<h2 id="nh-titel">Noch nicht angesehen</h2><p class="hinweis">' + hinweis + '</p><div class="chips">';
+    var hinweis = (liste.length === 1 && liste[0] === h - 1) ? tx('stories.nachholen.gestern', 'Gestern verpasst? Kein Problem.') :
+      tx('stories.nachholen.warten', { one: 'Ein Tag wartet noch auf dich.', other: '{n} Tage warten noch auf dich.' }, { n: liste.length });
+    var html = '<h2 id="nh-titel">' + tx('stories.nachholen.titel', 'Noch nicht angesehen') + '</h2><p class="hinweis">' + hinweis + '</p><div class="chips">';
     liste.forEach(function (t) {
       html += '<button type="button" class="chip" data-tag="' + t + '" data-quelle="nachholen" aria-label="' + ariaKreis(t) + '">' +
         '<span class="ring lebt">' + vorschauImg(t, true) + '</span>' +
-        '<span><b>Tag ' + t + '</b><small>' + K.wochentag(t) + '</small></span></button>';
+        '<span><b>' + tx('stories.tag', 'Tag {n}', { n: t }) + '</b><small>' + K.wochentag(t) + '</small></span></button>';
     });
     el.nachholen.innerHTML = html + '</div>';
   }
 
   function renderRueckblick() {
     var offen = K.geoeffnet(), h = K.heute();
-    var html = '<h2 id="rb-titel">Rückblick</h2>';
+    var html = '<h2 id="rb-titel">' + tx('stories.rueckblick.titel', 'Rückblick') + '</h2>';
     if (h === 0) {
-      html = '<h2 id="rb-titel">So funktioniert’s</h2><p class="hinweis">Ab Dezember sammeln sich hier alle Tage, die du angesehen hast.</p>' +
+      html = '<h2 id="rb-titel">' + tx('stories.anleitung.titel', 'So funktioniert’s') + '</h2><p class="hinweis">' + tx('stories.anleitung.ab', 'Ab Dezember sammeln sich hier alle Tage, die du angesehen hast.') + '</p>' +
         '<ul class="anleitung">' +
-        '<li><span class="a-bild" aria-hidden="true"><span class="ring lebt"><i></i></span></span><p><b>Kreis antippen</b><span>Jeden Tag leuchtet ein neuer Kreis auf. Antippen, und die Story startet.</span></p></li>' +
-        '<li><span class="a-bild" aria-hidden="true"><span class="a-seg"><i></i><i></i><i></i></span></span><p><b>Zuschauen oder anhalten</b><span>Die Fotos laufen von selbst weiter. Gedrückt halten hält sie an.</span></p></li>' +
-        '<li><span class="a-bild" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 24h30M15 17l-7 7 7 7M33 17l7 7-7 7"/></svg></span><p><b>Wischen</b><span>Zur Seite geht’s zum nächsten oder vorigen Tag, nach unten zurück zur Übersicht.</span></p></li>' +
+        '<li><span class="a-bild" aria-hidden="true"><span class="ring lebt"><i></i></span></span><p><b>' + tx('stories.anleitung.kreis', 'Kreis antippen') + '</b><span>' + tx('stories.anleitung.kreisText', 'Jeden Tag leuchtet ein neuer Kreis auf. Antippen, und die Story startet.') + '</span></p></li>' +
+        '<li><span class="a-bild" aria-hidden="true"><span class="a-seg"><i></i><i></i><i></i></span></span><p><b>' + tx('stories.anleitung.zuschauen', 'Zuschauen oder anhalten') + '</b><span>' + tx('stories.anleitung.zuschauenText', 'Die Fotos laufen von selbst weiter. Gedrückt halten hält sie an.') + '</span></p></li>' +
+        '<li><span class="a-bild" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 24h30M15 17l-7 7 7 7M33 17l7 7-7 7"/></svg></span><p><b>' + tx('stories.anleitung.wischen', 'Wischen') + '</b><span>' + tx('stories.anleitung.wischenText', 'Zur Seite geht’s zum nächsten oder vorigen Tag, nach unten zurück zur Übersicht.') + '</span></p></li>' +
         '</ul>';
     } else if (!offen.length) {
-      html += '<p class="hinweis">Jede Story, die du ansiehst, landet hier.</p>';
-      html += '<div class="leer">Noch nichts angesehen. Fang mit Tag ' + (h >= 25 ? 1 : h) + ' an!</div>';
+      html += '<p class="hinweis">' + tx('stories.rueckblick.landet', 'Jede Story, die du ansiehst, landet hier.') + '</p>';
+      html += '<div class="leer">' + tx('stories.rueckblick.leer', 'Noch nichts angesehen. Fang mit Tag {n} an!', { n: h >= 25 ? 1 : h }) + '</div>';
     } else {
-      html += '<p class="hinweis">' + (offen.length === 24 ? 'Alle 24 Tage angesehen.' : offen.length + ' von 24 Tagen angesehen') + '</p><div class="raster">';
+      html += '<p class="hinweis">' + (offen.length === 24 ? tx('stories.rueckblick.alle', 'Alle 24 Tage angesehen.') : tx('stories.rueckblick.zahl', '{n} von 24 Tagen angesehen', { n: offen.length })) + '</p><div class="raster">';
       offen.forEach(function (t) {
         html += '<button type="button" class="kachel" data-tag="' + t + '" data-quelle="rueckblick" aria-label="' + esc(ariaKreis(t) + (titel(t) ? ': ' + titel(t) : '')) + '">' +
           '<span class="kb">' + vorschauImg(t, true) + '<span class="kn" aria-hidden="true">' + t + '</span>' +
@@ -737,7 +740,7 @@ h1{margin:0;font-weight:700;line-height:1}
   function gesperrt(btn, t) {
     if (!RUHIG) { btn.classList.remove('wackeln'); void btn.offsetWidth; btn.classList.add('wackeln'); }
     var wrap = el.blase.parentNode.getBoundingClientRect(), r = btn.getBoundingClientRect(), ring = (btn.querySelector('.ring') || btn).getBoundingClientRect();
-    el.blase.innerHTML = '<b>' + K.sperrText(t) + '</b><span>Tag\u00a0' + t + ' kommt am ' + datumFest(t) + '.</span>';
+    el.blase.innerHTML = '<b>' + K.sperrText(t) + '</b><span>' + tx('stories.kommtAm', 'Tag\u00a0{n} kommt am {datum}.', { n: t, datum: datumFest(t) }) + '</span>';
     var bw = el.blase.offsetWidth;
     var cx = ring.left + ring.width / 2 - wrap.left;
     var links = Math.max(12, Math.min(wrap.width - bw - 12, cx - bw / 2));
@@ -864,7 +867,7 @@ h1{margin:0;font-weight:700;line-height:1}
   /* "Foto 2 von 3: Text" – ohne Doppelpunkt, wenn es keinen Text gibt */
   function fotoBeschreibung(t, i) {
     var x = bildText(t, i);
-    return 'Foto ' + (i + 1) + ' von ' + tagDaten(t).bilder.length + (x ? ': ' + x : '');
+    return x ? tx('stories.foto.text', 'Foto {n} von {gesamt}: {text}', { n: i + 1, gesamt: tagDaten(t).bilder.length, text: x }) : tx('stories.foto.zahl', 'Foto {n} von {gesamt}', { n: i + 1, gesamt: tagDaten(t).bilder.length });
   }
   function zeigeAufSeite(S, t, i) {
     var d = tagDaten(t), foto = $('.foto', S), n = d.bilder.length, text = bildText(t, i), tt = titel(t);
@@ -877,7 +880,7 @@ h1{margin:0;font-weight:700;line-height:1}
     /* Kopfzeile: Datum + Tagestitel; steht der Titel schon groß unten (echte Fotos), oben nicht doppelt */
     $('.s-titel', S).textContent = tt && tt !== text ? tt : '';
     $('.s-text', S).textContent = text;
-    $('.s-zahl', S).textContent = n > 1 ? 'Foto ' + (i + 1) + ' von ' + n : '';
+    $('.s-zahl', S).textContent = n > 1 ? tx('stories.foto.zahl', 'Foto {n} von {gesamt}', { n: i + 1, gesamt: n }) : '';
     $$('.seg i', S).forEach(function (s, k) { s.style.transform = 'scaleX(' + (k < i ? 1 : 0) + ')'; });
     bildLaden(t, i);
   }
@@ -922,29 +925,29 @@ h1{margin:0;font-weight:700;line-height:1}
   function tagBeginnt() {
     var t = P.tag, tt = titel(t);
     K.oeffne(t);
-    el.player.setAttribute('aria-label', 'Story Tag ' + t + ', ' + K.datumText(t) + (tt ? ': ' + tt : ''));
+    el.player.setAttribute('aria-label', tt ? tx('stories.player.titelText', 'Story Tag {n}, {datum}: {titel}', { n: t, datum: K.datumText(t), titel: tt }) : tx('stories.player.titel', 'Story Tag {n}, {datum}', { n: t, datum: K.datumText(t) }));
     el.herz.classList.toggle('voll', !!herzen[t]);
-    el.herz.setAttribute('aria-label', herzen[t] ? 'Noch ein Herz schicken' : 'Herz schicken');
+    el.herz.setAttribute('aria-label', herzen[t] ? tx('stories.herzNochmal', 'Noch ein Herz schicken') : tx('stories.herz', 'Herz schicken'));
     hinterSetzen(el.hinter1, t, P.idx);
     warteAufBild();
     vorausLaden();
     pfeileAktualisieren();
-    ansage('Tag ' + t + ', ' + K.datumText(t) + (tt ? ': ' + tt : '') + '. ' + fotoBeschreibung(t, 0));
+    ansage((tt ? tx('stories.ansage.titel', 'Tag {n}, {datum}: {titel}', { n: t, datum: K.datumText(t), titel: tt }) : tx('stories.kreis.tag', 'Tag {n}, {datum}', { n: t, datum: K.datumText(t) })) + '. ' + fotoBeschreibung(t, 0));
   }
 
   function pfeileAktualisieren() {
     if (!P) return;
     el.pfeilL.disabled = !zw && P.tag === 1 && P.idx === 0;
-    el.pfeilL.setAttribute('aria-label', zw ? 'Zurück zum letzten Foto' : 'Voriges Foto');
-    el.pfeilR.setAttribute('aria-label', zw === 'ende' ? 'Story beenden' : zw === 'heute' ? 'Tag ' + (P.tag + 1) + ' ansehen' : 'Nächstes Foto');
+    el.pfeilL.setAttribute('aria-label', zw ? tx('stories.pfeil.zurueckLetztes', 'Zurück zum letzten Foto') : tx('stories.voriges', 'Voriges Foto'));
+    el.pfeilR.setAttribute('aria-label', zw === 'ende' ? tx('stories.pfeil.beenden', 'Story beenden') : zw === 'heute' ? tx('stories.tagAnsehen', 'Tag {n} ansehen', { n: P.tag + 1 }) : tx('stories.naechstes', 'Nächstes Foto'));
   }
 
   function setzePause(an) {
     P.pause.nutzer = an;
     el.player.classList.toggle('nutzerpause', an);
     el.pause.innerHTML = an ? ICON.play : ICON.pause;
-    el.pause.setAttribute('aria-label', an ? 'Weiter abspielen' : 'Pause');
-    ansage(an ? 'Pausiert' : 'Läuft weiter');
+    el.pause.setAttribute('aria-label', an ? tx('stories.weiterAbspielen', 'Weiter abspielen') : tx('stories.pause', 'Pause'));
+    ansage(an ? tx('stories.pausiert', 'Pausiert') : tx('stories.laeuft', 'Läuft weiter'));
   }
   function setzeHalten(an) {
     if (!P) return;
@@ -997,22 +1000,22 @@ h1{margin:0;font-weight:700;line-height:1}
     if (art === 'heute') {
       var n = t + 1;
       ring = '<div class="hk-ring lebt zw-ring" aria-hidden="true"><span class="hk-foto verhuellt">' + vorschauImg(n) + '</span><span class="hk-zahl">' + n + '</span></div>';
-      titel = 'Und jetzt: dein Tag von heute';
-      text = 'Tag ' + n + ' ist noch eine Überraschung. Willst du sie jetzt ansehen?';
-      knoepfe = '<button type="button" class="los" data-aktion="weiter">' + PLAY + 'Tag ' + n + ' ansehen</button>' +
-        '<button type="button" class="los leise" data-aktion="zu">Später</button>';
+      titel = tx('stories.zw.heuteTitel', 'Und jetzt: dein Tag von heute');
+      text = tx('stories.zw.heuteText', 'Tag {n} ist noch eine Überraschung. Willst du sie jetzt ansehen?', { n: n });
+      knoepfe = '<button type="button" class="los" data-aktion="weiter">' + PLAY + tx('stories.tagAnsehen', 'Tag {n} ansehen', { n: n }) + '</button>' +
+        '<button type="button" class="los leise" data-aktion="zu">' + tx('stories.zw.spaeter', 'Später') + '</button>';
     } else {
       if (h <= 23) {
-        ring = '<div class="hk-ring zu zw-ring' + (RUHIG ? '' : ' wackelt') + '" aria-hidden="true">' + datumsSvg() + '<span class="hk-zahl">' + (h + 1) + '<small>Dezember</small></span></div>';
-        titel = 'Bis morgen!';
-        text = 'Morgen früh wartet Tag\u00a0' + (h + 1) + ' auf dich.';
+        ring = '<div class="hk-ring zu zw-ring' + (RUHIG ? '' : ' wackelt') + '" aria-hidden="true">' + datumsSvg() + '<span class="hk-zahl">' + (h + 1) + '<small>' + tx('stories.dezember', 'Dezember') + '</small></span></div>';
+        titel = tx('stories.zw.morgenTitel', 'Bis morgen!');
+        text = tx('stories.zw.morgenText', 'Morgen früh wartet Tag\u00a0{n} auf dich.', { n: h + 1 });
       } else {
         ring = '<div class="hk-ring gold zw-ring" aria-hidden="true"><span class="hk-foto">' + vorschauImg(24) + '</span></div>';
-        titel = h >= 25 ? 'Das war der ganze Advent' : 'Frohe Weihnachten!';
-        text = h >= 25 ? 'Frohe Weihnachten und danke fürs Zuschauen!' : 'Das war die letzte Story vor Weihnachten.';
+        titel = h >= 25 ? tx('stories.zw.ganzerAdvent', 'Das war der ganze Advent') : tx('stories.weihnachten', 'Frohe Weihnachten!');
+        text = h >= 25 ? tx('stories.zw.danke', 'Frohe Weihnachten und danke fürs Zuschauen!') : tx('stories.zw.letzte', 'Das war die letzte Story vor Weihnachten.');
       }
-      knoepfe = '<button type="button" class="los" data-aktion="zu">Zur Übersicht</button>' +
-        '<button type="button" class="los leise" data-aktion="nochmal">Tag ' + t + ' nochmal ansehen</button>';
+      knoepfe = '<button type="button" class="los" data-aktion="zu">' + tx('stories.zw.uebersicht', 'Zur Übersicht') + '</button>' +
+        '<button type="button" class="los leise" data-aktion="nochmal">' + tx('stories.tagNochmal', 'Tag {n} nochmal ansehen', { n: t }) + '</button>';
     }
     zw = art;
     P.pause.zwischen = true;
@@ -1055,10 +1058,10 @@ h1{margin:0;font-weight:700;line-height:1}
   }
   function grenzHinweis(r) {
     if (!P) return;
-    if (r < 0) { zeigeHinweis('Das ist der erste Tag.'); return; }
+    if (r < 0) { zeigeHinweis(tx('stories.grenze.erster', 'Das ist der erste Tag.')); return; }
     var n = P.tag + 1;
-    if (n > 24) zeigeHinweis('Das war der letzte Tag.', 'Frohe Weihnachten!');
-    else zeigeHinweis(K.sperrText(n), 'Tag\u00a0' + n + ' kommt am ' + datumFest(n) + '.');
+    if (n > 24) zeigeHinweis(tx('stories.grenze.letzter', 'Das war der letzte Tag.'), tx('stories.weihnachten', 'Frohe Weihnachten!'));
+    else zeigeHinweis(K.sperrText(n), tx('stories.kommtAm', 'Tag\u00a0{n} kommt am {datum}.', { n: n, datum: datumFest(n) }));
   }
 
   /* Würfel */
@@ -1131,7 +1134,7 @@ h1{margin:0;font-weight:700;line-height:1}
     fuelleSeite(A, t, 0);
     passeBuehne(true);
     el.player.classList.remove('halten', 'nutzerpause');
-    el.pause.innerHTML = ICON.pause; el.pause.setAttribute('aria-label', 'Pause');
+    el.pause.innerHTML = ICON.pause; el.pause.setAttribute('aria-label', tx('stories.pause', 'Pause'));
     el.player.style.backgroundColor = '';
     el.buehne.style.transform = '';
     el.hinter.style.opacity = '';
@@ -1310,9 +1313,9 @@ h1{margin:0;font-weight:700;line-height:1}
     herzen[P.tag] = (herzen[P.tag] || 0) + 1;
     herzSichern();
     el.herz.classList.add('voll');
-    el.herz.setAttribute('aria-label', 'Noch ein Herz schicken');
+    el.herz.setAttribute('aria-label', tx('stories.herzNochmal', 'Noch ein Herz schicken'));
     herzRegen();
-    ansage('Herz für Tag ' + P.tag + ' geschickt');
+    ansage(tx('stories.herzGeschickt', 'Herz für Tag {n} geschickt', { n: P.tag }));
   });
   function herzRegen() {
     var sr = el.steuer.getBoundingClientRect(), hr = el.herz.getBoundingClientRect();

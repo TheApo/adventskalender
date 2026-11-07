@@ -35,7 +35,7 @@ import crypto from 'node:crypto';
 import {
   REPO_ORDNER, KALENDER_ORDNER, CREDIT, abbrechen, gelb, rot, gruen, grau, fett, groesseText, nodePruefen,
   htmlText, jsonFuerScript, liegtIn, istOrdner, istDatei, lesen, ansichtenLaden, platzhalterEinsetzen,
-  zielPruefen, bauordnerAnlegen, zielErsetzen, ausfuehren, titelTeile
+  zielPruefen, bauordnerAnlegen, zielErsetzen, ausfuehren, titelTeile, verfuegbareSprachen, sprachpaketeLaden, sprachenJs
 } from './gemeinsam.mjs';
 
 const KENNUNG = 'DEIN-ADVENTSKALENDER-AUSGABE';      // steht in jeder gebauten index.html
@@ -135,17 +135,42 @@ function einstellungenLaden(datei, ansichten) {
   try { roh = JSON.parse(text); } catch (e) { abbrechen(`einstellungen.json ist kein gültiges JSON – ${jsonFehlerText(text, e)}`); }
   if (!roh || typeof roh !== 'object' || Array.isArray(roh)) abbrechen('einstellungen.json muss ein Objekt { … } sein.');
 
-  const bekannt = new Set(['titel', 'jahr', 'ansichten', 'standard_ansicht', 'testschluessel', 'zeitzone', 'webp_qualitaet']);
+  const bekannt = new Set(['titel', 'jahr', 'ansichten', 'standard_ansicht', 'sprachen', 'sprache', 'testschluessel', 'zeitzone', 'webp_qualitaet']);
   for (const k of Object.keys(roh)) if (!bekannt.has(k) && !k.startsWith('_')) warnung(`einstellungen.json: „${k}“ ist unbekannt und wird ignoriert.`);
 
   const ids = ansichten.map((a) => a.id);
   const e = {};
 
-  e.titel = typeof roh.titel === 'string' && roh.titel.trim() ? roh.titel.trim().replace(/\s+/g, ' ') : 'Dein Adventskalender';
-  if (roh.titel !== undefined && (typeof roh.titel !== 'string' || !roh.titel.trim())) warnung('„titel“ ist leer – „Dein Adventskalender“ wird benutzt.');
-  const teile = titelTeile(e.titel);
-  if (e.titel.length > 28 || Array.from(teile.a).length > 10) {
-    warnung(`Langer Titel („${e.titel}“): in manchen Ansichten wirkt er sehr klein oder bricht um – kurz ist besser, z. B. „Omas Adventskalender“.`);
+  // Sprachen: ["de", "en"] (Standard nur Deutsch); sprache: "auto" = Browsersprache beim ersten Besuch
+  const da = verfuegbareSprachen();
+  if (roh.sprachen === undefined) e.sprachen = ['de'];
+  else if (Array.isArray(roh.sprachen) && roh.sprachen.length && roh.sprachen.every((x) => typeof x === 'string')) {
+    e.sprachen = [...new Set(roh.sprachen.map((x) => x.trim().toLowerCase()))];
+    const falsch = e.sprachen.filter((x) => !da.includes(x));
+    if (falsch.length) abbrechen(`„sprachen“: ${falsch.map((x) => JSON.stringify(x)).join(', ')} gibt es nicht (keine Datei kalender/i18n/<code>.json).\n  Möglich sind: ${da.join(', ')}`);
+  } else abbrechen(`„sprachen“ muss eine Liste sein, z. B. ["de", "en"] (gelesen: ${JSON.stringify(roh.sprachen)}).`);
+  if (roh.sprache === undefined || roh.sprache === '') e.sprache = e.sprachen.length > 1 ? 'auto' : e.sprachen[0];
+  else if (roh.sprache === 'auto' || e.sprachen.includes(roh.sprache)) e.sprache = roh.sprache;
+  else abbrechen(`„sprache“ muss "auto" oder eine der Sprachen aus „sprachen“ sein (${e.sprachen.join(', ')}), nicht ${JSON.stringify(roh.sprache)}.`);
+
+  // Titel: Text (gilt für alle Sprachen) oder je Sprache { "de": "…", "en": "…" }
+  const sauber = (x) => (typeof x === 'string' ? x.trim().replace(/\s+/g, ' ') : '');
+  e.titelJeSprache = null;
+  if (roh.titel && typeof roh.titel === 'object' && !Array.isArray(roh.titel)) {
+    e.titelJeSprache = {};
+    for (const [c, w] of Object.entries(roh.titel)) if (e.sprachen.includes(c) && sauber(w)) e.titelJeSprache[c] = sauber(w);
+    for (const c of Object.keys(roh.titel)) if (!e.sprachen.includes(c)) warnung(`„titel“: ${JSON.stringify(c)} steht nicht in „sprachen“ und wird ignoriert.`);
+    e.titel = e.titelJeSprache[e.sprachen[0]] || Object.values(e.titelJeSprache)[0] || '';
+  } else e.titel = sauber(roh.titel);
+  if (!e.titel) {
+    e.titel = 'Dein Adventskalender';
+    if (roh.titel !== undefined) warnung('„titel“ ist leer – „Dein Adventskalender“ wird benutzt.');
+  }
+  for (const t of [e.titel, ...Object.values(e.titelJeSprache || {})]) {
+    const teile = titelTeile(t);
+    if (t.length > 28 || Array.from(teile.a).length > 10) {
+      warnung(`Langer Titel („${t}“): in manchen Ansichten wirkt er sehr klein oder bricht um – kurz ist besser, z. B. „Omas Adventskalender“.`);
+    }
   }
 
   const jetzt = new Date().getFullYear();
@@ -414,7 +439,7 @@ async function bauen() {
   // --- Prüfungen vorab (bei Problemen wird nichts verändert) ---
   if (!istOrdner(bilder)) abbrechen(`Bilder-Ordner nicht gefunden: ${bilder}`);
   if (!istDatei(VORLAGE)) abbrechen(`Vorlage fehlt: ${VORLAGE}`);
-  for (const d of ['kalender.js', 'fotos.js']) if (!istDatei(path.join(KALENDER_ORDNER, 'shared', d))) abbrechen(`kalender/shared/${d} fehlt.`);
+  for (const d of ['kalender.js', 'fotos.js', 'i18n.js']) if (!istDatei(path.join(KALENDER_ORDNER, 'shared', d))) abbrechen(`kalender/shared/${d} fehlt.`);
   if (liegtIn(KALENDER_ORDNER, ziel) || liegtIn(bilder, ziel) || liegtIn(REPO_ORDNER, ziel)) abbrechen('Das Ziel darf den Projekt-, Kalender- oder Bilder-Ordner nicht enthalten.');
   if (liegtIn(ziel, bilder) || liegtIn(ziel, KALENDER_ORDNER)) abbrechen('Das Ziel darf nicht in bilder/ oder kalender/ liegen.');
   zielPruefen(ziel, KENNUNG);
@@ -426,6 +451,11 @@ async function bauen() {
   console.log(`  „${einst.titel}“ · Advent ${einst.jahr} · Zeitzone ${einst.zeitzone}`);
   console.log(`  Ansichten: ${gewaehlt.length === ansichten.length ? `alle ${ansichten.length}` : gewaehlt.map((a) => a.id).join(', ')}` +
     ` · Start: ${einst.standard}${gewaehlt.length === 1 ? ' (nur eine Ansicht – im Menü gibt es kein Umschalten)' : ''}`);
+  const { pakete, fehlend } = sprachpaketeLaden(einst.sprachen);
+  console.log(`  Sprachen: ${einst.sprachen.join(', ')}` + (einst.sprachen.length > 1 ? ` · beim ersten Besuch: ${einst.sprache === 'auto' ? 'Sprache des Browsers' : einst.sprache} (umschaltbar im Menü)` : ''));
+  for (const c of einst.sprachen) {
+    if (fehlend[c] && fehlend[c].length) warnung(`kalender/i18n/${c}.json: ${fehlend[c].length} Text(e) fehlen – dort erscheint Deutsch (z. B. ${fehlend[c].slice(0, 3).join(', ')}).`);
+  }
   console.log(`  Testschlüssel: ${einst.testschluessel ? 'gesetzt – Testmodus mit ?test=<schlüssel>' : 'keiner (Testmodus aus)'} · WebP-Qualität ${einst.qualitaet}\n`);
 
   let sharp;
@@ -536,7 +566,8 @@ async function bauen() {
     for (const m of html.matchAll(/href="\.\.\/fonts\/([\w.-]+\.css)"/g)) schriftDateien.add(m[1]);
   }
   await fsp.mkdir(path.join(bau, 'shared'), { recursive: true });
-  for (const d of ['kalender.js', 'fotos.js']) await fsp.copyFile(path.join(KALENDER_ORDNER, 'shared', d), path.join(bau, 'shared', d));
+  for (const d of ['kalender.js', 'fotos.js', 'i18n.js']) await fsp.copyFile(path.join(KALENDER_ORDNER, 'shared', d), path.join(bau, 'shared', d));
+  await fsp.writeFile(path.join(bau, 'shared', 'sprachen.js'), sprachenJs(pakete), 'utf8');
 
   const fontsQuelle = path.join(KALENDER_ORDNER, 'fonts');
   const fontsZiel = path.join(bau, 'fonts');
@@ -576,7 +607,7 @@ async function bauen() {
   const kurztitel = kurztitelVon(einst.titel, einst.jahr);
   const manifest = {
     name: einst.titel, short_name: kurztitel, description: 'Jeden Tag im Advent ein neues Foto.',
-    lang: 'de', dir: 'ltr', start_url: './', scope: './', display: 'standalone', orientation: 'any',
+    lang: einst.sprache === 'auto' ? einst.sprachen[0] : einst.sprache, dir: 'ltr', start_url: './', scope: './', display: 'standalone', orientation: 'any',
     background_color: themeColor, theme_color: themeColor,
     icons: [
       { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
@@ -589,7 +620,7 @@ async function bauen() {
 
   // --- index.html (Lader) ---
   let vorlage = lesen(VORLAGE);
-  if (!vorlage.includes('/*@@KONFIG@@*/null') || !vorlage.includes('<!--@@KOPF@@-->') || !vorlage.includes(KENNUNG)) {
+  if (!vorlage.includes('/*@@KONFIG@@*/null') || !vorlage.includes('/*@@SPRACHE@@*/null') || !vorlage.includes('<!--@@KOPF@@-->') || !vorlage.includes(KENNUNG)) {
     abbrechen('kalender/vorlage/index.html ist beschädigt (Platzhalter fehlen).');
   }
   let schluessel = null;
@@ -600,6 +631,9 @@ async function bauen() {
   const lader = {
     jahr: einst.jahr,
     titel: einst.titel,
+    titelJeSprache: einst.titelJeSprache,
+    sprachen: einst.sprachen,
+    sprache: einst.sprache,
     kurztitel,
     standardVariante: einst.standard,
     zeitzone: einst.zeitzone,
@@ -622,7 +656,9 @@ async function bauen() {
     lader.appleIcon ? '<link rel="apple-touch-icon" href="apple-touch-icon.png">' : '',
     `<meta name="apple-mobile-web-app-title" content="${htmlText(kurztitel)}">`
   ].filter(Boolean).join('\n');
-  vorlage = vorlage.replace('/*@@KONFIG@@*/null', () => jsonFuerScript(lader)).replace('<!--@@KOPF@@-->', () => kopf)
+  const sprache = { titel: einst.titel, titelJeSprache: einst.titelJeSprache, sprachen: einst.sprachen, sprache: einst.sprache };
+  vorlage = vorlage.replace('/*@@KONFIG@@*/null', () => jsonFuerScript(lader)).replace('/*@@SPRACHE@@*/null', () => jsonFuerScript(sprache))
+    .replace('<!--@@KOPF@@-->', () => kopf)
     .split('@@TITEL@@').join(htmlText(einst.titel));
   await fsp.writeFile(path.join(bau, 'index.html'), vorlage, 'utf8');
 

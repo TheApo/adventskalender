@@ -101,6 +101,11 @@ html.still *, html.still *::before, html.still *::after { transition: none !impo
 }
 @media (min-width: 1024px) {
   .huelle { padding-left: 32px; padding-right: 32px; padding-top: 30px; }
+  /* Desktop ohne Scrollen: die quadratische 6×6-Wand richtet sich nach der Fensterhöhe (oben 30 px, unten 104 px für die Heute-Leiste) */
+  /* Quadratische Türchen wie gewohnt, aber die Wand nutzt die volle Fensterhöhe (oben 30 px, unten 16 px) */
+  .huelle { max-width: min(1080px, max(760px, calc(100svh + 18px))); padding-bottom: 16px; }
+  /* Kein Platz verschenken: Satz unten und Heute-Leiste nur auf Handy/Tablet (Datum steht im Titel, heute hat das Band) */
+  .fusszeile, .leiste { display: none !important; }
   .wand {
     --sp: 6;
     --gap: 18px;
@@ -163,7 +168,8 @@ body[data-phase="weihnachten"] .unterzeile { color: #fff; background: var(--kora
   .titel { --g1: 13.6cqi; --g2: 9.7cqi; --g3: 11.2cqi; --g4: clamp(15px, 3.4cqi, 24px); }
 }
 @media (min-width: 1024px) {
-  .titel { --g1: 18.5cqi; --g2: 13cqi; --g3: 16cqi; --g4: clamp(16px, 4.4cqi, 25px); justify-content: flex-end; padding-bottom: 4cqi; }
+  /* Titelfeld ist jetzt breiter als hoch: Schrift richtet sich auch nach der Höhe (cqh), damit Girlande und Titel sich nicht überlappen */
+  .titel { container-type: size; --g1: min(18.5cqi, 20cqh); --g2: min(13cqi, 14cqh); --g3: min(16cqi, 17cqh); --g4: clamp(15px, min(4.4cqi, 4.6cqh), 25px); justify-content: flex-end; padding-bottom: min(4cqi, 4cqh); }
   .girlande { display: block; position: absolute; left: 3%; right: 3%; top: 0; height: 26cqi; }
 }
 .girlande svg.schnur { position: absolute; inset: 0 0 auto 0; width: 100%; height: 10cqi; overflow: visible; }
@@ -746,8 +752,8 @@ html.gesperrt #kalender-reset { display: none; }
 }
 </style>
 <style id="titel-stil">
-.titel .z1 { font-size: calc(var(--g1) * clamp(.5, 9 / 4, 1.3)); }
-.titel .z2.titel-bunt { color: inherit; font-size: calc(var(--g2) * clamp(.5, 15 / 15, 1)); }
+.titel .z1 { font-size: calc(var(--g1) * clamp(.5, 9 / var(--titel-laenge, 4), 1.3)); }
+.titel .z2.titel-bunt { color: inherit; font-size: calc(var(--g2) * clamp(.5, 15 / var(--titel-laenge, 15), 1)); }
 .titel .z2.titel-bunt > span { -webkit-text-stroke: .028em color-mix(in srgb, currentColor 52%, var(--schiefer)); }
 </style>
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
@@ -767,25 +773,25 @@ html.gesperrt #kalender-reset { display: none; }
     <header class="titel">
       <div class="girlande" aria-hidden="true" id="girlande"></div>
       <h1>
-        <span class="nur-sr">Dein Adventskalender</span>
-        <span class="zeile z1" aria-hidden="true"><span class="c-k">D</span><span class="c-s">e</span><span class="c-p">i</span><span class="c-t">n</span></span>
-        <span class="zeile z2 titel-bunt" aria-hidden="true"><span class="c-s">A</span><span class="c-p">d</span><span class="c-t">v</span><span class="c-k">e</span><span class="c-s">n</span><span class="c-p">t</span><span class="c-t">s</span><span class="c-k">k</span><span class="c-s">a</span><span class="c-p">l</span><span class="c-t">e</span><span class="c-k">n</span><span class="c-s">d</span><span class="c-p">e</span><span class="c-t">r</span></span>
+        <span class="nur-sr" data-titel="ganz">Dein Adventskalender</span>
+        <span class="zeile z1" aria-hidden="true" data-titel-bunt="a"><span class="c-k">D</span><span class="c-s">e</span><span class="c-p">i</span><span class="c-t">n</span></span>
+        <span class="zeile z2 titel-bunt" aria-hidden="true" data-titel-bunt="b"><span class="c-s">A</span><span class="c-p">d</span><span class="c-t">v</span><span class="c-k">e</span><span class="c-s">n</span><span class="c-p">t</span><span class="c-t">s</span><span class="c-k">k</span><span class="c-s">a</span><span class="c-p">l</span><span class="c-t">e</span><span class="c-k">n</span><span class="c-s">d</span><span class="c-p">e</span><span class="c-t">r</span></span>
       </h1>
       <p class="unterzeile" id="unterzeile"></p>
     </header>
   </div>
   <div class="anhaenger" id="anhaenger" hidden aria-hidden="true"></div>
-  <p class="fusszeile">Jeden Tag ein Türchen, jeden Tag ein Stück von unserem Jahr.</p>
+  <p class="fusszeile" data-i18n="tueren.fusszeile">Jeden Tag ein Türchen, jeden Tag ein Stück von unserem Jahr.</p>
 </main>
 
 
 <p class="nur-sr" id="ansage" aria-live="polite"></p>
 
-<div class="ansicht" id="ansicht" role="dialog" aria-modal="true" aria-label="Bildansicht" aria-describedby="a-titel" hidden>
+<div class="ansicht" id="ansicht" role="dialog" aria-modal="true" aria-label="Bildansicht" data-i18n-attr="aria-label:tueren.ansicht.titel" aria-describedby="a-titel" hidden>
   <div class="a-grund"></div>
   <div class="a-kopf">
     <p class="a-zaehler" id="a-zaehler"></p>
-    <button type="button" class="filzknopf zu" id="a-zu" aria-label="Bildansicht schließen">
+    <button type="button" class="filzknopf zu" id="a-zu" aria-label="Bildansicht schließen" data-i18n-attr="aria-label:tueren.ansicht.schliessen">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>
     </button>
   </div>
@@ -797,25 +803,28 @@ html.gesperrt #kalender-reset { display: none; }
     </div>
   </div>
   <div class="a-fuss">
-    <button type="button" class="filzknopf" id="a-zurueck" aria-label="Vorheriges Bild">
+    <button type="button" class="filzknopf" id="a-zurueck" aria-label="Vorheriges Bild" data-i18n-attr="aria-label:tueren.ansicht.zurueck">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5L8 12l6.5 6.5"/></svg>
     </button>
     <div class="a-text">
       <span class="a-plakette" id="a-plakette" aria-hidden="true"></span>
       <div class="a-worte"><h2 class="a-titel" id="a-titel"></h2><p class="a-datum" id="a-datum"></p></div>
     </div>
-    <button type="button" class="filzknopf" id="a-weiter" aria-label="Nächstes Bild">
+    <button type="button" class="filzknopf" id="a-weiter" aria-label="Nächstes Bild" data-i18n-attr="aria-label:tueren.ansicht.weiter">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5L16 12l-6.5 6.5"/></svg>
     </button>
   </div>
 </div>
 
 <script src="../shared/start.js" data-ansicht="tueren"></script>
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „tueren“ (t ist hier die Tageszahl)
   var K = window.Kalender.init('tueren');
   var F = window.Fotos;
   var reduziert = !!K.bewegungReduziert;
@@ -964,7 +973,7 @@ html.gesperrt #kalender-reset { display: none; }
     if (h >= 1 && h <= 24 && t === h) return 'heute';
     return 'nachholen';
   }
-  var STATUS = { offen: 'geöffnet', heute: 'heute dran, noch zu', nachholen: 'noch zu, darf nachgeholt werden', zu: 'noch gesperrt' };
+  var STATUS = { offen: tx('tueren.status.offen', 'geöffnet'), heute: tx('tueren.status.heute', 'heute dran, noch zu'), nachholen: tx('tueren.status.nachholen', 'noch zu, darf nachgeholt werden'), zu: tx('tueren.status.zu', 'noch gesperrt') };
 
   /* ---------- Bilder kommen übers Netz: Laden abwarten, Fehler abfangen ---------- */
   // fertig(ok) genau einmal, sobald das Bild in img dargestellt werden kann. Scheitert eine Server-URL, tauscht
@@ -1031,15 +1040,15 @@ html.gesperrt #kalender-reset { display: none; }
       var b = tueren[t], z = zustand(t);
       if (b.dataset.z !== z) b.dataset.z = z;
       if (z === 'offen') sichereVorschau(t);
-      b.setAttribute('aria-label', 'Tag ' + t + ', ' + K.datumText(t) + ' – ' + STATUS[z]);
-      b.querySelector('.fahne').textContent = z === 'heute' ? 'Heute' : (z === 'nachholen' ? (h >= 25 ? 'Noch zu' : 'Nachholen') : '');
+      b.setAttribute('aria-label', tx('tueren.tuer', 'Tag {n}, {datum} – {status}', { n: t, datum: K.datumText(t), status: STATUS[z] }));
+      b.querySelector('.fahne').textContent = z === 'heute' ? tx('tueren.fahne.heute', 'Heute') : (z === 'nachholen' ? (h >= 25 ? tx('tueren.fahne.nochZu', 'Noch zu') : tx('tueren.fahne.nachholen', 'Nachholen')) : '');
     }
     document.body.dataset.phase = h === 0 ? 'november' : (h >= 25 ? 'weihnachten' : 'advent');
     var u = $('unterzeile');
-    if (h === 0) u.textContent = 'Noch ist November – bald geht’s los!';
-    else if (h >= 25) u.textContent = ungeoeffnet().length ? 'Frohe Weihnachten! Jetzt dürfen alle Türchen auf.' : 'Frohe Weihnachten! Alle Türchen sind offen.';
-    else if (h === 24) u.textContent = 'Heute ist Heiligabend!';
-    else u.textContent = 'Heute ist ' + K.datumText(h) + (K.istSonntag(h) ? ' – ' + K.adventsSonntag(h) + '. Advent' : '');
+    if (h === 0) u.textContent = tx('tueren.unterzeile.november', 'Noch ist November – bald geht’s los!');
+    else if (h >= 25) u.textContent = ungeoeffnet().length ? tx('tueren.unterzeile.weihnachtenRest', 'Frohe Weihnachten! Jetzt dürfen alle Türchen auf.') : tx('tueren.unterzeile.weihnachtenAlle', 'Frohe Weihnachten! Alle Türchen sind offen.');
+    else if (h === 24) u.textContent = tx('tueren.unterzeile.heiligabend', 'Heute ist Heiligabend!');
+    else u.textContent = K.istSonntag(h) ? tx('tueren.unterzeile.heuteAdvent', 'Heute ist {datum} – {n}. Advent', { datum: K.datumText(h), n: K.adventsSonntag(h) }) : tx('tueren.unterzeile.heute', 'Heute ist {datum}', { datum: K.datumText(h) });
     leisteAktualisieren();
   }
 
@@ -1085,7 +1094,7 @@ html.gesperrt #kalender-reset { display: none; }
       if (img && img.animate) img.animate([{ transform: 'scale(1.18)', filter: 'brightness(1.5) saturate(.7)' }, { transform: 'scale(1)', filter: 'none' }], { duration: 1300, delay: 150, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'backwards' });
     }
     aktualisiere();
-    ansage('Türchen ' + t + ' ist offen' + (titelVon(t) ? ': ' + titelVon(t) : '.'));
+    ansage(titelVon(t) ? tx('tueren.ansage.offenTitel', 'Türchen {n} ist offen: {titel}', { n: t, titel: titelVon(t) }) : tx('tueren.ansage.offen', 'Türchen {n} ist offen.', { n: t }));
     if (mitAnsicht) setTimeout(function () { F.bild(t); }, 60); // Collage während des Schwungs vorbereiten
     setTimeout(function () {
       b.classList.remove('schwingt');
@@ -1102,9 +1111,9 @@ html.gesperrt #kalender-reset { display: none; }
       var kn = b.querySelectorAll('.knauf');
       for (var i = 0; i < kn.length; i++) kn[i].animate([{ transform: 'none' }, { transform: 'translateY(-1.5px) rotate(-14deg)' }, { transform: 'translateY(1px) rotate(10deg)' }, { transform: 'rotate(-6deg)' }, { transform: 'none' }], { duration: 420 });
     }
-    var text = K.sperrText(t) || 'Noch ein bisschen Geduld!';
+    var text = K.sperrText(t) || tx('tueren.geduld', 'Noch ein bisschen Geduld!');
     zeigeAnhaenger(t, text);
-    ansage('Tag ' + t + ': ' + text);
+    ansage(tx('tueren.ansage.gesperrt', 'Tag {n}: {text}', { n: t, text: text }));
   }
 
   /* ---------- Anhänger (Sprechblase) ---------- */
@@ -1164,35 +1173,37 @@ html.gesperrt #kalender-reset { display: none; }
     var subs;
     leisteModus = 'los';
     if (h === 0) {
-      titel = 'Noch ist November';
-      subs = ['Am 1. Dezember geht’s los', 'Ab 1. Dezember geht’s los', 'Ab 1. Dezember'];
+      titel = tx('tueren.leiste.november', 'Noch ist November');
+      subs = [tx('tueren.leiste.start1', 'Am 1. Dezember geht’s los'), tx('tueren.leiste.start2', 'Ab 1. Dezember geht’s los'), tx('tueren.leiste.start3', 'Ab 1. Dezember')];
       filzHTML = STERN_FILZ;
       leisteZiel = 1;
       leisteAktion = function () { springeZu(1, function () { pulse(1); }); };
     } else if (h >= 25) {
       var rest = ungeoeffnet();
-      titel = 'Frohe Weihnachten!';
+      titel = tx('tueren.leiste.weihnachten', 'Frohe Weihnachten!');
       filzHTML = STERN_FILZ;
       leisteZiel = 0;
       if (rest.length) {
-        subs = rest.length === 1 ? ['Das letzte Türchen öffnen', 'Letztes Türchen öffnen']
-          : ['Alle ' + rest.length + ' restlichen Türchen öffnen', 'Alle ' + rest.length + ' Türchen öffnen', rest.length + ' Türchen öffnen'];
+        subs = rest.length === 1 ? [tx('tueren.leiste.letztes1', 'Das letzte Türchen öffnen'), tx('tueren.leiste.letztes2', 'Letztes Türchen öffnen')]
+          : [tx('tueren.leiste.rest1', 'Alle {n} restlichen Türchen öffnen', { n: rest.length }), tx('tueren.leiste.rest2', 'Alle {n} Türchen öffnen', { n: rest.length }), tx('tueren.leiste.rest3', '{n} Türchen öffnen', { n: rest.length })];
         leisteAktion = alleOeffnen;
       } else {
-        subs = ['Alle 24 Bilder ansehen', 'Alle Bilder ansehen'];
+        subs = [tx('tueren.leiste.alleBilder1', 'Alle 24 Bilder ansehen'), tx('tueren.leiste.alleBilder2', 'Alle Bilder ansehen')];
         leisteAktion = function () { zeigeAnsicht(1); };
       }
     } else {
       var verpasst = ungeoeffnet().filter(function (x) { return x !== h; }).length;
       var offen = K.istGeoeffnet(h);
-      titel = 'Heute: Türchen ' + h;
+      titel = tx('tueren.leiste.heute', 'Heute: Türchen {n}', { n: h });
       filzHTML = filz(h, true);
       leisteZiel = h;
+      var aktion = offen ? tx('tueren.leiste.bildAnsehen', 'Bild ansehen') : tx('tueren.leiste.jetztOeffnen', 'Jetzt öffnen');
+      var aktionKurz = offen ? tx('tueren.leiste.ansehen', 'Ansehen') : tx('tueren.leiste.oeffnen', 'Öffnen');
       subs = verpasst ? [
-        (offen ? 'Bild ansehen' : 'Jetzt öffnen') + ' · ' + verpasst + ' zum Nachholen',
-        (offen ? 'Bild ansehen' : 'Jetzt öffnen') + ' · ' + verpasst + ' nachholen',
-        (offen ? 'Ansehen' : 'Öffnen') + ' · ' + verpasst + ' nachholen'
-      ] : [offen ? 'Bild ansehen' : 'Jetzt öffnen'];
+        tx('tueren.leiste.zumNachholen', '{aktion} · {n} zum Nachholen', { aktion: aktion, n: verpasst }),
+        tx('tueren.leiste.nachholen', '{aktion} · {n} nachholen', { aktion: aktion, n: verpasst }),
+        tx('tueren.leiste.nachholen', '{aktion} · {n} nachholen', { aktion: aktionKurz, n: verpasst })
+      ] : [aktion];
       leisteAktion = function () { heuteOeffnen(h); };
     }
     sub = subs[0];
@@ -1310,7 +1321,7 @@ html.gesperrt #kalender-reset { display: none; }
     if (m && m.w > 0 && m.h > 0) return Math.max(0.3, Math.min(3.5, m.w / m.h));
     return F.format(t) === 'hoch' ? 2 / 3 : 1;
   }
-  function altText(t) { var s = titelVon(t); return 'Fotocollage vom ' + t + '. Dezember' + (s ? ': ' + s : ''); }
+  function altText(t) { var s = titelVon(t); return s ? tx('tueren.ansicht.altTitel', 'Fotocollage vom {n}. Dezember: {titel}', { n: t, titel: s }) : tx('tueren.ansicht.alt', 'Fotocollage vom {n}. Dezember', { n: t }); }
   // Solange das Foto lädt: Durchschnittsfarbe; bei quadratischen Collagen zusätzlich die Türchen-Vorschau –
   // aber nur, wenn sie in der Nische schon fertig geladen ist (liegt im Browser-Cache, keine Zusatzanfrage).
   // Das Foto wird dann nur noch „scharf“.
@@ -1409,7 +1420,7 @@ html.gesperrt #kalender-reset { display: none; }
   }
   function beschrifte() {
     var t = liste[pos], titel = titelVon(t), datum = $('a-datum');
-    $('a-zaehler').innerHTML = 'Bild ' + (pos + 1) + ' von ' + liste.length + (istTouch && liste.length > 1 ? '<small>Wischen zum Blättern</small>' : '');
+    $('a-zaehler').innerHTML = tx('tueren.ansicht.zaehler', 'Bild {n} von {gesamt}', { n: pos + 1, gesamt: liste.length }) + (istTouch && liste.length > 1 ? '<small>' + tx('tueren.ansicht.wischen', 'Wischen zum Blättern') + '</small>' : '');
     $('a-plakette').innerHTML = filz(t);
     // ohne Bildunterschrift wird das Datum zur Überschrift (statt einer leeren Zeile)
     $('a-titel').textContent = titel || K.datumText(t);

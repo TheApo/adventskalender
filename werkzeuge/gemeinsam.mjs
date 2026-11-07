@@ -115,6 +115,52 @@ export function ansichtenLaden() {
   return liste;
 }
 
+// ---------------------------------------------------------------------------------------------------
+// Sprachen (kalender/i18n/<code>.json – verschachtelt, in allen Sprachen dieselben Schlüssel)
+// ---------------------------------------------------------------------------------------------------
+
+export const SPRACH_ORDNER = path.join(KALENDER_ORDNER, 'i18n');
+export const QUELLSPRACHE = 'de';
+
+/** verfügbare Sprachen (Dateinamen in kalender/i18n/) */
+export function verfuegbareSprachen() {
+  if (!istOrdner(SPRACH_ORDNER)) return [];
+  return fs.readdirSync(SPRACH_ORDNER).filter((n) => /^[a-z]{2,3}\.json$/.test(n)).map((n) => n.slice(0, -5)).sort();
+}
+
+function flach(o, p = '', z = {}) {
+  for (const [k, v] of Object.entries(o)) {
+    const s = p ? `${p}.${k}` : k;
+    if (v && typeof v === 'object' && !Array.isArray(v) && !('other' in v)) flach(v, s, z); else z[s] = v;
+  }
+  return z;
+}
+
+/**
+ * Lädt die Sprachpakete (Deutsch immer mit – es ist die Rückfallsprache) und meldet je Sprache die Schlüssel,
+ * die gegenüber Deutsch fehlen (dort erscheint dann der deutsche Text).
+ */
+export function sprachpaketeLaden(codes) {
+  const pakete = {}, fehlend = {};
+  for (const c of [...new Set([QUELLSPRACHE, ...codes])]) {
+    const datei = path.join(SPRACH_ORDNER, `${c}.json`);
+    if (!istDatei(datei)) abbrechen(`Sprachdatei fehlt: kalender/i18n/${c}.json`);
+    let roh;
+    try { roh = JSON.parse(lesen(datei)); } catch (e) { abbrechen(`kalender/i18n/${c}.json ist kein gültiges JSON – ${e.message}`); }
+    pakete[c] = flach(roh);
+  }
+  for (const c of Object.keys(pakete)) {
+    if (c === QUELLSPRACHE) continue;
+    fehlend[c] = Object.keys(pakete[QUELLSPRACHE]).filter((k) => !(k in pakete[c]));
+  }
+  return { pakete, fehlend };
+}
+
+/** Inhalt von shared/sprachen.js (alle Pakete, flach) */
+export function sprachenJs(pakete) {
+  return '/* erzeugt aus kalender/i18n/*.json – Änderungen bitte dort */\nwindow.I18N_DATEN = ' + jsonFuerScript(pakete) + ';\n';
+}
+
 const BUNT = ['c-k', 'c-s', 'c-p', 'c-t'];
 function bunt(wort, versatz = 0) {
   return Array.from(wort).map((z, i) => `<span class="${BUNT[(i + versatz) % BUNT.length]}">${htmlText(z)}</span>`).join('');

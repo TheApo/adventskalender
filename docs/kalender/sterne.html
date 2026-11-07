@@ -313,15 +313,15 @@ body.november .fenster-licht{opacity:.55}
   <div class="polarlicht" aria-hidden="true"></div>
   <div class="mond" aria-hidden="true"></div>
   <header class="kopf" id="kopf">
-    <h1><span class="gross">Dein</span> <span class="klein">Adventskalender</span></h1>
+    <h1><span class="gross" data-titel="a">Dein</span> <span class="klein" data-titel="b">Adventskalender</span></h1>
     <p class="zeile2"><span class="heute-zeile" id="heuteZeile"></span> <span class="hilfe" id="hilfe"></span></p>
     <p class="stand" id="stand"></p>
   </header>
-  <main class="feld" id="feld" aria-label="Sternenhimmel mit 24 Sternbildern"></main>
+  <main class="feld" id="feld" aria-label="Sternenhimmel mit 24 Sternbildern" data-i18n-attr="aria-label:sterne.feld"></main>
   <div class="land" id="land" aria-hidden="true"></div>
   <div class="blase" id="blase" hidden></div>
 </div>
-<button type="button" class="chip" id="chip" hidden><svg aria-hidden="true"><use href="#i-stern"/></svg><span>Heute finden</span><svg class="pfeil" aria-hidden="true"><use href="#i-pfeil"/></svg></button>
+<button type="button" class="chip" id="chip" hidden><svg aria-hidden="true"><use href="#i-stern"/></svg><span data-i18n="sterne.heuteFinden">Heute finden</span><svg class="pfeil" aria-hidden="true"><use href="#i-pfeil"/></svg></button>
 <p class="unsichtbar" id="ansage" role="status" aria-live="polite"></p>
 
 <dialog class="fenster" id="fenster" aria-labelledby="fKopfText">
@@ -331,40 +331,43 @@ body.november .fenster-licht{opacity:.55}
     <div class="f-kopf">
       <p class="f-kopf-text" id="fKopfText"></p>
       <div class="f-kopf-knoepfe">
-        <button type="button" class="knopf-rund klein" id="fTon" aria-pressed="true" aria-label="Glockentöne beim Verbinden" title="Glockentöne an oder aus"><svg aria-hidden="true"><use href="#i-ton"/></svg></button>
-        <button type="button" class="knopf-rund" id="fZu" aria-label="Zurück zum Himmel"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+        <button type="button" class="knopf-rund klein" id="fTon" aria-pressed="true" aria-label="Glockentöne beim Verbinden" title="Glockentöne an oder aus" data-i18n-attr="aria-label:sterne.ton.label;title:sterne.ton.titel"><svg aria-hidden="true"><use href="#i-ton"/></svg></button>
+        <button type="button" class="knopf-rund" id="fZu" aria-label="Zurück zum Himmel" data-i18n-attr="aria-label:sterne.fenster.zu"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
       </div>
     </div>
     <div class="f-buehne" id="fBuehne">
       <div class="f-spur" id="fSpur"><span class="f-vorbild" id="fVorbild" aria-hidden="true"></span><img id="fBild" alt="" draggable="false"></div>
-      <div class="f-laden" id="fLaden" hidden><span class="lade-sterne" aria-hidden="true"><i></i><i></i><i></i></span><span>Das Foto wird geladen …</span></div>
-      <div class="f-fehler" id="fFehler" hidden><p>Das Foto ist gerade nicht durchgekommen. Ist das Internet an? Dann versuch es einfach noch einmal.</p><button type="button" class="knopf knopf-linie" id="fNeu">Noch einmal laden</button></div>
+      <div class="f-laden" id="fLaden" hidden><span class="lade-sterne" aria-hidden="true"><i></i><i></i><i></i></span><span data-i18n="sterne.foto.laden">Das Foto wird geladen …</span></div>
+      <div class="f-fehler" id="fFehler" hidden><p data-i18n="sterne.foto.fehler">Das Foto ist gerade nicht durchgekommen. Ist das Internet an? Dann versuch es einfach noch einmal.</p><button type="button" class="knopf knopf-linie" id="fNeu" data-i18n="sterne.foto.neu">Noch einmal laden</button></div>
     </div>
     <div class="f-fuss">
       <div class="fuss-v" id="fussV">
         <p class="f-hinweis" id="fHinweis" aria-live="polite"></p>
         <div class="fuss-knoepfe">
-          <button type="button" class="knopf knopf-linie" id="fAuto" aria-label="Sterne verbinden lassen"><svg aria-hidden="true"><use href="#i-stab"/></svg><span class="lang" aria-hidden="true">Sterne verbinden lassen</span><span class="kurz" aria-hidden="true">Verbinden lassen</span></button>
-          <button type="button" class="knopf knopf-schalter" id="fProfi" aria-pressed="false" title="Profi-Modus: ohne Ring, bei Zahlen nur Stern 1 und 2 nummeriert"><svg aria-hidden="true"><use href="#i-profi"/></svg><span>Profi</span></button>
-          <button type="button" class="knopf knopf-gold" id="fZumFoto" hidden>Foto groß ansehen</button>
+          <button type="button" class="knopf knopf-linie" id="fAuto" aria-label="Sterne verbinden lassen" data-i18n-attr="aria-label:sterne.auto.lang"><svg aria-hidden="true"><use href="#i-stab"/></svg><span class="lang" aria-hidden="true" data-i18n="sterne.auto.lang">Sterne verbinden lassen</span><span class="kurz" aria-hidden="true" data-i18n="sterne.auto.kurz">Verbinden lassen</span></button>
+          <button type="button" class="knopf knopf-schalter" id="fProfi" aria-pressed="false" title="Profi-Modus: ohne Ring, bei Zahlen nur Stern 1 und 2 nummeriert" data-i18n-attr="title:sterne.profi.titel"><svg aria-hidden="true"><use href="#i-profi"/></svg><span data-i18n="sterne.profi.kurz">Profi</span></button>
+          <button type="button" class="knopf knopf-gold" id="fZumFoto" hidden data-i18n="sterne.fenster.zumFoto">Foto groß ansehen</button>
         </div>
       </div>
       <div class="fuss-b" id="fussB" hidden>
-        <button type="button" class="knopf-rund" id="fZurueck" aria-label="Vorheriges Foto"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
+        <button type="button" class="knopf-rund" id="fZurueck" aria-label="Vorheriges Foto" data-i18n-attr="aria-label:sterne.fenster.zurueck"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
         <div class="f-text"><h2 id="fTitel"></h2><p id="fDatum"></p></div>
-        <button type="button" class="knopf-rund" id="fWeiter" aria-label="Nächstes Foto"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
-        <button type="button" class="f-nochmal" id="fNochmal"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Sterne nochmal verbinden</span></button>
+        <button type="button" class="knopf-rund" id="fWeiter" aria-label="Nächstes Foto" data-i18n-attr="aria-label:sterne.fenster.weiter"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
+        <button type="button" class="f-nochmal" id="fNochmal"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span data-i18n="sterne.fenster.nochmal">Sterne nochmal verbinden</span></button>
       </div>
     </div>
   </div>
 </dialog>
 
 <script src="../shared/start.js" data-ansicht="sterne"></script>
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „sterne“ (t ist hier die Tageszahl)
   var K = window.Kalender.init('sterne');
   var F = window.Fotos;
   var TAU = Math.PI * 2;
@@ -405,7 +408,7 @@ body.november .fenster-licht{opacity:.55}
   function sage(text) { clearTimeout(ansageUhr); el.ansage.textContent = ''; ansageUhr = setTimeout(function () { el.ansage.textContent = text; }, 60); }
   function vibriere(muster) { if (!GROB || !navigator.vibrate) return; try { navigator.vibrate(muster); } catch (e) { /* egal */ } }
   function fokus(x) { if (!x) return; try { x.focus({ preventScroll: true }); } catch (e) { x.focus(); } }
-  function datumLang(t) { var s = K.datumText(t); if (K.istSonntag(t)) s += ' – ' + K.adventsSonntag(t) + '. Advent'; return s; }
+  function datumLang(t) { var s = K.datumText(t); if (K.istSonntag(t)) s += ' – ' + tx('sterne.advent', '{n}. Advent', { n: K.adventsSonntag(t) }); return s; }
   function abstandZuStrecke(p, a, b) {
     var dx = b.x - a.x, dy = b.y - a.y, l = dx * dx + dy * dy, t = l ? ((p.x - a.x) * dx + (p.y - a.y) * dy) / l : 0;
     t = begrenze(t, 0, 1);
@@ -482,12 +485,12 @@ body.november .fenster-licht{opacity:.55}
   var KERZE = { p: [[.04, 1], [.04, .36], [.25, .36], [.12, .17], [.25, 0], [.38, .17], [.46, .36], [.46, 1]], weg: [0, 1, 2, 3, 4, 5, 2, 6, 7, 0] };
   // Bild-Sternbilder an besonderen Tagen (sonst ergeben die Sterne die Zahl des Tages)
   var FORMEN = {
-    6: { d: STIEFEL, name: 'Nikolausstiefel', schmuck: [[0, 'rgba(255,255,255,A)'], [8, 'rgba(255,255,255,A)']], such: 'den funkelnden Nikolausstiefel', pro: 'ihn', fertig: 'Geschafft! Der Nikolausstiefel leuchtet.' },
-    13: { d: KERZE, name: 'Adventskerze', flamme: [3, 4, 5], such: 'die funkelnde Adventskerze', pro: 'sie', fertig: 'Geschafft! Die Adventskerze brennt.' },
-    20: { d: TANNE, name: 'Tannenbaum', schmuck: [[0, 'rgba(255,214,120,A)'], [1, 'rgba(255,110,95,A)'], [10, 'rgba(120,232,196,A)'], [3, 'rgba(170,185,255,A)'], [8, 'rgba(255,214,120,A)']], such: 'den funkelnden Tannenbaum', pro: 'ihn', fertig: 'Geschafft! Der Tannenbaum leuchtet.' },
-    24: { d: STERN, name: 'Weihnachtsstern', such: 'den funkelnden Weihnachtsstern', pro: 'ihn', fertig: 'Geschafft! Der Weihnachtsstern leuchtet.' }
+    6: { d: STIEFEL, name: tx('sterne.form.stiefel.name', 'Nikolausstiefel'), schmuck: [[0, 'rgba(255,255,255,A)'], [8, 'rgba(255,255,255,A)']], hilfe: tx('sterne.form.stiefel.hilfe', 'Such den funkelnden Nikolausstiefel, tipp ihn an und verbinde seine Sterne.'), fertig: tx('sterne.form.stiefel.fertig', 'Geschafft! Der Nikolausstiefel leuchtet.') },
+    13: { d: KERZE, name: tx('sterne.form.kerze.name', 'Adventskerze'), flamme: [3, 4, 5], hilfe: tx('sterne.form.kerze.hilfe', 'Such die funkelnde Adventskerze, tipp sie an und verbinde ihre Sterne.'), fertig: tx('sterne.form.kerze.fertig', 'Geschafft! Die Adventskerze brennt.') },
+    20: { d: TANNE, name: tx('sterne.form.tanne.name', 'Tannenbaum'), schmuck: [[0, 'rgba(255,214,120,A)'], [1, 'rgba(255,110,95,A)'], [10, 'rgba(120,232,196,A)'], [3, 'rgba(170,185,255,A)'], [8, 'rgba(255,214,120,A)']], hilfe: tx('sterne.form.tanne.hilfe', 'Such den funkelnden Tannenbaum, tipp ihn an und verbinde seine Sterne.'), fertig: tx('sterne.form.tanne.fertig', 'Geschafft! Der Tannenbaum leuchtet.') },
+    24: { d: STERN, name: tx('sterne.form.stern.name', 'Weihnachtsstern'), hilfe: tx('sterne.form.stern.hilfe', 'Such den funkelnden Weihnachtsstern, tipp ihn an und verbinde seine Sterne.'), fertig: tx('sterne.form.stern.fertig', 'Geschafft! Der Weihnachtsstern leuchtet.') }
   };
-  function sbName(t) { return FORMEN[t] ? 'Sternbild ' + FORMEN[t].name : 'Sternbild ' + t; }
+  function sbName(t) { return tx('sterne.sternbild', 'Sternbild {name}', { name: FORMEN[t] ? FORMEN[t].name : t }); }
   var LUECKE = .22;
   var formSpeicher = {};
 
@@ -712,18 +715,19 @@ body.november .fenster-licht{opacity:.55}
     if (K.istGeoeffnet(t)) return 'offen';
     return t === K.heute() ? 'heute' : 'verpasst';
   }
-  var ZTEXT = { zu: 'noch zu', heute: 'heute dran, Sterne verbinden', verpasst: 'verpasst, Sterne verbinden', offen: 'geöffnet, Foto ansehen' };
+  var ZTEXT = { zu: tx('sterne.zustand.zu', 'noch zu'), heute: tx('sterne.zustand.heute', 'heute dran, Sterne verbinden'), verpasst: tx('sterne.zustand.verpasst', 'verpasst, Sterne verbinden'), offen: tx('sterne.zustand.offen', 'geöffnet, Foto ansehen') };
 
   function aktualisiere(t) {
     var b = knoepfe[t], z = zustand(t);
     b.classList.remove('z-zu', 'z-heute', 'z-verpasst', 'z-offen', 'frisch', 'gefunden');
     b.classList.add('z-' + z);
     // „Nachholen“-Schild nur für die drei jüngsten verpassten Tage – sonst wird der Himmel zum Schilderwald
-    var schild = z === 'heute' ? 'Heute' : (z === 'verpasst' && verpassteTage().slice(-3).indexOf(t) >= 0) ? 'Nachholen' : '';
+    var schild = z === 'heute' ? tx('sterne.schild.heute', 'Heute') : (z === 'verpasst' && verpassteTage().slice(-3).indexOf(t) >= 0) ? tx('sterne.schild.nachholen', 'Nachholen') : '';
     b.querySelector('.sb-etikett').textContent = schild;
     b.classList.toggle('mit-schild', !!schild);
     b.querySelector('.sb-nr').textContent = FORMEN[t] ? String(t) : '';
-    b.setAttribute('aria-label', 'Tag ' + t + ', ' + K.datumText(t) + (FORMEN[t] ? ', Sternbild ' + FORMEN[t].name : '') + ' – ' + ZTEXT[z]);
+    b.setAttribute('aria-label', FORMEN[t] ? tx('sterne.labelForm', 'Tag {n}, {datum}, {name} – {status}', { n: t, datum: K.datumText(t), name: sbName(t), status: ZTEXT[z] })
+      : tx('sterne.label', 'Tag {n}, {datum} – {status}', { n: t, datum: K.datumText(t), status: ZTEXT[z] }));
     var v = b.querySelector('.sb-vorschau');
     if (z === 'offen') { if (!b._vorschau) vorschauVormerken(t); }
     else {
@@ -788,16 +792,15 @@ body.november .fenster-licht{opacity:.55}
   function kopfText() {
     var h = K.heute(), offen = K.geoeffnet().length, hz, hi;
     if (h === 0) {
-      hz = 'Noch ist November.';
-      hi = 'Ab dem 1. Dezember leuchtet jeden Tag ein neues Sternbild auf. Dann verbindest du seine Sterne, und ein Foto erscheint am Himmel.';
+      hz = tx('sterne.kopf.november', 'Noch ist November.');
+      hi = tx('sterne.hilfe.november', 'Ab dem 1. Dezember leuchtet jeden Tag ein neues Sternbild auf. Dann verbindest du seine Sterne, und ein Foto erscheint am Himmel.');
     } else if (h >= 25) {
-      hz = 'Frohe Weihnachten!';
-      hi = offen === 24 ? 'Alle 24 Sternbilder leuchten. Tipp eins an, um sein Foto zu sehen.' : 'Alle Sternbilder sind frei – tipp eins an.';
+      hz = tx('sterne.kopf.weihnachten', 'Frohe Weihnachten!');
+      hi = offen === 24 ? tx('sterne.hilfe.alleOffen', 'Alle 24 Sternbilder leuchten. Tipp eins an, um sein Foto zu sehen.') : tx('sterne.hilfe.alleFrei', 'Alle Sternbilder sind frei – tipp eins an.');
     } else {
-      hz = 'Heute ist ' + K.datumText(h) + '.';
-      var was = FORMEN[h] ? FORMEN[h].such : 'das funkelnde Sternbild mit der ' + h;
-      hi = K.istGeoeffnet(h) ? (h === 24 ? 'Der Weihnachtsstern leuchtet schon. Frohe Weihnachten!' : 'Das Sternbild von heute leuchtet schon. Morgen kommt das nächste.')
-        : 'Such ' + was + ', tipp ' + (FORMEN[h] ? FORMEN[h].pro : 'es') + ' an und verbinde ' + (FORMEN[h] && FORMEN[h].pro === 'sie' ? 'ihre' : 'seine') + ' Sterne.';
+      hz = tx('sterne.kopf.heute', 'Heute ist {datum}.', { datum: K.datumText(h) });
+      hi = K.istGeoeffnet(h) ? (h === 24 ? tx('sterne.hilfe.sternOffen', 'Der Weihnachtsstern leuchtet schon. Frohe Weihnachten!') : tx('sterne.hilfe.heuteOffen', 'Das Sternbild von heute leuchtet schon. Morgen kommt das nächste.'))
+        : FORMEN[h] ? FORMEN[h].hilfe : tx('sterne.hilfe.suchen', 'Such das funkelnde Sternbild mit der {n}, tipp es an und verbinde seine Sterne.', { n: h });
     }
     el.heuteZeile.textContent = hz;
     el.hilfe.textContent = hi;
@@ -807,22 +810,22 @@ body.november .fenster-licht{opacity:.55}
     if (h === 0 || (h >= 25 && offen === 24)) { el.stand.hidden = true; return; }
     el.stand.hidden = false;
     var sp = document.createElement('span');
-    sp.textContent = offen === 0 ? 'Noch leuchtet kein Sternbild.'
-      : offen === frei ? (frei === 1 ? 'Das erste Sternbild leuchtet.' : 'Alle ' + frei + ' Sternbilder bis heute leuchten.')
-      : offen === 1 ? '1 von ' + frei + ' Sternbildern leuchtet.' : offen + ' von ' + frei + ' Sternbildern leuchten.';
+    sp.textContent = offen === 0 ? tx('sterne.stand.keins', 'Noch leuchtet kein Sternbild.')
+      : offen === frei ? (frei === 1 ? tx('sterne.stand.erstes', 'Das erste Sternbild leuchtet.') : tx('sterne.stand.alle', 'Alle {n} Sternbilder bis heute leuchten.', { n: frei }))
+      : tx('sterne.stand.teil', { one: '{n} von {gesamt} Sternbildern leuchtet.', other: '{n} von {gesamt} Sternbildern leuchten.' }, { n: offen, gesamt: frei });
     el.stand.appendChild(sp);
     if (vp.length) {
       var lbl = document.createElement('span');
-      lbl.textContent = 'Noch nicht verbunden:';
+      lbl.textContent = tx('sterne.stand.verpasst', 'Noch nicht verbunden:');
       el.stand.appendChild(lbl);
       vp.slice(-4).reverse().forEach(function (t) {
         var b = document.createElement('button');
         b.type = 'button'; b.className = 'mini-knopf'; b.dataset.tag = t;
-        b.setAttribute('aria-label', 'Sternbild ' + t + ' nachholen');
+        b.setAttribute('aria-label', tx('sterne.stand.nachholen', 'Sternbild {n} nachholen', { n: t }));
         b.innerHTML = '<svg aria-hidden="true"><use href="#i-stern"/></svg><span>' + t + '</span>';
         el.stand.appendChild(b);
       });
-      if (vp.length > 4) { var mehr = document.createElement('span'); mehr.textContent = 'und ' + (vp.length - 4) + ' weitere'; el.stand.appendChild(mehr); }
+      if (vp.length > 4) { var mehr = document.createElement('span'); mehr.textContent = tx('sterne.stand.weitere', 'und {n} weitere', { n: vp.length - 4 }); el.stand.appendChild(mehr); }
     }
   }
 
@@ -923,7 +926,7 @@ body.november .fenster-licht{opacity:.55}
     var b = knoepfe[t], fig = b.querySelector('.sb-figur');
     fig.classList.remove('wackelt'); void fig.offsetWidth; fig.classList.add('wackelt');
     schnuppe(b);
-    var unter = K.heute() === 0 ? 'Sternbild ' + t + ' leuchtet am ' + K.datumText(t) + '.' : 'Sternbild ' + t + ' leuchtet erst am ' + K.datumText(t) + '.';
+    var unter = K.heute() === 0 ? tx('sterne.blase.november', 'Sternbild {n} leuchtet am {datum}.', { n: t, datum: K.datumText(t) }) : tx('sterne.blase.erst', 'Sternbild {n} leuchtet erst am {datum}.', { n: t, datum: K.datumText(t) });
     zeigeBlase(b, K.sperrText(t), unter);
     sage(K.sperrText(t) + ' ' + unter);
   }
@@ -1084,7 +1087,7 @@ body.november .fenster-licht{opacity:.55}
   el.fTon.addEventListener('click', function () {
     TON.an = !TON.an; vorliebe('ton', TON.an ? '1' : '0'); tonAnzeigen();
     if (TON.an) glocke(tonhoehe(4), 0, .4, 1);
-    sage(TON.an ? 'Glockentöne an.' : 'Glockentöne aus.');
+    sage(TON.an ? tx('sterne.ton.an', 'Glockentöne an.') : tx('sterne.ton.aus', 'Glockentöne aus.'));
   });
   tonAnzeigen();
 
@@ -1094,7 +1097,7 @@ body.november .fenster-licht{opacity:.55}
   el.fProfi.addEventListener('click', function () {
     PROFI = !PROFI; vorliebe('profi', PROFI ? '1' : '0'); profiAnzeigen();
     if (V && !V.fertig) { V.hilfe = false; hinweisSetzen(); ringSetzen(); tippPlanen(); if (!raf) zeichne(jetzt()); }
-    sage(PROFI ? 'Profi-Modus an: ohne Ring, bei Zahlen ohne Nummern ab Stern 3.' : 'Profi-Modus aus.');
+    sage(PROFI ? tx('sterne.profi.an', 'Profi-Modus an: ohne Ring, bei Zahlen ohne Nummern ab Stern 3.') : tx('sterne.profi.aus', 'Profi-Modus aus.'));
   });
   profiAnzeigen();
 
@@ -1194,20 +1197,20 @@ body.november .fenster-licht{opacity:.55}
   function hinweisSetzen() {
     if (!V) return;
     var f = V.f, n = f.folge.length, p = V.p, haupt, klein, profi = PROFI && f.ziffern && !V.hilfe;
-    if (V.fertig) { haupt = FORMEN[V.tag] ? FORMEN[V.tag].fertig : 'Geschafft! Das Sternbild leuchtet.'; klein = 'Gleich erscheint das Foto am Himmel.'; }
+    if (V.fertig) { haupt = FORMEN[V.tag] ? FORMEN[V.tag].fertig : tx('sterne.hinweis.fertig', 'Geschafft! Das Sternbild leuchtet.'); klein = tx('sterne.hinweis.gleichFoto', 'Gleich erscheint das Foto am Himmel.'); }
     else if (p === 0) {
-      if (profi) haupt = (GROB ? 'Profi: Leg den Finger auf Stern 1' : 'Profi: Fang bei Stern 1 an') + ' und schreib die ' + V.tag + ' mit den Sternen.';
+      if (profi) haupt = GROB ? tx('sterne.hinweis.profiFinger', 'Profi: Leg den Finger auf Stern 1 und schreib die {n} mit den Sternen.', { n: V.tag }) : tx('sterne.hinweis.profiMaus', 'Profi: Fang bei Stern 1 an und schreib die {n} mit den Sternen.', { n: V.tag });
       // Wer mit der Tastatur unterwegs ist, erfährt auch sichtbar, dass die Leertaste Stern für Stern verbindet
-      else if (perTaste) haupt = 'Drück die Leertaste oder zieh mit ' + (GROB ? 'dem Finger' : 'der Maus') + ' von Stern zu Stern.';
-      else haupt = GROB ? 'Leg den Finger auf Stern 1 und zieh von Stern zu Stern.' : 'Zieh mit der Maus von Stern 1 aus von Stern zu Stern.';
-      klein = f.anzahl + ' Sterne warten' + (PROFI ? ' · Profi-Modus' : '') + (profi && perTaste ? ' · Leertaste verbindet' : '');
+      else if (perTaste) haupt = GROB ? tx('sterne.hinweis.tasteFinger', 'Drück die Leertaste oder zieh mit dem Finger von Stern zu Stern.') : tx('sterne.hinweis.tasteMaus', 'Drück die Leertaste oder zieh mit der Maus von Stern zu Stern.');
+      else haupt = GROB ? tx('sterne.hinweis.startFinger', 'Leg den Finger auf Stern 1 und zieh von Stern zu Stern.') : tx('sterne.hinweis.startMaus', 'Zieh mit der Maus von Stern 1 aus von Stern zu Stern.');
+      klein = tx('sterne.hinweis.warten', '{n} Sterne warten', { n: f.anzahl }) + (PROFI ? ' · ' + tx('sterne.hinweis.profiModus', 'Profi-Modus') : '') + (profi && perTaste ? ' · ' + tx('sterne.hinweis.leertaste', 'Leertaste verbindet') : '');
     } else {
       var i = f.folge[p], nr = f.sterne[i].nr;
-      if (V.verbunden[i]) haupt = profi && nr > 2 ? 'Und jetzt den Kreis schließen!' : 'Und zurück zu Stern ' + nr + '!';
-      else if (f.sprung[p]) haupt = profi ? 'Jetzt rüber zur zweiten Ziffer.' : 'Jetzt rüber zur zweiten Ziffer: Stern ' + nr + '.';
-      else haupt = profi && nr > 2 ? 'Weiter so – welcher Stern kommt jetzt?' : 'Weiter zu Stern ' + nr + '.';
+      if (V.verbunden[i]) haupt = profi && nr > 2 ? tx('sterne.hinweis.kreis', 'Und jetzt den Kreis schließen!') : tx('sterne.hinweis.zurueck', 'Und zurück zu Stern {n}!', { n: nr });
+      else if (f.sprung[p]) haupt = profi ? tx('sterne.hinweis.ziffer', 'Jetzt rüber zur zweiten Ziffer.') : tx('sterne.hinweis.zifferStern', 'Jetzt rüber zur zweiten Ziffer: Stern {n}.', { n: nr });
+      else haupt = profi && nr > 2 ? tx('sterne.hinweis.welcher', 'Weiter so – welcher Stern kommt jetzt?') : tx('sterne.hinweis.weiter', 'Weiter zu Stern {n}.', { n: nr });
       var rest = n - p;
-      klein = rest === 1 ? 'noch eine Linie' : 'noch ' + rest + ' Linien';
+      klein = tx('sterne.hinweis.linien', { one: 'noch eine Linie', other: 'noch {n} Linien' }, { n: rest });
     }
     el.fHinweis.innerHTML = '';
     el.fHinweis.appendChild(document.createTextNode(haupt));
@@ -1283,7 +1286,7 @@ body.november .fenster-licht{opacity:.55}
         if (Math.hypot(s.x - b.x, s.y - b.y) < Math.min(fangR(), 44) * .8 && jetzt() - V.falschUhr > 1400) {
           V.falschUhr = jetzt();
           hilfeZeigen();
-          el.fHinweis.firstChild.textContent = 'Erst Stern ' + ziel + ' – der leuchtende Ring zeigt ihn.';
+          el.fHinweis.firstChild.textContent = tx('sterne.hinweis.erst', 'Erst Stern {n} – der leuchtende Ring zeigt ihn.', { n: ziel });
           break;
         }
       }
@@ -1300,7 +1303,7 @@ body.november .fenster-licht{opacity:.55}
     hinweisSetzen();
     el.fAuto.hidden = true; el.fProfi.hidden = true; el.fZumFoto.hidden = false;
     schlussAkkord();
-    sage((FORMEN[V.tag] ? FORMEN[V.tag].fertig : 'Geschafft! Sternbild ' + V.tag + ' leuchtet.') + ' Gleich kommt das Foto.');
+    sage((FORMEN[V.tag] ? FORMEN[V.tag].fertig : tx('sterne.sage.fertig', 'Geschafft! Sternbild {n} leuchtet.', { n: V.tag })) + ' ' + tx('sterne.sage.gleichFoto', 'Gleich kommt das Foto.'));
     if (!V.bildP) bildVorladen();
     anfordern();
   }
@@ -1388,7 +1391,7 @@ body.november .fenster-licht{opacity:.55}
     var sm = el.fHinweis.querySelector('small');
     if (!sm) return;
     sm.innerHTML = '<span class="lade-sterne klein" aria-hidden="true"><i></i><i></i><i></i></span>';
-    sm.appendChild(document.createTextNode('Das Foto wird geladen …'));
+    sm.appendChild(document.createTextNode(tx('sterne.foto.laden', 'Das Foto wird geladen …')));
   }
 
   function enthalten(B, w, h) {
@@ -1680,7 +1683,7 @@ body.november .fenster-licht{opacity:.55}
     if (m === 'verbinden') {
       el.fBuehne.tabIndex = 0;
       el.fBuehne.setAttribute('role', 'application');
-      el.fBuehne.setAttribute('aria-label', sbName(D.tag) + ' zum Verbinden. Leertaste oder Pfeil nach rechts verbindet den nächsten Stern.');
+      el.fBuehne.setAttribute('aria-label', tx('sterne.fenster.buehne', '{name} zum Verbinden. Leertaste oder Pfeil nach rechts verbindet den nächsten Stern.', { name: sbName(D.tag) }));
       el.fKopfText.innerHTML = '';
       var b = document.createElement('b'); b.textContent = sbName(D.tag);
       el.fKopfText.appendChild(b); el.fKopfText.appendChild(document.createTextNode(datumLang(D.tag)));
@@ -1861,12 +1864,12 @@ body.november .fenster-licht{opacity:.55}
     var mein = ++D.token;
     function setze() {
       var ti = titelVon(t);
-      el.fTitel.textContent = ti || ('Tag ' + t);
-      el.fDatum.textContent = ti ? 'Tag ' + t + ', ' + datumLang(t) : datumLang(t);
+      el.fTitel.textContent = ti || tx('sterne.fenster.tag', 'Tag {n}', { n: t });
+      el.fDatum.textContent = ti ? tx('sterne.fenster.tagDatum', 'Tag {n}, {datum}', { n: t, datum: datumLang(t) }) : datumLang(t);
       el.fKopfText.innerHTML = '';
-      var bb = document.createElement('b'); bb.textContent = 'Foto ' + (D.i + 1) + ' von ' + D.liste.length;
+      var bb = document.createElement('b'); bb.textContent = tx('sterne.fenster.zaehler', 'Foto {n} von {gesamt}', { n: D.i + 1, gesamt: D.liste.length });
       el.fKopfText.appendChild(bb);
-      el.fKopfText.appendChild(document.createTextNode(D.liste.length === 1 ? 'Ein Sternbild leuchtet' : D.liste.length + ' Sternbilder leuchten'));
+      el.fKopfText.appendChild(document.createTextNode(tx('sterne.fenster.leuchten', { one: 'Ein Sternbild leuchtet', other: '{n} Sternbilder leuchten' }, { n: D.liste.length })));
       el.fZurueck.disabled = D.i <= 0; el.fWeiter.disabled = D.i >= D.liste.length - 1;
       // Das vorige Foto sofort (ohne Ausblenden) verstecken – sonst gleitet es beim Blättern halb durchsichtig unter
       // dem neuen Titel wieder herein. Bis das neue Foto da ist, zeigen sich nur die weiche Vorschau und die Ladeanzeige.
@@ -1882,8 +1885,8 @@ body.november .fenster-licht{opacity:.55}
           if (mein !== D.token) return;
           clearTimeout(ladeUhr); el.fLaden.hidden = true;
           bildSetzen(im);
-          im.alt = typeof F.hatBild === 'function' && !F.hatBild(t) ? 'Das Foto von Tag ' + t + ' folgt noch'
-            : 'Fotocollage von Tag ' + t + (ti ? ': ' + ti : '');
+          im.alt = typeof F.hatBild === 'function' && !F.hatBild(t) ? tx('sterne.fenster.folgt', 'Das Foto von Tag {n} folgt noch', { n: t })
+            : ti ? tx('sterne.fenster.altTitel', 'Fotocollage von Tag {n}: {titel}', { n: t, titel: ti }) : tx('sterne.fenster.alt', 'Fotocollage von Tag {n}', { n: t });
           if (direkt) { im.classList.add('sofort', 'da'); requestAnimationFrame(function () { requestAnimationFrame(function () { im.classList.remove('sofort'); }); }); }
           else { im.classList.remove('sofort'); void im.offsetWidth; im.classList.add('da'); }
           el.fVorbild.classList.remove('da');

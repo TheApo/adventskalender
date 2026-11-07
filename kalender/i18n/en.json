@@ -1,0 +1,1606 @@
+{
+  "allgemein": {
+    "ansicht": {
+      "baum": "Spinning Tree",
+      "fotoleine": "Photo Line",
+      "geschenk": "Unwrap Presents",
+      "girlande": "Bauble Garlands",
+      "kranz": "Advent Wreath",
+      "nuss": "Nutcracker",
+      "rubbellos": "Christmas Lottery",
+      "schneekugel": "Snow Globe",
+      "schneemann": "Build Snow Figures",
+      "sterne": "Constellations",
+      "stories": "Advent Stories",
+      "tueren": "Door Wall"
+    },
+    "knopf": {
+      "kurz": "View & settings",
+      "lang": "Change view and settings",
+      "menue": "Menu",
+      "testdatum": "Test date: {datum}",
+      "testdatumAktiv": "Test date active: {datum}"
+    },
+    "menue": {
+      "ansichtWaehlen": "Choose a view",
+      "bleibtErhalten": "Whatever you have opened stays open when you switch.",
+      "schliessen": "Close menu",
+      "sprache": "Language",
+      "startseite": "To the start page",
+      "credit": "Your Advent Calendar – made by Dirk Aporius"
+    },
+    "sperre": {
+      "ersterDezember": "It all starts on December 1!",
+      "morgen": "Tomorrow is the day!",
+      "november": "It’s still November – be patient!",
+      "schlafen": {
+        "one": "Just {n} more sleep!",
+        "other": "{n} more sleeps!"
+      }
+    },
+    "status": {
+      "alleOffen": "All 24 days are open.",
+      "allesZu": "All days are closed again.",
+      "bisGestern": {
+        "one": "Day 1 is open, today is still closed.",
+        "other": "Days 1 to {n} are open, today is still closed."
+      },
+      "ersterTag": "Today is the first day – there is nothing before it.",
+      "vorDezember": "Before December there is nothing to open yet."
+    },
+    "tag": {
+      "ab25": "from December 25",
+      "ab25Lang": "from December 25 (all open)",
+      "vorDezember": "before December",
+      "vorDezemberLang": "before December (all closed)"
+    },
+    "test": {
+      "allesNochZu": "everything still closed",
+      "allesOffen": "everything open",
+      "allesZu": "Close all again",
+      "anzeigen": "Show this date",
+      "bisGestern": "Open up to yesterday",
+      "echt": "Real date ({datum})",
+      "endet": "Test mode ends automatically on {datum}.",
+      "frueher": "One day earlier",
+      "getrennt": "A test date is stored separately from the real progress.",
+      "marke": "Test date active",
+      "schluessel": "Test mode active via test key.",
+      "spaeter": "One day later",
+      "titel": "Test mode",
+      "waehlen": "Choose test date",
+      "zeigtEcht": "Showing the real date: {datum}.",
+      "zeigtTest": "Showing the test date {datum}.",
+      "hinweisStatisch": "Set a test date – only in this browser, separate from the real progress. “?test=aus” ends test mode."
+    },
+    "fotoFolgt": "Photo coming soon",
+    "demo": {
+      "testTitel": "Try a date",
+      "testHinweis": "Pick any date – and see how the calendar fills up until Christmas."
+    }
+  },
+  "tueren": {
+    "ansage": {
+      "gesperrt": "Day {n}: {text}",
+      "offen": "Door {n} is open.",
+      "offenTitel": "Door {n} is open: {titel}"
+    },
+    "ansicht": {
+      "alt": "Photo collage from December {n}",
+      "altTitel": "Photo collage from December {n}: {titel}",
+      "schliessen": "Close photo view",
+      "titel": "Photo view",
+      "weiter": "Next picture",
+      "wischen": "Swipe to browse",
+      "zaehler": "Picture {n} of {gesamt}",
+      "zurueck": "Previous picture"
+    },
+    "fahne": {
+      "heute": "Today",
+      "nachholen": "Catch up",
+      "nochZu": "Still closed"
+    },
+    "fusszeile": "A door every day – a piece of our year every day.",
+    "geduld": "Just a little more patience!",
+    "leiste": {
+      "alleBilder1": "View all 24 pictures",
+      "alleBilder2": "View all pictures",
+      "ansehen": "View",
+      "bildAnsehen": "View picture",
+      "heute": "Today: door {n}",
+      "jetztOeffnen": "Open now",
+      "letztes1": "Open the last door",
+      "letztes2": "Open last door",
+      "nachholen": "{aktion} · {n} to catch up",
+      "november": "It’s still November",
+      "oeffnen": "Open",
+      "rest1": "Open all {n} remaining doors",
+      "rest2": "Open all {n} doors",
+      "rest3": "Open {n} doors",
+      "start1": "It all starts on December 1",
+      "start2": "Starts on December 1",
+      "start3": "From December 1",
+      "weihnachten": "Merry Christmas!",
+      "zumNachholen": "{aktion} · {n} to catch up"
+    },
+    "status": {
+      "heute": "today’s door, still closed",
+      "nachholen": "still closed, can be caught up",
+      "offen": "open",
+      "zu": "still locked"
+    },
+    "tuer": "Day {n}, {datum} – {status}",
+    "unterzeile": {
+      "heiligabend": "Today is Christmas Eve!",
+      "heute": "Today is {datum}",
+      "heuteAdvent": "Today is {datum} – Advent Sunday {n}",
+      "november": "It’s still November – starting soon!",
+      "weihnachtenAlle": "Merry Christmas! All doors are open.",
+      "weihnachtenRest": "Merry Christmas! Now every door may be opened."
+    }
+  },
+  "girlande": {
+    "ansicht": {
+      "bild": "Picture of bauble {n} – {datum}",
+      "kugel": "Bauble {n}",
+      "schliessen": "Close photo view",
+      "weiter": "Next picture",
+      "zaehler": "{n} of {gesamt} opened",
+      "zurueck": "Previous picture"
+    },
+    "baum": "24 Christmas baubles, one for each day until Christmas Eve",
+    "etikett": {
+      "advent": "Advent Sunday {n}",
+      "heiligabend": "Christmas Eve",
+      "heute": "today",
+      "nachholen": "catch up"
+    },
+    "hinweis": {
+      "advent": "Green baubles tell you how many more sleeps to go",
+      "heiligabend": "Merry Christmas, dear ones",
+      "november": "Opens on December 1",
+      "weihnachten": "Merry Christmas and a happy New Year"
+    },
+    "jahr": "View the whole year",
+    "kugel": "Day {n}, {datum} – {status}",
+    "pille": {
+      "heute": "Today: bauble {n}",
+      "nachholen": "Catch up: bauble {n}"
+    },
+    "sprung": "To bauble {n}",
+    "sprungLang": "Jump to golden bauble {n}",
+    "status": {
+      "gesperrt": "locked. {sperre}",
+      "heute": "today, not opened yet",
+      "offen": "open, view picture",
+      "verpasst": "missed, catch up now"
+    },
+    "unterzeile": {
+      "jahr": "a whole year",
+      "kugeln": "24 baubles",
+      "momente": "24 moments"
+    },
+    "zahlwoerter": "zero,one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve",
+    "zeile": {
+      "alleOffen": "Every bauble is full of memories – take another look at them.",
+      "festWarten": {
+        "one": "One golden bauble is still waiting to be opened.",
+        "other": "There are still {wort} golden baubles waiting to be opened."
+      },
+      "heiligabend": "Christmas Eve! The last red bauble is today’s.",
+      "heuteDran": "The red bauble is today’s – tap it.",
+      "heuteOffen": "Today’s bauble is open. The next one comes tomorrow.",
+      "letzteOffen": "The last bauble is open – merry Christmas!",
+      "nachholen": {
+        "one": "One golden bauble is waiting to be caught up.",
+        "other": "{wortGross} golden baubles are waiting to be caught up."
+      },
+      "november": "It’s still November. From <strong>December 1</strong>, a bauble fills with a picture from our year every day.",
+      "weihnachten": "Merry Christmas!"
+    }
+  },
+  "kranz": {
+    "advent": "Advent Sunday {n}",
+    "aktion": {
+      "anzuenden": "Light the candle",
+      "foto": "View photo",
+      "zuHeute": "To today’s candle"
+    },
+    "ansicht": {
+      "alt": "Photo from December {n}",
+      "altTitel": "Photo from December {n}: {titel}",
+      "keinWeiter": "No next photo",
+      "keinZurueck": "No previous photo",
+      "laden": "Fetching photo …",
+      "schliessen": "Close photo view",
+      "weiter": "Next photo, day {n}",
+      "zurueck": "Previous photo, day {n}"
+    },
+    "buehne": "Advent wreath with 24 candles. Swipe sideways to turn it.",
+    "heiligabend": "Christmas Eve",
+    "heute": "Today",
+    "hinweis": {
+      "wischen": "Swipe sideways to turn",
+      "ziehen": "Drag the wreath to turn it"
+    },
+    "kerze": {
+      "brennt": "open, the candle is burning",
+      "heute": "today, candle not lit yet",
+      "leer": "still locked",
+      "mitte": "big candle in the middle",
+      "tag": "Day {n}, {datum}",
+      "verpasst": "missed, can be caught up"
+    },
+    "kerzen": "Candles from December 1 to 24",
+    "nachholenTag": "Catch up · day {n}",
+    "naechste": "Next candle",
+    "nochLeer": "still empty",
+    "panel": "Selected candle",
+    "status": {
+      "alleBrennen": "Merry Christmas! All candles are burning.",
+      "anzuenden": "Light the candles.",
+      "brennen": {
+        "one": "1 candle is burning",
+        "other": "{n} of 24 candles are burning"
+      },
+      "festBrennen": {
+        "one": "1 candle is burning.",
+        "other": "{n} of 24 candles are burning."
+      },
+      "keine": "no candle is burning yet",
+      "november": "It’s still November. The wreath is waiting for its candles.",
+      "weihnachten": "Merry Christmas!"
+    },
+    "tag": "Day {n}",
+    "text": {
+      "anzuenden": "The candle is being lit …",
+      "brennt": "The candle is burning – take a look at the photo!",
+      "gesperrt": "{sperre} Then a new candle will appear here.",
+      "heute": "A new candle has been added. Light today’s candle!",
+      "heute24": "The big candle in the middle is here. Light today’s candle!",
+      "november": "From December 1 a new candle is added every day, until all 24 are burning on Christmas Eve.",
+      "verpasst": "This candle is still waiting to be lit."
+    },
+    "vorherige": "Previous candle",
+    "wichern": "Just like Wichern’s first Advent wreath (Hamburg, 1839): small red candles for weekdays, big white ones for Sundays.",
+    "zuHeute": "Go to today"
+  },
+  "rubbellos": {
+    "alt": {
+      "datum": "Picture for ticket {n}, {datum}",
+      "titel": "Picture for ticket {n}: {titel}"
+    },
+    "anlass": {
+      "1": "Advent begins",
+      "4": "St. Barbara’s Day",
+      "6": "St. Nicholas Day",
+      "13": "3rd Sunday of Advent",
+      "20": "4th Sunday of Advent",
+      "21": "Winter solstice",
+      "24": "Christmas Eve",
+      "6lang": "St. Nicholas Day and 2nd Sunday of Advent"
+    },
+    "aria": {
+      "basis": "Ticket {n}, {datum}",
+      "gesperrt": "locked. {sperre}",
+      "heute": "today, not scratched yet",
+      "offen": "open",
+      "verpasst": "not scratched yet"
+    },
+    "aufdecken": "Reveal",
+    "aufgedeckt": "Ticket {n} is revealed",
+    "bild": {
+      "laden": "Loading picture …",
+      "schliessen": "Close photo view",
+      "weiter": "Next picture",
+      "zaehler": "Picture {n} of {gesamt}",
+      "zurueck": "Previous picture"
+    },
+    "bildAnsehen": "View picture",
+    "dezember": "December",
+    "enthuellt": "Revealed",
+    "fokus": {
+      "titel": "Ticket from {datum}",
+      "zu": "Put the ticket away and close"
+    },
+    "folie": "Scratch here",
+    "gerubbelt": "Scratched",
+    "held": {
+      "alleBilder": "View all pictures",
+      "alleGerubbelt": "You have scratched all 24 tickets. What a year!",
+      "bald": "Starting soon",
+      "davon": "You have already scratched {n} of them.",
+      "festBand": "Merry Christmas",
+      "festStempel": "Merry<br>Christmas!",
+      "festTitel": "Merry Christmas!",
+      "frisch": "Freshly drawn",
+      "gold": "Scratch off the gold foil. Today’s picture is waiting underneath.",
+      "grosseZiehung": "Today is the grand draw",
+      "hauptziehung": "Grand draw",
+      "heute": "Today’s ticket",
+      "jetztRubbeln": "Scratch now",
+      "letztes": "That was the last ticket. Merry Christmas!",
+      "losEins": "Just start with ticket 1.",
+      "losbude": "The lottery booth opens on December 1",
+      "morgen": "The next ticket is drawn tomorrow.",
+      "naechstes": "Scratch the next ticket",
+      "nochNicht": "Not scratched yet:",
+      "schonFrei": "Already scratched today",
+      "silber": "Scratch off the silver foil. Today’s picture is waiting underneath.",
+      "vorfreude": "Then a new ticket is drawn every morning. Until then: happy anticipation.",
+      "weitere": "and {n} more – look for the yellow label in the grid.",
+      "ziehungVorbei": "The draw is over, all 24 tickets are yours."
+    },
+    "hinweis": {
+      "fast": "Almost! Just the edges left.",
+      "finger": "Scratch with your finger",
+      "maus": "Scratch with the mouse button held down"
+    },
+    "kurzDatum": "{wt}, Dec {n}",
+    "los": "Ticket {n}",
+    "marke": "Christmas Lottery",
+    "nochNichtDran": "Not yet!",
+    "stand": {
+      "november": "From December 1, a ticket is drawn every day.",
+      "zahl": "{n} of {gezogen} drawn tickets scratched"
+    },
+    "stempel": {
+      "1a": "Advent",
+      "1b": "begins",
+      "21a": "Winter",
+      "21b": "solstice",
+      "6zusatz": "and 2nd Sunday of Advent",
+      "enthuellt": "Revealed!"
+    },
+    "unterzeile": "The family Christmas lottery: a ticket to scratch every day.",
+    "von24": "of 24",
+    "vorlesen": {
+      "gesperrt": "Ticket {n}: {text}",
+      "start": "Ticket {n}. {hinweis} or press Reveal."
+    },
+    "lostopf": "The ticket drum",
+    "feld": {
+      "gesperrt": "Not drawn<br>yet",
+      "verpasst": "Not scratched yet",
+      "heute": "Today’s turn"
+    }
+  },
+  "fotoleine": {
+    "ansicht": {
+      "alt": "Collage from December {n}",
+      "altTitel": "Collage from December {n}: {titel}",
+      "schliessen": "Close",
+      "weiter": "Next photo",
+      "wischen": "swipe to browse",
+      "zaehler": "Photo {n} of {gesamt}",
+      "zurueck": "Previous photo"
+    },
+    "buehne": {
+      "collage": "View collage",
+      "foto": "Photo from December {n}. Tap to see the whole collage.",
+      "fotoTitel": "Photo from December {n}: {titel}. Tap to see the whole collage.",
+      "haengen": "Hang it on the line",
+      "titel": "Envelope {n}, {datum}",
+      "zu": "Hang the photo on the line and close"
+    },
+    "entwickelt": "The photo has finished developing.",
+    "hinweis": {
+      "heute": "Today: envelope",
+      "zeigen": "Today: show envelope {n}"
+    },
+    "hinweisText": {
+      "fertig": "Fully developed! Tap the photo to see the whole collage.",
+      "finger": "The photo is still developing. Hold it and shake it to make it go faster.",
+      "laedt": "Just a moment – the photo is almost here.",
+      "maus": "The photo is still developing. Hold it with the mouse and shake it to make it go faster.",
+      "weiter": "That’s it, keep shaking!"
+    },
+    "kommtAm": "Envelope {n} arrives on {datum}.",
+    "kopf": {
+      "alle": "All 24 photos are hanging on the line. Tap one and browse through the year.",
+      "fotos": {
+        "one": "One photo is already hanging on the line.",
+        "other": "{n} photos are already hanging on the line."
+      },
+      "heute": "Today is {datum}.",
+      "keinFoto": "No photo is hanging on the line yet.",
+      "lichterkette": "Then the fairy lights switch on too.",
+      "nachholen": "Envelopes with a note can be caught up.",
+      "november": "It’s still November. From December 1, a new envelope hangs on the line every morning.",
+      "offen": "Today’s envelope is open – more post tomorrow.",
+      "siegel": "The envelope with the red seal is today’s.",
+      "warten": {
+        "one": "One envelope is still waiting – go ahead and open it now.",
+        "other": "{n} envelopes are still waiting – go ahead and open them now."
+      },
+      "weihnachten": "Merry Christmas!"
+    },
+    "stempel": "Delivery on",
+    "status": {
+      "heute": "today, open the envelope",
+      "offen": "open, view photo",
+      "verpasst": "not opened yet, open the envelope",
+      "zu": "still sealed. {sperre}"
+    },
+    "tag": "Day {n}, {datum}",
+    "tagDezember": "December {n}",
+    "umschlag": "Envelope {n}",
+    "wand": "The photo line with 24 envelopes",
+    "zettel": "not opened<br>yet"
+  },
+  "stories": {
+    "anleitung": {
+      "ab": "From December, every day you have watched collects here.",
+      "kreis": "Tap a circle",
+      "kreisText": "Every day a new circle lights up. Tap it and the story starts.",
+      "titel": "How it works",
+      "wischen": "Swipe",
+      "wischenText": "Sideways for the next or previous day, down to go back to the overview.",
+      "zuschauen": "Watch or pause",
+      "zuschauenText": "The photos play on by themselves. Press and hold to pause."
+    },
+    "ansage": {
+      "titel": "Day {n}, {datum}: {titel}"
+    },
+    "beispiel": {
+      "1": "Fresh snow overnight|The first footprints in the garden|Hats on, let’s go out|Who builds the biggest snowman?",
+      "2": "Made it to the top|And off we go!|Slid almost to the fence|One more run, please|Cocoa to warm up",
+      "3": "Who’s behind the mask?|The parade sets off|Confetti everywhere",
+      "4": "The dice are ready|Who wins this time?|Lost by a whisker|Rematch on Sunday",
+      "5": "Outside again at last|The first blossoms|Jackets off, sun on|Picnic on the blanket|Barefoot in the grass",
+      "6": "Where did the bunny hide them?|One in the flower bed!|The basket is filling up",
+      "7": "Helmets on, saddles up|A short break on the path|The lake is sparkling ahead|Feet in the water",
+      "8": "Counting candles|One big puff|Make a wish!|The first slice|Crumbs on the plate",
+      "9": "A day by the water|Skimming stones|Stayed until the evening",
+      "10": "Holidays at last!|The first wave|Collecting shells|Ice cream with a sea view",
+      "11": "The plan is set|Dig, dig, dig|The moat holds|Almost done|Our castle!",
+      "12": "The sun goes for a swim|Everyone looks out to sea|Five more minutes",
+      "13": "The school cone is almost as big as you|In front of the school gate|The first seat in the classroom|Made it: the first day!",
+      "14": "Off into the woods|Who finds the thickest tree?|Only look at the mushrooms|A rest on the tree trunk|Back with full pockets",
+      "15": "The wind is perfect|Higher, higher!|It’s flying!",
+      "16": "Which pumpkin will it be?|First, hollow it out|Spooky or funny?|Ready to glow",
+      "17": "A giant pile of leaves|Watch out, attack!|Leaves in the hood|Everyone lying in the leaves|Again from the start",
+      "18": "The lanterns are finished|Lantern, lantern …|Through the dark street",
+      "19": "Rolling out the dough|Stars, hearts, moons|Just one little nibble|The first tray is done",
+      "20": "Between the stalls|It smells of roasted almonds|One ride on the carousel|Warm hands around the mug|Lights above the square",
+      "21": "Skates on|First wobbly lap|Hand in hand across the ice",
+      "22": "A tunnel of light|Everything sparkles|Cold noses, warm hearts|The most beautiful tree in the park",
+      "23": "The tree is up|First the fairy lights|Bauble by bauble|Who gets to put the star on top?|Lights on!",
+      "24": "Christmas Eve at last|All together under the tree|Thank you for this wonderful year"
+    },
+    "dez": "Dec",
+    "dezember": "December",
+    "foto": {
+      "text": "Photo {n} of {gesamt}: {text}",
+      "zahl": "Photo {n} of {gesamt}"
+    },
+    "frueher": "Show earlier days",
+    "grenze": {
+      "erster": "This is the first day.",
+      "letzter": "That was the last day."
+    },
+    "herz": "Send a heart",
+    "herzGeschickt": "Heart sent for day {n}",
+    "herzNochmal": "Send another heart",
+    "heute": "Today",
+    "heuteKarte": {
+      "ab1": "From December 1, a new story with photos from our year is waiting here every morning.",
+      "alleOffen": "All 24 days are open. Watch the whole Advent again in one go.",
+      "bald": "Starting soon",
+      "deine": "Your story for today",
+      "fotos": "{n} photos",
+      "fotosGesehen": "{n} photos, already watched",
+      "ganzerAdvent": "Watch the whole Advent",
+      "heuteIst": "Today is {datum}",
+      "letzte": "The last story before Christmas",
+      "neu": "A new story is waiting",
+      "november": "It’s still November",
+      "schlafen": {
+        "one": "Just {n} more sleep!",
+        "other": "{n} more sleeps!"
+      }
+    },
+    "kerzen": {
+      "0": "No Advent candle is burning yet",
+      "1": "One Advent candle is burning",
+      "2": "Two Advent candles are burning",
+      "3": "Three Advent candles are burning",
+      "4": "All four Advent candles are burning",
+      "titel": "Advent candles"
+    },
+    "kommtAm": "Day {n} comes on {datum}.",
+    "kreis": {
+      "gesperrt": "locked. {sperre}",
+      "heuteNeu": "today, new",
+      "heuteOffen": "today, open",
+      "nichtAngesehen": "not watched yet",
+      "offen": "open",
+      "tag": "Day {n}, {datum}",
+      "verpasst": "missed, catch up now"
+    },
+    "laeuft": "Playing again",
+    "leiste": "All 24 days as stories. Use the arrow keys to go from day to day.",
+    "marke": {
+      "heute": "Today",
+      "nachholen": "Catch up"
+    },
+    "nachholen": {
+      "gestern": "Missed yesterday? No problem.",
+      "titel": "Not watched yet",
+      "warten": {
+        "one": "One day is still waiting for you.",
+        "other": "{n} days are still waiting for you."
+      }
+    },
+    "naechstes": "Next photo",
+    "pause": "Pause",
+    "pausiert": "Paused",
+    "pfeil": {
+      "beenden": "End story",
+      "zurueckLetztes": "Back to the last photo"
+    },
+    "player": {
+      "titel": "Story day {n}, {datum}",
+      "titelText": "Story day {n}, {datum}: {titel}"
+    },
+    "rueckblick": {
+      "alle": "All 24 days watched.",
+      "landet": "Every story you watch ends up here.",
+      "leer": "Nothing watched yet. Start with day {n}!",
+      "titel": "Look back",
+      "zahl": "{n} of 24 days watched"
+    },
+    "schliessen": "Close story",
+    "spaeter": "Show later days",
+    "tag": "Day {n}",
+    "tagAnsehen": "Watch day {n}",
+    "tagNochmal": "Watch day {n} again",
+    "voriges": "Previous photo",
+    "weihnachten": "Merry Christmas!",
+    "weiterAbspielen": "Play on",
+    "zw": {
+      "danke": "Merry Christmas and thank you for watching!",
+      "ganzerAdvent": "That was the whole Advent",
+      "heuteText": "Day {n} is still a surprise. Do you want to watch it now?",
+      "heuteTitel": "And now: your day for today",
+      "letzte": "That was the last story before Christmas.",
+      "morgenText": "Tomorrow morning day {n} will be waiting for you.",
+      "morgenTitel": "See you tomorrow!",
+      "spaeter": "Later",
+      "uebersicht": "To the overview"
+    },
+    "playerName": "Story"
+  },
+  "schneekugel": {
+    "ansehen": "View photo full size",
+    "ansicht": {
+      "alt": "Photo collage for day {n}, {datum}",
+      "altTitel": "Photo collage for day {n}: {titel}",
+      "schliessen": "Close photo view",
+      "weiter": "Next day",
+      "zaehler": {
+        "one": "1 photo opened",
+        "other": "{n} photos opened"
+      },
+      "zurueck": "Previous day"
+    },
+    "dran": "Globe {n} is due on {datum}.",
+    "erstSchuetteln": "Shake it first – the photo is still snowed in.",
+    "handy": {
+      "erlauben": "Allow phone shaking",
+      "jetzt": "Now shake your phone!",
+      "kannst": "Now you can shake your phone.",
+      "weg": "Hide hint"
+    },
+    "hilfe": {
+      "advent": "Tap a globe and it goes onto the stand. White ones are snowed in, wrapped ones are still to come.",
+      "alleOffen": "All globes are open. Tap one to put it on the big stand.",
+      "festZu": "A few globes are still snowed in – tap them and shake them free. Red dot: not opened yet.",
+      "november": "All the globes are still wrapped. From December 1 you may unwrap one every day.",
+      "punkt": "Red dot: missed, catch up now."
+    },
+    "info": {
+      "alleOffen": "All 24 globes are open. Shake them as often as you like.",
+      "folgt": "The photo for this day is coming soon.",
+      "folgtDatum": "{datum} – the photo for this day is coming soon.",
+      "heute": "Today’s photo.",
+      "heuteDatum": "{datum} – today’s photo.",
+      "tag": "The photo for day {n}."
+    },
+    "kopf": {
+      "heute": "Today is {datum}.",
+      "november": "It’s still November. It all starts on December 1.",
+      "weihnachten": "Merry Christmas! All 24 globes are on the shelf."
+    },
+    "kugel": "Snow globe",
+    "kugelDatum": "Snow globe day {n}, photo from {datum}",
+    "kugelFoto": "Snow globe day {n}, photo: {titel}",
+    "kugelZu": "Snow globe day {n}, still snowed in",
+    "laedt": "Photo loading …",
+    "mini": {
+      "heute": "Today",
+      "heuteZu": "today, still snowed in",
+      "offen": "open",
+      "sockel": "on the stand",
+      "tag": "Day {n}, {datum}",
+      "verpasst": "missed, catch up now",
+      "zu": "still wrapped"
+    },
+    "nachholen": {
+      "gestern": "Missed yesterday: get globe {n}",
+      "verpasst": "Missed: get globe {n}"
+    },
+    "november": {
+      "info": "On December 1 the first globe with a photo will stand here. You can already shake it now.",
+      "kugel": "Snow globe with a snowy little house",
+      "titel": "Advent is coming soon"
+    },
+    "regal": {
+      "alle": "All",
+      "kugeln": "globes"
+    },
+    "sage": {
+      "offen": "Day {n} is open.",
+      "offenTitel": "Day {n} is open: {titel}",
+      "sockel": "Globe {n} is now on the stand."
+    },
+    "schild": "Day {n}",
+    "schildJahr": "Advent {jahr}",
+    "schuetteln": "Shake",
+    "tag": "Day {n}",
+    "titel": "The Snow Globe",
+    "zu": {
+      "handy": "Shake your phone, drag the globe hard back and forth or press “Shake”.",
+      "heute": "Day {n} is snowed in",
+      "keinProblem": "Missed it? No problem.",
+      "stufe1": "Keep shaking hard – the snow is still stuck!",
+      "stufe2": "Keep shaking – the photo is appearing.",
+      "verpasst": "Day {n} is still waiting for you",
+      "ziehen": "Drag the globe hard back and forth or up and down – or press “Shake”."
+    }
+  },
+  "baum": {
+    "ansicht": {
+      "alt": "Photo collage for day {n}",
+      "altTitel": "Photo collage for day {n}: {titel}",
+      "erstes": "Your first photo",
+      "fehler": "This photo can’t be loaded right now.",
+      "heiligabend": "Christmas Eve · Day 24",
+      "laden": "Fetching photo …",
+      "nochmal": "Try again",
+      "schliessen": "Close photo view",
+      "tag": "Day {n}",
+      "tagDatum": "Day {n} · {datum}",
+      "weiter": "Next photo",
+      "zaehler": "Photo {n} of {gesamt}",
+      "zurueck": "Previous photo"
+    },
+    "blase": {
+      "daIstSie": "There it is!",
+      "drehen": "Until then you can already spin the tree.",
+      "kugel": "Bauble {n} is due on {datum}.",
+      "stern": "You can switch on the star on {datum}.",
+      "tipp": "Tap bauble {n}."
+    },
+    "geschenk": {
+      "ausgepackt": "All unwrapped already?",
+      "erstHeiligabend": "Presents only come on Christmas Eve.",
+      "fuerWen": "Who might this be for?",
+      "hohoho": "Ho ho ho!",
+      "morgen": "Tomorrow is Christmas Eve!",
+      "nichtSchuetteln": "Don’t shake it!",
+      "psst": "Shh!",
+      "raschel": "Rustle, rustle …",
+      "raschelt": "Something’s rustling …",
+      "schlafen": "{n} more sleeps until Christmas Eve.",
+      "zerbrechlich": "There might be something fragile inside."
+    },
+    "haupt": {
+      "aufmachen": "Open bauble {n}",
+      "finden": "Find today’s",
+      "foto": "View photo {n}",
+      "fotos": "View photos",
+      "kugelFinden": "Find bauble {n}",
+      "nachholen": "Catch up on bauble {n}",
+      "nochZu": "Bauble {n} is still closed",
+      "november": "From December 1",
+      "stern": "Switch on the star"
+    },
+    "hinweis": {
+      "alleFotos": "All 24 photos are hanging on the tree – spin it and look at them again.",
+      "allesDarfAuf": "Everything can be opened!",
+      "eineVerpasst": "Bauble {h} is open. Bauble {n} is still waiting – with a red bow.",
+      "gefunden": "Found it! Tap the glowing bauble {n}.",
+      "gestern": "Bauble {h} is open. Bauble {n} from yesterday is still waiting – with a red bow.",
+      "heiligabend": "Christmas Eve! Tap the star at the top and switch it on.",
+      "mehrereVerpasst": "Bauble {h} is open. {n} more baubles with a red bow are waiting to be caught up on.",
+      "november": "It’s still November. From December 1 a bauble with a photo will hang here every day.",
+      "offen": "Bauble {h} is open. Tap a photo bauble – tomorrow the next one will hang here.",
+      "rest": {
+        "one": "One bauble with a red bow is still waiting.",
+        "other": "{n} baubles with a red bow are still waiting."
+      },
+      "schimmert": "Bauble {n} is already shimmering! Spin a little more.",
+      "stern": "Everything can be opened! Switch on the star.",
+      "sternLeuchtet": "The star is shining!",
+      "sternUndKugeln": {
+        "one": "Everything can be opened! Switch on the star – and one bauble is still waiting too.",
+        "other": "Everything can be opened! Switch on the star – and {n} baubles are still waiting too."
+      },
+      "suchenFinger": "Bauble {n} is glowing somewhere … Spin the tree with your finger until you find it.",
+      "suchenMaus": "Bauble {n} is glowing somewhere … Spin the tree with the mouse or the arrow keys until you find it.",
+      "weihnachten": "Merry Christmas! All 24 photos are hanging on the tree – spin it and look at them."
+    },
+    "knopf": {
+      "links": "Turn the tree left",
+      "rechts": "Turn the tree right"
+    },
+    "kopf": {
+      "heiligabend": "Christmas Eve, December 24",
+      "heute": "Today: {datum}",
+      "november": "It’s still November",
+      "weihnachten": "Merry Christmas!"
+    },
+    "legende": {
+      "foto": "with photo: already open",
+      "frost": "frosted: still to come",
+      "glas": "shiny: may be opened",
+      "schleife": "red bow: missed"
+    },
+    "liste": {
+      "auf": "Show all baubles as a list",
+      "hilfe": "Mixed up like on the tree. Tap one – the tree turns to it and it opens.",
+      "november": "All baubles are still frosted. From December 1 one may be opened every day.",
+      "titel": "All baubles",
+      "zu": "Close list"
+    },
+    "mini": {
+      "kugel": "Bauble, day {n}, {datum}",
+      "stern": "Star, day {n}, {datum}"
+    },
+    "pfeil": {
+      "links": "Turn left",
+      "rechts": "Turn right"
+    },
+    "platz": "Christmas tree with 23 baubles and a star. The left and right arrow keys turn the tree, Enter opens the bauble at the front, the up arrow the star.",
+    "rolle": "Spinning tree",
+    "sage": {
+      "kugel": "Bauble {n} is open.",
+      "stern": "The star is shining.",
+      "vorne": "Bauble {n} is at the front, {datum} – {zustand}."
+    },
+    "steuer": "Tree controls",
+    "ton": {
+      "an": "Bell sound is on",
+      "aus": "Bell sound is off",
+      "kurzAn": "Sound on",
+      "kurzAus": "Sound off",
+      "label": "Bell sound",
+      "titel": "Bell sound on or off"
+    },
+    "zustand": {
+      "heute": "today, still closed",
+      "offen": "opened",
+      "verpasst": "missed, catch up now",
+      "zu": "still closed"
+    }
+  },
+  "geschenk": {
+    "ansicht": {
+      "alt": "Photo collage for day {n}",
+      "altTitel": "Photo collage for day {n}: {titel}",
+      "fehler": "This photo isn’t coming through right now.",
+      "laden": "Unwrapping photo …",
+      "nochmal": "Unwrap again",
+      "schliessen": "Close photo view",
+      "tagDatum": "Day {n} – {datum}",
+      "weiter": "Next photo",
+      "wiederholen": "Try again",
+      "zaehler": "{n} of {gesamt}",
+      "zurueck": "Previous photo"
+    },
+    "blase": {
+      "ansehen": "Tap it to see the photo.",
+      "ansehenMaus": "Click it to see the photo.",
+      "auspacken": "Tap it and unwrap it.",
+      "auspackenMaus": "Click it and unwrap it.",
+      "daIstEs": "There it is!",
+      "dran": "Present {n} is due on {datum}."
+    },
+    "etikett": {
+      "heute": "Today"
+    },
+    "fokus": {
+      "auspacken": "Unwrap",
+      "fotoGross": "View photo full size",
+      "fotoKommt": "Photo coming …",
+      "schritt": {
+        "foto": "Photo",
+        "papier": "Paper",
+        "schleife": "Bow"
+      },
+      "zu": "Back to the gift table",
+      "zurueck": "To the gift table"
+    },
+    "fuss": {
+      "advent": "A present every day. You can look at unwrapped ones again any time.",
+      "weihnachten": "Merry Christmas – and thanks for unwrapping along!"
+    },
+    "gabe": "Day {n}, {datum} – {status}",
+    "hilfe": {
+      "alleOffen": "All 24 presents are unwrapped. Tap one to see its photo again.",
+      "alleOffenMaus": "All 24 presents are unwrapped. Click one to see its photo again.",
+      "alleWarten": "All 24 presents are still waiting for you – tap one and unwrap it.",
+      "alleWartenMaus": "All 24 presents are still waiting for you – click one and unwrap it.",
+      "andere": "You can tap all the others to see their photos again.",
+      "andereMaus": "You can click all the others to see their photos again.",
+      "heuteOffen": "Today’s present is unwrapped – tap it to see the photo again.",
+      "heuteOffenMaus": "Today’s present is unwrapped – click it to see the photo again.",
+      "nachholen": "You can still catch up on presents with a note.",
+      "november": "The presents are all ready – but they’re all taped shut. From December 1 you may unwrap one every day.",
+      "rest": {
+        "one": "One present with a note is still waiting for you.",
+        "other": "{n} presents with a note are still waiting for you."
+      },
+      "suchen": "Today’s present is glowing somewhere. Can you find it?"
+    },
+    "hinweis": {
+      "ausgepackt": "Unwrapped!",
+      "deckel": "The lid pops open …",
+      "fast": "<b>Almost done!</b>Just a few scraps left&nbsp;– mostly {wo}.",
+      "fastZiehen": "<b>Almost!</b>Pull a little further.",
+      "fotoAnsehen": "Tap the photo to see it full size.",
+      "fotoAnsehenMaus": "Click the photo to see it full size.",
+      "genau": "<b>Yes, just like that!</b>Keep tearing until the bar reaches the bow.",
+      "geschafft": "<b>Done!</b>The lid pops open …",
+      "gleich": "<b>It’s about to come undone!</b>",
+      "papier": "<b>The bow is off!</b>Now tear off all the paper&nbsp;– swipe back and forth across it.",
+      "papierMaus": "<b>The bow is off!</b>Now tear off all the paper&nbsp;– hold the mouse button and swipe.",
+      "schleife": "Pull the bow – hard, until it comes undone.",
+      "schleifeAb": "<b>The bow is off!</b>And now the paper …",
+      "schleifeMaus": "Pull the bow with the mouse – hard, until it comes undone.",
+      "weiterSo": "<b>Keep going!</b>You can already see the box.",
+      "wischen": "<b>Don’t just tap – swipe!</b>Drag your finger firmly across the paper.",
+      "wischenMaus": "<b>Don’t just click – swipe!</b>Hold the mouse button and drag across the paper.",
+      "woanders": "<b>It’s all off here already!</b>Try tearing somewhere else&nbsp;– mostly {wo}.",
+      "ziehen": "Keep pulling …"
+    },
+    "kopf": {
+      "ansehen": "See today’s",
+      "finden": "Find today’s",
+      "heute": "Today is {datum}.",
+      "nachholen": "Catch up: {n}",
+      "nachholenLang": "Unwrap missed present {n}",
+      "november": "It’s still November.",
+      "weihnachten": "Merry Christmas!"
+    },
+    "ort": {
+      "links": "on the left",
+      "linksRechts": "on the left and right",
+      "mitte": "in the middle",
+      "oben": "at the top",
+      "obenLinks": "at the top left",
+      "obenRechts": "at the top right",
+      "obenUnten": "at the top and bottom",
+      "raender": "at the edges",
+      "rechts": "on the right",
+      "unten": "at the bottom",
+      "untenLinks": "at the bottom left",
+      "untenRechts": "at the bottom right"
+    },
+    "sage": {
+      "ausgepackt": "Unwrapped! {datum}.",
+      "ausgepacktTitel": "Unwrapped! {datum}: {titel}.",
+      "schleifeAb": "The bow is off. Now tear open the paper.",
+      "start": "Present {n}. {hinweis} Or press Unwrap."
+    },
+    "schachtel": "For you",
+    "status": {
+      "heute": "today, still wrapped",
+      "offen": "unwrapped, view photo",
+      "verpasst": "missed, unwrap now",
+      "zu": "still taped shut, don’t open before December {n}"
+    },
+    "tag": "Day {n}",
+    "tisch": "All 24 presents",
+    "weiterUnten": "Your present is further down",
+    "zettel": {
+      "datum": "Dec {n}",
+      "fuerDich": "for you",
+      "oben": "Wait until",
+      "unten": "to open!"
+    }
+  },
+  "nuss": {
+    "ansicht": {
+      "alt": "Photo collage for day {n}",
+      "altTitel": "Photo collage for day {n}: {titel}",
+      "fehler": "This photo can’t be loaded right now.",
+      "fehlerKurz": "The photo can’t be loaded right now.",
+      "laden": "Loading the photo …",
+      "nochmal": "Try again",
+      "schliessen": "Close photo view",
+      "tag": "Day {n}",
+      "tagDatum": "Day {n} · {datum}",
+      "weiter": "Next photo",
+      "zaehler": "{n} of {gesamt}",
+      "zaehlerLang": "Photo {n} of {gesamt}",
+      "zurueck": "Previous photo"
+    },
+    "blase": {
+      "dran": "Nut {n} is due on {datum}."
+    },
+    "knopf": {
+      "alleFotos": "View all photos",
+      "einlegen": "Put in the golden nut",
+      "finden": "Find today’s",
+      "foto": "View photo",
+      "gestern": "Missed yesterday: get nut {n}",
+      "knacken": "Crack",
+      "nochmal": "Crack again",
+      "uebung": "New practice nut",
+      "verpasst": "Missed: get nut {n}",
+      "weglegen": "Put away",
+      "zuruecklegen": "Put back"
+    },
+    "kopf": {
+      "feiertage": "Merry Christmas and happy holidays!",
+      "heute": "Today is {datum}.",
+      "november": "It’s still November – it all starts on December 1.",
+      "weihnachten": "Merry Christmas!",
+      "weihnachtenNachholen": "Merry Christmas! Now every nut may be cracked."
+    },
+    "label": "Day {n}, {datum} – {status}",
+    "legende": {
+      "heute": "Today",
+      "nachholen": "Catch up",
+      "offen": "Open",
+      "titel": "Key",
+      "zu": "Still to come"
+    },
+    "lw": {
+      "brett": "Next to it on the board the golden nut {n} is waiting",
+      "gold": "the golden nut {n}",
+      "kerne": {
+        "one": "There is one kernel in the little bowl",
+        "other": "There are {n} kernels in the little bowl"
+      },
+      "leer": "Wooden nutcracker, empty",
+      "nuss": "nut {n}",
+      "risse": {
+        "one": "{art} with {n} crack",
+        "other": "{art} with {n} cracks"
+      },
+      "uebung": "a practice nut",
+      "voll": "Wooden nutcracker, holding {art}"
+    },
+    "sage": {
+      "drin": "Nut {n} is in the nutcracker.",
+      "eingelegt": "Nut {n} is in the nutcracker. Push the lever down or tap “Crack”.",
+      "fast": "Crack! Push hard one more time.",
+      "gefunden": "There it is: the golden nut for day {n}. Tap it.",
+      "offen": "Done! The nut is open, a photo rolls out.",
+      "riss": "Crack! A crack in the shell. Push again.",
+      "uebungDrin": "A practice nut is in the nutcracker.",
+      "uebungOffen": "Done! There was a hazelnut inside, the kernel is now in the little bowl."
+    },
+    "sagt": {
+      "fast": "Almost! Once more!",
+      "fester": "Harder!",
+      "kerne": "{n} kernels already!",
+      "lecker": "Yummy!",
+      "nochmal": "Once more!",
+      "schonGeknackt": "Already cracked today!",
+      "weihnachten": "Merry Christmas!",
+      "weiter": "Keep going!"
+    },
+    "schild": "Your Advent",
+    "status": {
+      "brett": "today – the golden nut is ready next to the nutcracker",
+      "heute": "today, the golden nut – tap to crack",
+      "offen": "opened, view photo",
+      "unterwegs": "in the nutcracker right now",
+      "verpasst": "missed, catch up now",
+      "zu": "still closed"
+    },
+    "tafel": {
+      "abDezember": "From December 1 a photo rolls out of every nut.",
+      "alleGeknackt": "All 24 nuts are cracked",
+      "alleGeknacktText": "Tap an open nut on the cloth – or look at all the photos one after another.",
+      "brett": "It’s already next to the nutcracker. Tap it or pull the red handle – then it hops in.",
+      "ersterKern": "The first kernel is in the little bowl.",
+      "ersterRiss": "Crack! A first crack. Lever up – and again!",
+      "gleich": "It’s almost open – one more hard push!",
+      "gleichDrin": "It’ll be in the nutcracker in a moment.",
+      "gutGeknackt": "Well cracked!",
+      "heute": "Crack the golden nut!",
+      "hilfe": "Pull the red handle down – or tap the nut. Every push makes a crack.",
+      "kernHuepft": "The kernel hops into the little bowl.",
+      "kerne": "{n} kernels in the little bowl already.",
+      "knirscht": "It’s crunching nicely – keep going!",
+      "kommt": "The golden nut is coming",
+      "nachholen": "Catch up on nut {n}",
+      "nochmal": "Crack nut {n} again",
+      "november": "It’s still November",
+      "novemberText": "From December 1 a golden nut will be ready every day.",
+      "nussDatum": "Nut {n} · {datum}.",
+      "offen": "Nut {n} is open",
+      "schaelchen": {
+        "one": "There’s already one kernel in the little bowl.",
+        "other": "There are already {n} kernels in the little bowl."
+      },
+      "schleife": "Tap a nut with a bow to catch up on it.",
+      "schonOffen": "Today’s nut is already open. The next one is waiting tomorrow – or just crack it again.",
+      "suchen": "Today’s golden nut is somewhere on the cloth. Tap it or pull the red handle – then it rolls into the nutcracker.",
+      "titel": "The Nutcracker",
+      "uebung": "A nut for practice",
+      "uebungText": "From December 1 there’s a photo in every nut. Until then you can practice: pull the red handle down – or tap the nut. Every push makes a crack.",
+      "warten": "A few nuts are still waiting",
+      "wartenText": "You can now take your time catching up on the nuts with a bow.",
+      "wartet": "The golden nut is waiting"
+    },
+    "ton": {
+      "an": "Cracking sound is on – tap to turn it off",
+      "aus": "Cracking sound is off – tap to turn it on",
+      "kurzAn": "Cracking sound on.",
+      "kurzAus": "Cracking sound off.",
+      "label": "Cracking sound",
+      "titel": "Cracking sound on or off"
+    },
+    "tuch": "The nut cloth",
+    "wort": {
+      "geschafft": "Done!",
+      "knack": "Crack!",
+      "knirsch": "Crunch!",
+      "krrk": "Krrk!"
+    }
+  },
+  "sterne": {
+    "advent": "Advent Sunday {n}",
+    "auto": {
+      "kurz": "Connect for me",
+      "lang": "Connect the stars for me"
+    },
+    "blase": {
+      "erst": "Constellation {n} only lights up on {datum}.",
+      "november": "Constellation {n} lights up on {datum}."
+    },
+    "feld": "Starry sky with 24 constellations",
+    "fenster": {
+      "alt": "Photo collage for day {n}",
+      "altTitel": "Photo collage for day {n}: {titel}",
+      "buehne": "{name} to connect. Space or the right arrow connects the next star.",
+      "folgt": "The photo for day {n} is coming soon",
+      "leuchten": {
+        "one": "One constellation is shining",
+        "other": "{n} constellations are shining"
+      },
+      "nochmal": "Connect the stars again",
+      "tag": "Day {n}",
+      "tagDatum": "Day {n}, {datum}",
+      "weiter": "Next photo",
+      "zaehler": "Photo {n} of {gesamt}",
+      "zu": "Back to the sky",
+      "zumFoto": "View photo full size",
+      "zurueck": "Previous photo"
+    },
+    "form": {
+      "kerze": {
+        "fertig": "Done! The Advent candle is burning.",
+        "hilfe": "Find the twinkling Advent candle, tap it and connect its stars.",
+        "name": "Advent candle"
+      },
+      "stern": {
+        "fertig": "Done! The Christmas star is shining.",
+        "hilfe": "Find the twinkling Christmas star, tap it and connect its stars.",
+        "name": "Christmas star"
+      },
+      "stiefel": {
+        "fertig": "Done! St. Nicholas’s boot is shining.",
+        "hilfe": "Find St. Nicholas’s twinkling boot, tap it and connect its stars.",
+        "name": "St. Nicholas’s boot"
+      },
+      "tanne": {
+        "fertig": "Done! The Christmas tree is shining.",
+        "hilfe": "Find the twinkling Christmas tree, tap it and connect its stars.",
+        "name": "Christmas tree"
+      }
+    },
+    "foto": {
+      "fehler": "The photo didn’t come through just now. Is the internet on? Then simply try again.",
+      "laden": "Loading the photo …",
+      "neu": "Load again"
+    },
+    "heuteFinden": "Find today’s",
+    "hilfe": {
+      "alleFrei": "All constellations are unlocked – tap one.",
+      "alleOffen": "All 24 constellations are shining. Tap one to see its photo.",
+      "heuteOffen": "Today’s constellation is already shining. The next one comes tomorrow.",
+      "november": "From December 1 a new constellation lights up every day. Then you connect its stars, and a photo appears in the sky.",
+      "sternOffen": "The Christmas star is already shining. Merry Christmas!",
+      "suchen": "Find the twinkling constellation with the {n}, tap it and connect its stars."
+    },
+    "hinweis": {
+      "erst": "Star {n} first – the glowing ring shows it.",
+      "fertig": "Done! The constellation is shining.",
+      "gleichFoto": "The photo will appear in the sky in a moment.",
+      "kreis": "And now close the loop!",
+      "leertaste": "Space connects",
+      "linien": {
+        "one": "one more line",
+        "other": "{n} more lines"
+      },
+      "profiFinger": "Pro: put your finger on star 1 and write the {n} with the stars.",
+      "profiMaus": "Pro: start at star 1 and write the {n} with the stars.",
+      "profiModus": "Pro mode",
+      "startFinger": "Put your finger on star 1 and drag from star to star.",
+      "startMaus": "Drag with the mouse from star 1, from star to star.",
+      "tasteFinger": "Press space or drag your finger from star to star.",
+      "tasteMaus": "Press space or drag with the mouse from star to star.",
+      "warten": "{n} stars are waiting",
+      "weiter": "On to star {n}.",
+      "welcher": "Keep going – which star comes next?",
+      "ziffer": "Now over to the second digit.",
+      "zifferStern": "Now over to the second digit: star {n}.",
+      "zurueck": "And back to star {n}!"
+    },
+    "kopf": {
+      "heute": "Today is {datum}.",
+      "november": "It’s still November.",
+      "weihnachten": "Merry Christmas!"
+    },
+    "label": "Day {n}, {datum} – {status}",
+    "labelForm": "Day {n}, {datum}, {name} – {status}",
+    "profi": {
+      "an": "Pro mode on: no ring, and for numbers no labels from star 3 on.",
+      "aus": "Pro mode off.",
+      "kurz": "Pro",
+      "titel": "Pro mode: no ring, for numbers only stars 1 and 2 are labeled"
+    },
+    "sage": {
+      "fertig": "Done! Constellation {n} is shining.",
+      "gleichFoto": "The photo is coming in a moment."
+    },
+    "schild": {
+      "heute": "Today",
+      "nachholen": "Catch up"
+    },
+    "stand": {
+      "alle": "All {n} constellations up to today are shining.",
+      "erstes": "The first constellation is shining.",
+      "keins": "No constellation is shining yet.",
+      "nachholen": "Catch up on constellation {n}",
+      "teil": {
+        "one": "{n} of {gesamt} constellations is shining.",
+        "other": "{n} of {gesamt} constellations are shining."
+      },
+      "verpasst": "Not connected yet:",
+      "weitere": "and {n} more"
+    },
+    "sternbild": "Constellation {name}",
+    "ton": {
+      "an": "Bell sounds on.",
+      "aus": "Bell sounds off.",
+      "label": "Bell sounds while connecting",
+      "titel": "Bell sounds on or off"
+    },
+    "zustand": {
+      "heute": "due today, connect the stars",
+      "offen": "opened, view photo",
+      "verpasst": "missed, connect the stars",
+      "zu": "still closed"
+    }
+  },
+  "schneemann": {
+    "ansicht": {
+      "alt": "Photo collage for day {n}",
+      "altTitel": "Photo collage for day {n}: {titel}",
+      "fehler": "The photo can’t be loaded right now.",
+      "figurDatum": "{figur} – {datum}",
+      "laden": "Fetching photo …",
+      "nochmal": "Try again",
+      "nochmalLabel": "Build {figur} (day {n}) again",
+      "nochmalTitel": "Build this figure again",
+      "schliessen": "Close photo view",
+      "weiter": "Next photo",
+      "zaehler": "Photo {n} of {gesamt}",
+      "zurueck": "Previous photo"
+    },
+    "bau": {
+      "datumKurz": "{wt}, Dec {n}",
+      "lassen": "Build it for me",
+      "nochmal": "Build again",
+      "nochmalKurz": "again",
+      "titel": "Build a snow figure",
+      "ueben": "Practice",
+      "uebenKurz": "Practice round",
+      "uebenLang": "With a photo from December 1",
+      "zu": "Stop building, back to the meadow",
+      "zurWiese": "To the meadow"
+    },
+    "blase": {
+      "dran": "Building spot {n} is due on {datum}."
+    },
+    "fertig": {
+      "datum": "{figur} for December {n}",
+      "titel": "{figur} – done!",
+      "ueben": "Good practice!",
+      "uebenText": "From December 1 every figure holds a photo.",
+      "voll": "All 24 snow figures are standing – the meadow is full!"
+    },
+    "figur": {
+      "burg": {
+        "name": "Snow castle",
+        "ein": "a snow castle"
+      },
+      "dackel": {
+        "name": "Dachshund",
+        "ein": "a dachshund"
+      },
+      "drache": {
+        "name": "Snow dragon",
+        "ein": "a little snow dragon"
+      },
+      "eisbaer": {
+        "name": "Polar bear",
+        "ein": "a polar bear"
+      },
+      "elefant": {
+        "name": "Elephant",
+        "ein": "an elephant with a baby"
+      },
+      "engel": {
+        "name": "Angel",
+        "ein": "an angel"
+      },
+      "eule": {
+        "name": "Snowy owl",
+        "ein": "a snowy owl"
+      },
+      "familie": {
+        "name": "Snowman family",
+        "ein": "a snowman family"
+      },
+      "hase": {
+        "name": "Snow hare",
+        "ein": "a snow hare"
+      },
+      "igel": {
+        "name": "Hedgehog",
+        "ein": "a hedgehog"
+      },
+      "iglu": {
+        "name": "Igloo",
+        "ein": "an igloo"
+      },
+      "katze": {
+        "name": "Cat",
+        "ein": "a cat"
+      },
+      "maus": {
+        "name": "Mouse",
+        "ein": "a mouse"
+      },
+      "nikolaus": {
+        "name": "St. Nicholas",
+        "ein": "St. Nicholas"
+      },
+      "pinguin": {
+        "name": "Penguin",
+        "ein": "a penguin"
+      },
+      "raupe": {
+        "name": "Caterpillar",
+        "ein": "a caterpillar"
+      },
+      "rentier": {
+        "name": "Reindeer",
+        "ein": "a reindeer"
+      },
+      "robbe": {
+        "name": "Seal",
+        "ein": "a seal with a ball"
+      },
+      "schaf": {
+        "name": "Sheep",
+        "ein": "a sheep"
+      },
+      "schildkroete": {
+        "name": "Turtle",
+        "ein": "a turtle"
+      },
+      "schneemann": {
+        "name": "Snowman",
+        "ein": "a snowman"
+      },
+      "tanne": {
+        "name": "Snowy fir",
+        "ein": "a snowy fir tree"
+      },
+      "teddy": {
+        "name": "Teddy bear",
+        "ein": "a teddy bear"
+      },
+      "wichtel": {
+        "name": "Elf",
+        "ein": "an elf"
+      }
+    },
+    "foto": {
+      "gross": "View full size",
+      "platzhalter": "Photo"
+    },
+    "groesse": {
+      "gross": "big",
+      "klein": "small",
+      "mittel": "medium",
+      "winzig": "tiny"
+    },
+    "hilfe": {
+      "alleOffen": "All building spots are open – pick a pile of snow.",
+      "ansehen": "Tap a figure to see its photo.",
+      "heute": "The glowing building spot is for today.",
+      "nachBauen": "You can still build the snow piles with a shovel.",
+      "november": "The wooden pegs mark the 24 building spots. It all starts on December 1.",
+      "pfloecke": "Wooden pegs are still to come.",
+      "verpasst": "Snow piles with a shovel were missed and are still waiting."
+    },
+    "hinweis": {
+      "eis": "Ice! The ball slides here – and doesn’t grow.",
+      "gefunden": "{sache} found! It goes on the figure later.",
+      "gras": "There’s no snow left here – find fresh, white snow!",
+      "greifenFinger": "Put your finger on the ball and roll it through the snow.",
+      "greifenMaus": "Grab the ball and drag it through the snow.",
+      "grossGenug": "Big enough! Hop – off to the building spot.",
+      "halb": "Halfway there!",
+      "halbErste": "Already half the size – keep going!",
+      "heiss": "Hot! Get away {vom}, quick!",
+      "hopp": "Hop!",
+      "knifflig": "Phew, pretty tricky? You can also let the figure build itself.",
+      "lassen": "Watch: the figure almost builds itself.",
+      "letzte": "The last ball is done!",
+      "neuschnee": "Fresh snow is falling – keep rolling!",
+      "plan": "Take a look at the building plan – then off you go.",
+      "schmuecken": "Done rolling! Now for the decorations – then the photo comes.",
+      "schmueckenUeben": "Done rolling! Now for the decorations …",
+      "startFinger": "Roll the ball through fresh snow with your finger – that’s how it grows.",
+      "startMaus": "Drag the ball through fresh snow with the mouse (or the arrow keys) – that’s how it grows.",
+      "weiterKugeln": {
+        "one": "Let’s go on – one ball is already standing.",
+        "other": "Let’s go on – {n} balls are already standing."
+      },
+      "weiterWartet": "Let’s go on – your ball has been waiting for you.",
+      "zaun": "The warning fence is up. Now the ball can’t roll into the warm spots any more."
+    },
+    "hud": {
+      "label": "Show building plan",
+      "stand": "Show building plan – {n} of {gesamt} balls standing"
+    },
+    "karte": {
+      "alleFotos": "View all photos",
+      "alleOffen": "All building spots are open – pick a pile of snow and start building.",
+      "alleStehen": "All 24 snow figures are standing on the meadow.",
+      "bauen": "Build {figur}",
+      "chip": "Catch up on day {n}: {figur}, {datum}",
+      "fotoHeute": "Today’s photo",
+      "heute": "Today is {datum}.",
+      "morgen": "A new building plan is waiting tomorrow.",
+      "nochNicht": "Not built yet:",
+      "november": "It’s still November.",
+      "novemberText": "From December 1 there’s a new building plan here every day: snowman, penguin, igloo … and every figure holds a photo.",
+      "plan": "Today’s building plan: {figur}.",
+      "planFest": "Today’s building plan: {figur} – the most festive figure of all.",
+      "steht": "{figur} is already standing.",
+      "teil": {
+        "one": "{n} of 24 snow figures is standing on the meadow.",
+        "other": "{n} of 24 snow figures are standing on the meadow."
+      },
+      "ueben": "Practice now",
+      "verpasst": "Missed, not built yet:",
+      "weihnachten": "Merry Christmas!",
+      "weitere": "and {n} more",
+      "wo": "Where is the spot?"
+    },
+    "kugel": {
+      "gross": "Ball {n} of {gesamt}: a big one.",
+      "klein": "Ball {n} of {gesamt}: a small one.",
+      "mittel": "Ball {n} of {gesamt}: a medium one.",
+      "winzig": "Ball {n} of {gesamt}: a tiny one."
+    },
+    "plan": {
+      "eis": "Ice = slides.",
+      "eisText": "Nothing grows there.",
+      "extra": "Extra:",
+      "extraText": "find the {liste}.",
+      "gras": "Green = no snow.",
+      "grasText": "Roll through the white.",
+      "kugeln": "{n} balls: {liste}.",
+      "los": "Let’s go",
+      "ueben": "Practice snowman",
+      "warm": "Warm = melts!",
+      "weiter": "Keep building"
+    },
+    "platz": {
+      "heute": "Today",
+      "heuteBauen": "build today",
+      "label": "Day {n}, {datum} – {status}",
+      "labelFigur": "Day {n} ({figur}), {datum} – {status}",
+      "offen": "built, view photo",
+      "verpasst": "missed, catch up now",
+      "zu": "not yet"
+    },
+    "sache": {
+      "apfel": "apple",
+      "besen": "broom",
+      "brille": "glasses",
+      "fahne": "flag",
+      "fisch": "fish",
+      "geschenk": "present",
+      "glocke": "little bell",
+      "kaese": "cheese",
+      "karotte": "carrot",
+      "knochen": "bone",
+      "krone": "crown",
+      "sack": "sack of presents",
+      "schleife": "bow",
+      "stern": "star"
+    },
+    "sage": {
+      "alle": "All 24 figures are standing!",
+      "fertig": "{figur} is done.",
+      "fertigFoto": "{figur} is done and shows the photo: {titel}.",
+      "gefunden": "{sache} found.",
+      "gefundenListe": "Found: {liste}.",
+      "geschmolzen": "The ball has melted and starts again.",
+      "hut": "New hat.",
+      "kugelFertig": "Ball {n} of {gesamt} is done.",
+      "markiert": "The building spot for day {n} is marked.",
+      "neuschnee": "Fresh snow is falling.",
+      "schal": "New scarf color.",
+      "tauschen": "You can tap the hat or scarf to swap it.",
+      "uebenFertig": "The practice snowman is done.",
+      "warm": "Careful, warm!",
+      "weiter": "Your figure has been waiting for you. Let’s go on.",
+      "zaun": "Warning fence put up.",
+      "zaunTipp": "You can put up a warning fence."
+    },
+    "schild": {
+      "ab": "From December 1!",
+      "alt": "Photo for day {n}",
+      "altTitel": "Photo for day {n}: {titel}",
+      "neuLaden": "Load photo again",
+      "spaeter": "Photo coming later"
+    },
+    "schmelzen": {
+      "bogen": "Sizzle – melted! The ball starts again. Roll in an arc {um}.",
+      "zaunAuto": "Sizzle! From now on a warning fence keeps the ball away from the warm spots.",
+      "zisch": "Sizzle – melted!",
+      "zweimal": "Melted twice! A warning fence helps – or roll around in a wide arc."
+    },
+    "szene": {
+      "figur": "Snowfield for {figur}: roll the ball with the arrow keys",
+      "label": "Snowfield: roll the ball with the arrow keys",
+      "rolle": "Snowfield",
+      "ueben": "Snowfield for the practice snowman: roll the ball with the arrow keys"
+    },
+    "ton": {
+      "an": "Sounds on.",
+      "aus": "Sounds off.",
+      "label": "Sounds",
+      "titel": "Sounds on or off"
+    },
+    "und": "and",
+    "unterzeile": {
+      "advent": "A different snow figure every day – and each one holds a photo.",
+      "weihnachten": "All building spots are open – Merry Christmas!"
+    },
+    "wahl": {
+      "hut": "Put on a different hat",
+      "schal": "Different scarf color"
+    },
+    "warm": {
+      "feuer": {
+        "name": "campfire",
+        "um": "around the campfire",
+        "vom": "from the campfire"
+      },
+      "gitter": {
+        "name": "heating grate",
+        "um": "around the grate",
+        "vom": "from the heating grate"
+      },
+      "kakao": {
+        "name": "cocoa stove",
+        "um": "around the cocoa stove",
+        "vom": "from the cocoa stove"
+      },
+      "sonne": {
+        "name": "sunny patch",
+        "um": "around the sunny patch",
+        "vom": "from the sunny patch"
+      },
+      "tee": {
+        "name": "hot tea puddle",
+        "um": "around the tea puddle",
+        "vom": "from the tea puddle"
+      }
+    },
+    "wiese": "The snowy meadow",
+    "zaun": {
+      "kurz": "Warning fence",
+      "lang": "Put up a warning fence around the warm spots"
+    }
+  },
+  "lader": {
+    "datei": {
+      "text": "When opened by double-click (file://), the browser can’t load the calendar data. Upload the folder to your web space or run “npm run ansehen” locally.",
+      "titel": "Please open it via a web server"
+    },
+    "fehler": {
+      "knopf": "Try again",
+      "offline": "No internet connection. Please check it and try again.",
+      "text": "Please try again in a moment. ({fehler})",
+      "titel": "The calendar isn’t loading right now",
+      "unbekannt": "unknown error"
+    },
+    "laedt": "Loading the calendar …",
+    "vorlage": {
+      "text": "This file is filled in by “npm run bauen”. Please build first, then view or upload the folder ausgabe/.",
+      "titel": "Just the template"
+    }
+  },
+  "start": {
+    "datum": {
+      "frueher": "One day earlier",
+      "nov": "Nov",
+      "november": "Still November",
+      "regler": "Date",
+      "skalaTag": "{n}",
+      "spaeter": "One day later",
+      "titel": "Pick a date",
+      "weihnachten": "From December 25"
+    },
+    "eigen": {
+      "anleitung": "The guide is",
+      "github": "on GitHub",
+      "text": "Put 24 of your own photos in a folder, build once, upload to your own web space – free and without third-party servers.",
+      "titel": "Make your own calendar"
+    },
+    "einleitung": "A new photo every day of Advent – and twelve different ways to open it.",
+    "fuss": {
+      "datenschutz": "Privacy",
+      "impressum": "Legal notice",
+      "text": "No trackers, no ads, no third-party servers. Your browser only remembers the chosen date, the language and what you have already opened."
+    },
+    "hinweis": {
+      "flocke": "<strong>In the calendar, this snowflake sits at the bottom left.</strong> Use it to switch the view or the language, set a different date or close everything again with “Close all again”.",
+      "platzhalter": "The photos are painted placeholders – in your own calendar, your pictures go there.",
+      "titel": "How it works"
+    },
+    "info": {
+      "erstes": "The first photo is up.",
+      "heiligabend": "Christmas Eve: all 24 days can be opened.",
+      "november": "Everything is still closed – it all starts on December 1.",
+      "standard": "This is how the calendar looks on this day.",
+      "tage": "Days 1 to {n} can be opened.",
+      "weihnachten": "Christmas is here – everything is open."
+    },
+    "seitentitel": "Your Advent Calendar – a photo every day of Advent",
+    "sprache": "Language",
+    "wahl": "Pick a calendar",
+    "satz": {
+      "tueren": "The classic: 24 cardboard doors that swing open – behind them waits the photo of the day.",
+      "girlande": "Fir garlands with 24 Christmas baubles. Each opened bauble shows its photo as if through curved glass.",
+      "kranz": "An Advent wreath with 24 candles: one more burns every day, and the room gets brighter.",
+      "rubbellos": "A scratch card every day. Scratch off the silver foil with your finger – the photo is underneath.",
+      "fotoleine": "Envelopes on the string of lights – inside, an instant photo that develops before your eyes.",
+      "stories": "Every day is a little story of several photos, tapped through like on a phone.",
+      "schneekugel": "Shake until the snow settles – then the photo appears in the globe.",
+      "baum": "Spin a 3D Christmas tree with your finger until the glowing bauble of the day appears.",
+      "geschenk": "Pull open the bow, tear off the paper – and the photo rises out of the box with confetti.",
+      "nuss": "A golden nut every day: pull the lever until it cracks and a photo rolls out.",
+      "sterne": "Connect the numbered stars with your finger until the constellation lights up and shows the photo.",
+      "schneemann": "Roll a different figure from snowballs every day – but watch out for warm spots. The finished figure holds the photo."
+    }
+  }
+}

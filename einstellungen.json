@@ -1,7 +1,9 @@
 {
-  "titel": "Dein Adventskalender",
+  "titel": { "de": "Dein Adventskalender", "en": "Your Advent Calendar" },
   "jahr": 2026,
   "ansichten": "alle",
   "standard_ansicht": "tueren",
+  "sprachen": ["de", "en"],
+  "sprache": "auto",
   "testschluessel": ""
 }

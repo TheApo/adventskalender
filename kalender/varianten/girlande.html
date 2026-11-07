@@ -154,6 +154,8 @@ button { font: inherit; color: inherit; }
   .unterzeile { letter-spacing: .1em; }
   .trenn { margin: 0 .55em; }
   .statusblock { padding-bottom: 4px; }
+  /* Desktop: alle Kugeln sind ohnehin sichtbar – keine „Zu Kugel …“-Pillen oben rechts (sparen Platz, kein Scrollen) */
+  .sprungliste { display: none; }
   .status { font-size: 15.5px; }
 }
 
@@ -527,6 +529,13 @@ button { font: inherit; color: inherit; }
   box-shadow: 0 0 0 1.5px rgba(255, 240, 200, .5), 0 0 10px rgba(240, 190, 90, .45);
 }
 .zu-heute.oben svg { transform: rotate(180deg); }
+/* Desktop (ab 1000 px): alle Kugeln passen auf einen Bildschirm → keine schwebende Heute-Pille und unten nur wenig Rand
+   (der Menü-Knopf sitzt links, der Hinweis mittig). Steht bewusst NACH den Grundregeln von .fuss und .zu-heute,
+   sonst würden diese (gleiche Spezifität, später im Stylesheet) die Desktop-Werte überschreiben. */
+@media (min-width: 1000px) {
+  .zu-heute { display: none; }
+  .fuss { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
+}
 /* Menü-Knopf (#kalender-reset aus shared/kalender.js, rund, 40 px): sitzt fest unten links (Lage setzt
    kalender.js). Die Seite hält die Ecke frei: Heute-Pille rechts neben der Zone, Fuß mit genug Abstand
    nach unten. In der Bildansicht ist er ausgeblendet. */
@@ -750,7 +759,7 @@ button { font: inherit; color: inherit; }
 
 <header class="kopf" id="kopf">
   <div class="titelblock">
-    <h1 class="titel" aria-label="{{TITEL}}"><span class="z1" aria-hidden="true"><span class="initial">{{TITEL_A_ERSTES}}<svg class="ilex" viewBox="0 0 64 48" aria-hidden="true" focusable="false">
+    <h1 class="titel" aria-label="{{TITEL}}" data-titel="ganz" data-titel-attr="aria-label"><span class="z1" aria-hidden="true"><span class="initial"><span data-titel="a1">{{TITEL_A_ERSTES}}</span><svg class="ilex" viewBox="0 0 64 48" aria-hidden="true" focusable="false">
       <defs>
         <radialGradient id="beere" cx="35%" cy="32%" r="70%"><stop offset="0" stop-color="#ff8a7a"/><stop offset=".45" stop-color="#d42b2b"/><stop offset="1" stop-color="#7a0d14"/></radialGradient>
         <linearGradient id="blatt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3f8a55"/><stop offset="1" stop-color="#1c4d2f"/></linearGradient>
@@ -758,25 +767,25 @@ button { font: inherit; color: inherit; }
       <g transform="translate(31 30) rotate(-152)"><path d="M0,0 Q4,-6 7,-6 Q8,-3 12,-8 Q14,-4 18,-8 Q19,-4 24,-6 Q26,-3 31,0 Q26,3 24,6 Q19,4 18,8 Q14,4 12,8 Q8,3 7,6 Q4,6 0,0Z" fill="url(#blatt)"/><path d="M2,0 L27,0" stroke="#7fbf86" stroke-width=".9" opacity=".7"/></g>
       <g transform="translate(33 30) rotate(-28)"><path d="M0,0 Q4,-6 7,-6 Q8,-3 12,-8 Q14,-4 18,-8 Q19,-4 24,-6 Q26,-3 31,0 Q26,3 24,6 Q19,4 18,8 Q14,4 12,8 Q8,3 7,6 Q4,6 0,0Z" fill="url(#blatt)"/><path d="M2,0 L27,0" stroke="#7fbf86" stroke-width=".9" opacity=".7"/></g>
       <circle cx="28" cy="31" r="5" fill="url(#beere)"/><circle cx="37" cy="32" r="5" fill="url(#beere)"/><circle cx="32.5" cy="38" r="5" fill="url(#beere)"/>
-    </svg></span>{{TITEL_A_REST}}</span> <span class="z2" aria-hidden="true">{{TITEL_B}}</span></h1>
-    <p class="unterzeile">24 Kugeln <span class="trenn" aria-hidden="true"></span> 24 Momente <span class="trenn" aria-hidden="true"></span> ein ganzes Jahr</p>
+    </svg></span><span data-titel="a-rest">{{TITEL_A_REST}}</span></span> <span class="z2" aria-hidden="true" data-titel="b">{{TITEL_B}}</span></h1>
+    <p class="unterzeile"><span data-i18n="girlande.unterzeile.kugeln">24 Kugeln</span> <span class="trenn" aria-hidden="true"></span> <span data-i18n="girlande.unterzeile.momente">24 Momente</span> <span class="trenn" aria-hidden="true"></span> <span data-i18n="girlande.unterzeile.jahr">ein ganzes Jahr</span></p>
   </div>
   <div class="statusblock">
     <p class="status" id="status"></p>
     <div class="aktionen" id="aktionen" hidden>
-      <button class="jahr" id="jahr" type="button" hidden>Das ganze Jahr ansehen</button>
+      <button class="jahr" id="jahr" type="button" hidden data-i18n="girlande.jahr">Das ganze Jahr ansehen</button>
       <span class="sprungliste" id="sprung"></span>
     </div>
   </div>
 </header>
 
-<main class="baum" id="baum" aria-label="24 Christbaumkugeln, eine für jeden Tag bis Heiligabend"></main>
+<main class="baum" id="baum" aria-label="24 Christbaumkugeln, eine für jeden Tag bis Heiligabend" data-i18n-attr="aria-label:girlande.baum"></main>
 
 <footer class="fuss" id="fuss"><p class="hinweis" id="hinweis"></p></footer>
 </div>
 
 <button class="zu-heute" id="zuHeute" type="button" hidden>
-  <span class="mini" aria-hidden="true"></span><span id="zuHeuteText">Heute: Kugel 1</span>
+  <span class="mini" aria-hidden="true"></span><span id="zuHeuteText"></span>
   <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </button>
 
@@ -789,7 +798,7 @@ button { font: inherit; color: inherit; }
       <p class="a-datum" id="aDatum"></p>
       <h2 class="a-titel" id="aTitel"></h2>
     </div>
-    <button class="a-knopf" id="aZu" type="button" aria-label="Bildansicht schließen">
+    <button class="a-knopf" id="aZu" type="button" aria-label="Bildansicht schließen" data-i18n-attr="aria-label:girlande.ansicht.schliessen">
       <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.5 4.5l11 11M15.5 4.5l-11 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
   </div>
@@ -801,22 +810,25 @@ button { font: inherit; color: inherit; }
     </div>
   </div>
   <div class="a-fuss" id="aFuss">
-    <button class="a-knopf" id="aZurueck" type="button" aria-label="Vorheriges Bild">
+    <button class="a-knopf" id="aZurueck" type="button" aria-label="Vorheriges Bild" data-i18n-attr="aria-label:girlande.ansicht.zurueck">
       <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M12.5 4l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <span class="a-zaehler" id="aZaehler"></span>
-    <button class="a-knopf" id="aWeiter" type="button" aria-label="Nächstes Bild">
+    <button class="a-knopf" id="aWeiter" type="button" aria-label="Nächstes Bild" data-i18n-attr="aria-label:girlande.ansicht.weiter">
       <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
   <p class="sr" id="aAnsage" aria-live="polite"></p>
 </div>
 
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „girlande“ (t ist hier die Tageszahl)
 
   var K = window.Kalender.init('girlande');
   var F = window.Fotos;
@@ -945,8 +957,10 @@ button { font: inherit; color: inherit; }
   var spalten = 0, D = 84, slotW = 120, contW = 360, reihen = [], girlandenSchluessel = '';
   var G_TOP = 15, ETIKETT = 22;
 
-  function layout() {
-    var vw = root.clientWidth, vh = window.innerHeight;
+  // abzug: zusätzlich abgezogene Höhe – nach dem Messen nötig, wenn die Seite trotz Rechnung noch scrollt
+  function layout(abzug) {
+    abzug = abzug > 0 ? abzug : 0;
+    var vw = root.clientWidth, vh = window.innerHeight - abzug;
     var pad = Math.round(clamp(vw * 0.045, 14, 52));
     // Handy: 4 Kugeln je Girlande, solange sie mindestens 64 px groß bleiben, sonst 3
     var quer = vh < 520 && vw >= 600 && vw > vh * 1.3;
@@ -962,10 +976,11 @@ button { font: inherit; color: inherit; }
       cw = Math.floor(Math.min(frei, 1120));
       for (var durchgang = 0; durchgang < 2; durchgang++) {
         root.style.setProperty('--cw', cw + 'px');
-        var kh = kopf.offsetHeight + lichter.getBoundingClientRect().height + 16;
-        var pro = (vh - kh - 6) / 4;
-        var dh = (pro - (G_TOP + sag + 2 + lmax + 27)) / 1.17;
-        d = Math.floor(clamp(Math.min(dh, frei / 6 * 0.62), 72, 124));
+        var kh = kopf.offsetHeight + lichter.getBoundingClientRect().height + 16 + ((document.getElementById('fuss') || {}).offsetHeight || 0);  // inkl. Fußzeile: Desktop ohne Scrollen
+        var pro = (vh - kh - 6) / 4, dh = 124;
+        // Etikett unter der Kugel hängt selbst von der Kugelgröße ab → kurz iterieren (wie ETIKETT unten)
+        for (var it = 0; it < 4; it++) dh = (pro - (G_TOP + sag + 2 + lmax + clamp(dh * 0.22, 18, 25) + 8 + dh * 0.04)) / 1.17;
+        d = Math.floor(clamp(Math.min(dh, frei / 6 * 0.62), 46, 124));
         cw = Math.floor(Math.min(frei, 1120, Math.max(1000, 6 * d * 2)));
       }
     } else {
@@ -1028,6 +1043,11 @@ button { font: inherit; color: inherit; }
     // sonst bleibt sie nach einem Datumswechsel stehen, obwohl ihre Kugel längst im Bild ist.
     pilleAktualisieren();
     if (A.offen) tafelnMessen();
+    // Desktop: Ist die Seite trotz Rechnung noch höher als das Fenster (Schriften, Rundung), genau um den Rest verkleinern
+    if (sp === 6 && !quer && abzug < 400) {
+      var ueber = document.documentElement.scrollHeight - window.innerHeight;
+      if (ueber > 0 && D > 46) layout(abzug + ueber + 2);
+    }
   }
 
   /* ---------- Tannengirlande (Canvas, fein gestrichelte Nadeln) ---------- */
@@ -1387,7 +1407,7 @@ button { font: inherit; color: inherit; }
   }, { passive: true });
 
   /* ---------- Zustände darstellen ---------- */
-  var ZAHL = ['null', 'eine', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn', 'elf', 'zwölf'];
+  var ZAHL = tx('girlande.zahlwoerter', 'null,eine,zwei,drei,vier,fünf,sechs,sieben,acht,neun,zehn,elf,zwölf').split(',');
   function zustandVon(tag) {
     if (K.istGeoeffnet(tag)) return 'offen';
     if (!K.darfOeffnen(tag)) return 'zu';
@@ -1409,17 +1429,16 @@ button { font: inherit; color: inherit; }
       h.el.className = 'haenger ist-' + st + (istTag ? ' ist-tag' : '') + (laedt ? ' glas-laedt' : '');
       if (laedt) h.lader.style.setProperty('--ladefarbe', F.farbe(t));
       var et = '';
-      if (t === 24) et = 'Heiligabend';
-      else if (st === 'heute' || (istTag && st === 'offen')) et = 'heute';
-      else if (st === 'verpasst') et = 'nachholen';   // vor dem Advents-Etikett: alle goldenen Kugeln gleich beschriftet
-      else if (K.istSonntag(t)) et = K.adventsSonntag(t) + '. Advent';
+      if (t === 24) et = tx('girlande.etikett.heiligabend', 'Heiligabend');
+      else if (st === 'heute' || (istTag && st === 'offen')) et = tx('girlande.etikett.heute', 'heute');
+      else if (st === 'verpasst') et = tx('girlande.etikett.nachholen', 'nachholen');   // vor dem Advents-Etikett: alle goldenen Kugeln gleich beschriftet
+      else if (K.istSonntag(t)) et = tx('girlande.etikett.advent', '{n}. Advent', { n: K.adventsSonntag(t) });
       h.etikett.textContent = et;
-      var lab = 'Tag ' + t + ', ' + K.datumText(t) + ' – ';
-      if (st === 'offen') lab += 'geöffnet, Bild ansehen';
-      else if (st === 'heute') lab += 'heute, noch nicht geöffnet';
-      else if (st === 'verpasst') lab += 'verpasst, jetzt nachholen';
-      else lab += 'gesperrt. ' + K.sperrText(t);
-      h.knopf.setAttribute('aria-label', lab);
+      var zst = st === 'offen' ? tx('girlande.status.offen', 'geöffnet, Bild ansehen')
+        : st === 'heute' ? tx('girlande.status.heute', 'heute, noch nicht geöffnet')
+        : st === 'verpasst' ? tx('girlande.status.verpasst', 'verpasst, jetzt nachholen')
+        : tx('girlande.status.gesperrt', 'gesperrt. {sperre}', { sperre: K.sperrText(t) });
+      h.knopf.setAttribute('aria-label', tx('girlande.kugel', 'Tag {n}, {datum} – {status}', { n: t, datum: K.datumText(t), status: zst }));
     });
     ORD.forEach(function (t) { if (K.istGeoeffnet(t)) glasAnfordern(t); });
 
@@ -1428,20 +1447,19 @@ button { font: inherit; color: inherit; }
     var wort = n < ZAHL.length ? ZAHL[n] : String(n);
     var s;
     if (heute === 0) {
-      s = 'Noch ist November. Ab dem <strong>1. Dezember</strong> füllt sich jeden Tag eine Kugel mit einem Bild aus unserem Jahr.';
+      s = tx('girlande.zeile.november', 'Noch ist November. Ab dem <strong>1. Dezember</strong> füllt sich jeden Tag eine Kugel mit einem Bild aus unserem Jahr.');
     } else if (heute >= 25) {
-      s = '<strong>Frohe Weihnachten!</strong> ' + (n === 0
-        ? 'Alle Kugeln hängen voller Erinnerungen – schaut sie euch noch einmal an.'
-        : '<span class="gold">' + (n === 1 ? 'Eine goldene Kugel wartet' : 'Noch ' + wort + ' goldene Kugeln warten') +
-          ' darauf, geöffnet zu werden.</span>');
+      s = '<strong>' + tx('girlande.zeile.weihnachten', 'Frohe Weihnachten!') + '</strong> ' + (n === 0
+        ? tx('girlande.zeile.alleOffen', 'Alle Kugeln hängen voller Erinnerungen – schaut sie euch noch einmal an.')
+        : '<span class="gold">' + tx('girlande.zeile.festWarten', { one: 'Eine goldene Kugel wartet darauf, geöffnet zu werden.', other: 'Noch {wort} goldene Kugeln warten darauf, geöffnet zu werden.' }, { n: n, wort: wort }) + '</span>');
     } else {
       var offenHeute = K.istGeoeffnet(heute);
       s = '<strong>' + K.datumText(heute) + '.</strong> ' +
-        (heute === 24 ? (offenHeute ? 'Die letzte Kugel ist offen – frohe Weihnachten!' : 'Heiligabend! Die letzte rote Kugel ist dran.')
-          : (offenHeute ? 'Die Kugel von heute ist offen. Morgen kommt die nächste.' : 'Die rote Kugel ist heute dran – tipp sie an.'));
+        (heute === 24 ? (offenHeute ? tx('girlande.zeile.letzteOffen', 'Die letzte Kugel ist offen – frohe Weihnachten!') : tx('girlande.zeile.heiligabend', 'Heiligabend! Die letzte rote Kugel ist dran.'))
+          : (offenHeute ? tx('girlande.zeile.heuteOffen', 'Die Kugel von heute ist offen. Morgen kommt die nächste.') : tx('girlande.zeile.heuteDran', 'Die rote Kugel ist heute dran – tipp sie an.')));
       if (n) {
         var w = wort.charAt(0).toUpperCase() + wort.slice(1);
-        s += ' <span class="gold">' + (n === 1 ? 'Eine goldene Kugel wartet' : w + ' goldene Kugeln warten') + ' aufs Nachholen.</span>';
+        s += ' <span class="gold">' + tx('girlande.zeile.nachholen', { one: 'Eine goldene Kugel wartet aufs Nachholen.', other: '{wortGross} goldene Kugeln warten aufs Nachholen.' }, { n: n, wortGross: w }) + '</span>';
       }
     }
     statusEl.innerHTML = s;
@@ -1453,18 +1471,18 @@ button { font: inherit; color: inherit; }
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'sprung';
-      b.innerHTML = '<span class="mini gold" aria-hidden="true"></span>Zu Kugel ' + t;
-      b.setAttribute('aria-label', 'Zur goldenen Kugel ' + t + ' springen');
+      b.innerHTML = '<span class="mini gold" aria-hidden="true"></span>' + tx('girlande.sprung', 'Zu Kugel {n}', { n: t });
+      b.setAttribute('aria-label', tx('girlande.sprungLang', 'Zur goldenen Kugel {n} springen', { n: t }));
       b.addEventListener('click', function () { zeigeKugel(H[t - 1]); });
       sprungEl.appendChild(b);
     });
     aktionenEl.hidden = jahrBtn.hidden && !sprungEl.firstChild;
 
     var hw;
-    if (heute === 0) hw = 'Öffnet am 1. Dezember';
-    else if (heute >= 25) hw = 'Frohe Weihnachten und ein gutes neues Jahr';
-    else if (heute === 24) hw = 'Frohe Weihnachten, ihr Lieben';
-    else hw = 'Grüne Kugeln verraten, wie oft ihr noch schlafen müsst';
+    if (heute === 0) hw = tx('girlande.hinweis.november', 'Öffnet am 1. Dezember');
+    else if (heute >= 25) hw = tx('girlande.hinweis.weihnachten', 'Frohe Weihnachten und ein gutes neues Jahr');
+    else if (heute === 24) hw = tx('girlande.hinweis.heiligabend', 'Frohe Weihnachten, ihr Lieben');
+    else hw = tx('girlande.hinweis.advent', 'Grüne Kugeln verraten, wie oft ihr noch schlafen müsst');
     hinweisEl.textContent = hw;
 
     girlandenZeichnen();
@@ -1487,7 +1505,7 @@ button { font: inherit; color: inherit; }
     }
     pillZiel = ziel;
     if (ziel) {
-      zuHeuteText.textContent = (art === 'heute' ? 'Heute: Kugel ' : 'Nachholen: Kugel ') + ziel.tag;
+      zuHeuteText.textContent = art === 'heute' ? tx('girlande.pille.heute', 'Heute: Kugel {n}', { n: ziel.tag }) : tx('girlande.pille.nachholen', 'Nachholen: Kugel {n}', { n: ziel.tag });
       zuHeute.classList.toggle('nachholen', art !== 'heute');
     }
     zuHeute.classList.toggle('oben', oben);
@@ -1610,7 +1628,7 @@ button { font: inherit; color: inherit; }
   function tafel(pos) { return A.tafeln[A.rolle[pos + 1]]; }
   function bildText(tag) {
     var ti = F.titel(tag);
-    return ti ? ti + ' – ' + K.datumText(tag) : 'Bild von Kugel ' + tag + ' – ' + K.datumText(tag);
+    return ti ? ti + ' – ' + K.datumText(tag) : tx('girlande.ansicht.bild', 'Bild von Kugel {n} – {datum}', { n: tag, datum: K.datumText(tag) });
   }
   // Seitenverhältnis des Tagesbildes, bevor es geladen ist: echte Maße vom Server (masse), sonst aus format()
   function erwarteteMasse(tag) {
@@ -1690,9 +1708,9 @@ button { font: inherit; color: inherit; }
     if (i === undefined) i = A.idx;
     var tag = A.liste[i], ti = F.titel(tag);
     // Ohne Bildunterschrift: Datum groß als Überschrift, darüber dezent die Kugel-Nummer (nie eine leere Zeile)
-    aDatum.textContent = ti ? K.datumText(tag) : 'Kugel ' + tag;
+    aDatum.textContent = ti ? K.datumText(tag) : tx('girlande.ansicht.kugel', 'Kugel {n}', { n: tag });
     aTitel.textContent = ti || K.datumText(tag);
-    aZaehler.textContent = (i + 1) + ' von ' + A.liste.length + ' geöffnet';
+    aZaehler.textContent = tx('girlande.ansicht.zaehler', '{n} von {gesamt} geöffnet', { n: i + 1, gesamt: A.liste.length });
     aZurueck.disabled = i <= 0;
     aWeiter.disabled = i >= A.liste.length - 1;
     ansicht.style.setProperty('--tagfarbe', F.farbe(tag));

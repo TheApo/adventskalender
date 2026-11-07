@@ -334,7 +334,7 @@ body.fest .kopf{padding-top:24px}
 <div class="seite">
   <header class="kopf">
     <div class="lichterkette" aria-hidden="true"></div>
-    <h1>{{TITEL}}</h1>
+    <h1 data-titel="ganz">{{TITEL}}</h1>
     <p class="heute-zeile" id="heuteZeile"></p>
   </header>
 
@@ -346,16 +346,16 @@ body.fest .kopf{padding-top:24px}
         <div class="zone zone-nuss" aria-hidden="true"></div>
         <div class="knall" id="knall" aria-hidden="true"></div>
         <div class="sagt" id="sagt" aria-hidden="true"></div>
-        <button type="button" class="ton" id="bTon" aria-pressed="true" aria-label="Knackgeräusch" title="Knackgeräusch an oder aus"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" fill="currentColor" fill-opacity=".18"/><g class="an"><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.2 6.8a7.4 7.4 0 0 1 0 10.4"/></g><g class="aus"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g></g></svg></button>
+        <button type="button" class="ton" id="bTon" aria-pressed="true" aria-label="Knackgeräusch" title="Knackgeräusch an oder aus" data-i18n-attr="aria-label:nuss.ton.label;title:nuss.ton.titel"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" fill="currentColor" fill-opacity=".18"/><g class="an"><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.2 6.8a7.4 7.4 0 0 1 0 10.4"/></g><g class="aus"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g></g></svg></button>
       </div>
       <div class="tafel">
         <div class="knoepfe">
-          <button type="button" class="knopf knopf-lack" id="bKnacken" hidden><svg aria-hidden="true"><use href="#i-hebel"/></svg><span>Knacken</span></button>
+          <button type="button" class="knopf knopf-lack" id="bKnacken" hidden><svg aria-hidden="true"><use href="#i-hebel"/></svg><span data-i18n="nuss.knopf.knacken">Knacken</span></button>
           <button type="button" class="knopf knopf-lack" id="bFinden" hidden><svg aria-hidden="true"><use href="#i-suchen"/></svg><span>Heute finden</span></button>
           <button type="button" class="knopf knopf-lack" id="bAnsehen" hidden><svg aria-hidden="true"><use href="#i-bild"/></svg><span>Foto ansehen</span></button>
-          <button type="button" class="knopf knopf-lack" id="bUebung" hidden><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Neue Übungsnuss</span></button>
-          <button type="button" class="knopf knopf-leinen" id="bNochmal" hidden><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Nochmal knacken</span></button>
-          <button type="button" class="knopf knopf-leinen" id="bZurueck" hidden><svg aria-hidden="true"><use href="#i-zurueck"/></svg><span>Zurücklegen</span></button>
+          <button type="button" class="knopf knopf-lack" id="bUebung" hidden><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span data-i18n="nuss.knopf.uebung">Neue Übungsnuss</span></button>
+          <button type="button" class="knopf knopf-leinen" id="bNochmal" hidden><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span data-i18n="nuss.knopf.nochmal">Nochmal knacken</span></button>
+          <button type="button" class="knopf knopf-leinen" id="bZurueck" hidden><svg aria-hidden="true"><use href="#i-zurueck"/></svg><span data-i18n="nuss.knopf.zuruecklegen">Zurücklegen</span></button>
           <button type="button" class="knopf knopf-klein" id="bNachholen" hidden><svg viewBox="0 0 100 40" aria-hidden="true"><use href="#schleife" x="0" y="0" width="100" height="100"/></svg><span></span></button>
         </div>
         <h2 id="bankTitel">Der Nussknacker</h2>
@@ -364,12 +364,12 @@ body.fest .kopf{padding-top:24px}
     </section>
 
     <section class="tuch-bereich" id="tuchBereich" aria-labelledby="tuchTitel">
-      <h2 id="tuchTitel">Das Nusstuch</h2>
-      <ul class="legende" aria-label="Zeichenerklärung">
-        <li id="lgHeute"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-gold"/></svg>Heute</li>
-        <li id="lgNach"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-braun"/><use href="#schleife"/></svg>Nachholen</li>
-        <li id="lgOffen"><span class="mini-offen" aria-hidden="true"><i></i><svg viewBox="0 0 100 64"><use href="#schale"/></svg><svg viewBox="0 0 100 64"><use href="#schale"/></svg></span>Offen</li>
-        <li id="lgZu"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-braun"/></svg>Kommt noch</li>
+      <h2 id="tuchTitel" data-i18n="nuss.tuch">Das Nusstuch</h2>
+      <ul class="legende" aria-label="Zeichenerklärung" data-i18n-attr="aria-label:nuss.legende.titel">
+        <li id="lgHeute"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-gold"/></svg><span data-i18n="nuss.legende.heute">Heute</span></li>
+        <li id="lgNach"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-braun"/><use href="#schleife"/></svg><span data-i18n="nuss.legende.nachholen">Nachholen</span></li>
+        <li id="lgOffen"><span class="mini-offen" aria-hidden="true"><i></i><svg viewBox="0 0 100 64"><use href="#schale"/></svg><svg viewBox="0 0 100 64"><use href="#schale"/></svg></span><span data-i18n="nuss.legende.offen">Offen</span></li>
+        <li id="lgZu"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-braun"/></svg><span data-i18n="nuss.legende.zu">Kommt noch</span></li>
       </ul>
       <div class="tuch" id="tuch"></div>
       <div class="blase" id="blase" hidden></div>
@@ -384,8 +384,8 @@ body.fest .kopf{padding-top:24px}
   <div class="a-innen">
     <div class="a-kopf" id="aKopf">
       <p class="a-zaehler" id="aZaehler"></p>
-      <button type="button" class="knopf knopf-klein a-nochmal" id="aNochmal"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Nochmal knacken</span></button>
-      <button type="button" class="rund" id="aZu" aria-label="Bildansicht schließen"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+      <button type="button" class="knopf knopf-klein a-nochmal" id="aNochmal"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span data-i18n="nuss.knopf.nochmal">Nochmal knacken</span></button>
+      <button type="button" class="rund" id="aZu" aria-label="Bildansicht schließen" data-i18n-attr="aria-label:nuss.ansicht.schliessen"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
     </div>
     <div class="a-buehne" id="aBuehne">
       <div class="spur" id="spur">
@@ -397,22 +397,25 @@ body.fest .kopf{padding-top:24px}
           </div>
           <div class="rolle unten" id="rolleUnten"><span class="band"></span></div>
         </div>
-        <p class="a-status" id="aStatus" hidden>Das Foto wird geladen …</p>
+        <p class="a-status" id="aStatus" hidden data-i18n="nuss.ansicht.laden">Das Foto wird geladen …</p>
       </div>
     </div>
     <div class="a-fuss" id="aFuss">
-      <button type="button" class="rund" id="aVor" aria-label="Vorheriges Foto"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
+      <button type="button" class="rund" id="aVor" aria-label="Vorheriges Foto" data-i18n-attr="aria-label:nuss.ansicht.zurueck"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
       <div class="a-text"><h2 id="aTitel"></h2><p id="aDatum"></p></div>
-      <button type="button" class="rund" id="aNach" aria-label="Nächstes Foto"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
+      <button type="button" class="rund" id="aNach" aria-label="Nächstes Foto" data-i18n-attr="aria-label:nuss.ansicht.weiter"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
     </div>
   </div>
 </dialog>
 
+<script src="../shared/sprachen.js"></script>
+<script src="../shared/i18n.js"></script>
 <script src="../shared/kalender.js"></script>
 <script src="../shared/fotos.js"></script>
 <script>
 (function () {
   'use strict';
+  var tx = I18N.t; // Texte aus i18n/<sprache>.json, Bereich „nuss“ (t ist hier die Tageszahl)
   var K = window.Kalender.init('nuss');
   var F = window.Fotos;
   var REDUZIERT = !!K.bewegungReduziert;
@@ -512,11 +515,11 @@ body.fest .kopf{padding-top:24px}
   }
   document.addEventListener('pointerup', tonEntsperren, true);
   document.addEventListener('keydown', tonEntsperren, true);
-  function tonKnopf() { el.bTon.setAttribute('aria-pressed', ton.an ? 'true' : 'false'); el.bTon.title = ton.an ? 'Knackgeräusch ist an – zum Ausschalten tippen' : 'Knackgeräusch ist aus – zum Einschalten tippen'; }
+  function tonKnopf() { el.bTon.setAttribute('aria-pressed', ton.an ? 'true' : 'false'); el.bTon.title = ton.an ? tx('nuss.ton.an', 'Knackgeräusch ist an – zum Ausschalten tippen') : tx('nuss.ton.aus', 'Knackgeräusch ist aus – zum Einschalten tippen'); }
   el.bTon.addEventListener('click', function () {
     ton.an = !ton.an; merkeSchreiben('ton', ton.an ? '1' : '0'); tonKnopf();
     if (ton.an) knackTon(0.6);
-    sage(ton.an ? 'Knackgeräusch an.' : 'Knackgeräusch aus.');
+    sage(ton.an ? tx('nuss.ton.kurzAn', 'Knackgeräusch an.') : tx('nuss.ton.kurzAus', 'Knackgeräusch aus.'));
   });
   tonKnopf();
 
@@ -671,8 +674,9 @@ body.fest .kopf{padding-top:24px}
     rr(g, 66, 58.5, 20.5, 3.4, 0.8); g.fillStyle = goldVerlauf(g, 58.5, 61.9); g.fill();
     g.strokeStyle = 'rgba(90,60,15,.6)'; g.lineWidth = 0.18; g.stroke();
     g.font = '2.3px "Young Serif", Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = 'rgba(255,250,225,.7)'; g.fillText('Dein Advent', 76.25, 60.45);
-    g.fillStyle = '#4a3208'; g.fillText('Dein Advent', 76.25, 60.25);
+    var schild = tx('nuss.schild', 'Dein Advent');
+    g.fillStyle = 'rgba(255,250,225,.7)'; g.fillText(schild, 76.25, 60.45);
+    g.fillStyle = '#4a3208'; g.fillText(schild, 76.25, 60.25);
     // Säule: Fuß, Schaft, Ringe
     rr(g, 12.4, 52, 15.2, 3.8, 1.6); g.fillStyle = holzQuer(g, 12.4, 27.6); g.fill();
     g.fillStyle = 'rgba(255,240,210,.35)'; g.fillRect(13.4, 52.1, 13.2, 0.35);
@@ -997,7 +1001,7 @@ body.fest .kopf{padding-top:24px}
   var unterwegs = {};         // Tage, deren Nuss gerade fliegt oder im Knacker liegt
   var raf = 0, zuletzt = 0, token = 0, offenUhr = 0;
   var DRUCK_PX = 34;          // Fingerweg über den Kontakt hinaus für einen Riss (wächst je Riss um 9 %)
-  var WORTE = ['Knack!', 'Knirsch!', 'Krrk!', 'Knack!'];
+  var WORTE = [tx('nuss.wort.knack', 'Knack!'), tx('nuss.wort.knirsch', 'Knirsch!'), tx('nuss.wort.krrk', 'Krrk!'), tx('nuss.wort.knack', 'Knack!')];
   var huepfer = null;         // Nuss hüpft zwischen Brett und Mulde: { tag, n, t, d, von, nach, hub, rein, fertig }
   var kernFlug = null, kerne = parseInt(merkeLesen('kerne', '0'), 10) || 0;
   var brettAnim = 0, brettBild = null, sperreBis = 0;
@@ -1276,14 +1280,14 @@ body.fest .kopf{padding-top:24px}
     knackTon(0.55 + nuss.risse * 0.12);
     knallWort(WORTE[(nuss.risse - 1) % WORTE.length], false);
     var rest = nuss.ziel - nuss.risse;
-    koenigSagt(rest <= 1 ? 'Fast! Noch einmal!' : nuss.risse === 1 ? 'Noch einmal!' : 'Weiter so!', 260);
+    koenigSagt(rest <= 1 ? tx('nuss.sagt.fast', 'Fast! Noch einmal!') : nuss.risse === 1 ? tx('nuss.sagt.nochmal', 'Noch einmal!') : tx('nuss.sagt.weiter', 'Weiter so!'), 260);
     tafel();
-    sage(rest <= 1 ? 'Knack! Noch einmal kräftig drücken.' : 'Knack! Ein Riss in der Schale. Noch einmal drücken.');
+    sage(rest <= 1 ? tx('nuss.sage.fast', 'Knack! Noch einmal kräftig drücken.') : tx('nuss.sage.riss', 'Knack! Ein Riss in der Schale. Noch einmal drücken.'));
   }
   // Kontakt ohne Riss: kleine Rückmeldung, damit man weiß, dass es fester gehen muss
   function fester() {
     wackle(0.12, 0.55); vibriere(6);
-    koenigSagt('Fester!', 0);
+    koenigSagt(tx('nuss.sagt.fester', 'Fester!'), 0);
   }
   var sagtUhr = 0, sagtAnim = null;
   function koenigSagt(text, verzug) {
@@ -1307,7 +1311,7 @@ body.fest .kopf{padding-top:24px}
   function kernInsSchaelchen() {
     kerne++; merkeSchreiben('kerne', kerne);
     tockTon(true); vibriere(8);
-    if (K.heute() === 0) koenigSagt(kerne === 1 ? 'Lecker!' : 'Schon ' + kerne + ' Kerne!', 0);
+    if (K.heute() === 0) koenigSagt(kerne === 1 ? tx('nuss.sagt.lecker', 'Lecker!') : tx('nuss.sagt.kerne', 'Schon {n} Kerne!', { n: kerne }), 0);
     tafel(); starte();
   }
 
@@ -1326,7 +1330,7 @@ body.fest .kopf{padding-top:24px}
     vibriere([30, 40, 80]);
     knackTon(1.6);
     koenigStill();
-    knallWort('Geschafft!', true);
+    knallWort(tx('nuss.wort.geschafft', 'Geschafft!'), true);
     el.buehne.classList.remove('scharf');
     sperreBis = performance.now() + (n.uebung ? 700 : 1500);
     if (!n.uebung && !n.nochmal) {
@@ -1335,8 +1339,8 @@ body.fest .kopf{padding-top:24px}
       fuelleNuss(n.tag, true);
     }
     tafel();
-    if (n.uebung) { sage('Geschafft! Drinnen war eine Haselnuss, der Kern liegt jetzt im Schälchen.'); return; }
-    sage('Geschafft! Die Nuss ist offen, ein Foto rollt heraus.');
+    if (n.uebung) { sage(tx('nuss.sage.uebungOffen', 'Geschafft! Drinnen war eine Haselnuss, der Kern liegt jetzt im Schälchen.')); return; }
+    sage(tx('nuss.sage.offen', 'Geschafft! Die Nuss ist offen, ein Foto rollt heraus.'));
     ladeBild(n.tag).catch(noop);
     var mein = token;
     clearTimeout(offenUhr);
@@ -1534,8 +1538,8 @@ body.fest .kopf{padding-top:24px}
     if (h <= 24 && zustand(h) === 'heute' && !unterwegs[h]) { legeEin(h, slots[h], perTaste); return; }
     v = juengsterVerpasst();
     if (v) { lassFallen(v, null, perTaste); return; }
-    koenigSagt(h >= 25 ? 'Frohe Weihnachten!' : 'Heute schon geknackt!', 0);
-    if (h <= 24) el.text.textContent = 'Die Nuss von heute ist schon offen. Morgen wartet die nächste – oder knack sie einfach nochmal.';
+    koenigSagt(h >= 25 ? tx('nuss.sagt.weihnachten', 'Frohe Weihnachten!') : tx('nuss.sagt.schonGeknackt', 'Heute schon geknackt!'), 0);
+    if (h <= 24) el.text.textContent = tx('nuss.tafel.schonOffen', 'Die Nuss von heute ist schon offen. Morgen wartet die nächste – oder knack sie einfach nochmal.');
   }
 
   /* ================================================================
@@ -1618,7 +1622,7 @@ body.fest .kopf{padding-top:24px}
     vibriere(10); tockTon(false);
     el.buehne.classList.add('scharf');
     tafel(); starte();
-    sage('Nuss ' + t + ' liegt im Nussknacker. Drück den Hebel nach unten oder tipp auf „Knacken“.');
+    sage(tx('nuss.sage.eingelegt', 'Nuss {n} liegt im Nussknacker. Drück den Hebel nach unten oder tipp auf „Knacken“.', { n: t }));
     if (perTaste) fokus(el.bKnacken);
     vorladen(t);
   }
@@ -1653,7 +1657,7 @@ body.fest .kopf{padding-top:24px}
       el.buehne.classList.add('scharf');
       tafel(); starte(); zeichne();
       if (!nuss.uebung) vorladen(t);
-      sage((nuss.uebung ? 'Eine Übungsnuss' : 'Nuss ' + t) + ' liegt im Nussknacker.');
+      sage(nuss.uebung ? tx('nuss.sage.uebungDrin', 'Eine Übungsnuss liegt im Nussknacker.') : tx('nuss.sage.drin', 'Nuss {n} liegt im Nussknacker.', { n: t }));
       if (perTaste) fokus(el.bKnacken);
     });
   }
@@ -1738,18 +1742,18 @@ body.fest .kopf{padding-top:24px}
     b.className = 'nuss z-' + z + (weg ? ' leer' : '') + (neu ? ' neu' : '');
     if (weg) {
       html = '<span class="figur"><span class="mulde">' + t + '</span></span>';
-      status = unterwegs[t] ? 'liegt gerade im Nussknacker' : 'heute – die goldene Nuss liegt schon beim Nussknacker bereit';
+      status = unterwegs[t] ? tx('nuss.status.unterwegs', 'liegt gerade im Nussknacker') : tx('nuss.status.brett', 'heute – die goldene Nuss liegt schon beim Nussknacker bereit');
     } else if (z === 'offen') {
       html = '<span class="figur offen"><span class="foto"><img alt="" decoding="async" draggable="false"></span><svg class="schale sl" viewBox="0 0 100 64" aria-hidden="true"><use href="#schale"/></svg><svg class="schale sr" viewBox="0 0 100 64" aria-hidden="true"><use href="#schale"/></svg><span class="nr" aria-hidden="true">' + t + '</span></span>';
-      status = 'geöffnet, Foto ansehen';
+      status = tx('nuss.status.offen', 'geöffnet, Foto ansehen');
     } else {
       html = '<span class="figur">' + nussSvg(t, z === 'heute' ? 'gold' : 'braun', z === 'verpasst') + '</span>';
-      status = z === 'heute' ? 'heute, die goldene Nuss – zum Knacken antippen' : z === 'verpasst' ? 'verpasst, jetzt nachholen' : 'noch zu';
+      status = z === 'heute' ? tx('nuss.status.heute', 'heute, die goldene Nuss – zum Knacken antippen') : z === 'verpasst' ? tx('nuss.status.verpasst', 'verpasst, jetzt nachholen') : tx('nuss.status.zu', 'noch zu');
     }
     var altesBild = vorschauIO && b.querySelector('img');
     if (altesBild) vorschauIO.unobserve(altesBild);
     b.innerHTML = html;
-    b.setAttribute('aria-label', 'Tag ' + t + ', ' + K.datumText(t) + ' – ' + status);
+    b.setAttribute('aria-label', tx('nuss.label', 'Tag {n}, {datum} – {status}', { n: t, datum: K.datumText(t), status: status }));
     if (z === 'offen' && !weg) {
       var img = b.querySelector('img'), foto = img.parentNode, schon = vorschauFertig[t];
       img.setAttribute('data-tag', t);
@@ -1843,7 +1847,7 @@ body.fest .kopf{padding-top:24px}
   function sperre(b, t) {
     b.classList.remove('zurueckrollen'); void b.offsetWidth; b.classList.add('zurueckrollen');
     vibriere(12);
-    zeigeBlase(b, K.sperrText(t), K.heute() === 0 ? 'Nuss ' + t + ' ist am ' + K.datumText(t) + ' dran.' : 'Nuss ' + t + ' ist am ' + K.datumText(t) + ' dran.');
+    zeigeBlase(b, K.sperrText(t), tx('nuss.blase.dran', 'Nuss {n} ist am {datum} dran.', { n: t, datum: K.datumText(t) }));
   }
   document.addEventListener('pointerdown', function (e) { if (!el.blase.hidden && !(e.target.closest && e.target.closest('.nuss'))) versteckeBlase(); });
 
@@ -1855,7 +1859,7 @@ body.fest .kopf{padding-top:24px}
       b.classList.remove('hopst'); void b.offsetWidth; b.classList.add('hopst', 'gefunden');
       setTimeout(function () { b.classList.remove('gefunden'); }, 2600);
       fokus(b);
-      sage('Da ist sie: die goldene Nuss von Tag ' + t + '. Tipp sie an.');
+      sage(tx('nuss.sage.gefunden', 'Da ist sie: die goldene Nuss von Tag {n}. Tipp sie an.', { n: t }));
     };
     if (r.top < 70 || r.bottom > vh - 40) scrolleZu(window.scrollY + r.top - vh * 0.42).then(fertig); else fertig();
   }
@@ -1879,40 +1883,40 @@ body.fest .kopf{padding-top:24px}
   function tafel() {
     var h = K.heute(), titel, text, z = {};
     if (phase === 'bereit' && nuss) {
-      var hilfe = 'Zieh den roten Griff nach unten – oder tipp auf die Nuss. Jeder Druck gibt einen Riss.';
-      if (nuss.uebung) { titel = 'Eine Nuss zum Üben'; text = 'Ab 1. Dezember steckt in jeder Nuss ein Foto. Bis dahin darfst du üben: ' + hilfe.charAt(0).toLowerCase() + hilfe.slice(1); }
-      else if (nuss.nochmal) { titel = 'Nuss ' + nuss.tag + ' nochmal knacken'; text = hilfe; }
-      else if (nuss.tag === h) { titel = 'Knack die goldene Nuss!'; text = hilfe; }
-      else { titel = 'Nuss ' + nuss.tag + ' nachholen'; text = K.datumText(nuss.tag) + '. ' + hilfe; }
+      var hilfe = tx('nuss.tafel.hilfe', 'Zieh den roten Griff nach unten – oder tipp auf die Nuss. Jeder Druck gibt einen Riss.');
+      if (nuss.uebung) { titel = tx('nuss.tafel.uebung', 'Eine Nuss zum Üben'); text = tx('nuss.tafel.uebungText', 'Ab 1. Dezember steckt in jeder Nuss ein Foto. Bis dahin darfst du üben: zieh den roten Griff nach unten – oder tipp auf die Nuss. Jeder Druck gibt einen Riss.'); }
+      else if (nuss.nochmal) { titel = tx('nuss.tafel.nochmal', 'Nuss {n} nochmal knacken', { n: nuss.tag }); text = hilfe; }
+      else if (nuss.tag === h) { titel = tx('nuss.tafel.heute', 'Knack die goldene Nuss!'); text = hilfe; }
+      else { titel = tx('nuss.tafel.nachholen', 'Nuss {n} nachholen', { n: nuss.tag }); text = K.datumText(nuss.tag) + '. ' + hilfe; }
       if (nuss.risse > 0) {
         var rest = nuss.ziel - nuss.risse;
-        text = rest <= 1 ? 'Gleich ist sie offen – noch einmal kräftig!' : nuss.risse === 1 ? 'Knack! Ein erster Riss. Hebel hoch – und gleich nochmal!' : 'Es knirscht schon ordentlich – weiter!';
+        text = rest <= 1 ? tx('nuss.tafel.gleich', 'Gleich ist sie offen – noch einmal kräftig!') : nuss.risse === 1 ? tx('nuss.tafel.ersterRiss', 'Knack! Ein erster Riss. Hebel hoch – und gleich nochmal!') : tx('nuss.tafel.knirscht', 'Es knirscht schon ordentlich – weiter!');
       }
       z.knacken = 1; if (!nuss.uebung) z.zurueck = 1;
-      el.bZurueck.lastChild.textContent = nuss.nochmal ? 'Weglegen' : 'Zurücklegen';
+      el.bZurueck.lastChild.textContent = nuss.nochmal ? tx('nuss.knopf.weglegen', 'Weglegen') : tx('nuss.knopf.zuruecklegen', 'Zurücklegen');
     } else if (phase === 'geknackt' && letzter && letzter.uebung) {
-      titel = 'Gut geknackt!';
-      text = (kernFlug ? 'Der Kern hüpft ins Schälchen. ' : kerne > 1 ? 'Schon ' + kerne + ' Kerne im Schälchen. ' : kerne === 1 ? 'Der erste Kern liegt im Schälchen. ' : '') + 'Ab 1. Dezember rollt aus jeder Nuss ein Foto.';
+      titel = tx('nuss.tafel.gutGeknackt', 'Gut geknackt!');
+      text = (kernFlug ? tx('nuss.tafel.kernHuepft', 'Der Kern hüpft ins Schälchen.') + ' ' : kerne > 1 ? tx('nuss.tafel.kerne', 'Schon {n} Kerne im Schälchen.', { n: kerne }) + ' ' : kerne === 1 ? tx('nuss.tafel.ersterKern', 'Der erste Kern liegt im Schälchen.') + ' ' : '') + tx('nuss.tafel.abDezember', 'Ab 1. Dezember rollt aus jeder Nuss ein Foto.');
       z.uebung = 1;
     } else {
       var t = anzeigeTag();
-      if (h === 0) { titel = 'Noch ist November'; text = 'Ab 1. Dezember liegt jeden Tag eine goldene Nuss bereit.' + (kerne ? ' Im Schälchen ' + (kerne === 1 ? 'liegt schon ein Kern.' : 'liegen schon ' + kerne + ' Kerne.') : ''); z.uebung = 1; }
-      else if (h <= 24 && unterwegs[h] && !nuss) { titel = 'Die goldene Nuss kommt'; text = 'Gleich liegt sie im Nussknacker.'; }
+      if (h === 0) { titel = tx('nuss.tafel.november', 'Noch ist November'); text = tx('nuss.tafel.novemberText', 'Ab 1. Dezember liegt jeden Tag eine goldene Nuss bereit.') + (kerne ? ' ' + tx('nuss.tafel.schaelchen', { one: 'Im Schälchen liegt schon ein Kern.', other: 'Im Schälchen liegen schon {n} Kerne.' }, { n: kerne }) : ''); z.uebung = 1; }
+      else if (h <= 24 && unterwegs[h] && !nuss) { titel = tx('nuss.tafel.kommt', 'Die goldene Nuss kommt'); text = tx('nuss.tafel.gleichDrin', 'Gleich liegt sie im Nussknacker.'); }
       else if (h <= 24 && !K.istGeoeffnet(h) && !unterwegs[h]) {
-        titel = 'Die goldene Nuss wartet';
-        text = aufBrett() ? 'Sie liegt schon neben dem Nussknacker. Tipp sie an oder zieh am roten Griff – dann hüpft sie hinein.'
-          : 'Irgendwo auf dem Tuch liegt die goldene Nuss von heute. Tipp sie an oder zieh am roten Griff – dann rollt sie in den Nussknacker.';
+        titel = tx('nuss.tafel.wartet', 'Die goldene Nuss wartet');
+        text = aufBrett() ? tx('nuss.tafel.brett', 'Sie liegt schon neben dem Nussknacker. Tipp sie an oder zieh am roten Griff – dann hüpft sie hinein.')
+          : tx('nuss.tafel.suchen', 'Irgendwo auf dem Tuch liegt die goldene Nuss von heute. Tipp sie an oder zieh am roten Griff – dann rollt sie in den Nussknacker.');
         z.finden = 1;
       } else if (t) {
         var ti = bildTitel(t);
-        titel = ti || 'Nuss ' + t + ' ist offen';
-        text = (ti ? 'Nuss ' + t + ' · ' : '') + K.datumText(t) + '.';
-        if (h >= 25 && !juengsterVerpasst() && phase !== 'geknackt') { titel = 'Alle 24 Nüsse sind geknackt'; text = 'Tipp eine offene Nuss auf dem Tuch an – oder schau dir alle Fotos nacheinander an.'; z.alle = 1; }
+        titel = ti || tx('nuss.tafel.offen', 'Nuss {n} ist offen', { n: t });
+        text = ti ? tx('nuss.tafel.nussDatum', 'Nuss {n} · {datum}.', { n: t, datum: K.datumText(t) }) : K.datumText(t) + '.';
+        if (h >= 25 && !juengsterVerpasst() && phase !== 'geknackt') { titel = tx('nuss.tafel.alleGeknackt', 'Alle 24 Nüsse sind geknackt'); text = tx('nuss.tafel.alleGeknacktText', 'Tipp eine offene Nuss auf dem Tuch an – oder schau dir alle Fotos nacheinander an.'); z.alle = 1; }
         z.ansehen = 1; z.nochmal = 1;
       } else if (h >= 25) {
-        titel = 'Ein paar Nüsse warten noch'; text = 'Die Nüsse mit Schleife darfst du jetzt in Ruhe nachholen.';
+        titel = tx('nuss.tafel.warten', 'Ein paar Nüsse warten noch'); text = tx('nuss.tafel.wartenText', 'Die Nüsse mit Schleife darfst du jetzt in Ruhe nachholen.');
         if (K.geoeffnet().length) z.ansehen = 1;
-      } else { titel = 'Der Nussknacker'; text = 'Tipp eine Nuss mit Schleife an, um sie nachzuholen.'; }
+      } else { titel = tx('nuss.tafel.titel', 'Der Nussknacker'); text = tx('nuss.tafel.schleife', 'Tipp eine Nuss mit Schleife an, um sie nachzuholen.'); }
     }
     var t2 = phase === 'bereit' ? 0 : anzeigeTag();
     nachholTag = phase !== 'bereit' && !z.uebung ? juengsterVerpasst() : 0;
@@ -1920,28 +1924,30 @@ body.fest .kopf{padding-top:24px}
     el.bKnacken.hidden = !z.knacken; el.bZurueck.hidden = !z.zurueck; el.bFinden.hidden = !z.finden;
     el.bAnsehen.hidden = !z.ansehen; el.bNochmal.hidden = !z.nochmal; el.bUebung.hidden = !z.uebung;
     ansehenAlle = !!(z.alle || !t2);
-    el.bAnsehen.lastChild.textContent = ansehenAlle ? 'Alle Fotos ansehen' : 'Foto ansehen';
-    el.bFinden.lastChild.textContent = aufBrett() ? 'Goldene Nuss einlegen' : 'Heute finden';
+    el.bAnsehen.lastChild.textContent = ansehenAlle ? tx('nuss.knopf.alleFotos', 'Alle Fotos ansehen') : tx('nuss.knopf.foto', 'Foto ansehen');
+    el.bFinden.lastChild.textContent = aufBrett() ? tx('nuss.knopf.einlegen', 'Goldene Nuss einlegen') : tx('nuss.knopf.finden', 'Heute finden');
     el.bFinden.firstChild.innerHTML = '<use href="' + (aufBrett() ? '#i-hebel' : '#i-suchen') + '"/>';
     el.bNachholen.hidden = !nachholTag || !!z.finden && nachholTag === h;
-    if (nachholTag) el.bNachholen.lastChild.textContent = (nachholTag === h - 1 && h <= 24 ? 'Gestern verpasst: Nuss ' : 'Verpasst: Nuss ') + nachholTag + ' holen';
+    if (nachholTag) el.bNachholen.lastChild.textContent = nachholTag === h - 1 && h <= 24 ? tx('nuss.knopf.gestern', 'Gestern verpasst: Nuss {n} holen', { n: nachholTag }) : tx('nuss.knopf.verpasst', 'Verpasst: Nuss {n} holen', { n: nachholTag });
     // Ohne goldene Nuss und ohne offenes Foto ist „Nachholen“ die Hauptsache
     el.bNachholen.className = 'knopf ' + (!z.finden && !z.ansehen && !z.knacken ? 'knopf-lack' : 'knopf-klein');
-    var art = nuss ? (nuss.uebung ? 'eine Übungsnuss' : (nuss.art === 'gold' ? 'die goldene Nuss ' : 'Nuss ') + nuss.tag) + (nuss.risse ? ' mit ' + nuss.risse + (nuss.risse === 1 ? ' Riss' : ' Rissen') : '') : '';
-    el.lw.setAttribute('aria-label', nuss ? 'Hölzerner Nussknacker, im Knacker liegt ' + art
-      : 'Hölzerner Nussknacker, leer' + (brettNussDa() ? '. Daneben auf dem Brett wartet die goldene Nuss ' + brettNussDa() : '') + (h === 0 && kerne ? '. Im Schälchen ' + (kerne === 1 ? 'liegt ein Kern' : 'liegen ' + kerne + ' Kerne') : ''));
+    var art = nuss ? (nuss.uebung ? tx('nuss.lw.uebung', 'eine Übungsnuss') : nuss.art === 'gold' ? tx('nuss.lw.gold', 'die goldene Nuss {n}', { n: nuss.tag }) : tx('nuss.lw.nuss', 'Nuss {n}', { n: nuss.tag })) : '';
+    if (nuss && nuss.risse) art = tx('nuss.lw.risse', { one: '{art} mit {n} Riss', other: '{art} mit {n} Rissen' }, { art: art, n: nuss.risse });
+    el.lw.setAttribute('aria-label', nuss ? tx('nuss.lw.voll', 'Hölzerner Nussknacker, im Knacker liegt {art}', { art: art })
+      : tx('nuss.lw.leer', 'Hölzerner Nussknacker, leer') + (brettNussDa() ? '. ' + tx('nuss.lw.brett', 'Daneben auf dem Brett wartet die goldene Nuss {n}', { n: brettNussDa() }) : '') +
+        (h === 0 && kerne ? '. ' + tx('nuss.lw.kerne', { one: 'Im Schälchen liegt ein Kern', other: 'Im Schälchen liegen {n} Kerne' }, { n: kerne }) : ''));
     kopf();
   }
   function kopf() {
     var h = K.heute();
     document.body.classList.toggle('november', h === 0);
     document.body.classList.toggle('fest', h >= 25);
-    el.heuteZeile.textContent = h === 0 ? 'Noch ist November – am 1. Dezember geht’s los.'
-      : h >= 25 ? 'Frohe Weihnachten!'
-      : 'Heute ist ' + K.datumText(h) + '.';
+    el.heuteZeile.textContent = h === 0 ? tx('nuss.kopf.november', 'Noch ist November – am 1. Dezember geht’s los.')
+      : h >= 25 ? tx('nuss.kopf.weihnachten', 'Frohe Weihnachten!')
+      : tx('nuss.kopf.heute', 'Heute ist {datum}.', { datum: K.datumText(h) });
     var nz = 0, nv = 0, no = 0;
     for (var t = 1; t <= 24; t++) { var zz = zustand(t); if (zz === 'zu') nz++; else if (zz === 'verpasst' && !unterwegs[t]) nv++; else if (zz === 'offen') no++; }
-    if (h >= 25) el.heuteZeile.textContent = nv ? 'Frohe Weihnachten! Jetzt darf jede Nuss geknackt werden.' : 'Frohe Weihnachten und schöne Feiertage!';
+    if (h >= 25) el.heuteZeile.textContent = nv ? tx('nuss.kopf.weihnachtenNachholen', 'Frohe Weihnachten! Jetzt darf jede Nuss geknackt werden.') : tx('nuss.kopf.feiertage', 'Frohe Weihnachten und schöne Feiertage!');
     // Legende zeigt nur, was gerade auf dem Tuch liegt
     $('lgHeute').hidden = !(h >= 1 && h <= 24 && zustand(h) === 'heute' && !aufBrett() && !unterwegs[h]);
     $('lgNach').hidden = !nv; $('lgOffen').hidden = !no && !(h >= 1 && h <= 24); $('lgZu').hidden = !nz;
@@ -2018,12 +2024,12 @@ body.fest .kopf{padding-top:24px}
 
   function setzeTexte(t) {
     var ti = bildTitel(t);
-    el.aTitel.textContent = ti || 'Tag ' + t;
-    el.aDatum.textContent = ti ? 'Tag ' + t + ' · ' + K.datumText(t) : K.datumText(t);
-    el.aZaehler.textContent = (A.i + 1) + ' von ' + A.liste.length;
-    el.aZaehler.setAttribute('aria-label', 'Foto ' + (A.i + 1) + ' von ' + A.liste.length);
+    el.aTitel.textContent = ti || tx('nuss.ansicht.tag', 'Tag {n}', { n: t });
+    el.aDatum.textContent = ti ? tx('nuss.ansicht.tagDatum', 'Tag {n} · {datum}', { n: t, datum: K.datumText(t) }) : K.datumText(t);
+    el.aZaehler.textContent = tx('nuss.ansicht.zaehler', '{n} von {gesamt}', { n: A.i + 1, gesamt: A.liste.length });
+    el.aZaehler.setAttribute('aria-label', tx('nuss.ansicht.zaehlerLang', 'Foto {n} von {gesamt}', { n: A.i + 1, gesamt: A.liste.length }));
     el.aVor.disabled = A.i <= 0; el.aNach.disabled = A.i >= A.liste.length - 1;
-    el.aBild.alt = 'Fotocollage von Tag ' + t + (ti ? ': ' + ti : '');
+    el.aBild.alt = ti ? tx('nuss.ansicht.altTitel', 'Fotocollage von Tag {n}: {titel}', { n: t, titel: ti }) : tx('nuss.ansicht.alt', 'Fotocollage von Tag {n}', { n: t });
   }
   // Ladezustand im Pergament (Streifenpapier + Nuss, erscheint erst nach kurzer Wartezeit) bzw. bei Fehlern
   // (403/404/Netz) ein Hinweis mit „Nochmal versuchen“ – nie ein leeres oder schwarzes Blatt
@@ -2033,7 +2039,7 @@ body.fest .kopf{padding-top:24px}
     L.hidden = false; el.aBild.hidden = true;
     L.classList.toggle('laedt', !fehler);
     if (fehler) {
-      L.innerHTML = '<p>Dieses Foto lässt sich gerade nicht laden.</p><button type="button" class="knopf knopf-lack"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Nochmal versuchen</span></button>';
+      L.innerHTML = '<p>' + tx('nuss.ansicht.fehler', 'Dieses Foto lässt sich gerade nicht laden.') + '</p><button type="button" class="knopf knopf-lack"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>' + tx('nuss.ansicht.nochmal', 'Nochmal versuchen') + '</span></button>';
       var b = L.querySelector('button');
       b.addEventListener('click', function (e) {
         delete bildCache[t];
@@ -2042,9 +2048,9 @@ body.fest .kopf{padding-top:24px}
         A.nochmalPerTaste = e.detail === 0;   // per Tastatur: klappt es wieder nicht, landet der Fokus erneut hier
       });
       if (hatteFokus) fokus(b);
-      sage('Das Foto lässt sich gerade nicht laden.');
+      sage(tx('nuss.ansicht.fehlerKurz', 'Das Foto lässt sich gerade nicht laden.'));
     } else {
-      L.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-braun"/></svg><span>Das Foto wird geladen …</span>';
+      L.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-braun"/></svg><span>' + tx('nuss.ansicht.laden', 'Das Foto wird geladen …') + '</span>';
     }
   }
 
