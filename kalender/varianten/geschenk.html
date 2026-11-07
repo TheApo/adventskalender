@@ -1,0 +1,2453 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6dcd8">
+<title>Der Gabentisch – {{TITEL}}</title>
+<link rel="stylesheet" href="../fonts/geschenk.css">
+<style>
+:root {
+  /* Farben: Zuckerrosa Wand, Brombeer-Tinte, Kirschband, Tannenpapier, Goldkordel, Seidenpapier */
+  --wand: #f6dcd8;
+  --brombeer: #3d1830;
+  --kirsch: #c8203f;
+  --tanne: #1f5c45;
+  --gold: #e8b04a;
+  --seide: #fff8f4;
+  /* Schriften: Plakat-Schwung für Titel und Zahlen, sehr gut lesbare Textschrift, Handschrift für Anhänger */
+  --schrift-titel: 'Shrikhand', 'Cooper Black', Georgia, serif;
+  --schrift-text: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --schrift-hand: 'Caveat', 'Segoe Print', 'Bradley Hand', cursive;
+  /* Menü-Knopf aus kalender.js (#kalender-reset, runder 40-px-Knopf: Ansicht wechseln, Testmodus): sitzt in
+     allen Varianten fest unten links (kalender.js setzt die Lage selbst, Varianten verschieben ihn nicht).
+     Diese Seite hält die Ecke frei (Fläche --menue-knopf-zone, 64 × 64 px): die Pille „weiter unten“
+     weicht nach oben aus, die Fußzeile lässt links und rechts 64 px frei. In Fokus- und Bildansicht ausgeblendet. */
+  --spalten: 3;
+  --spalt: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--wand); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overscroll-behavior-x: none; }
+html.vollansicht { overflow: hidden; overscroll-behavior: none; }
+body {
+  position: relative; margin: 0; min-height: 100vh; color: var(--brombeer);
+  font-family: var(--schrift-text); font-size: 17px; line-height: 1.45; overflow-x: clip;
+  background:
+    radial-gradient(120% 60% at 50% -8%, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0) 62%),
+    radial-gradient(circle, rgba(255, 255, 255, .55) 0 1.4px, transparent 1.9px) 0 0 / 26px 26px,
+    radial-gradient(circle, rgba(200, 32, 63, .08) 0 1.1px, transparent 1.6px) 13px 13px / 26px 26px,
+    var(--wand);
+}
+body.fest { background:
+    radial-gradient(120% 60% at 50% -8%, rgba(255, 244, 214, .85), rgba(255, 255, 255, 0) 62%),
+    radial-gradient(circle, rgba(255, 255, 255, .55) 0 1.4px, transparent 1.9px) 0 0 / 26px 26px,
+    radial-gradient(circle, rgba(232, 176, 74, .22) 0 1.3px, transparent 1.8px) 13px 13px / 26px 26px,
+    var(--wand); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--kirsch); outline-offset: 3px; }
+.unsichtbar { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+img { -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
+
+/* ---------- Seite ---------- */
+.seite { max-width: 1240px; margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left)); }
+.kopf { position: relative; text-align: center; padding: 10px 4px 0; }
+.wimpel { display: none; position: absolute; left: -14px; right: -14px; top: -14px; height: 34px; pointer-events: none;
+  background:
+    linear-gradient(rgba(61, 24, 48, .45), rgba(61, 24, 48, .45)) 0 5px / 100% 1.5px no-repeat,
+    conic-gradient(from 150deg at 50% 0, var(--kirsch) 0 60deg, transparent 0) 0 6px / 44px 28px repeat-x,
+    conic-gradient(from 150deg at 50% 0, var(--gold) 0 60deg, transparent 0) 22px 6px / 44px 28px repeat-x; }
+body.fest .wimpel { display: block; }
+body.fest .kopf { padding-top: 34px; }
+.titel { margin: 0; font-family: var(--schrift-titel); font-weight: 400; color: var(--kirsch); line-height: .98; letter-spacing: .005em;
+  text-shadow: 2px 2px 0 var(--seide), 4px 5px 0 rgba(61, 24, 48, .13); text-wrap: balance; }
+.titel span { display: block; }
+.titel .t1 { font-size: clamp(44px, 14vw, 76px); }
+.titel .t2 { font-size: clamp(23px, 7vw, 38px); margin-top: 4px; }
+.heute-zeile { margin: 12px auto 0; font-weight: 700; font-size: 19px; }
+.hilfe { margin: 4px auto 0; max-width: 34ch; text-wrap: pretty; }
+.kopf-knoepfe { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 14px 0 6px; }
+.kopf-knoepfe[hidden] { display: none; }
+@media (max-width: 679px) {
+  .kopf-knoepfe { gap: 8px; margin-top: 12px; }
+  .kopf-knoepfe .knopf { min-height: 46px; padding: 0 22px; font-size: 16px; }
+  .kopf-knoepfe .knopf svg { width: 19px; height: 19px; }
+  .heute-zeile { margin-top: 10px; font-size: 18px; }
+  .hilfe { font-size: 16px; }
+}
+
+/* Knöpfe: ein Stück Schleifenband mit eingekerbten Enden */
+.knopf { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 30px;
+  border: 0; background: none; color: var(--seide); font-weight: 700; font-size: 18px; line-height: 1.1; cursor: pointer; isolation: isolate;
+  -webkit-tap-highlight-color: transparent; border-radius: 4px; transition: transform .15s; }
+.knopf::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, #df3352, var(--kirsch) 55%, #a8152f);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 13px) 50%, 100% 100%, 0 100%, 13px 50%); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); }
+.knopf::after { content: ""; position: absolute; inset: 5px 15px; z-index: -1; border-top: 1.5px dashed rgba(255, 248, 244, .45); border-bottom: 1.5px dashed rgba(255, 248, 244, .45); pointer-events: none; }
+.knopf:active { transform: scale(.97); }
+.knopf svg { width: 22px; height: 22px; flex: none; }
+.knopf-leise { color: var(--brombeer); }
+.knopf-leise::before { background: var(--seide); box-shadow: none; }
+.knopf-leise::after { border-color: rgba(61, 24, 48, .3); }
+.knopf-gold { color: var(--brombeer); }
+.knopf-gold::before { background: linear-gradient(180deg, #f6cd73, var(--gold) 55%, #c98d27); }
+.knopf-gold::after { border-color: rgba(61, 24, 48, .35); }
+.knopf[hidden] { display: none; }
+
+/* ---------- Gabentisch / Regal ---------- */
+.tisch { position: relative; margin: 18px auto 0; }
+.etagen { display: grid; row-gap: 22px; }
+.etage { position: relative; display: grid; grid-template-columns: repeat(var(--spalten), minmax(0, 1fr)); column-gap: var(--spalt); padding: 0 2px; }
+.etage::after { content: ""; position: absolute; z-index: 0; left: -10px; right: -10px; bottom: -11px; height: 13px; border-radius: 3px;
+  background: linear-gradient(180deg, #fffdfb 0 3px, #f3e4df 3px 6px, #e6cfc9 6px, #d7bab4);
+  box-shadow: 0 10px 14px -8px rgba(61, 24, 48, .45), 0 1px 0 rgba(61, 24, 48, .12); }
+.gabe { position: relative; z-index: 1; display: block; width: 100%; aspect-ratio: 100 / 118; margin: 0; padding: 0; border: 0; border-radius: 12px; background: none;
+  cursor: pointer; container-type: inline-size; -webkit-tap-highlight-color: transparent; }
+.gabe:focus-visible { outline-offset: 2px; }
+.fig { position: absolute; inset: 0; transform-origin: 50% 97%; rotate: var(--dreh, 0deg); }
+.fig svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.gabe text { pointer-events: none; }
+.gabe .zahl { font-family: var(--schrift-titel); fill: var(--brombeer); }
+.gabe .hand { font-family: var(--schrift-hand); font-weight: 700; fill: var(--brombeer); }
+.z-heute .fig { filter: drop-shadow(0 0 1px rgba(232, 176, 74, .9)) drop-shadow(0 0 12px rgba(232, 176, 74, .75)); }
+.z-heute .heiligenschein { animation: schein 2.6s ease-in-out 3; }
+@keyframes schein { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+.z-zu .fig { filter: saturate(.86); }
+.gabe.weg .fig { visibility: hidden; }
+/* Foto in der offenen Schachtel: zwischen Rückwand (SVG hinten) und Vorderwand (SVG vorn) */
+.vk { position: absolute; z-index: 1; aspect-ratio: 1; padding: 3.2%; margin: 0; background: var(--seide); border-radius: 2px; box-shadow: 0 2px 5px rgba(61, 24, 48, .3); rotate: var(--vkd, 0deg); }
+/* Fotofläche: solange das Vorschaubild (echte Bilder kommen asynchron vom Server) noch lädt, sieht man hier
+   einen hellen Hauch der Tagesfarbe, der sanft pulsiert – nie ein leeres oder dunkles Feld */
+.vk::before { content: ""; position: absolute; inset: 3.2%; border-radius: 1px; background: #ead7d0;
+  background: color-mix(in srgb, var(--fb, #e9d6cf) 34%, #f3e3dd); }
+.vk img, .vk .ersatz { position: relative; display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 1px; }
+.vk img { transition: opacity .3s ease-out; }
+.vk.wartet img { opacity: 0; transition: none; }
+.vk.wartet::before { animation: laedt 1.1s ease-in-out infinite alternate; }
+.fig .vorn { z-index: 2; }
+.ersatz { position: relative; display: grid !important; place-items: center; background: repeating-linear-gradient(135deg, #f1dcd5 0 6px, #ead0c8 6px 12px) !important;
+  font-family: var(--schrift-hand); font-weight: 700; color: rgba(61, 24, 48, .7); font-size: max(12px, 13cqi); line-height: 1; text-align: center; }
+.laedt { animation: laedt 1.1s ease-in-out infinite alternate; }
+@keyframes laedt { from { opacity: .55; } to { opacity: 1; } }
+.wackelt { animation: wackeln .55s cubic-bezier(.36, .07, .19, .97); }
+@keyframes wackeln { 0%, 100% { transform: rotate(0); } 18% { transform: rotate(-7deg); } 38% { transform: rotate(6deg); } 58% { transform: rotate(-4deg); } 78% { transform: rotate(2deg); } }
+.huepft { animation: huepfen .9s cubic-bezier(.3, .7, .3, 1); }
+@keyframes huepfen { 0%, 100% { transform: none; } 22% { transform: translateY(-16%) scale(1.04, .97); } 40% { transform: translateY(0) scale(1.06, .92); } 58% { transform: translateY(-7%); } 76% { transform: none; } }
+
+/* Sprechblase für gesperrte Geschenke */
+.blase { position: absolute; z-index: 20; left: 0; top: 0; width: max-content; max-width: min(260px, calc(100vw - 28px)); padding: 9px 14px 10px; border-radius: 14px;
+  background: var(--brombeer); color: var(--seide); font-size: 16px; line-height: 1.3; text-align: center; pointer-events: none;
+  box-shadow: 0 10px 24px -8px rgba(61, 24, 48, .6); animation: blaseRein .28s cubic-bezier(.2, .9, .3, 1.3); }
+.blase[hidden] { display: none; }
+.blase strong { display: block; font-family: var(--schrift-titel); font-weight: 400; font-size: 20px; line-height: 1.15; color: var(--gold); margin-bottom: 2px; }
+.blase::after { content: ""; position: absolute; top: 100%; left: var(--pfeil, 50%); margin-left: -8px; border: 8px solid transparent; border-top-color: var(--brombeer); }
+.blase.unten::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--brombeer); }
+@keyframes blaseRein { from { opacity: 0; transform: translateY(6px) scale(.94); } to { opacity: 1; transform: none; } }
+
+.fuss { position: relative; margin: 40px auto 0; padding: 0 64px calc(22px + env(safe-area-inset-bottom)); min-height: 68px; text-align: center; font-size: 15px; color: rgba(61, 24, 48, .72); }
+.fuss p { margin: 0; padding-top: 14px; }
+html.vollansicht #kalender-reset { display: none; }
+
+/* Hinweis, wenn das heutige Geschenk weiter unten liegt (verrät die Richtung, nicht den Platz) */
+.weiter-unten { position: fixed; z-index: 30; left: 0; right: 0; bottom: max(14px, calc(env(safe-area-inset-bottom) + 8px)); margin: 0 auto;
+  display: flex; align-items: center; gap: 9px; width: max-content; min-height: 48px; max-width: calc(100vw - 28px); padding: 0 20px 0 15px; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--brombeer); color: var(--seide); font-weight: 700; font-size: 16px; line-height: 1.15; text-align: left; -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 0 0 3px rgba(232, 176, 74, .85), 0 12px 26px -8px rgba(61, 24, 48, .7); animation: unten-rein .4s cubic-bezier(.2, .9, .3, 1.2); }
+.weiter-unten[hidden] { display: none; }
+.weiter-unten svg { width: 22px; height: 22px; flex: none; color: var(--gold); animation: unten-pfeil 1.1s ease-in-out .5s 4; }
+.weiter-unten:focus-visible { outline-color: var(--gold); outline-offset: 4px; }
+html.vollansicht .weiter-unten { display: none; }
+/* Schmale Bildschirme: unten mittig würde die Pille in die Ecke des Menü-Knopfs reichen (Tipp auf den Pfeil
+   öffnete sonst das Erwachsenen-Menü) → sie schwebt knapp über der Knopf-Zone */
+@media (max-width: 559px) {
+  .weiter-unten { bottom: calc(var(--menue-knopf-zone, 64px) + env(safe-area-inset-bottom, 0px)); }
+}
+@keyframes unten-rein { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes unten-pfeil { 0%, 100% { transform: none; } 50% { transform: translateY(4px); } }
+
+/* ---------- Fokus: das Geschenk kommt nach vorn ---------- */
+.fokus, .ansicht { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: hidden; color: var(--seide);
+  overscroll-behavior: none; touch-action: pan-y pinch-zoom; /* waagerechtes Wischen nie an den Browser (Zurück-Geste) */ }
+.fokus { background: transparent; }
+.fk-grund { position: absolute; inset: 0; background: radial-gradient(70% 52% at 50% 58%, #6a2a4c 0%, #4a1d39 48%, #2c0f22 100%); }
+.fokus::backdrop { background: transparent; }
+.ansicht::backdrop { background: rgba(44, 15, 34, .6); }
+.fokus-innen { position: relative; height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; max-width: 720px; margin: 0 auto;
+  padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
+.fk-kopf { position: relative; z-index: 11; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; } /* über der Effektebene */
+.fk-tag { margin: 0; line-height: 1.1; }
+.fk-tag b { display: block; font-family: var(--schrift-titel); font-weight: 400; font-size: 26px; color: var(--gold); }
+.fk-tag span { font-size: 16px; opacity: .88; }
+.knopf-rund { display: grid; place-items: center; flex: none; width: 50px; height: 50px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; color: var(--seide);
+  background: rgba(255, 248, 244, .1); box-shadow: inset 0 0 0 1.5px rgba(255, 248, 244, .5); -webkit-tap-highlight-color: transparent; }
+.knopf-rund svg { width: 24px; height: 24px; }
+.knopf-rund:disabled { opacity: .28; cursor: default; }
+.knopf-rund:not(:disabled):active { background: rgba(255, 248, 244, .2); }
+.fokus :focus-visible, .ansicht :focus-visible { outline-color: var(--gold); }
+.fk-buehne { position: relative; min-height: 0; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.fk-buehne.reisst { cursor: crosshair; }
+.fk-buehne.fertig { cursor: default; } /* bleibt touch-action: none – Weiterwischen pustet Schnipsel weg */
+.fk-tisch { position: absolute; left: 50%; translate: -50% 0; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(20, 4, 14, .55), rgba(20, 4, 14, .2) 62%, transparent); }
+.fk-geschenk { position: absolute; left: 0; top: 0; transform-origin: 50% 100%; }
+.fk-geschenk > * { position: absolute; }
+.fk-geschenk svg { overflow: visible; }
+.fk-hinten { z-index: 1; left: 0; top: 0; }
+.fk-deckel { z-index: 4; left: 0; top: 0; transform-origin: 30% 100%; }
+.fk-deckel.hinten { z-index: 1; }
+.fk-fotohalter { z-index: 2; left: 0; top: 0; clip-path: inset(-300% -60% 0 -60%); pointer-events: none; }
+.fk-foto { position: absolute; pointer-events: auto; border: 0; left: 0; top: 0; padding: 4%; background: var(--seide); border-radius: 3px; box-shadow: 0 12px 26px -8px rgba(20, 4, 14, .6); cursor: pointer; transform-origin: 50% 100%; }
+.fk-foto img, .fk-foto .ersatz { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 2px; background: #e9d6cf; }
+.fk-foto img { animation: einblenden .3s ease-out; }
+@keyframes einblenden { from { opacity: 0; } }
+.fk-foto .ersatz { font-size: 22px; }
+.fk-vorn { z-index: 3; left: 0; top: 0; pointer-events: none; }
+.fk-papier { z-index: 5; left: 0; top: 0; pointer-events: none; }
+.fk-fx { position: fixed; inset: 0; z-index: 10; width: 100%; height: 100%; pointer-events: none; }
+.fk-fuss { position: relative; z-index: 11; text-align: center; padding-top: 6px; }
+/* Fortschritt beim Papierreißen: eine Geschenkband-Leiste, die bis zur Schleife wächst (ohne Prozentzahlen) */
+.fk-leiste { position: absolute; left: 50%; bottom: 100%; width: min(210px, 60%); height: 12px; translate: calc(-50% - 9px) -4px; border-radius: 999px; pointer-events: none;
+  background: rgba(255, 248, 244, .1); box-shadow: inset 0 0 0 1.5px rgba(255, 248, 244, .32); opacity: 0; visibility: hidden; transition: opacity .35s, visibility 0s .35s; }
+.fk-leiste.an { opacity: 1; visibility: visible; transition: opacity .35s; }
+.fk-leiste-band { position: absolute; left: 2px; top: 2px; bottom: 2px; width: calc((100% - 4px) * var(--wert, 0)); border-radius: 999px;
+  background: repeating-linear-gradient(-55deg, rgba(255, 255, 255, .34) 0 3px, transparent 3px 8px), var(--gold); transition: width .3s cubic-bezier(.2, .8, .3, 1); }
+.fk-leiste-ziel { position: absolute; left: 100%; top: 50%; width: 30px; height: 20px; margin: -11px 0 0 -12px; overflow: visible;
+  fill: var(--band, #c8203f); stroke: rgba(255, 248, 244, .75); stroke-width: 1.6; paint-order: stroke; filter: drop-shadow(0 1px 1.5px rgba(20, 4, 14, .55)); }
+.fk-leiste-ziel.hopst { animation: hopsen .55s ease; }
+@keyframes hopsen { 30% { transform: translateY(-5px) rotate(-10deg) scale(1.12); } 62% { transform: translateY(1px) rotate(6deg); } }
+.schritte { display: flex; justify-content: center; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; font-size: 14px; }
+.schritte li { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 2px 11px 2px 8px; border-radius: 999px; color: rgba(255, 248, 244, .7); box-shadow: inset 0 0 0 1px rgba(255, 248, 244, .25); }
+.schritte li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; }
+.schritte li.jetzt { color: var(--brombeer); background: var(--gold); box-shadow: none; font-weight: 700; }
+.schritte li.jetzt::before { background: var(--brombeer); box-shadow: none; }
+.schritte li.erledigt { color: var(--seide); }
+.schritte li.erledigt::before { width: 11px; height: 7px; border-radius: 0; box-shadow: none; border: solid currentColor; border-width: 0 0 2.5px 2.5px; rotate: -45deg; translate: 0 -2px; }
+/* Platz für Überschrift + zwei Zeilen von Anfang an: die Fußzeile wächst beim Auspacken nicht mehr in die
+   Bühne hinein (sonst rücken Schritte und Hinweis nachträglich über Band und Schnipsel am Tischrand);
+   auch Fortschrittsleiste und Knöpfe springen so beim Wechsel der Hinweise nicht */
+.fk-hinweis { display: flex; flex-direction: column; justify-content: center; min-height: 4.2em; margin: 0 auto 10px; max-width: 32ch; font-size: 18px; line-height: 1.35; text-wrap: balance; }
+.fk-hinweis b { font-family: var(--schrift-titel); font-weight: 400; font-size: 22px; color: var(--gold); display: block; line-height: 1.2; }
+.fk-hinweis.stupst { animation: stupsen .4s ease; }
+@keyframes stupsen { 30% { transform: translateX(-5px); } 60% { transform: translateX(4px); } }
+.fk-knoepfe { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+/* ---------- Bildansicht ---------- */
+.ansicht { background:
+    radial-gradient(80% 50% at 50% 45%, rgba(255, 248, 244, .12), transparent 70%),
+    radial-gradient(circle, rgba(255, 248, 244, .07) 0 1.4px, transparent 1.9px) 0 0 / 26px 26px,
+    #3d1830; }
+.ansicht-innen { position: relative; height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 6px;
+  padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); }
+.ansicht-kopf { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 52px; max-width: 1100px; width: 100%; margin: 0 auto; }
+.knopf-klein { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 14px 0 11px; border: 0; border-radius: 999px; cursor: pointer; color: var(--seide);
+  font-weight: 700; font-size: 15px; background: rgba(255, 248, 244, .1); box-shadow: inset 0 0 0 1.5px rgba(255, 248, 244, .4); }
+.knopf-klein svg { width: 20px; height: 20px; flex: none; }
+.ansicht-zaehler { margin: 0; font-size: 15px; opacity: .8; }
+.ansicht-buehne { position: relative; min-height: 0; overflow: hidden; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; cursor: grab; }
+.spur { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; }
+.spur img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 14px 28px rgba(10, 2, 8, .55)); pointer-events: none; transition: opacity .25s; }
+.spur img.laedt-noch { opacity: 0; transition: none; }
+/* Platzhalter-Rahmen, solange das große Foto lädt (oder wenn es nicht ankommt): schon in der echten
+   Bildform (Seitenverhältnis aus den Metadaten), Tagesfarbe gedämpft + wandernder Lichtschimmer */
+.ansicht-platz { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 70%; height: 70%; min-width: min(100%, 250px); min-height: 150px;
+  display: grid; place-content: center; justify-items: center; gap: 14px; padding: 14px; overflow: hidden; border-radius: 4px; text-align: center;
+  background: #5a2a45; background: color-mix(in srgb, var(--fb, #7a3a5c) 40%, #4a1d39); box-shadow: 0 14px 28px -6px rgba(10, 2, 8, .55); }
+.ansicht-platz[hidden] { display: none; }
+.ansicht-platz.laedt::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, rgba(255, 248, 244, 0) 25%, rgba(255, 248, 244, .14) 50%, rgba(255, 248, 244, 0) 75%);
+  transform: translateX(-100%); animation: schimmern 1.5s ease-in-out infinite; }
+@keyframes schimmern { to { transform: translateX(100%); } }
+.ansicht-status { position: relative; margin: 0; max-width: 22ch; font-family: var(--schrift-hand); font-weight: 700; font-size: 26px; line-height: 1.15; color: rgba(255, 248, 244, .9); text-wrap: balance; }
+.ansicht-platz .knopf { position: relative; }
+.ansicht-platz .knopf[hidden] { display: none; }
+.ansicht-fuss { display: grid; grid-template-columns: 50px minmax(0, 1fr) 50px; align-items: center; gap: 8px; max-width: 780px; width: 100%; margin: 0 auto; }
+.ansicht-text { text-align: center; min-width: 0; }
+.ansicht-text h2 { margin: 0; font-family: var(--schrift-titel); font-weight: 400; font-size: clamp(21px, 5.6vw, 28px); line-height: 1.15; color: var(--gold); text-wrap: balance;
+  overflow-wrap: break-word; -webkit-hyphens: auto; hyphens: auto; }
+/* echte Bildunterschriften mit langen Wörtern („Neujahrsspaziergang“): etwas kleiner statt mitten im Wort umbrechen */
+.ansicht-text h2.lang { font-size: clamp(17px, 4.6vw, 26px); }
+.ansicht-text p { margin: 2px 0 0; font-size: 16px; opacity: .88; }
+
+/* ---------- Größere Bildschirme ---------- */
+@media (min-width: 680px) {
+  :root { --spalten: 6; --spalt: 12px; }
+  .seite { padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
+  .hilfe { max-width: 52ch; }
+  .etagen { row-gap: 26px; }
+  .tisch { margin-top: 26px; }
+}
+@media (min-width: 960px) {
+  :root { --spalten: 8; --spalt: 14px; }
+  .kopf { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 34px; text-align: left; max-width: 1100px; margin: 0 auto; }
+  .titel { grid-row: span 3; }
+  .titel .t1 { font-size: 68px; }
+  .titel .t2 { font-size: 32px; }
+  .heute-zeile, .hilfe { margin-left: 0; }
+  .heute-zeile { margin-top: 0; }
+  .kopf-knoepfe { justify-content: flex-start; margin-bottom: 0; }
+  .tisch { max-width: 1160px; margin-top: 24px; }
+  /* Gabentisch in drei Stufen: hinten schmaler, vorne die breite Tischplatte mit Decke */
+  .etage:nth-child(1) { margin: 0 7%; }
+  .etage:nth-child(2) { margin: 0 3.5%; }
+  .etage:nth-child(3)::after { height: 18px; bottom: -16px; left: -18px; right: -18px; }
+  .etage:nth-child(3)::before { content: ""; position: absolute; z-index: 0; left: -18px; right: -18px; bottom: -44px; height: 30px; border-radius: 0 0 6px 6px;
+    background: radial-gradient(14px 10px at 14px 0, var(--kirsch) 98%, transparent) 0 100% / 28px 10px repeat-x, linear-gradient(var(--kirsch), #a8152f) 0 0 / 100% 22px no-repeat;
+    clip-path: inset(0 0 0 0); filter: drop-shadow(0 6px 6px rgba(61, 24, 48, .3)); }
+  .fuss { margin-top: 64px; }
+  .fokus-innen { max-width: 820px; }
+}
+@media (min-width: 960px) and (max-height: 860px) {
+  .titel .t1 { font-size: 58px; }
+  .titel .t2 { font-size: 28px; }
+  .etagen { row-gap: 22px; }
+}
+/* Handy quer / niedrige Fenster: Kopf zweispaltig und kleiner, damit schon im ersten Bild die erste
+   Geschenkreihe zu sehen ist (sonst füllt allein der Titel die ganze Höhe) */
+@media (max-height: 540px) and (min-width: 600px) {
+  .seite { padding-top: max(10px, env(safe-area-inset-top)); }
+  .kopf { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 28px; text-align: left; max-width: 1100px; margin: 0 auto; padding-top: 0; }
+  body.fest .kopf { padding-top: 26px; }
+  .titel { grid-row: span 3; }
+  .titel .t1 { font-size: 46px; }
+  .titel .t2 { font-size: 23px; margin-top: 2px; }
+  .heute-zeile, .hilfe { margin-left: 0; }
+  .heute-zeile { margin-top: 0; font-size: 18px; }
+  .hilfe { font-size: 16px; max-width: 46ch; }
+  .kopf-knoepfe { justify-content: flex-start; margin: 10px 0 0; }
+  .kopf-knoepfe .knopf { min-height: 44px; padding: 0 22px; font-size: 16px; }
+  .tisch { margin-top: 18px; }
+}
+/* Handy quer: Hinweis und Knöpfe neben das Geschenk, damit es groß bleibt */
+@media (max-height: 540px) and (min-width: 600px) {
+  .fokus-innen { max-width: none; grid-template-columns: minmax(0, 1fr) minmax(220px, 34%); grid-template-rows: auto minmax(0, 1fr); column-gap: 12px; }
+  .fk-kopf { grid-column: 1 / -1; min-height: 46px; }
+  .fk-buehne { grid-row: 2; grid-column: 1; }
+  .fk-fuss { grid-row: 2; grid-column: 2; align-self: center; padding-top: 0; }
+  .fk-hinweis { font-size: 16px; min-height: 6em; } /* schmale Spalte: Überschrift + drei Zeilen, damit Leiste und Knopf nicht springen */
+}
+@media (prefers-reduced-motion: reduce) {
+  .wackelt, .huepft { animation-duration: .01s; }
+  .z-heute .heiligenschein, .laedt, .vk.wartet::before, .ansicht-platz.laedt::before { animation: none; }
+  .fk-foto img { animation: none; }
+  .blase { animation: none; }
+  .knopf { transition: none; }
+  .weiter-unten, .weiter-unten svg { animation: none; }
+  .fk-leiste, .fk-leiste.an, .fk-leiste-band { transition: none; }
+  .fk-leiste-ziel.hopst { animation: none; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs id="defs">
+    <linearGradient id="licht" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#2a0c1e" stop-opacity=".22"/></linearGradient>
+    <radialGradient id="schein"><stop offset="0" stop-color="#ffe09a" stop-opacity=".95"/><stop offset=".55" stop-color="#f5c35e" stop-opacity=".45"/><stop offset="1" stop-color="#f5c35e" stop-opacity="0"/></radialGradient>
+    <pattern id="pappe" patternUnits="userSpaceOnUse" width="12" height="12"><rect width="12" height="12" fill="#d3a978"/><path d="M0 3h12M0 9h12" stroke="#c49867" stroke-width=".7"/></pattern>
+  </defs>
+  <symbol id="s-klassisch" viewBox="0 0 40 26"><path d="M20 12C13 1 2 0 2.5 7.5 3 13 12 14 20 12Z"/><path d="M20 12C27 1 38 0 37.5 7.5 37 13 28 14 20 12Z"/><path d="M18.6 12.6 12 25l4.6-1.6L20 13Zm2.8 0L28 25l-4.6-1.6L20 13Z"/><path d="M20 12C14.6 4 7 3.6 7.2 7.6 7.4 10.6 13 12 20 12Z" fill="#000" fill-opacity=".16"/><path d="M20 12c5.4-8 13-8.4 12.8-4.4C32.6 10.6 27 12 20 12Z" fill="#000" fill-opacity=".16"/><rect x="16.6" y="9" width="6.8" height="6.4" rx="2.4"/></symbol>
+  <symbol id="s-rosette" viewBox="0 0 40 26"><g><ellipse cx="20" cy="13" rx="7" ry="11" transform="rotate(-60 20 13)"/><ellipse cx="20" cy="13" rx="7" ry="11" transform="rotate(60 20 13)"/><ellipse cx="20" cy="11" rx="6" ry="10"/></g><g fill="#000" fill-opacity=".15"><ellipse cx="20" cy="13" rx="3.6" ry="7.6" transform="rotate(-60 20 13)"/><ellipse cx="20" cy="13" rx="3.6" ry="7.6" transform="rotate(60 20 13)"/></g><circle cx="20" cy="13" r="4.4"/></symbol>
+  <symbol id="s-kordel" viewBox="0 0 40 26"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 15c-5-9-13-9-12-3 1 5 8 4 12 3Zm0 0c5-9 13-9 12-3-1 5-8 4-12 3Z"/><path d="M19 16c-2 4-5 7-8 8M21 16c2 4 5 7 8 8"/></g><circle cx="20" cy="15" r="3"/></symbol>
+  <symbol id="i-zu" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-links" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-rechts" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-paket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="9" width="17" height="11.5" rx="1.5"/><path d="M2.5 9h19M12 9v11.5"/><path d="M12 9C9 3.5 5.5 4.5 6.5 7.2 7.2 9 12 9 12 9Zm0 0c3-5.5 6.5-4.5 5.5-1.8C16.8 9 12 9 12 9Z"/></g></symbol>
+  <symbol id="i-suche" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></g></symbol>
+</svg>
+
+<div class="seite">
+  <header class="kopf">
+    <div class="wimpel" aria-hidden="true"></div>
+    <h1 class="titel"><span class="t1">{{TITEL_A}}</span> <span class="t2">{{TITEL_B}}</span></h1>
+    <p class="heute-zeile" id="heuteZeile"></p>
+    <p class="hilfe" id="hilfe"></p>
+    <div class="kopf-knoepfe" id="kopfKnoepfe">
+      <button type="button" class="knopf" id="heuteFinden"><svg aria-hidden="true"><use href="#i-suche"/></svg><span>Heute finden</span></button>
+      <button type="button" class="knopf knopf-leise" id="nachholen" hidden></button>
+    </div>
+  </header>
+
+  <section class="tisch" id="tisch" aria-labelledby="tischTitel">
+    <h2 class="unsichtbar" id="tischTitel">Alle 24 Geschenke</h2>
+    <div class="etagen" id="etagen"></div>
+    <div class="blase" id="blase" hidden></div>
+  </section>
+</div>
+<footer class="fuss"><p id="fussText">Jeden Tag ein Geschenk. Geöffnete kannst du jederzeit wieder ansehen.</p></footer>
+<button type="button" class="weiter-unten" id="weiterUnten" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15m-6.5-6.5L12 19l6.5-6.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Dein Geschenk liegt weiter unten</span></button>
+<p class="unsichtbar" id="ansage" role="status" aria-live="polite"></p>
+
+<dialog class="fokus" id="fokus" aria-labelledby="fkTitel" aria-describedby="fkHinweis">
+  <div class="fk-grund" id="fkGrund" aria-hidden="true"></div>
+  <div class="fokus-innen" id="fkInnen">
+    <div class="fk-kopf">
+      <p class="fk-tag" id="fkTitel"><b id="fkNummer"></b><span id="fkDatum"></span></p>
+      <button type="button" class="knopf-rund" id="fkZu" aria-label="Zurück zum Gabentisch"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+    </div>
+    <div class="fk-buehne" id="fkBuehne">
+      <div class="fk-tisch" id="fkTisch"></div>
+      <div class="fk-geschenk" id="fkGeschenk">
+        <svg class="fk-hinten" id="fkHinten" aria-hidden="true"></svg>
+        <div class="fk-fotohalter" id="fkFotoHalter"><button type="button" class="fk-foto" id="fkFoto" tabindex="-1" aria-label="Foto groß ansehen"></button></div>
+        <svg class="fk-vorn" id="fkVorn" aria-hidden="true"></svg>
+        <svg class="fk-deckel" id="fkDeckel" aria-hidden="true"></svg>
+        <canvas class="fk-papier" id="fkPapier" aria-hidden="true"></canvas>
+      </div>
+    </div>
+    <div class="fk-fuss">
+      <div class="fk-leiste" id="fkLeiste" aria-hidden="true"><span class="fk-leiste-band"></span><svg class="fk-leiste-ziel" viewBox="0 0 40 26"><use href="#s-klassisch"/></svg></div>
+      <ol class="schritte" id="fkSchritte" aria-hidden="true"><li>Schleife</li><li>Papier</li><li>Foto</li></ol>
+      <p class="fk-hinweis" id="fkHinweis"></p>
+      <div class="fk-knoepfe">
+        <button type="button" class="knopf knopf-gold" id="fkAuspacken"><svg aria-hidden="true"><use href="#i-paket"/></svg><span>Auspacken</span></button>
+        <button type="button" class="knopf knopf-leise" id="fkZurueck" hidden>Zum Gabentisch</button>
+      </div>
+    </div>
+  </div>
+  <canvas class="fk-fx" id="fkFx" aria-hidden="true"></canvas>
+</dialog>
+
+<dialog class="ansicht" id="ansicht" aria-labelledby="ansichtTitel">
+  <div class="ansicht-innen">
+    <div class="ansicht-kopf">
+      <button type="button" class="knopf-klein" id="nochmal"><svg aria-hidden="true"><use href="#i-paket"/></svg><span>Nochmal auspacken</span></button>
+      <p class="ansicht-zaehler" id="ansichtZaehler"></p>
+      <button type="button" class="knopf-rund" id="ansichtZu" aria-label="Bildansicht schließen"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+    </div>
+    <div class="ansicht-buehne" id="ansichtBuehne">
+      <div class="spur" id="spur"><img id="ansichtBild" alt="" draggable="false" data-kein-ersatz>
+        <div class="ansicht-platz" id="ansichtPlatz" hidden>
+          <p class="ansicht-status" id="ansichtStatus" role="status"></p>
+          <button type="button" class="knopf knopf-gold" id="ansichtNochmal" hidden>Nochmal versuchen</button>
+        </div>
+      </div>
+    </div>
+    <div class="ansicht-fuss">
+      <button type="button" class="knopf-rund" id="zurueck" aria-label="Vorheriges Foto"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
+      <div class="ansicht-text"><h2 id="ansichtTitel"></h2><p id="ansichtDatum"></p></div>
+      <button type="button" class="knopf-rund" id="weiter" aria-label="Nächstes Foto"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
+    </div>
+  </div>
+</dialog>
+
+<script src="../shared/kalender.js"></script>
+<script src="../shared/fotos.js"></script>
+<script>
+(function () {
+  'use strict';
+  var K = window.Kalender.init('geschenk');
+  var F = window.Fotos;
+  var TAU = Math.PI * 2;
+  var REDUZIERT = !!K.bewegungReduziert;
+  var GROB = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  var MAUS = !GROB;
+  // Wortwahl je nach Gerät: „Tippe … an“ am Handy, „Klick … an“ mit Maus
+  var W = MAUS ? { Tipp: 'Klick', tipp: 'klick', antippen: 'anklicken', aufs: 'Klick aufs' } : { Tipp: 'Tippe', tipp: 'tippe', antippen: 'antippen', aufs: 'Tippe aufs' };
+  var DPR = Math.min(2, window.devicePixelRatio || 1);
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  // ► Wie viel vom Geschenkpapier muss wirklich ab sein, bevor das Geschenk aufgeht? 0.80 = 80 % (0.90 = 90 %, 0.95 = 95 %).
+  //   Zum Ausprobieren: 0.80 (geht schneller) oder 0.95 (noch gründlicher). Gemessen wird die sichtbar freie Fläche;
+  //   sobald der Wert erreicht ist, fallen die letzten Fetzen von selbst ab.
+  var PAPIER_MINDESTENS = 0.80;
+  // ► Breite eines Risses im Verhältnis zur Geschenkbreite (0.11 ≈ ein Finger breit). Kleiner = mehr Wischen.
+  var RISS_BREITE = 0.11;
+  // ► Kleine, ringsum losgerissene Papierstücke fallen schon beim Reißen von selbst ab, wenn sie kleiner sind als
+  //   dieser Anteil der Geschenkfläche (0.005 = 0,5 %). Am Anfang nur Krümel (ein Viertel davon), die volle Größe
+  //   erst kurz vor dem Ziel – so bleibt das Reißen Arbeit, aber am Ende muss niemand Fetzen jagen.
+  //   Abgefallene Stücke sind wirklich weg und zählen zu den PAPIER_MINDESTENS.
+  var LOSE_STUECKE_BIS = 0.005;
+  function $(id) { return document.getElementById(id); }
+  var el = {
+    heuteZeile: $('heuteZeile'), hilfe: $('hilfe'), kopfKnoepfe: $('kopfKnoepfe'), heuteFinden: $('heuteFinden'), nachholen: $('nachholen'),
+    tisch: $('tisch'), etagen: $('etagen'), blase: $('blase'), ansage: $('ansage'), fussText: $('fussText'), defs: $('defs'),
+    fokus: $('fokus'), fkGrund: $('fkGrund'), fkInnen: $('fkInnen'), fkNummer: $('fkNummer'), fkDatum: $('fkDatum'), fkZu: $('fkZu'),
+    fkBuehne: $('fkBuehne'), fkTisch: $('fkTisch'), fkGeschenk: $('fkGeschenk'), fkHinten: $('fkHinten'), fkFotoHalter: $('fkFotoHalter'),
+    fkFoto: $('fkFoto'), fkVorn: $('fkVorn'), fkDeckel: $('fkDeckel'), fkPapier: $('fkPapier'), fkFx: $('fkFx'),
+    fkSchritte: $('fkSchritte'), fkLeiste: $('fkLeiste'), fkHinweis: $('fkHinweis'), fkAuspacken: $('fkAuspacken'), fkZurueck: $('fkZurueck'),
+    ansicht: $('ansicht'), nochmal: $('nochmal'), aZaehler: $('ansichtZaehler'), aZu: $('ansichtZu'), aBuehne: $('ansichtBuehne'),
+    spur: $('spur'), aBild: $('ansichtBild'), aStatus: $('ansichtStatus'), aPlatz: $('ansichtPlatz'), aNochmal: $('ansichtNochmal'),
+    aTitel: $('ansichtTitel'), aDatum: $('ansichtDatum'),
+    zurueck: $('zurueck'), weiter: $('weiter'), weiterUnten: $('weiterUnten')
+  };
+
+  function zufall(seed) {
+    var a = seed >>> 0;
+    return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function leinwand(w, h) { var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; }
+  function klemme(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function f1(v) { return Math.round(v * 10) / 10; }
+  var MASKE = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return MASKE[c]; }); }
+  function sage(text) { el.ansage.textContent = ''; setTimeout(function () { el.ansage.textContent = text; }, 40); }
+  function brumm(muster) { if (navigator.vibrate && !REDUZIERT) { try { navigator.vibrate(muster); } catch (e) { /* egal */ } } }
+  function fokussiere(z) { if (!z) return; try { z.focus({ preventScroll: true }); } catch (e) { z.focus(); } }
+
+  // Bilder immer über Image + onload/decode laden (echte Server-URLs: asynchron, evtl. 403/404/Netzfehler).
+  // Das Versprechen liefert erst ein fertig dekodiertes Bild; bei Fehlern wird es verworfen (nächster Versuch lädt neu).
+  var bildCache = {}, geladen = {}; // geladen: URLs, die schon einmal fertig da waren (liegen im Browser-Speicher)
+  function ladeBild(url) {
+    if (!url) return Promise.reject(new Error('keine URL'));
+    if (bildCache[url]) return bildCache[url];
+    var p = new Promise(function (ok, fehl) {
+      var img = new Image();
+      img.decoding = 'async';
+      img.onload = function () {
+        var fertig = function () { geladen[url] = 1; ok(img); };
+        if (img.decode) img.decode().then(fertig, fertig); else fertig();
+      };
+      img.onerror = function () { delete bildCache[url]; fehl(new Error('Bild fehlt')); };
+      img.src = url;
+    });
+    bildCache[url] = p;
+    return p;
+  }
+  function sicher(fn) { try { return fn(); } catch (e) { return ''; } }
+  // Bildunterschrift kann leer sein (echte Bilder ohne Eintrag in texte.txt)
+  function titelVon(t) { var s = sicher(function () { return F.titel(t); }); return typeof s === 'string' ? s.trim() : ''; }
+  // Gemalter „Foto folgt“-Platzhalter (nur Produktions-Baustein, im Prototyp gibt es den nicht → '')
+  function platzhalterVon(t, px) { return typeof F.platzhalter === 'function' ? sicher(function () { return F.platzhalter(t, px); }) : ''; }
+  // Seitenverhältnis (Breite/Höhe) der Collage: echte Maße, falls bekannt (Produktion), sonst aus dem Format
+  function seitenVerhaeltnis(t) {
+    var m = typeof F.masse === 'function' ? sicher(function () { return F.masse(t); }) : null;
+    if (m && m.w > 0 && m.h > 0) return m.w / m.h;
+    return sicher(function () { return F.format(t); }) === 'hoch' ? 2 / 3 : 1;
+  }
+  function farbeVon(t) { var f = sicher(function () { return F.farbe(t); }); return /^#[0-9a-f]{6}$/i.test(f) ? f : '#c98f8f'; }
+
+  /* ================================================================
+     Geschenkpapiere: eine Kachel-Malfunktion je Papier (für SVG-Raster und Canvas)
+     ================================================================ */
+  function stern(g, x, y, R, r, n) {
+    g.beginPath();
+    for (var i = 0; i < n * 2; i++) {
+      var a = -Math.PI / 2 + i * Math.PI / n, q = i % 2 ? r : R;
+      if (i) g.lineTo(x + Math.cos(a) * q, y + Math.sin(a) * q); else g.moveTo(x + Math.cos(a) * q, y + Math.sin(a) * q);
+    }
+    g.closePath(); g.fill();
+  }
+  function rund(g, x, y, r) { g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); }
+  function flocke(g, x, y, r) {
+    g.beginPath();
+    for (var i = 0; i < 6; i++) {
+      var a = i * Math.PI / 3, cx = Math.cos(a), sy = Math.sin(a);
+      g.moveTo(x, y); g.lineTo(x + cx * r, y + sy * r);
+      var m = 0.58, b = r * 0.3, bx = x + cx * r * m, by = y + sy * r * m;
+      g.moveTo(bx, by); g.lineTo(bx + Math.cos(a + 0.7) * b, by + Math.sin(a + 0.7) * b);
+      g.moveTo(bx, by); g.lineTo(bx + Math.cos(a - 0.7) * b, by + Math.sin(a - 0.7) * b);
+    }
+    g.stroke();
+  }
+  // an allen vier Kanten wiederholen, damit die Kachel nahtlos ist
+  function ringsum(s, fn) { for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) fn(dx * s, dy * s); }
+
+  var PAPIERE = [
+    { name: 'Koralle mit Punkten', grund: '#de5a3c', band: '#fff8f4', male: function (g, s) {
+      g.fillStyle = '#fff8f4'; ringsum(s, function (ox, oy) { rund(g, s * .25 + ox, s * .25 + oy, s * .1); rund(g, s * .75 + ox, s * .75 + oy, s * .1); });
+      g.fillStyle = 'rgba(255,248,244,.5)'; rund(g, s * .75, s * .25, s * .035); rund(g, s * .25, s * .75, s * .035);
+    } },
+    { name: 'Tanne mit Goldsternen', grund: '#21603f', band: '#e8b04a', male: function (g, s) {
+      g.fillStyle = '#e8b04a'; ringsum(s, function (ox, oy) { stern(g, s * .28 + ox, s * .3 + oy, s * .15, s * .065, 5); stern(g, s * .76 + ox, s * .76 + oy, s * .1, s * .043, 5); });
+      g.fillStyle = 'rgba(255,248,244,.7)'; rund(g, s * .72, s * .2, s * .025); rund(g, s * .2, s * .8, s * .02);
+    } },
+    { name: 'Zuckerstange', grund: '#2a9d8f', band: '#c8203f', male: function (g, s) {
+      g.lineCap = 'butt';
+      for (var i = -1; i <= 4; i++) {
+        var x = i * s / 2;
+        g.strokeStyle = '#fff8f4'; g.lineWidth = s * .17; g.beginPath(); g.moveTo(x, -2); g.lineTo(x - s - 2, s + 2); g.stroke();
+        g.strokeStyle = 'rgba(200,32,63,.75)'; g.lineWidth = s * .035; g.beginPath(); g.moveTo(x + s / 4, -2); g.lineTo(x + s / 4 - s - 2, s + 2); g.stroke();
+      }
+    } },
+    { name: 'Kraftpapier mit Tannen', grund: '#c99a63', band: '#c8203f', male: function (g, s) {
+      var r = zufall(5); g.strokeStyle = 'rgba(90,55,25,.16)'; g.lineWidth = Math.max(1, s * .012);
+      for (var i = 0; i < 26; i++) { var x = r() * s, y = r() * s, a = r() * .5 - .25, l = s * (.05 + r() * .1); g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke(); }
+      ringsum(s, function (ox, oy) {
+        [[.28, .34, .2], [.76, .8, .15]].forEach(function (b) {
+          var x = s * b[0] + ox, y = s * b[1] + oy, h = s * b[2];
+          g.fillStyle = '#a3263a'; g.beginPath(); g.moveTo(x, y - h * .62); g.lineTo(x + h * .42, y + h * .3); g.lineTo(x - h * .42, y + h * .3); g.closePath(); g.fill();
+          g.fillRect(x - h * .06, y + h * .3, h * .12, h * .16);
+        });
+      });
+      g.fillStyle = 'rgba(255,248,244,.8)'; rund(g, s * .76, s * .3, s * .025); rund(g, s * .25, s * .78, s * .025);
+    } },
+    { name: 'Senf mit Schneeflocken', grund: '#e8b45a', band: '#1f5c45', male: function (g, s) {
+      g.strokeStyle = '#fff8f4'; g.lineCap = 'round'; g.lineWidth = s * .022;
+      ringsum(s, function (ox, oy) { flocke(g, s * .27 + ox, s * .28 + oy, s * .15); flocke(g, s * .77 + ox, s * .76 + oy, s * .1); });
+      g.fillStyle = 'rgba(255,248,244,.7)'; rund(g, s * .78, s * .22, s * .025); rund(g, s * .22, s * .78, s * .022);
+    } },
+    { name: 'Schiefer mit Goldpunkten', grund: '#34494b', band: '#e8b04a', male: function (g, s) {
+      var r = zufall(9); g.fillStyle = '#e8b04a';
+      for (var i = 0; i < 9; i++) { var x = r() * s, y = r() * s, q = s * (.014 + r() * .02); ringsum(s, function (ox, oy) { rund(g, x + ox, y + oy, q); }); }
+      g.fillStyle = '#f4d48c'; ringsum(s, function (ox, oy) { stern(g, s * .3 + ox, s * .36 + oy, s * .1, s * .025, 4); stern(g, s * .78 + ox, s * .8 + oy, s * .07, s * .018, 4); });
+    } },
+    { name: 'Weiß mit Rauten', grund: '#fff6f1', band: '#c8203f', male: function (g, s) {
+      g.strokeStyle = 'rgba(200,32,63,.85)'; g.lineWidth = s * .03;
+      g.beginPath(); g.moveTo(0, s / 2); g.lineTo(s / 2, 0); g.lineTo(s, s / 2); g.lineTo(s / 2, s); g.closePath(); g.stroke();
+      g.fillStyle = '#c8203f';
+      ringsum(s, function (ox, oy) { g.beginPath(); g.moveTo(ox, oy - s * .09); g.lineTo(ox + s * .07, oy); g.lineTo(ox, oy + s * .09); g.lineTo(ox - s * .07, oy); g.closePath(); g.fill(); });
+      g.fillStyle = '#2a9d8f'; rund(g, s / 2, s / 2, s * .045);
+    } },
+    { name: 'Rosa Karo', grund: '#ec9ea3', band: '#7b1830', male: function (g, s) {
+      g.fillStyle = 'rgba(255,248,244,.36)'; g.fillRect(0, s * .375, s, s * .25); g.fillRect(s * .375, 0, s * .25, s);
+      g.fillStyle = 'rgba(123,24,48,.16)'; g.fillRect(0, s * .1, s, s * .03); g.fillRect(s * .1, 0, s * .03, s);
+    } },
+    // nur für den 24.: Goldfolie mit Glanzstreifen und hellen Sternen
+    { name: 'Goldfolie', grund: '#d9a03c', band: '#c8203f', male: function (g, s) {
+      g.lineCap = 'butt';
+      for (var i = -1; i <= 3; i++) {
+        var x = i * s / 2;
+        g.strokeStyle = 'rgba(255,236,180,.42)'; g.lineWidth = s * .12; g.beginPath(); g.moveTo(x, -2); g.lineTo(x + s + 2, s + 2); g.stroke();
+        g.strokeStyle = 'rgba(150,95,20,.18)'; g.lineWidth = s * .05; g.beginPath(); g.moveTo(x + s * .22, -2); g.lineTo(x + s * 1.22 + 2, s + 2); g.stroke();
+      }
+      g.fillStyle = '#fff6dc'; ringsum(s, function (ox, oy) { stern(g, s * .27 + ox, s * .72 + oy, s * .12, s * .05, 5); stern(g, s * .75 + ox, s * .25 + oy, s * .085, s * .035, 5); });
+      g.fillStyle = 'rgba(200,32,63,.85)'; rund(g, s * .75, s * .76, s * .03); rund(g, s * .25, s * .22, s * .025);
+    } }
+  ];
+  var NORMALE_PAPIERE = 8, GOLD = 8;
+  var RUECKSEITE = '#f6eee5';
+  var kachelCache = {};
+  function kachel(nr, px) {
+    px = Math.max(8, Math.round(px));
+    var k = nr + '_' + px;
+    if (kachelCache[k]) return kachelCache[k];
+    var c = leinwand(px, px), g = c.getContext('2d'), p = PAPIERE[nr];
+    g.fillStyle = p.grund; g.fillRect(0, 0, px, px);
+    p.male(g, px);
+    kachelCache[k] = c;
+    return c;
+  }
+  // SVG-Muster fürs Raster (eine Kachel = 24 Einheiten des 100er-Rasters)
+  var KACHEL_E = 24;
+  (function musterAnlegen() {
+    for (var i = 0; i < PAPIERE.length; i++) {
+      var pat = document.createElementNS(SVGNS, 'pattern');
+      pat.setAttribute('id', 'pap-' + i); pat.setAttribute('patternUnits', 'userSpaceOnUse');
+      pat.setAttribute('width', KACHEL_E); pat.setAttribute('height', KACHEL_E);
+      var im = document.createElementNS(SVGNS, 'image');
+      im.setAttribute('width', KACHEL_E); im.setAttribute('height', KACHEL_E); im.setAttribute('preserveAspectRatio', 'none');
+      im.setAttribute('href', kachel(i, 72).toDataURL('image/png'));
+      pat.appendChild(im); el.defs.appendChild(pat);
+    }
+  })();
+
+  /* ================================================================
+     Jedes Geschenk: feste Größe, Papier, Schleife (aus dem Tag abgeleitet)
+     ================================================================ */
+  var SCHLEIFEN = ['klassisch', 'rosette', 'kordel'];
+  var infoCache = {};
+  function gabeInfo(t) {
+    if (infoCache[t]) return infoCache[t];
+    var r = zufall(t * 977 + 13);
+    var b = 66 + r() * 24, hh = 48 + r() * 26;
+    if (b > 84 && hh > 66) hh -= 10;
+    // Papier nach dem Platz auf dem Tisch: Nachbarn (auch über- und untereinander) haben nie dasselbe Papier
+    var pos = Math.max(0, anordnung().indexOf(t));
+    var i = {
+      t: t, papier: (pos * 3 + Math.floor(pos / 8)) % NORMALE_PAPIERE, b: b, hh: hh,
+      schleife: SCHLEIFEN[Math.floor(r() * 3)], dreh: (r() - .5) * 3, versatz: (r() - .5) * (100 - b) * .55,
+      seite: r() < .5 ? -1 : 1, kartenDreh: (r() - .5) * 8, wackel: (r() < .5 ? -1 : 1) * (4 + r() * 2.5)
+    };
+    if (t === 24) { // Heiligabend: das große Paket in Goldfolie
+      i.b = 95; i.hh = 79; i.papier = GOLD; i.schleife = 'rosette'; i.versatz = 0; i.dreh = -.6;
+    }
+    i.band = PAPIERE[i.papier].band;
+    infoCache[t] = i;
+    return i;
+  }
+
+  function zustand(t) {
+    if (!K.darfOeffnen(t)) return 'zu';
+    if (K.istGeoeffnet(t)) return 'offen';
+    return t === K.heute() ? 'heute' : 'verpasst';
+  }
+
+  // Raster-Geometrie im 100×118-Feld
+  var BASIS = 114;
+  function masse(i, offen) {
+    var B = offen ? i.b * .9 : i.b, HH = offen ? i.hh * .72 : i.hh;
+    var T = klemme(B * .19, 9, 16), D = klemme(B * .11, 6, 10);
+    var x0 = 50 - B / 2 + i.versatz, yb = BASIS, yf = yb - HH;
+    return { B: B, HH: HH, T: T, D: D, x0: x0, yb: yb, yf: yf, cx: x0 + B / 2, cy: yf - T / 2, xF: x0 + (B - D) / 2 };
+  }
+  function pfad(pk) { var s = 'M' + f1(pk[0][0]) + ' ' + f1(pk[0][1]); for (var i = 1; i < pk.length; i++) s += 'L' + f1(pk[i][0]) + ' ' + f1(pk[i][1]); return s + 'Z'; }
+  function flaechen(m) {
+    var x0 = m.x0, yf = m.yf, yb = m.yb, B = m.B, T = m.T, D = m.D;
+    return {
+      front: [[x0, yf], [x0 + B - D, yf], [x0 + B - D, yb], [x0, yb]],
+      oben: [[x0, yf], [x0 + D, yf - T], [x0 + B, yf - T], [x0 + B - D, yf]],
+      seite: [[x0 + B - D, yf], [x0 + B, yf - T], [x0 + B, yb - T], [x0 + B - D, yb]]
+    };
+  }
+  function bandFlaechen(m, bw) {
+    var x0 = m.x0, yf = m.yf, B = m.B, T = m.T, D = m.D, xF = m.xF, q = Math.min(.32, bw * .32 / T);
+    var s1 = .5 - q, s2 = .5 + q;
+    function L(s) { return [x0 + D * s, yf - T * s]; }
+    function R(s) { return [x0 + B - D + D * s, yf - T * s]; }
+    var r1 = R(s1), r2 = R(s2);
+    return [
+      [[xF - bw / 2, yf], [xF + bw / 2, yf], [xF + bw / 2, m.yb], [xF - bw / 2, m.yb]],
+      [[xF - bw / 2, yf], [xF + bw / 2, yf], [xF + D + bw / 2, yf - T], [xF + D - bw / 2, yf - T]],
+      [L(s1), r1, r2, L(s2)],
+      [r1, r2, [r2[0], r2[1] + m.HH], [r1[0], r1[1] + m.HH]]
+    ];
+  }
+
+  function anhaenger(m, i, t, heute) {
+    var w = heute ? 34 : (t > 9 ? 27 : 22), h = heute ? 29 : 21;
+    var tx = i.seite < 0 ? m.x0 + 3 : m.x0 + m.B - m.D - w - 3, ty = m.yf + Math.min(7, m.HH * .1);
+    var d = i.seite < 0 ? -7 : 7;
+    var lochX = tx + (i.seite < 0 ? w - 4 : 4), lochY = ty + 4;
+    var s = '<path d="M' + f1(m.cx) + ' ' + f1(m.cy) + 'Q' + f1((m.cx + lochX) / 2) + ' ' + f1(m.cy + 10) + ' ' + f1(lochX) + ' ' + f1(lochY) + '" fill="none" stroke="#3d1830" stroke-width=".7" stroke-opacity=".7"/>';
+    s += '<g transform="rotate(' + d + ' ' + f1(lochX) + ' ' + f1(lochY) + ')">';
+    s += '<rect x="' + f1(tx) + '" y="' + f1(ty) + '" width="' + w + '" height="' + h + '" rx="3" fill="#fff8f4" stroke="#3d1830" stroke-opacity=".22" stroke-width=".6"/>';
+    s += '<circle cx="' + f1(lochX) + '" cy="' + f1(lochY) + '" r="1.5" fill="#3d1830" fill-opacity=".45"/>';
+    if (heute) {
+      s += '<text class="hand" x="' + f1(tx + w / 2) + '" y="' + f1(ty + 10.5) + '" font-size="9.5" text-anchor="middle" fill="#c8203f" style="fill:#c8203f">Heute</text>';
+      s += '<text class="zahl" x="' + f1(tx + w / 2) + '" y="' + f1(ty + 25) + '" font-size="15" text-anchor="middle">' + t + '</text>';
+    } else {
+      s += '<text class="zahl" x="' + f1(tx + w / 2) + '" y="' + f1(ty + 16.5) + '" font-size="14" text-anchor="middle">' + t + '</text>';
+    }
+    return s + '</g>';
+  }
+
+  function schleifeUse(m, i) {
+    var w = klemme(m.B * .54, 32, 46), h = w * .65;
+    return '<use href="#s-' + i.schleife + '" x="' + f1(m.cx - w / 2) + '" y="' + f1(m.cy - h * .5) + '" width="' + f1(w) + '" height="' + f1(h) + '" fill="' + i.band + '" color="' + i.band + '" stroke="#3d1830" stroke-opacity=".22" stroke-width=".5"/>';
+  }
+
+  function eingepackt(i, z, t) {
+    var m = masse(i, false), fl = flaechen(m), pat = 'url(#pap-' + i.papier + ')', bw = klemme(m.B * .12, 7, 11);
+    var s = '';
+    if (z === 'heute') s += '<ellipse class="heiligenschein" cx="' + f1(m.cx) + '" cy="' + f1(m.yb - (m.HH + m.T) * .5) + '" rx="58" ry="62" fill="url(#schein)"/>';
+    s += '<ellipse cx="' + f1(m.cx) + '" cy="' + (m.yb + .5) + '" rx="' + f1(m.B * .56) + '" ry="3" fill="#3d1830" fill-opacity=".2"/>';
+    s += '<path d="' + pfad(fl.front) + '" fill="' + pat + '"/><path d="' + pfad(fl.front) + '" fill="url(#licht)"/>';
+    s += '<path d="' + pfad(fl.oben) + '" fill="' + pat + '"/><path d="' + pfad(fl.oben) + '" fill="#fff" fill-opacity=".2"/>';
+    s += '<path d="' + pfad(fl.seite) + '" fill="' + pat + '"/><path d="' + pfad(fl.seite) + '" fill="#2a0c1e" fill-opacity=".26"/>';
+    var bf = bandFlaechen(m, bw);
+    s += '<g fill="' + i.band + '">';
+    for (var k = 0; k < bf.length; k++) s += '<path d="' + pfad(bf[k]) + '"/>';
+    s += '</g><path d="' + pfad(bf[3]) + '" fill="#2a0c1e" fill-opacity=".22"/>';
+    s += '<path d="M' + f1(m.x0) + ' ' + f1(m.yf) + 'H' + f1(m.x0 + m.B - m.D) + 'L' + f1(m.x0 + m.B) + ' ' + f1(m.yf - m.T) + '" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width=".7"/>';
+    if (z === 'zu') {
+      // zugeklebt: Klebestreifen über die Deckelkante und ein Datumsetikett
+      var kx = m.x0 + (m.B - m.D) * (i.seite < 0 ? .22 : .7);
+      s += '<rect x="' + f1(kx - 4) + '" y="' + f1(m.yf - 6) + '" width="8" height="15" fill="#fff" fill-opacity=".55" stroke="#3d1830" stroke-opacity=".08" transform="rotate(' + (i.seite * 12) + ' ' + f1(kx) + ' ' + f1(m.yf) + ')"/>';
+      var ew = Math.min(m.B - m.D - 4, 60), eh = 42, ex = m.x0 + (m.B - m.D - ew) / 2, ey = m.yb - eh - 4;
+      s += '<g transform="rotate(' + f1(-i.dreh - 2) + ' ' + f1(ex + ew / 2) + ' ' + f1(ey + eh / 2) + ')">';
+      s += '<rect x="' + f1(ex) + '" y="' + f1(ey) + '" width="' + f1(ew) + '" height="' + eh + '" rx="4" fill="#fff8f4" stroke="#c8203f" stroke-width="1.1"/>';
+      s += '<rect x="' + f1(ex + 2) + '" y="' + f1(ey + 2) + '" width="' + f1(ew - 4) + '" height="' + (eh - 4) + '" rx="3" fill="none" stroke="#c8203f" stroke-width=".5"/>';
+      s += '<text class="hand" text-anchor="middle" x="' + f1(ex + ew / 2) + '" font-size="10.5"><tspan x="' + f1(ex + ew / 2) + '" y="' + f1(ey + 12) + '">Nicht vor dem</tspan>';
+      s += '<tspan x="' + f1(ex + ew / 2) + '" y="' + f1(ey + 27.5) + '" font-size="18" style="fill:#c8203f">' + t + '.12.</tspan><tspan x="' + f1(ex + ew / 2) + '" y="' + f1(ey + 37.5) + '">öffnen!</tspan></text>';
+      s += '<rect x="' + f1(ex - 5) + '" y="' + f1(ey + 2) + '" width="11" height="5" fill="#fff" fill-opacity=".6" transform="rotate(-30 ' + f1(ex) + ' ' + f1(ey + 4) + ')"/>';
+      s += '</g>';
+    } else {
+      s += anhaenger(m, i, t, z === 'heute');
+    }
+    if (z === 'verpasst') {
+      var zx = i.seite < 0 ? m.x0 + m.B - m.D - 36 : m.x0 + 2, zy = m.yb - 24;
+      s += '<g transform="rotate(' + (i.seite * -6) + ' ' + f1(zx + 17) + ' ' + f1(zy + 10) + ')"><rect x="' + f1(zx) + '" y="' + f1(zy) + '" width="34" height="19" fill="#fbe28a" stroke="#3d1830" stroke-opacity=".12" stroke-width=".5"/>';
+      s += '<rect x="' + f1(zx + 11) + '" y="' + f1(zy - 3) + '" width="12" height="5" fill="#fff" fill-opacity=".6"/>';
+      s += '<text class="hand" x="' + f1(zx + 17) + '" y="' + f1(zy + 13.5) + '" font-size="11.5" text-anchor="middle">für dich</text></g>';
+    }
+    s += schleifeUse(m, i);
+    if (z === 'heute') {
+      s += '<g fill="#e8b04a"><path d="M' + f1(m.cx + 26) + ' ' + f1(m.cy - 14) + 'l1.6 4.4 4.4 1.6-4.4 1.6-1.6 4.4-1.6-4.4-4.4-1.6 4.4-1.6z"/><path d="M' + f1(m.cx - 30) + ' ' + f1(m.cy - 4) + 'l1 2.8 2.8 1-2.8 1-1 2.8-1-2.8-2.8-1 2.8-1z"/></g>';
+    }
+    return '<span class="fig"><svg viewBox="0 0 100 118" aria-hidden="true" focusable="false">' + s + '</svg></span>';
+  }
+
+  // Offene Schachtel: Rückwand + Deckel (hinten), Foto (HTML), Vorderwand + Papierreste (vorn)
+  function ausgepackt(i, t) {
+    var m = masse(i, true), fl = flaechen(m), pat = 'url(#pap-' + i.papier + ')';
+    var hinten = '<ellipse cx="' + f1(m.cx) + '" cy="' + (m.yb + .5) + '" rx="' + f1(m.B * .62) + '" ry="3" fill="#3d1830" fill-opacity=".2"/>';
+    // Deckel lehnt hinten an
+    var dw = m.B * .96, dh = m.T + 8, dx = m.x0 + m.B * .06, dy = m.yf - m.T - dh * .8;
+    hinten += '<g transform="rotate(' + (i.seite * -9) + ' ' + f1(dx + dw / 2) + ' ' + f1(dy + dh) + ')"><rect x="' + f1(dx) + '" y="' + f1(dy) + '" width="' + f1(dw) + '" height="' + f1(dh) + '" rx="1.5" fill="url(#pappe)"/><rect x="' + f1(dx) + '" y="' + f1(dy) + '" width="' + f1(dw) + '" height="' + f1(dh) + '" rx="1.5" fill="#3d1830" fill-opacity=".18"/></g>';
+    hinten += '<path d="' + pfad(fl.oben) + '" fill="#4a2a16"/>';
+    hinten += '<path d="M' + f1(m.x0 + 4) + ' ' + f1(m.yf - 2) + 'q6 -12 14 -6 q6 -10 14 -3 q8 -9 14 0 q6 -7 ' + f1(m.B - 50) + ' 2 L' + f1(m.x0 + m.B - 6) + ' ' + f1(m.yf - m.T + 2) + 'Z" fill="#fde7ea"/>';
+    var P = klemme(m.B * .84, 50, 64), kartenUnten = m.yf + m.HH * .34, kartenOben = kartenUnten - P;
+    var kL = m.cx - P / 2;
+    var vorn = '<path d="' + pfad(fl.front) + '" fill="url(#pappe)"/><path d="' + pfad(fl.front) + '" fill="url(#licht)"/>';
+    vorn += '<path d="' + pfad(fl.seite) + '" fill="url(#pappe)"/><path d="' + pfad(fl.seite) + '" fill="#2a0c1e" fill-opacity=".3"/>';
+    vorn += '<path d="M' + f1(m.x0 + 2) + ' ' + f1(m.yf + 1) + 'q5 -9 11 -3 q4 -8 10 -1 q5 -6 9 1" fill="#fff6f8" stroke="#e7b9c1" stroke-width=".5"/>';
+    vorn += '<path d="M' + f1(m.x0 + m.B - m.D - 22) + ' ' + f1(m.yf + 1) + 'q5 -8 10 -2 q5 -7 10 2" fill="#f9d2d9" stroke="#e7b9c1" stroke-width=".5"/>';
+    vorn += '<path d="M' + f1(m.x0) + ' ' + f1(m.yf) + 'H' + f1(m.x0 + m.B - m.D) + '" stroke="#fff" stroke-opacity=".5" stroke-width=".8"/>';
+    vorn += '<text class="zahl" x="' + f1(m.x0 + (m.B - m.D) / 2) + '" y="' + f1(m.yf + m.HH * .62 + 6) + '" font-size="' + f1(klemme(m.HH * .5, 14, 20)) + '" text-anchor="middle" fill="#3d1830" fill-opacity=".85">' + t + '</text>';
+    // Papierreste daneben
+    var rx = i.seite < 0 ? m.x0 + m.B + 1 : m.x0 - 15, ry = m.yb - 9;
+    vorn += '<path d="M' + f1(rx) + ' ' + f1(ry + 9) + 'l3 -9 6 3 4 -4 3 8 -2 2z" fill="' + pat + '"/><path d="M' + f1(rx) + ' ' + f1(ry + 9) + 'l3 -9 6 3 4 -4 3 8 -2 2z" fill="#2a0c1e" fill-opacity=".12"/>';
+    vorn += '<path d="M' + f1(rx - (i.seite < 0 ? 4 : -10)) + ' ' + f1(m.yb) + 'c3 -6 8 -6 9 -1s-5 4 -4 -1" fill="none" stroke="' + i.band + '" stroke-width="2.4" stroke-linecap="round"/>';
+    // Kleine quadratische Vorschau (nie das große Bild). Die Quelle steht erst in data-src und wird gesetzt,
+    // sobald das Geschenk in Sichtnähe kommt (vkBeobachten); schon einmal geladene kommen sofort.
+    var bild = sicher(function () { return F.vorschau(t, VK_PX); }), schon = !!(bild && geladen[bild]);
+    var foto = '<span class="vk' + (bild && !schon ? ' wartet' : '') + '" style="left:' + f1(kL) + '%;top:' + f1(kartenOben / 118 * 100) + '%;width:' + f1(P) + '%;--vkd:' + f1(i.kartenDreh) + 'deg;--fb:' + farbeVon(t) + '">' +
+      (bild ? '<img alt="" decoding="async" draggable="false" data-tag="' + t + '" ' + (schon ? 'src' : 'data-src') + '="' + esc(bild) + '">' : '<span class="ersatz">Foto folgt</span>') + '</span>';
+    return '<span class="fig"><svg viewBox="0 0 100 118" aria-hidden="true" focusable="false">' + hinten + '</svg>' + foto +
+      '<svg class="vorn" viewBox="0 0 100 118" aria-hidden="true" focusable="false">' + vorn + '</svg></span>';
+  }
+
+  /* ================================================================
+     Gabentisch aufbauen
+     ================================================================ */
+  var knoepfe = [];
+  function anordnung() {
+    var r = K.reihenfolge ? K.reihenfolge() : null, ok = r && r.length === 24, i, gesehen = {};
+    if (ok) for (i = 0; i < 24; i++) { if (!(r[i] >= 1 && r[i] <= 24) || gesehen[r[i]]) ok = false; gesehen[r[i]] = 1; }
+    if (ok) return r;
+    r = []; for (i = 1; i <= 24; i++) r.push(i); return r;
+  }
+  function spalten() { return window.innerWidth >= 960 ? 8 : window.innerWidth >= 680 ? 6 : 3; }
+
+  function statusText(t, z) {
+    return z === 'offen' ? 'ausgepackt, Foto ansehen' : z === 'zu' ? 'noch zugeklebt, nicht vor dem ' + t + '. Dezember öffnen'
+      : z === 'heute' ? 'heute, noch eingepackt' : 'verpasst, jetzt auspacken';
+  }
+  function fuelleGabe(t) {
+    var b = knoepfe[t];
+    if (!b) return;
+    var z = zustand(t), i = gabeInfo(t), alt = b.querySelector('img[data-src]');
+    if (alt && vkBeob) vkBeob.unobserve(alt);
+    b.className = 'gabe z-' + z;
+    b.style.setProperty('--dreh', f1(z === 'verpasst' ? i.wackel : i.dreh) + 'deg');
+    b.innerHTML = z === 'offen' ? ausgepackt(i, t) : eingepackt(i, z, t);
+    b.setAttribute('aria-label', 'Tag ' + t + ', ' + K.datumText(t) + ' – ' + statusText(t, z));
+    var neu = b.querySelector('img[data-src]');
+    if (neu) vkBeobachten(neu);
+  }
+
+  /* --- Vorschaufotos in den offenen Schachteln: nur laden, wenn sie in Sichtnähe kommen --- */
+  var VK_PX = 240;
+  var vkBeob = window.IntersectionObserver ? new IntersectionObserver(function (eintraege) {
+    for (var k = 0; k < eintraege.length; k++) {
+      if (!eintraege[k].isIntersecting) continue;
+      vkBeob.unobserve(eintraege[k].target);
+      vkLaden(eintraege[k].target);
+    }
+  }, { rootMargin: '300px 0px' }) : null;
+  function vkBeobachten(img) {
+    var url = img.getAttribute('data-src') || '';
+    // gemalte Platzhalter (data:-URLs) kosten kein Netz → gleich setzen
+    if (!vkBeob || url.indexOf('data:') === 0) vkLaden(img); else vkBeob.observe(img);
+  }
+  function vkLaden(img) {
+    var url = img.getAttribute('data-src');
+    if (!url) return;
+    img.removeAttribute('data-src');
+    img.src = url;
+  }
+  // Zeigt das Regal für Tag t nur einen Platzhalter, weil die Vorschau unterwegs verloren ging (404/403/Netz),
+  // obwohl es ein echtes Bild gibt? Dann die Schachtel neu füllen – die Vorschau lädt erneut (in Sichtnähe).
+  function vkErneuern(t) {
+    var b = knoepfe[t], vk = b && b.querySelector('.vk');
+    if (!vk || zustand(t) !== 'offen') return;
+    var img = vk.querySelector('img');
+    if (img && !img.hasAttribute('data-platzhalter') && !img._ersatz) return;
+    var url = sicher(function () { return F.vorschau(t, VK_PX); });
+    if (!url || url.indexOf('data:') === 0) return;
+    fuelleGabe(t);
+  }
+  var aktSpalten = 0;
+  function baueTisch() {
+    var n = spalten(), folge = anordnung();
+    aktSpalten = n;
+    if (vkBeob) vkBeob.disconnect();
+    el.etagen.innerHTML = ''; knoepfe = [];
+    document.documentElement.style.setProperty('--spalten', n);
+    for (var r = 0; r < 24 / n; r++) {
+      var etage = document.createElement('div'); etage.className = 'etage';
+      for (var k = 0; k < n; k++) {
+        var t = folge[r * n + k], b = document.createElement('button');
+        b.type = 'button'; b.dataset.tag = t; knoepfe[t] = b; etage.appendChild(b); fuelleGabe(t);
+      }
+      el.etagen.appendChild(etage);
+    }
+  }
+  // Vorschaubilder: Ladezustand und Ausweichbild bei Fehlern (Ereignisse bubbeln nicht, daher Capture).
+  // Bei 403/404/Netzfehler tauscht fotos.js (Produktion) die Quelle selbst gegen den gemalten „Foto folgt“-
+  // Platzhalter (sein Hörer auf window läuft vorher und setzt data-platzhalter) → dessen load abwarten.
+  // Sonst einmal F.platzhalter versuchen, zuletzt die gestreifte Karte „Foto folgt“.
+  el.etagen.addEventListener('load', function (e) {
+    var img = e.target;
+    if (img.tagName !== 'IMG' || !img.parentNode) return;
+    if (!img.hasAttribute('data-platzhalter') && !img._ersatz) geladen[img.getAttribute('src')] = 1;
+    img.parentNode.classList.remove('wartet');
+  }, true);
+  el.etagen.addEventListener('error', function (e) {
+    var img = e.target;
+    if (img.tagName !== 'IMG' || !img.parentNode || !img.getAttribute('src')) return;
+    if (!img._ersatz) {
+      img._ersatz = true;
+      if (img.hasAttribute('data-platzhalter')) return;
+      var p = platzhalterVon(+img.dataset.tag, VK_PX);
+      if (p && p !== img.getAttribute('src')) { img.src = p; return; }
+    }
+    var ers = document.createElement('span'); ers.className = 'ersatz'; ers.textContent = 'Foto folgt';
+    img.parentNode.classList.remove('wartet'); img.parentNode.replaceChild(ers, img);
+  }, true);
+
+  function verpassteTage() {
+    var r = [], h = Math.min(24, K.heute());
+    for (var d = h; d >= 1; d--) if (zustand(d) === 'verpasst') r.push(d);
+    return r;
+  }
+  function kopf() {
+    var h = K.heute(), verp = verpassteTage(), z = h >= 1 && h <= 24 ? zustand(h) : '';
+    document.body.classList.toggle('fest', h >= 25);
+    document.body.classList.toggle('november', h === 0);
+    var zeile, hilfe;
+    if (h === 0) {
+      zeile = 'Noch ist November.';
+      hilfe = 'Die Geschenke liegen schon bereit – aber alle sind zugeklebt. Ab dem 1. Dezember darfst du jeden Tag eins auspacken.';
+    } else if (h >= 25) {
+      zeile = 'Frohe Weihnachten!';
+      // kein Vorbelegen: wer erst nach Heiligabend kommt, hat noch gar nichts ausgepackt
+      hilfe = verp.length >= 24 ? 'Alle 24 Geschenke warten noch auf dich – ' + W.tipp + ' eins an und pack es aus.'
+        : verp.length ? (verp.length === 1 ? 'Ein Geschenk mit Zettel wartet noch auf dich.' : verp.length + ' Geschenke mit Zettel warten noch auf dich.') + ' Alle anderen kannst du ' + W.antippen + ' und ihr Foto wieder ansehen.'
+        : 'Alle 24 Geschenke sind ausgepackt. ' + W.Tipp + ' eins an, um sein Foto wieder anzusehen.';
+    } else {
+      zeile = 'Heute ist ' + K.datumText(h) + '.';
+      hilfe = z === 'offen' ? 'Dein Geschenk von heute ist ausgepackt – ' + W.tipp + ' es an, um das Foto wieder anzusehen.'
+        : 'Irgendwo leuchtet dein Geschenk von heute. Findest du es?';
+      if (verp.length) hilfe += ' Geschenke mit Zettel darfst du nachholen.';
+    }
+    el.heuteZeile.textContent = zeile; el.hilfe.textContent = hilfe;
+    el.heuteFinden.hidden = !(h >= 1 && h <= 24);
+    el.heuteFinden.lastChild.textContent = z === 'offen' ? 'Heute ansehen' : 'Heute finden';
+    nachholTag = verp.length ? verp[0] : 0;
+    el.nachholen.hidden = !nachholTag;
+    if (nachholTag) {
+      el.nachholen.textContent = 'Nachholen: ' + nachholTag;
+      el.nachholen.setAttribute('aria-label', 'Verpasstes Geschenk ' + nachholTag + ' auspacken');
+    }
+    el.kopfKnoepfe.hidden = el.heuteFinden.hidden && el.nachholen.hidden;
+    el.fussText.textContent = h >= 25 ? 'Frohe Weihnachten – und danke fürs Mitauspacken!' : 'Jeden Tag ein Geschenk. Ausgepackte kannst du jederzeit wieder ansehen.';
+  }
+  var nachholTag = 0;
+
+  /* --- Sprechblase --- */
+  var blaseUhr = 0;
+  function versteckeBlase() { clearTimeout(blaseUhr); el.blase.hidden = true; }
+  function zeigeBlase(btn, kopfText, text) {
+    var b = el.blase;
+    b.innerHTML = '<strong></strong><span></span>';
+    b.firstChild.textContent = kopfText; b.lastChild.textContent = text;
+    b.hidden = false; b.classList.remove('unten');
+    b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
+    var tr = el.tisch.getBoundingClientRect(), br = btn.getBoundingClientRect();
+    var w = b.offsetWidth, mitte = br.left + br.width / 2 - tr.left;
+    var links = Math.max(-6, Math.min(tr.width - w + 6, mitte - w / 2));
+    var oben = br.top - tr.top + br.height * .18 - b.offsetHeight - 6;
+    if (br.top + br.height * .18 - b.offsetHeight - 12 < 0) { oben = br.bottom - tr.top + 6; b.classList.add('unten'); }
+    b.style.left = links + 'px'; b.style.top = oben + 'px';
+    b.style.setProperty('--pfeil', Math.max(16, Math.min(w - 16, mitte - links)) + 'px');
+    sage(kopfText + ' ' + text);
+    clearTimeout(blaseUhr); blaseUhr = setTimeout(versteckeBlase, 2900);
+  }
+  function animiere(knopf, klasse) {
+    var fig = knopf && knopf.querySelector('.fig');
+    if (!fig) return;
+    fig.classList.remove('wackelt', 'huepft'); void fig.offsetWidth; fig.classList.add(klasse);
+  }
+  el.etagen.addEventListener('animationend', function (e) { if (e.target.classList && e.target.classList.contains('fig')) e.target.classList.remove('wackelt', 'huepft'); });
+
+  function sperre(btn, t) {
+    animiere(btn, 'wackelt');
+    brumm(12);
+    zeigeBlase(btn, K.sperrText(t), 'Geschenk ' + t + ' ist am ' + K.datumText(t) + ' dran.');
+  }
+
+  el.etagen.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('.gabe');
+    if (!btn) return;
+    var t = +btn.dataset.tag;
+    if (!K.darfOeffnen(t)) { sperre(btn, t); return; }
+    versteckeBlase();
+    if (K.istGeoeffnet(t)) oeffneAnsicht(t, btn);
+    else oeffneFokus(t, btn, false);
+  });
+  document.addEventListener('pointerdown', function (e) { if (!el.blase.hidden && !(e.target.closest && e.target.closest('.gabe'))) versteckeBlase(); });
+
+  // Sanft scrollen – nur window.scrollTo, damit die Übersichtsseite (iframe) nicht mitscrollt
+  function scrolleZu(knopf) {
+    return new Promise(function (fertig) {
+      var r = knopf.getBoundingClientRect(), vh = window.innerHeight;
+      if (r.top >= 70 && r.bottom <= vh - 30) { fertig(false); return; }
+      var ziel = Math.max(0, Math.round(window.scrollY + r.top + r.height / 2 - vh * .48)), erledigt = false;
+      function ende() { if (erledigt) return; erledigt = true; window.removeEventListener('scrollend', ende); fertig(true); }
+      window.addEventListener('scrollend', ende);
+      setTimeout(ende, REDUZIERT ? 60 : 700);
+      try { window.scrollTo({ top: ziel, behavior: REDUZIERT ? 'auto' : 'smooth' }); } catch (x) { window.scrollTo(0, ziel); }
+    });
+  }
+  function findeHeute(perTaste) {
+    var h = K.heute(), b = knoepfe[h];
+    if (!b) return;
+    versteckeBlase(); verbergeUnten();
+    scrolleZu(b).then(function () {
+      animiere(b, 'huepft');
+      if (perTaste) fokussiere(b);
+      zeigeBlase(b, 'Da ist es!', zustand(h) === 'offen' ? W.Tipp + ' es an, um das Foto zu sehen.' : W.Tipp + ' es an und pack es aus.');
+    });
+  }
+  el.heuteFinden.addEventListener('click', function (e) {
+    var h = K.heute();
+    if (!knoepfe[h]) return;
+    // schon ausgepackt: „Heute ansehen“ zeigt das Foto direkt (spart Großeltern einen Schritt)
+    if (zustand(h) === 'offen') { versteckeBlase(); oeffneAnsicht(h, el.heuteFinden); return; }
+    findeHeute(e.detail === 0);
+  });
+  el.weiterUnten.addEventListener('click', function (e) { findeHeute(e.detail === 0); });
+
+  /* --- „Dein Geschenk liegt weiter unten“: nur solange das heutige Geschenk noch nicht zu sehen war --- */
+  var unten = { beob: null, gesehen: false, bereit: false, unter: false, tag: -1 };
+  function verbergeUnten() { el.weiterUnten.hidden = true; }
+  function pruefeUnten() {
+    var h = K.heute(), b = knoepfe[h];
+    var zeigen = unten.bereit && !unten.gesehen && unten.unter && b && zustand(h) === 'heute' && !FK.offen && !el.ansicht.open;
+    if (zeigen && el.weiterUnten.hidden) el.weiterUnten.hidden = false;
+    else if (!zeigen) el.weiterUnten.hidden = true;
+  }
+  function beobachteHeute(neuerTag) {
+    var h = K.heute(), b = knoepfe[h];
+    if (unten.beob) unten.beob.disconnect();
+    if (neuerTag || unten.tag !== h) { unten.gesehen = false; unten.tag = h; }
+    unten.unter = false;
+    verbergeUnten();
+    if (!b || zustand(h) !== 'heute' || !window.IntersectionObserver) return;
+    unten.beob = new IntersectionObserver(function (eintraege) {
+      var e = eintraege[eintraege.length - 1];
+      if (e.intersectionRatio >= .85) {
+        if (!unten.gesehen) {
+          unten.gesehen = true;
+          // erstes Mal im Blick: kurz hüpfen (beim Laden erst nach einem Moment)
+          if (!REDUZIERT) setTimeout(function () { if (zustand(h) === 'heute' && !FK.offen && !el.ansicht.open && K.heute() === h) animiere(b, 'huepft'); }, unten.bereit ? 180 : 1100);
+        }
+        unten.unter = false;
+      } else {
+        unten.unter = e.boundingClientRect.top > (e.rootBounds ? e.rootBounds.height : window.innerHeight) * .45;
+      }
+      pruefeUnten();
+    }, { threshold: [0, .5, .85, 1] });
+    unten.beob.observe(b);
+  }
+  setTimeout(function () { unten.bereit = true; pruefeUnten(); }, 1400);
+  el.nachholen.addEventListener('click', function () {
+    if (!nachholTag || !knoepfe[nachholTag]) return;
+    var b = knoepfe[nachholTag];
+    scrolleZu(b).then(function () { oeffneFokus(nachholTag, b, false); });
+  });
+
+  /* ================================================================
+     Fokusansicht: Schleife lösen, Papier aufreißen, Foto steigt auf
+     ================================================================ */
+  var pctx = el.fkPapier.getContext('2d', { willReadFrequently: true }); // wird zum Messen der freien Fläche gelesen
+  var fxctx = el.fkFx.getContext('2d');
+  var FK = {
+    offen: false, tag: 0, info: null, nochmal: false, quelle: null, phase: 'zu',
+    B: 0, HH: 0, T: 0, D: 0, M: 6, bw: 0, S: 0, ox: 0, oy: 0, s: 1, boden: 0, rissBreite: 24, Pmax: 100, rise: 0,
+    schwaenze: null, ruhe: null, laenge: [0, 0], gehalten: -1, finger: { x: 0, y: 0 }, d0: 0, p: 0, pv: 0, fortschritt: 0, stufe: 0,
+    knoten: { x: 0, y: 0 }, lose: false, seile: [], zeiger: null, strich: null, mess: null, anteil: 0, wo: '',
+    hinweisStufe: 0, wackel: 0, auto: null, fetzen: [], konfetti: [], stuecke: [], reste: [], snap: null, uhren: [], fotoGeladen: false, gegriffen: false,
+    wind: null, griffK: 0, fuss: null, P: 0, fotoL: 0, glitzerWeg: 0, fotoWackel: 0
+  };
+  var raf = 0, zuletzt = 0, fxW = 0, fxH = 0, papierMuster = null, fxMuster = null;
+
+  function lm() { // lokale Maße der großen Schachtel (Ursprung = linke obere Ecke des Geschenks)
+    return { x0: 0, yf: FK.T, yb: FK.T + FK.HH, B: FK.B, T: FK.T, D: FK.D, HH: FK.HH, xF: (FK.B - FK.D) / 2, cx: FK.B / 2, cy: FK.T / 2 };
+  }
+  function uhr(fn, ms) { var id = setTimeout(fn, ms); FK.uhren.push(id); return id; }
+  function setzeHinweis(html, stups) {
+    el.fkHinweis.innerHTML = html;
+    if (stups && !REDUZIERT) { el.fkHinweis.classList.remove('stupst'); void el.fkHinweis.offsetWidth; el.fkHinweis.classList.add('stupst'); }
+  }
+  var TEXT = {
+    schleife: MAUS ? 'Zieh mit der Maus an der Schleife – kräftig, bis sie aufgeht.' : 'Zieh an der Schleife – kräftig, bis sie aufgeht.',
+    papier: MAUS ? '<b>Die Schleife ist ab!</b>Jetzt reiß das ganze Papier ab&nbsp;– Maustaste halten und wischen.' : '<b>Die Schleife ist ab!</b>Jetzt reiß das ganze Papier ab&nbsp;– wisch kreuz und quer drüber.'
+  };
+  // Zwischen-Hinweise beim Reißen (Anteil wirklich freier Fläche); passen sich an PAPIER_MINDESTENS an
+  var HINWEIS_AB = [.15, Math.min(.5, PAPIER_MINDESTENS - .25), PAPIER_MINDESTENS - .1];
+  function schritte(n) {
+    var li = el.fkSchritte.children;
+    for (var i = 0; i < li.length; i++) li[i].className = i < n ? 'erledigt' : i === n ? 'jetzt' : '';
+  }
+
+  /* --- Schachtel (SVG) und Papier (Canvas) in Fokusgröße --- */
+  function svgSetzen(svg, w, h, inhalt) {
+    svg.setAttribute('viewBox', '0 0 ' + f1(w) + ' ' + f1(h));
+    svg.setAttribute('width', f1(w)); svg.setAttribute('height', f1(h));
+    svg.innerHTML = inhalt;
+  }
+  function baueSchachtel() {
+    var B = FK.B, T = FK.T, D = FK.D, HH = FK.HH, m = lm(), fl = flaechen(m), L = HH * .2, t = FK.tag;
+    var hinten = '<path d="' + pfad(fl.oben) + '" fill="#3a2010"/><path d="M' + f1(D) + ' 0H' + f1(B) + 'L' + f1(B - D) + ' ' + f1(T) + 'H' + f1(D * .3) + 'Z" fill="#000" fill-opacity=".25"/>' +
+      '<g id="fkSeideH" style="transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0)"><path d="M' + f1(D * .5) + ' ' + f1(T * .8) +
+      'C' + f1(B * .1) + ' ' + f1(-T * .9) + ' ' + f1(B * .24) + ' ' + f1(-T * .2) + ' ' + f1(B * .3) + ' ' + f1(-T * .7) + 'S' + f1(B * .48) + ' ' + f1(-T * .1) + ' ' + f1(B * .56) + ' ' + f1(-T * .9) +
+      'S' + f1(B * .78) + ' ' + f1(-T * .2) + ' ' + f1(B * .86) + ' ' + f1(-T * .6) + 'S' + f1(B * .97) + ' ' + f1(T * .1) + ' ' + f1(B - D * .4) + ' ' + f1(T * .3) + 'L' + f1(B - D) + ' ' + f1(T) + 'H' + f1(D * .3) + 'Z" fill="#fde3e8" stroke="#e6aeb9" stroke-width="1"/></g>';
+    svgSetzen(el.fkHinten, B, T + HH, hinten);
+    var vorn = '<path d="' + pfad(fl.front) + '" fill="url(#pappe)"/><path d="' + pfad(fl.front) + '" fill="url(#licht)"/>' +
+      '<path d="' + pfad(fl.seite) + '" fill="url(#pappe)"/><path d="' + pfad(fl.seite) + '" fill="#2a0c1e" fill-opacity=".3"/>' +
+      '<text x="' + f1((B - D) / 2) + '" y="' + f1(T + HH * .64) + '" font-size="' + f1(HH * .34) + '" text-anchor="middle" style="font-family:var(--schrift-titel);fill:#3d1830;fill-opacity:.78">' + t + '</text>' +
+      '<text x="' + f1((B - D) / 2) + '" y="' + f1(T + HH * .84) + '" font-size="' + f1(Math.max(14, HH * .1)) + '" text-anchor="middle" style="font-family:var(--schrift-hand);font-weight:700;fill:#3d1830;fill-opacity:.6">Für dich</text>' +
+      '<g id="fkSeideV" style="transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0)"><path d="M' + f1(-2) + ' ' + f1(T + 3) + 'C' + f1(B * .05) + ' ' + f1(T - B * .14) + ' ' + f1(B * .16) + ' ' + f1(T - B * .05) + ' ' + f1(B * .2) + ' ' + f1(T - B * .1) +
+      'S' + f1(B * .3) + ' ' + f1(T - B * .02) + ' ' + f1(B * .34) + ' ' + f1(T + 3) + 'Z" fill="#fff4f6" stroke="#e6aeb9" stroke-width="1"/><path d="M' + f1(B * .56) + ' ' + f1(T + 3) + 'C' + f1(B * .6) + ' ' + f1(T - B * .1) + ' ' + f1(B * .7) + ' ' + f1(T - B * .03) + ' ' + f1(B * .74) + ' ' + f1(T - B * .08) +
+      'S' + f1(B * .86) + ' ' + f1(T - B * .01) + ' ' + f1(B - D + 2) + ' ' + f1(T + 3) + 'Z" fill="#f9cdd6" stroke="#e6aeb9" stroke-width="1"/></g>';
+    svgSetzen(el.fkVorn, B, T + HH, vorn);
+    var ob = [[0, T], [D, 0], [B, 0], [B - D, T]];
+    var deckel = '<path d="' + pfad(ob) + '" fill="url(#pappe)"/><path d="' + pfad(ob) + '" fill="#fff" fill-opacity=".18"/>' +
+      '<rect x="0" y="' + f1(T) + '" width="' + f1(B - D) + '" height="' + f1(L) + '" fill="url(#pappe)"/><rect x="0" y="' + f1(T) + '" width="' + f1(B - D) + '" height="' + f1(L) + '" fill="url(#licht)"/>' +
+      '<path d="M' + f1(B - D) + ' ' + f1(T) + 'L' + f1(B) + ' 0V' + f1(L) + 'L' + f1(B - D) + ' ' + f1(T + L) + 'Z" fill="url(#pappe)"/><path d="M' + f1(B - D) + ' ' + f1(T) + 'L' + f1(B) + ' 0V' + f1(L) + 'L' + f1(B - D) + ' ' + f1(T + L) + 'Z" fill="#2a0c1e" fill-opacity=".32"/>' +
+      '<path d="M0 ' + f1(T + L) + 'H' + f1(B - D) + 'L' + f1(B) + ' ' + f1(L) + '" fill="none" stroke="#3d1830" stroke-opacity=".35" stroke-width="1.4"/>';
+    svgSetzen(el.fkDeckel, B, T + L, deckel);
+  }
+
+  function malPapier() {
+    var B = FK.B, T = FK.T, D = FK.D, HH = FK.HH, M = FK.M, g = pctx, i = FK.info, c = el.fkPapier;
+    c.width = Math.round((B + 2 * M) * DPR); c.height = Math.round((T + HH + 2 * M) * DPR);
+    c.style.width = (B + 2 * M) + 'px'; c.style.height = (T + HH + 2 * M) + 'px'; c.style.left = -M + 'px'; c.style.top = -M + 'px';
+    g.setTransform(DPR, 0, 0, DPR, M * DPR, M * DPR);
+    var kp = B * KACHEL_E / i.b;
+    papierMuster = g.createPattern(kachel(i.papier, kp * DPR), 'repeat');
+    try { papierMuster.setTransform(new DOMMatrix().scale(1 / DPR)); } catch (e) { /* ältere Browser: Muster etwas größer */ }
+    var e = 1.6, flaechenPk = [
+      [[-e, T - e * .4], [B - D + e * .4, T - e * .4], [B - D + e * .4, T + HH + e], [-e, T + HH + e]],
+      [[-e, T], [D - e * .3, -e], [B + e, -e], [B - D + e * .4, T]],
+      [[B - D, T], [B + e, -e], [B + e, HH + e * .4], [B - D, T + HH + e]]
+    ];
+    var ueber = [null, 'rgba(255,255,255,.2)', 'rgba(42,12,30,.28)'];
+    for (var k = 0; k < 3; k++) {
+      g.beginPath(); var pk = flaechenPk[k];
+      g.moveTo(pk[0][0], pk[0][1]); for (var j = 1; j < pk.length; j++) g.lineTo(pk[j][0], pk[j][1]); g.closePath();
+      g.fillStyle = papierMuster; g.fill();
+      if (ueber[k]) { g.fillStyle = ueber[k]; g.fill(); }
+      else {
+        var v = g.createLinearGradient(0, T, B - D, T + HH);
+        v.addColorStop(0, 'rgba(255,255,255,.16)'); v.addColorStop(.5, 'rgba(255,255,255,0)'); v.addColorStop(1, 'rgba(42,12,30,.2)');
+        g.fillStyle = v; g.fill();
+      }
+    }
+    // Faltkanten an den unteren Ecken und eine helle Kante oben
+    g.fillStyle = 'rgba(42,12,30,.13)';
+    g.beginPath(); g.moveTo(0, T + HH); g.lineTo(B * .1, T + HH); g.lineTo(0, T + HH - B * .07); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(B - D, T + HH); g.lineTo(B - D - B * .1, T + HH); g.lineTo(B - D, T + HH - B * .07); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.4)'; g.lineWidth = 1.2;
+    g.beginPath(); g.moveTo(0, T); g.lineTo(B - D, T); g.lineTo(B, 0); g.stroke();
+    baueMessRaster();
+  }
+  function imPoly(pk, x, y) {
+    var innen = false;
+    for (var i = 0, j = pk.length - 1; i < pk.length; j = i++) {
+      if (((pk[i][1] > y) !== (pk[j][1] > y)) && (x < (pk[j][0] - pk[i][0]) * (y - pk[i][1]) / (pk[j][1] - pk[i][1]) + pk[i][0])) innen = !innen;
+    }
+    return innen;
+  }
+
+  /* --- Wie viel Papier ist wirklich ab? ---
+     Gemessen wird genau das, was man sieht: jeder Bildpunkt (auf ganzen CSS-Pixeln) des Papier-Canvas,
+     der auf einer der drei Geschenkflächen (vorn, oben, Seite) liegt, zählt als frei, sobald das Papier
+     dort zu weniger als der Hälfte deckt. Daneben ein grobes Raster (Zellen von etwa 3 px) für
+     zusammenhängende Reste und den „Wo noch?“-Hinweis. */
+  function baueMessRaster() {
+    var c = el.fkPapier, zg = Math.max(2, Math.round(3 * DPR)), nx = Math.floor(c.width / zg), ny = Math.floor(c.height / zg);
+    var Wp = nx * zg, Hp = ny * zg, fl = flaechen(lm()), M = FK.M, sp = DPR >= 1.5 ? 2 : 1, x, y, xi;
+    // Pixelmaske der Geschenkflächen: genau so gezeichnet wie das Papier, nur ohne Überstand
+    var mc = leinwand(Wp, Hp), mg = mc.getContext('2d', { willReadFrequently: true }), md;
+    mg.setTransform(DPR, 0, 0, DPR, M * DPR, M * DPR); mg.fillStyle = '#000';
+    [fl.front, fl.oben, fl.seite].forEach(function (pk) { mg.beginPath(); mg.moveTo(pk[0][0], pk[0][1]); for (var q = 1; q < pk.length; q++) mg.lineTo(pk[q][0], pk[q][1]); mg.closePath(); mg.fill(); });
+    FK.anteil = 0; FK.rissWeg = 0; FK.messFehler = false; FK.messZeit = 0;
+    try { md = mg.getImageData(0, 0, Wp, Hp).data; } catch (e) { FK.mess = null; FK.messFehler = true; return; }
+    // Messpunkte: jeder sp-te Bildpunkt in beide Richtungen (bei DPR 2 also ein Punkt je CSS-Pixel)
+    var xs = [], spalte = [], ys = [], zeile = [];
+    for (x = 0; x < Wp; x += sp) { xs.push(x); spalte.push(x / zg | 0); }
+    for (y = 0; y < Hp; y += sp) { ys.push(y); zeile.push((y / zg | 0) * nx); }
+    var pmaske = new Uint8Array(xs.length * ys.length), gesPx = 0, anz = new Uint16Array(nx * ny), inM = new Uint16Array(nx * ny), p = 0;
+    for (var yi = 0; yi < ys.length; yi++) for (xi = 0; xi < xs.length; xi++, p++) {
+      var k = zeile[yi] + spalte[xi], drin = md[(ys[yi] * Wp + xs[xi]) * 4 + 3] >= 128 ? 1 : 0;
+      pmaske[p] = drin; gesPx += drin; anz[k]++; inM[k] += drin;
+    }
+    var maske = new Uint8Array(nx * ny), ges = 0;
+    for (k = 0; k < maske.length; k++) if (inM[k] * 2 >= anz[k]) { maske[k] = 1; ges++; }
+    FK.mess = { zg: zg, nx: nx, ny: ny, Wp: Wp, Hp: Hp, xs: xs, ys: ys, spalte: spalte, zeile: zeile, anz: anz, summe: new Uint32Array(nx * ny),
+      pmaske: pmaske, gesPx: gesPx, maske: maske, ges: ges, papier: maske.slice() }; // am Anfang liegt überall Papier
+    c.dataset.frei = '0.0';
+  }
+  // Liefert den wirklich freien Anteil der Geschenkfläche (0…1) und füllt FK.mess.papier (1 = in dieser Zelle liegt noch Papier).
+  // Mit nurSpur: jede Zelle, in der überhaupt noch sichtbar Papier ist (auch Fransen am Rand) – fürs Abfallen am Ende.
+  function messePapier(nurSpur) {
+    var m = FK.mess;
+    if (!m || !m.gesPx) return FK.anteil;
+    var d;
+    try { d = pctx.getImageData(0, 0, m.Wp, m.Hp).data; } catch (e) { FK.messFehler = true; return FK.anteil; } // nur denkbar bei fremden Bildern im Papier
+    var xs = m.xs, ys = m.ys, spalte = m.spalte, pm = m.pmaske, summe = m.summe, Wp = m.Wp, freiPx = 0, p = 0, k;
+    summe.fill(0);
+    for (var yi = 0; yi < ys.length; yi++) {
+      var o = ys[yi] * Wp, z = m.zeile[yi];
+      for (var xi = 0; xi < xs.length; xi++, p++) {
+        var al = d[(o + xs[xi]) * 4 + 3];
+        summe[z + spalte[xi]] += al;
+        if (pm[p] && al < 128) freiPx++;
+      }
+    }
+    var f = nurSpur ? 14 : 128, papier = m.papier;
+    for (k = 0; k < papier.length; k++) papier[k] = (m.maske[k] || nurSpur) && summe[k] >= f * m.anz[k] ? 1 : 0;
+    if (nurSpur) return FK.anteil;
+    FK.anteil = freiPx / m.gesPx;
+    el.fkPapier.dataset.frei = (Math.floor(FK.anteil * 1000) / 10).toFixed(1); // zum Nachprüfen (Prozent)
+    return FK.anteil;
+  }
+  // Liegt auf dem Weg von a nach b (Breite w) überhaupt noch Papier? (Stand der letzten Messung)
+  function trifftPapier(a, b, w) {
+    var m = FK.mess;
+    if (!m) return true;
+    var s = m.zg / DPR, L = Math.hypot(b.x - a.x, b.y - a.y), n = Math.max(1, Math.ceil(L / 6)), nx = -(b.y - a.y) / (L || 1), ny = (b.x - a.x) / (L || 1);
+    for (var i = 0; i <= n; i++) for (var q = -1; q <= 1; q++) {
+      var x = a.x + (b.x - a.x) * i / n + nx * q * w * .35, y = a.y + (b.y - a.y) * i / n + ny * q * w * .35;
+      var ci = Math.floor((x + FK.M) / s), cj = Math.floor((y + FK.M) / s);
+      if (ci >= 0 && cj >= 0 && ci < m.nx && cj < m.ny && m.papier[cj * m.nx + ci]) return true;
+    }
+    return false;
+  }
+  // Zusammenhängende Papierstücke im Raster (4er-Nachbarschaft)
+  function papierStuecke() {
+    var m = FK.mess, nx = m.nx, ny = m.ny, feld = m.papier, gesehen = new Uint8Array(nx * ny), stapel = new Int32Array(nx * ny), teile = [];
+    for (var k0 = 0; k0 < feld.length; k0++) {
+      if (!feld[k0] || gesehen[k0]) continue;
+      var oben = 0, zellen = [], i0 = nx, i1 = 0, j0 = ny, j1 = 0, sx = 0, sy = 0;
+      stapel[oben++] = k0; gesehen[k0] = 1;
+      while (oben) {
+        var k = stapel[--oben], i = k % nx, j = (k - i) / nx;
+        zellen.push(k); sx += i; sy += j;
+        if (i < i0) i0 = i; if (i > i1) i1 = i; if (j < j0) j0 = j; if (j > j1) j1 = j;
+        if (i > 0 && feld[k - 1] && !gesehen[k - 1]) { gesehen[k - 1] = 1; stapel[oben++] = k - 1; }
+        if (i < nx - 1 && feld[k + 1] && !gesehen[k + 1]) { gesehen[k + 1] = 1; stapel[oben++] = k + 1; }
+        if (j > 0 && feld[k - nx] && !gesehen[k - nx]) { gesehen[k - nx] = 1; stapel[oben++] = k - nx; }
+        if (j < ny - 1 && feld[k + nx] && !gesehen[k + nx]) { gesehen[k + nx] = 1; stapel[oben++] = k + nx; }
+      }
+      teile.push({ zellen: zellen, n: zellen.length, i0: i0, i1: i1, j0: j0, j1: j1, ci: sx / zellen.length, cj: sy / zellen.length });
+    }
+    return teile;
+  }
+  // Ein Papierstück (plus Rand aus freien Nachbarzellen, dort hängen noch Fransen) aus dem Papier schneiden;
+  // es fällt danach als eigenes Bild herunter.
+  function schneideAus(teil, art) {
+    var m = FK.mess, nx = m.nx, ny = m.ny, zg = m.zg, feld = m.papier, M = FK.M;
+    var i0 = Math.max(0, teil.i0 - 1), i1 = Math.min(nx - 1, teil.i1 + 1), j0 = Math.max(0, teil.j0 - 1), j1 = Math.min(ny - 1, teil.j1 + 1);
+    var bw = i1 - i0 + 1, bh = j1 - j0 + 1, schnitt = new Uint8Array(bw * bh), z, k;
+    for (z = 0; z < teil.zellen.length; z++) {
+      k = teil.zellen[z];
+      var ci = k % nx, cj = (k - ci) / nx;
+      for (var dj = -1; dj <= 1; dj++) for (var di = -1; di <= 1; di++) {
+        var ii = ci + di, jj = cj + dj;
+        if (ii < i0 || ii > i1 || jj < j0 || jj > j1) continue;
+        var kk = jj * nx + ii;
+        if (kk === k || !feld[kk]) schnitt[(jj - j0) * bw + (ii - i0)] = 1;
+      }
+      feld[k] = 0;
+    }
+    // Zellen zeilenweise zu Rechtecken zusammenfassen
+    var rechtecke = [];
+    for (var j = 0; j < bh; j++) {
+      var start = -1;
+      for (var i = 0; i <= bw; i++) {
+        var an = i < bw && schnitt[j * bw + i];
+        if (an && start < 0) start = i;
+        else if (!an && start >= 0) { rechtecke.push([start * zg, j * zg, (i - start) * zg, zg]); start = -1; }
+      }
+    }
+    function pfadAus(g, x0, y0) { g.beginPath(); for (var r = 0; r < rechtecke.length; r++) g.rect(rechtecke[r][0] + x0, rechtecke[r][1] + y0, rechtecke[r][2], rechtecke[r][3]); }
+    var sx = i0 * zg, sy = j0 * zg, sw = bw * zg, sh = bh * zg;
+    if (!REDUZIERT) {
+      var bild = leinwand(sw, sh), bg = bild.getContext('2d');
+      pfadAus(bg, 0, 0); bg.clip();
+      bg.drawImage(el.fkPapier, sx, sy, sw, sh, 0, 0, sw, sh);
+      var x = sx / DPR - M, y = sy / DPR - M, w = sw / DPR, h = sh / DPR, cx = x + w / 2, ende = art === 'ende';
+      var weg = (cx - FK.B / 2) / FK.B; // nach außen auseinander
+      FK.reste.push({ bild: bild, x: x, y: y, w: w, h: h, dx: 0, dy: 0, rot: 0, flip: Math.random() * TAU, alpha: 1,
+        alter: ende ? -Math.random() * .12 - (1 - (y + h) / (FK.T + FK.HH)) * .06 : 0, lockern: ende ? .2 + Math.random() * .1 : .05,
+        vx: weg * (ende ? 300 : 160) + (Math.random() - .5) * 120, vy: -(ende ? 70 : 50) - Math.random() * 130,
+        vr: (Math.random() < .5 ? -1 : 1) * (1.2 + Math.random() * 3) / Math.max(1, Math.sqrt(w * h) / 60), vf: 3 + Math.random() * 4, gelandet: false });
+    }
+    pctx.save();
+    pctx.setTransform(1, 0, 0, 1, 0, 0);
+    pctx.globalCompositeOperation = 'destination-out'; pctx.fillStyle = '#000';
+    pfadAus(pctx, sx, sy); pctx.fill();
+    pctx.restore();
+  }
+  // Kleine, ringsum losgerissene Papierstücke fallen von selbst ab – keine Jagd nach Krümeln
+  function loseStueckeAb(a) {
+    var stufe = klemme((a - .3) / Math.max(.1, PAPIER_MINDESTENS - .45), .25, 1); // 30 % → ¼, ab Ziel −15 Punkte → voll
+    var teile = papierStuecke(), klein = Math.max(4, FK.mess.ges * LOSE_STUECKE_BIS * stufe), anzahl = 0;
+    if (teile.length < 2) return 0;
+    teile.sort(function (a, b) { return b.n - a.n; });
+    for (var t = 1; t < teile.length && anzahl < 12; t++) { // das größte Stück bleibt immer kleben
+      if (teile[t].n >= klein) continue;
+      schneideAus(teile[t], 'los'); anzahl++;
+    }
+    if (anzahl) starte();
+    return anzahl;
+  }
+  // Wo liegt noch das meiste Papier? (für „Fast geschafft – vor allem oben links“)
+  function woNochPapier() {
+    if (!FK.mess || FK.messFehler) return 'an den Rändern';
+    var m = FK.mess, zaehl = [0, 0, 0, 0, 0, 0, 0, 0, 0], s = m.zg / DPR, H = FK.T + FK.HH;
+    for (var k = 0; k < m.papier.length; k++) {
+      if (!m.papier[k] || !m.maske[k]) continue;
+      var i = k % m.nx, j = (k - i) / m.nx, x = (i + .5) * s - FK.M, y = (j + .5) * s - FK.M;
+      zaehl[klemme(Math.floor(y / H * 3), 0, 2) * 3 + klemme(Math.floor(x / FK.B * 3), 0, 2)]++;
+    }
+    var best = 4, ges = 0;
+    for (k = 0; k < 9; k++) { ges += zaehl[k]; if (zaehl[k] > zaehl[best]) best = k; }
+    var bz = best / 3 | 0, bs = best % 3, reihe = zaehl[bz * 3] + zaehl[bz * 3 + 1] + zaehl[bz * 3 + 2], spalte = zaehl[bs] + zaehl[bs + 3] + zaehl[bs + 6];
+    // ein Fleck, eine ganze Reihe (z. B. ein Streifen unten) oder eine Spalte – sonst die Ecke mit dem meisten Papier
+    if (zaehl[best] < ges * .5 && reihe >= ges * .6) return ['oben', 'in der Mitte', 'unten'][bz];
+    if (zaehl[best] < ges * .5 && spalte >= ges * .6) return ['links', 'in der Mitte', 'rechts'][bs];
+    // nur die Mitte frei gewischt (z. B. immer quer durch die Mitte) und keine Ecke sticht heraus: gegenüberliegende Ränder nennen
+    var ou = zaehl[0] + zaehl[1] + zaehl[2] + zaehl[6] + zaehl[7] + zaehl[8], lr = zaehl[0] + zaehl[3] + zaehl[6] + zaehl[2] + zaehl[5] + zaehl[8];
+    if (zaehl[best] < ges * .3) {
+      if (ou >= ges * .75 && lr >= ges * .75) return 'an den Rändern';
+      if (ou >= ges * .75) return 'oben und unten';
+      if (lr >= ges * .75) return 'links und rechts';
+    }
+    return ['oben links', 'oben', 'oben rechts', 'links', 'in der Mitte', 'rechts', 'unten links', 'unten', 'unten rechts'][best];
+  }
+  // Dezente Leiste über den Schritten: füllt sich mit dem Reißen, voll = Geschenk geht auf
+  function zeigeLeiste(a) {
+    el.fkLeiste.style.setProperty('--wert', Math.min(1, a / PAPIER_MINDESTENS).toFixed(3));
+  }
+
+  /* --- Layout der Bühne --- */
+  function fkLayout() {
+    var sw = el.fkBuehne.clientWidth, sh = el.fkBuehne.clientHeight, i = FK.info;
+    var ratio = klemme(i.hh / i.b, .62, .86), tR = .18, dR = .11, pR = .8;
+    // Unter der Schachtel liegen nach dem Auspacken Band und Schnipsel auf dem Tisch (bis ≈ 0,14·B unter der
+    // Kante). Steht die Fußzeile darunter (nicht quer), bleibt dazu noch etwas Luft bis zu Schritten und Hinweis
+    // plus ein Streifen von 20 px für die Fortschrittsleiste beim Reißen (sitzt knapp über den Schritten).
+    var fu = el.fkInnen.lastElementChild.getBoundingClientRect(), br = el.fkBuehne.getBoundingClientRect();
+    var quer = fu.left > br.left + br.width * .6, unten = quer ? .12 : .15, luft = quer ? 0 : 12 + 20;
+    var oben = Math.max(pR - tR - .3 * ratio, .3), gesamt = oben + tR + ratio + unten;
+    var B = Math.max(130, Math.min(sw * (sw < 500 ? .76 : .6), (sh - 8 - luft) / gesamt, 430));
+    var T = B * tR, D = B * dR, HH = B * ratio;
+    // Geschenk (mit Schleife) mittig – aber oben immer Platz für das aufsteigende Foto lassen
+    var gy = Math.max(oben * B + 2, (sh - luft - (tR + ratio + unten + .2) * B) / 2 + .2 * B), gx = (sw - B) / 2;
+    FK.B = B; FK.T = T; FK.D = D; FK.HH = HH; FK.bw = klemme(B * .1, 12, 32); FK.S = klemme(B * .2, 28, 74);
+    FK.rissBreite = klemme(B * RISS_BREITE, 20, 42); FK.Pmax = klemme(B * .42, 84, 150); FK.boden = T + HH + B * .035;
+    var g = el.fkGeschenk.style;
+    g.left = gx + 'px'; g.top = gy + 'px'; g.width = B + 'px'; g.height = (T + HH) + 'px';
+    var tisch = el.fkTisch.style;
+    tisch.width = (B * 1.9) + 'px'; tisch.height = (B * .26) + 'px'; tisch.top = (gy + T + HH - B * .12) + 'px';
+    var halter = el.fkFotoHalter.style; halter.width = B + 'px'; halter.height = (T + HH) + 'px';
+    var P = pR * B, fs = el.fkFoto.style;
+    fs.width = P + 'px'; fs.height = P + 'px'; fs.left = (B / 2 - P / 2 - D * .1) + 'px'; fs.top = (T + 3) + 'px';
+    FK.rise = (T + HH * .3 - P) - (T + 3); FK.P = P; FK.fotoL = B / 2 - P / 2 - D * .1;
+    var r = el.fkBuehne.getBoundingClientRect();
+    FK.ox = r.left + gx; FK.oy = r.top + gy;
+    fussMessen(); // Bereich von Hinweis und Knöpfen: dort wird kein Konfetti gezeichnet
+  }
+  function fxGroesse() {
+    var w = window.innerWidth, h = window.innerHeight;
+    if (w === fxW && h === fxH) return;
+    fxW = w; fxH = h; el.fkFx.width = Math.round(w * DPR); el.fkFx.height = Math.round(h * DPR);
+    fxMuster = null;
+  }
+  function holeFxMuster() {
+    if (fxMuster) return fxMuster;
+    var kp = FK.B * KACHEL_E / FK.info.b;
+    fxMuster = fxctx.createPattern(kachel(FK.info.papier, kp * DPR), 'repeat');
+    try { fxMuster.setTransform(new DOMMatrix().scale(1 / DPR)); } catch (e) { /* egal */ }
+    return fxMuster;
+  }
+
+  /* --- Schleifenbänder als Seile --- */
+  function baueSchwaenze() {
+    var m = lm(), n = 9, C = { x: m.cx, y: m.cy };
+    FK.schwaenze = []; FK.ruhe = []; FK.laenge = [];
+    for (var s = 0; s < 2; s++) {
+      var sd = s ? 1 : -1, lx = FK.B * (s ? .15 : .19), ly = FK.T / 2 + FK.HH * (s ? .3 : .4);
+      var r = [], ruhe = [], len = 0;
+      for (var k = 0; k < n; k++) {
+        var u = k / (n - 1), x = C.x + sd * (lx * Math.pow(u, .85) + FK.B * .03 * Math.sin(u * Math.PI)), y = C.y + ly * u;
+        ruhe.push({ x: x, y: y }); r.push({ x: x, y: y, px: x, py: y });
+        if (k) len += Math.hypot(x - ruhe[k - 1].x, y - ruhe[k - 1].y);
+      }
+      FK.schwaenze.push(r); FK.ruhe.push(ruhe); FK.laenge.push(len);
+    }
+    FK.knoten.x = C.x; FK.knoten.y = C.y; FK.gehalten = -1; FK.p = 0; FK.pv = 0; FK.fortschritt = 0; FK.stufe = 0; FK.lose = false; FK.seile = [];
+  }
+  function stups(staerke) { // Bänder kurz anschubsen (Einladung zum Ziehen)
+    if (!FK.schwaenze || REDUZIERT) return;
+    for (var s = 0; s < 2; s++) for (var k = 2; k < FK.schwaenze[s].length; k++) { var q = FK.schwaenze[s][k]; q.px -= (s ? 1 : -1) * staerke * k / 8; q.py += staerke * .4; }
+    starte();
+  }
+  function simSchwaenze() {
+    var C = { x: FK.B / 2, y: FK.T / 2 }, held = FK.gehalten, bewegt = held >= 0 || Math.abs(FK.p) > .3 || Math.abs(FK.pv) > .3;
+    if (held >= 0) {
+      var dx = FK.finger.x - C.x, dy = FK.finger.y - C.y, d = Math.hypot(dx, dy) || 1;
+      FK.p = Math.max(0, d - FK.d0);
+      var f = FK.p / FK.Pmax, zit = f > .62 && !REDUZIERT ? (f - .62) * 3.2 : 0;
+      FK.knoten.x = C.x + dx / d * Math.min(8, f * 10) + (Math.random() - .5) * zit;
+      FK.knoten.y = C.y + dy / d * Math.min(8, f * 10) + (Math.random() - .5) * zit;
+    } else {
+      FK.pv = FK.pv * .72 - FK.p * .28; FK.p += FK.pv;
+      if (Math.abs(FK.p) < .3 && Math.abs(FK.pv) < .3) { FK.p = 0; FK.pv = 0; }
+      FK.knoten.x += (C.x - FK.knoten.x) * .3; FK.knoten.y += (C.y - FK.knoten.y) * .3;
+    }
+    FK.fortschritt = FK.p / FK.Pmax;
+    var kdx = FK.knoten.x - C.x, kdy = FK.knoten.y - C.y, schwer = .28, energie = 0;
+    for (var s = 0; s < 2; s++) {
+      var r = FK.schwaenze[s], ruhe = FK.ruhe[s], n = r.length, h = held === s;
+      var L = FK.laenge[s] * (h ? 1 : 1 - .3 * Math.max(0, FK.fortschritt)) + (h ? FK.p : 0), seg = L / (n - 1);
+      for (var k = 1; k < n; k++) {
+        var q = r[k], vx = (q.x - q.px) * .86, vy = (q.y - q.py) * .86;
+        q.px = q.x; q.py = q.y; q.x += vx; q.y += vy + schwer;
+        var fe = h ? .01 : .15;
+        q.x += (ruhe[k].x + kdx - q.x) * fe; q.y += (ruhe[k].y + kdy - q.y) * fe;
+        energie += Math.abs(vx) + Math.abs(vy);
+      }
+      var kg = h ? klemme(FK.griffK || n - 1, 1, n - 1) : -1;
+      if (h) { var e = r[kg]; e.x += (FK.finger.x - e.x) * .5; e.y += (FK.finger.y - e.y) * .5; }
+      r[0].x = FK.knoten.x; r[0].y = FK.knoten.y;
+      for (var it = 0; it < 6; it++) for (k = 1; k < n; k++) {
+        var a = r[k - 1], b = r[k], ddx = b.x - a.x, ddy = b.y - a.y, dd = Math.sqrt(ddx * ddx + ddy * ddy) || 1, diff = (dd - seg) / dd;
+        var wa = k - 1 === 0 || k - 1 === kg ? 0 : .5, wb = k === kg ? 0 : .5;
+        if (wa + wb === 0) continue;
+        var nrm = 1 / (wa + wb); wa *= nrm; wb *= nrm;
+        a.x += ddx * diff * wa; a.y += ddy * diff * wa; b.x -= ddx * diff * wb; b.y -= ddy * diff * wb;
+      }
+    }
+    if (held >= 0) {
+      var stufe = FK.fortschritt >= .7 ? 2 : FK.fortschritt >= .35 ? 1 : 0;
+      if (stufe > FK.stufe) { brumm(7); FK.stufe = stufe; setzeHinweis(stufe === 2 ? '<b>Gleich geht sie auf!</b>' : 'Weiter ziehen …'); }
+      if (FK.fortschritt >= 1) loese();
+    }
+    return bewegt || energie > .6;
+  }
+
+  function loese() {
+    if (FK.lose) return;
+    FK.lose = true; brumm([14, 40, 22]);
+    var held = FK.gehalten, m = lm(), seite = held >= 0 ? held : 0;
+    function seil(punkte, haltIndex) {
+      var p = [], rest = [], phase = Math.random() * TAU;
+      for (var k = 0; k < punkte.length; k++) {
+        var x = punkte[k].x, y = punkte[k].y;
+        // tf: wie weit vorn (Richtung Betrachter) dieser Punkt auf dem Tisch zu liegen kommt → das Band liegt in Kringeln, nicht als Balken
+        p.push({ x: x, y: y, px: x - (Math.random() - .5) * 2.4, py: y + 1 + Math.random() * 2.2, tf: FK.B * (.006 + .085 * (.5 + .5 * Math.sin(k * 1.15 + phase))) });
+        if (k) rest.push(Math.max(2, Math.hypot(x - punkte[k - 1].x, y - punkte[k - 1].y)));
+      }
+      return { p: p, rest: rest, halt: haltIndex, ruhig: 0, frei: false };
+    }
+    var a = FK.schwaenze[seite].slice().reverse(), b = FK.schwaenze[1 - seite].slice().reverse(), k;
+    var haltA = held >= 0 ? a.length - 1 - klemme(FK.griffK || a.length - 1, 1, a.length - 1) : -1;
+    var vorne = [{ x: m.xF, y: m.yf }];
+    for (k = 1; k <= 6; k++) vorne.push({ x: m.xF + (Math.random() - .5) * 2, y: m.yf + m.HH * k / 6 });
+    var seitlich = [{ x: m.B - m.D / 2, y: m.T / 2 }];
+    for (k = 1; k <= 4; k++) seitlich.push({ x: m.B - m.D / 2, y: m.T / 2 + m.HH * k / 4 });
+    FK.seile = [seil(a.concat(vorne), haltA), seil(b.concat(seitlich), -1)];
+    FK.schwaenze = null;
+    FK.phase = 'papier';
+    el.fkBuehne.classList.add('reisst');
+    schritte(1);
+    setzeHinweis(FK.auto ? '<b>Die Schleife ist ab!</b>Und jetzt das Papier …' : TEXT.papier);
+    zeigeLeiste(FK.anteil); el.fkLeiste.classList.add('an');
+    sage('Die Schleife ist ab. Jetzt das Papier aufreißen.');
+    starte();
+  }
+  function simSeile(dt) {
+    var g = 2300 * dt * dt, aktiv = false, halbe = FK.bw * .4, boden = FK.boden - halbe;
+    for (var s = 0; s < FK.seile.length; s++) {
+      var sl = FK.seile[s], p = sl.p, n = p.length, bew = 0;
+      if (sl.ruhig > 40 && sl.halt < 0) continue;
+      for (var k = 0; k < n; k++) {
+        var q = p[k];
+        if (k === sl.halt) { q.px = q.x; q.py = q.y; q.x += (FK.finger.x - q.x) * .6; q.y += (FK.finger.y - q.y) * .6; continue; }
+        var vx = (q.x - q.px) * .99, vy = (q.y - q.py) * .99;
+        q.px = q.x; q.py = q.y; q.x += vx; q.y += vy + g;
+        bew += Math.abs(vx) + Math.abs(vy);
+      }
+      for (var it = 0; it < 10; it++) {
+        for (k = 1; k < n; k++) {
+          var a = p[k - 1], b = p[k], dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) || 1, diff = (d - sl.rest[k - 1]) / d;
+          var wa = k - 1 === sl.halt ? 0 : .5, wb = k === sl.halt ? 0 : .5, nrm = wa + wb ? 1 / (wa + wb) : 0;
+          a.x += dx * diff * wa * nrm; a.y += dy * diff * wa * nrm; b.x -= dx * diff * wb * nrm; b.y -= dy * diff * wb * nrm;
+        }
+        for (k = 0; k < n; k++) {
+          var q2 = p[k], bk = boden + (q2.tf || 0);
+          if (q2.y > bk && k !== sl.halt) { q2.y = bk; q2.px = q2.x - (q2.x - q2.px) * .2; }
+          // beim ersten Herunterfallen nicht weit über die Schachtel hinaus rutschen (Wegpusten darf weiter)
+          if (!sl.frei && sl.halt < 0) {
+            if (q2.x < -FK.B * .22) { q2.x = -FK.B * .22; q2.px = q2.x; }
+            else if (q2.x > FK.B * 1.22) { q2.x = FK.B * 1.22; q2.px = q2.x; }
+          }
+        }
+      }
+      sl.ruhig = bew < .05 * n ? sl.ruhig + 1 : 0;
+      if (sl.ruhig <= 40 || sl.halt >= 0) aktiv = true;
+    }
+    return aktiv;
+  }
+
+  /* --- Papier aufreißen --- */
+  function riss(a, b, w, mitFetzen, tempo) {
+    var dx = b.x - a.x, dy = b.y - a.y, L = Math.sqrt(dx * dx + dy * dy);
+    if (L < .5) return;
+    var g = pctx, ux = dx / L, uy = dy / L, nx = -uy, ny = ux, n = Math.max(2, Math.ceil(L / 5)), li = [], re = [], k;
+    for (k = 0; k <= n; k++) { li.push(w * (.5 + (Math.random() - .5) * .4)); re.push(w * (.5 + (Math.random() - .5) * .4)); }
+    function form(extra) {
+      g.beginPath();
+      g.moveTo(a.x - ux * (w * .42 + extra), a.y - uy * (w * .42 + extra));
+      for (k = 0; k <= n; k++) { var f = k / n, o = li[k] + extra * (.6 + Math.random() * .8); g.lineTo(a.x + dx * f + nx * o, a.y + dy * f + ny * o); }
+      g.lineTo(b.x + ux * (w * .42 + extra), b.y + uy * (w * .42 + extra));
+      for (k = n; k >= 0; k--) { var f2 = k / n, o2 = re[k] + extra * (.6 + Math.random() * .8); g.lineTo(a.x + dx * f2 - nx * o2, a.y + dy * f2 - ny * o2); }
+      g.closePath();
+    }
+    g.globalCompositeOperation = 'source-atop';
+    g.fillStyle = 'rgba(58,12,34,.2)'; form(7); g.fill();
+    g.fillStyle = RUECKSEITE; form(3.4); g.fill();
+    g.fillStyle = 'rgba(120,90,70,.18)'; form(1.4); g.fill();
+    g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000'; form(0); g.fill();
+    g.globalCompositeOperation = 'source-over';
+    if (FK.strichRiss !== undefined) FK.strichRiss += L;
+    FK.rissWeg = (FK.rissWeg || 0) + L;
+    if (!trifftPapier(a, b, w)) return; // nur Luft gewischt: kein Wackeln, keine Schnipsel aus dem Nichts
+    FK.wackel = Math.min(5, FK.wackel + L * .05);
+    FK.brummWeg = (FK.brummWeg || 0) + L;
+    if (FK.brummWeg > 55) { FK.brummWeg = 0; brumm(5); }
+    if (mitFetzen && !REDUZIERT) {
+      var anzahl = Math.min(3, 1 + (L / 14 | 0)), sk = FK.B / 300;
+      for (k = 0; k < anzahl; k++) {
+        var f3 = Math.random(), sx = (Math.random() - .5) * w;
+        fetzen(a.x + dx * f3 + nx * sx, a.y + dy * f3 + ny * sx, ux * tempo * .16 + nx * (Math.random() - .5) * 280, uy * tempo * .16 - 150 - Math.random() * 260, (5 + Math.random() * 8) * Math.max(.8, sk));
+      }
+    }
+  }
+  function fetzen(x, y, vx, vy, gr) {
+    var max = GROB ? 90 : 150;
+    if (FK.fetzen.length >= max) FK.fetzen.shift();
+    var form = [], n = 4 + (Math.random() * 2 | 0);
+    for (var i = 0; i < n; i++) { var a = i / n * TAU + Math.random() * .6, r = gr * (.55 + Math.random() * .5); form.push([Math.cos(a) * r, Math.sin(a) * r * .8]); }
+    FK.fetzen.push({ x: x, y: y, vx: vx, vy: vy, rot: Math.random() * TAU, vr: (Math.random() - .5) * 14, flip: Math.random() * TAU, vf: 6 + Math.random() * 10, form: form, liegt: false, tf: Math.random() * FK.B * .07 });
+    starte();
+  }
+
+  /* --- Weiterspiel nach dem Auspacken: Wischen pustet Schnipsel und Bänder weg, das Foto wackelt --- */
+  function puste(a, b, dtMs) {
+    var dx = b.x - a.x, dy = b.y - a.y, L2 = dx * dx + dy * dy;
+    if (L2 < 1) return;
+    var dt = Math.max(10, dtMs || 16) / 1000, vx = klemme(dx / dt, -2400, 2400), vy = klemme(dy / dt, -2400, 2400);
+    var R = FK.B * .09 + 24, R2 = R * R, i, k;
+    function nah(x, y) {
+      var t = klemme(((x - a.x) * dx + (y - a.y) * dy) / L2, 0, 1), ex = a.x + dx * t - x, ey = a.y + dy * t - y;
+      return ex * ex + ey * ey < R2;
+    }
+    for (i = 0; i < FK.fetzen.length; i++) {
+      var f = FK.fetzen[i];
+      if (!nah(f.x, f.y)) continue;
+      f.liegt = false;
+      f.vx = f.vx * .3 + vx * .5 + (Math.random() - .5) * 140;
+      f.vy = Math.min(0, f.vy) * .3 + Math.min(0, vy * .3) - 220 - Math.random() * 300;
+      f.vr += (Math.random() - .5) * 16; f.vf = 6 + Math.random() * 10;
+    }
+    for (i = 0; i < FK.seile.length; i++) {
+      var sl = FK.seile[i], p = sl.p;
+      for (k = 0; k < p.length; k++) {
+        if (k === sl.halt || !nah(p[k].x, p[k].y)) continue;
+        p[k].px = p[k].x - klemme(vx * .4 / 60, -16, 16); p[k].py = p[k].y - (klemme(vy * .25 / 60, -12, 12) - 5);
+        sl.ruhig = 0; sl.frei = true;
+      }
+    }
+    if (!REDUZIERT) { // ein wenig Glitzer folgt dem Finger
+      FK.glitzerWeg = (FK.glitzerWeg || 0) + Math.sqrt(L2);
+      if (FK.glitzerWeg > 26 && FK.konfetti.length < 170) {
+        FK.glitzerWeg = 0;
+        FK.konfetti.push({ x: b.x + (Math.random() - .5) * 16, y: b.y + (Math.random() - .5) * 16, vx: vx * .05 + (Math.random() - .5) * 60, vy: -60 - Math.random() * 90,
+          w: 0, h: 0, rot: Math.random() * TAU, vr: 0, flip: 0, vf: 0, farbe: '#ffe8a8', alter: 0, max: .5 + Math.random() * .35, glanz: true, gr: .45 + Math.random() * .3 });
+      }
+    }
+    if (FK.phase === 'fertig' && fotoGetroffen(a, b)) wackelFoto();
+  }
+  function fotoGetroffen(a, b) {
+    var l = FK.fotoL, o = FK.T + 3 + FK.rise, P = FK.P;
+    for (var s = 0; s <= 1; s += .5) {
+      var x = a.x + (b.x - a.x) * s, y = a.y + (b.y - a.y) * s;
+      if (x > l && x < l + P && y > o && y < o + P) return true;
+    }
+    return false;
+  }
+  function wackelFoto() {
+    if (REDUZIERT || !el.fkFoto.animate) return;
+    var jetzt = performance.now();
+    if (jetzt - (FK.fotoWackel || 0) < 650) return;
+    FK.fotoWackel = jetzt; brumm(8);
+    var z = 'translateY(' + f1(FK.rise) + 'px) ';
+    el.fkFoto.animate([{ transform: z + 'rotate(-2deg)' }, { transform: z + 'rotate(4deg)', offset: .22 }, { transform: z + 'rotate(-5deg)', offset: .5 },
+      { transform: z + 'rotate(1deg)', offset: .78 }, { transform: z + 'rotate(-2deg)' }], { duration: 560, easing: 'ease-out' });
+  }
+  // Misst (höchstens alle 110 ms, beim Loslassen sofort), wie viel Papier wirklich ab ist.
+  // Erst ab PAPIER_MINDESTENS geht das Geschenk auf – vorher nie.
+  function pruefePapier(sofort) {
+    if (FK.phase !== 'papier') return;
+    var jetzt = performance.now();
+    if (!sofort && jetzt - FK.messZeit < 110) return;
+    FK.messZeit = jetzt;
+    var a = messePapier();
+    // Notlösung, falls sich das Papier nicht auslesen lässt: nach sehr viel Reißen trotzdem öffnen
+    if (FK.messFehler) a = Math.min(1, (FK.rissWeg || 0) / (FK.B * 16));
+    else if (a < PAPIER_MINDESTENS && loseStueckeAb(a)) a = messePapier(); // die abgefallenen Stücke sind wirklich weg: neu messen
+    zeigeLeiste(a);
+    if (a >= PAPIER_MINDESTENS) { papierFaellt(true); return; }
+    if (FK.auto) return; // der Knopf „Auspacken“ reißt selbst: keine Anfeuerung
+    var st = a >= HINWEIS_AB[2] ? 3 : a >= HINWEIS_AB[1] ? 2 : a >= HINWEIS_AB[0] ? 1 : 0;
+    if (st > FK.hinweisStufe) {
+      FK.hinweisStufe = st; FK.leer = 0; brumm(8);
+      if (st === 3) { FK.wo = woNochPapier(); setzeHinweis('<b>Fast geschafft!</b>Nur noch ein paar Fetzen&nbsp;– vor&nbsp;allem ' + FK.wo + '.'); }
+      else setzeHinweis(st === 2 ? '<b>Weiter so!</b>Man sieht schon die Schachtel.' : '<b>Ja, genau so!</b>Reiß weiter, bis die Leiste bei der Schleife ist.');
+      hopse();
+    } else if (st === 3 && sofort) {
+      var wo = woNochPapier();
+      if (wo !== FK.wo) { FK.wo = wo; setzeHinweis('<b>Fast geschafft!</b>Nur noch ein paar Fetzen&nbsp;– vor&nbsp;allem ' + wo + '.'); }
+    }
+  }
+
+  function hopse() { // die Schleife am Ende der Leiste hüpft kurz
+    if (REDUZIERT) return;
+    var z = el.fkLeiste.lastElementChild; z.classList.remove('hopst'); void z.getBoundingClientRect(); z.classList.add('hopst');
+  }
+  // Nach dem Loslassen: Hat der Strich etwas gebracht? Wer dreimal hintereinander nur über schon freie Stellen wischt
+  // (je weniger als ½ Prozentpunkt), bekommt den Ort gezeigt, wo noch das meiste Papier liegt – in jeder Stufe.
+  function pruefeLeerlauf() {
+    if (FK.phase !== 'papier' || FK.auto || FK.messFehler || FK.strichVor === undefined) return;
+    if ((FK.strichRiss || 0) < 30) return; // nur getippt oder kaum bewegt: dafür gibt es den eigenen Hinweis
+    FK.leer = FK.anteil - FK.strichVor < .005 ? (FK.leer || 0) + 1 : 0;
+    if (FK.leer < 3) return;
+    FK.leer = 0; FK.wo = woNochPapier();
+    setzeHinweis('<b>Da ist schon alles ab!</b>Reiß mal woanders&nbsp;– vor&nbsp;allem ' + FK.wo + '.', true);
+    hopse(); brumm([8, 40, 8]);
+  }
+
+  // Das Papier ist ab: entweder genug aufgerissen (rest = true: die letzten Fetzen fallen einzeln ab)
+  // oder per Knopf „Auspacken“ (das restliche Papier fliegt in drei Teilen weg)
+  function papierFaellt(rest) {
+    if (FK.phase !== 'papier') return;
+    FK.phase = 'faellt';
+    // reißt der Finger gerade noch: derselbe Strich pustet ab jetzt die Schnipsel weiter
+    if (FK.zeiger !== null && FK.strich) FK.wind = { x: FK.strich.x, y: FK.strich.y, t: FK.strich.t }; else FK.zeiger = null;
+    FK.strich = null;
+    el.fkBuehne.classList.remove('reisst');
+    zeigeLeiste(PAPIER_MINDESTENS);
+    uhr(function () { el.fkLeiste.classList.remove('an'); }, REDUZIERT ? 0 : 700);
+    if (!FK.nochmal) K.oeffne(FK.tag);
+    var c = el.fkPapier, M = FK.M;
+    if (rest && !REDUZIERT && FK.mess && !FK.messFehler) {
+      // Die letzten Fetzen lösen sich, wackeln kurz und fallen auf den Tisch
+      messePapier(true);
+      var teile = papierStuecke().sort(function (a, b) { return b.n - a.n; });
+      for (var t = 0; t < teile.length; t++) {
+        if (t < 40 && teile[t].n >= 2) schneideAus(teile[t], 'ende');
+        else if (t < 60) fetzen((teile[t].ci + .5) * FK.mess.zg / DPR - M, (teile[t].cj + .5) * FK.mess.zg / DPR - M, (Math.random() - .5) * 200, -80 - Math.random() * 120, 3 + Math.random() * 3);
+      }
+      for (var f2 = 0; f2 < 6; f2++) fetzen(Math.random() * FK.B, Math.random() * (FK.T + FK.HH), (Math.random() - .5) * 360, -160 - Math.random() * 220, 5 + Math.random() * 7);
+      brumm([10, 30, 14]);
+    } else if (!REDUZIERT) {
+      var snap = leinwand(c.width, c.height); snap.getContext('2d').drawImage(c, 0, 0);
+      FK.snap = snap;
+      var H = FK.T + FK.HH, linien = [], x1 = FK.B * (.34 + Math.random() * .06), x2 = FK.B * (.64 + Math.random() * .06);
+      [x1, x2].forEach(function (xc) { var l = []; for (var k = 0; k <= 8; k++) l.push([xc + (Math.random() - .5) * FK.B * .08, -M + k * (H + 2 * M) / 8]); linien.push(l); });
+      var links = [[-M, -M]].concat(linien[0], [[-M, H + M]]);
+      var mitte = linien[0].slice().concat(linien[1].slice().reverse());
+      var rechts = linien[1].slice().reverse().concat([[FK.B + M, H + M], [FK.B + M, -M]]);
+      [[links, -1], [mitte, 0], [rechts, 1]].forEach(function (st) {
+        var pk = st[0], sx = 0, sy = 0;
+        for (var i = 0; i < pk.length; i++) { sx += pk[i][0]; sy += pk[i][1]; }
+        FK.stuecke.push({ pk: pk, cx: sx / pk.length, cy: sy / pk.length, dx: 0, dy: 0, vx: st[1] * (220 + Math.random() * 140) + (Math.random() - .5) * 60, vy: -260 - Math.random() * 160, rot: 0, vr: st[1] * (2 + Math.random()) + (Math.random() - .5), alpha: 1, alter: 0 });
+      });
+      for (var f = 0; f < (GROB ? 14 : 22); f++) fetzen(Math.random() * FK.B, Math.random() * H, (Math.random() - .5) * 500, -200 - Math.random() * 300, 5 + Math.random() * 9);
+    }
+    pctx.setTransform(1, 0, 0, 1, 0, 0); pctx.clearRect(0, 0, c.width, c.height);
+    setzeHinweis(rest ? '<b>Geschafft!</b>Der Deckel springt auf …' : 'Der Deckel springt auf …');
+    starte();
+    if (REDUZIERT) deckelAuf(); else uhr(deckelAuf, rest ? 640 : 300); // erst die Fetzen fallen sehen, dann springt der Deckel
+  }
+
+  function deckelAuf() {
+    FK.phase = 'auf';
+    schritte(2);
+    var lid = el.fkDeckel, B = FK.B, HH = FK.HH, T = FK.T;
+    var ziel = 'translate(' + f1(-B * .04) + 'px,' + f1(-(T * .5 + HH * .24)) + 'px) rotate(-8deg)';
+    if (REDUZIERT || !lid.animate) { lid.classList.add('hinten'); lid.style.transform = ziel; zeigeFoto(); return; }
+    var a = lid.animate([
+      { transform: 'none' },
+      { transform: 'translateY(-' + f1(T * .3) + 'px) rotate(-2deg)', offset: .12 },
+      { transform: 'translateY(0) rotate(1deg)', offset: .22 },
+      { transform: 'translateY(-' + f1(T * .5) + 'px) rotate(-3deg)', offset: .34 },
+      { transform: 'translate(' + f1(B * .1) + 'px,' + f1(-(T + HH * .8)) + 'px) rotate(9deg)', offset: .64 },
+      { transform: ziel }
+    ], { duration: 1150, easing: 'ease-out', fill: 'forwards' });
+    a.onfinish = function () { lid.style.transform = ziel; a.cancel(); };
+    uhr(function () { lid.classList.add('hinten'); }, 690);
+    uhr(zeigeFoto, 560);
+  }
+
+  function zeigeFoto() {
+    var foto = el.fkFoto, ziel = 'translateY(' + f1(FK.rise) + 'px) rotate(-2deg)';
+    var sh = document.getElementById('fkSeideH'), sv = document.getElementById('fkSeideV');
+    if (REDUZIERT || !foto.animate) {
+      foto.style.transform = ziel; if (sh) sh.style.transform = 'none'; if (sv) sv.style.transform = 'none';
+      fertig(); return;
+    }
+    [sh, sv].forEach(function (s, i) {
+      if (!s || !s.animate) { if (s) s.style.transform = 'none'; return; }
+      var an = s.animate([{ transform: 'scaleY(0)' }, { transform: 'scaleY(1.25)', offset: .6 }, { transform: 'none' }], { duration: 620, delay: i * 90, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'forwards' });
+      an.onfinish = function () { s.style.transform = 'none'; an.cancel(); };
+    });
+    var a = foto.animate([
+      { transform: 'translateY(0) scale(.92)' },
+      { transform: 'translateY(' + f1(FK.rise * 1.1) + 'px) rotate(-4deg) scale(1.02)', offset: .68 },
+      { transform: ziel }
+    ], { duration: 900, delay: 120, easing: 'cubic-bezier(.2,.75,.3,1)', fill: 'forwards' });
+    a.onfinish = function () { foto.style.transform = ziel; a.cancel(); };
+    uhr(function () { konfettiRegen(); brumm(22); }, 380);
+    uhr(fertig, 1000);
+  }
+
+  // Jeder Tag hat seine eigene kleine Überraschung im Konfetti; am 24. regnet es goldene Sterne
+  var FORMEN = (function () {
+    if (!window.Path2D) return null;
+    function zacken(n, R, r) {
+      var p = new Path2D();
+      for (var i = 0; i < n * 2; i++) { var a = -Math.PI / 2 + i * Math.PI / n, q = i % 2 ? r : R; if (i) p.lineTo(Math.cos(a) * q, Math.sin(a) * q); else p.moveTo(Math.cos(a) * q, Math.sin(a) * q); }
+      p.closePath(); return p;
+    }
+    var flocke = new Path2D(), w = .16;
+    for (var i = 0; i < 3; i++) {
+      var a = i * Math.PI / 3, c = Math.cos(a), s = Math.sin(a);
+      flocke.moveTo(c - s * w, s + c * w); flocke.lineTo(c + s * w, s - c * w); flocke.lineTo(-c + s * w, -s - c * w); flocke.lineTo(-c - s * w, -s + c * w); flocke.closePath();
+    }
+    var kreis = new Path2D(); kreis.arc(0, 0, .78, 0, TAU);
+    return {
+      stern: zacken(5, 1, .45), flocke: flocke, kreis: kreis,
+      herz: new Path2D('M0 .95C-.25 .72-1 .25-1-.28-1-.72-.62-.98-.3-.98-.12-.98 0-.86 0-.7 0-.86.12-.98.3-.98.62-.98 1-.72 1-.28 1 .25.25.72 0 .95Z'),
+      tanne: new Path2D('M0-1 .78.42H.2V1H-.2V.42H-.78Z')
+    };
+  })();
+  var TAGESFORMEN = ['kreis', 'stern', 'herz', 'flocke', 'tanne'];
+  function konfettiRegen() {
+    var t = FK.tag, heilig = t === 24, n = (GROB ? 70 : 120) + (heilig ? 30 : 0);
+    var farben = heilig ? ['#e8b04a', '#f4d48c', '#fff1c2', '#c98d27', '#fff8f4', '#c8203f'] : ['#c8203f', '#e8b04a', '#2a9d8f', '#fff8f4', '#ef5a3c', '#f4d48c', '#ec9ea3'];
+    var form = FORMEN ? (heilig ? 'stern' : TAGESFORMEN[t % TAGESFORMEN.length]) : null;
+    var x0 = FK.B / 2, y0 = FK.T * .4;
+    fussMessen();
+    for (var i = 0; i < n; i++) {
+      var a = -Math.PI / 2 + (Math.random() - .5) * 1.9, v = 380 + Math.random() * 620;
+      FK.konfetti.push({ x: x0 + (Math.random() - .5) * FK.B * .5, y: y0, vx: Math.cos(a) * v, vy: Math.sin(a) * v, w: 4 + Math.random() * 5, h: 6 + Math.random() * 7,
+        rot: Math.random() * TAU, vr: (Math.random() - .5) * 12, flip: Math.random() * TAU, vf: 7 + Math.random() * 9, farbe: farben[i % farben.length], alter: 0, max: 1.8 + Math.random() * 1.2,
+        glanz: heilig ? i % 3 === 0 : i % 5 === 0, form: form && (heilig || i % 3) ? form : null, gr: 4.2 + Math.random() * 3.6 });
+    }
+    starte();
+  }
+  function fussMessen() {
+    var fu = el.fkInnen.lastElementChild.getBoundingClientRect(), r = el.fkBuehne.getBoundingClientRect();
+    FK.fuss = { l: fu.left, t: fu.top, quer: fu.left > r.left + r.width * .6 };
+  }
+
+  function fertig() {
+    if (!FK.offen) return;
+    FK.phase = 'fertig';
+    el.fkBuehne.classList.add('fertig');
+    schritte(3);
+    var t = FK.tag, titel = titelVon(t);
+    setzeHinweis('<b>' + esc(titel || 'Ausgepackt!') + '</b>' + W.aufs + ' Foto, um es groß zu sehen.');
+    el.fkAuspacken.lastChild.textContent = 'Foto groß ansehen';
+    el.fkZurueck.hidden = false;
+    el.fkFoto.tabIndex = 0;
+    fokussiere(el.fkAuspacken);
+    sage('Ausgepackt! ' + K.datumText(t) + (titel ? ': ' + titel : '') + '.');
+    uhr(function () { if (FK.offen) ladeBild(sicher(function () { return F.bild(t); })).catch(function () { /* egal */ }); }, 1400);
+  }
+
+  /* --- Fokus öffnen / schließen --- */
+  // Foto in der Schachtel: quadratische Vorschau passend zur Anzeigegröße (≤ 480 px → klein, sonst 960 px),
+  // nie das große Bild. Bis es dekodiert ist: Karte „Foto kommt …“; bei Fehlern der gemalte Platzhalter.
+  function ladeFokusFoto(t) {
+    var halter = el.fkFoto, nr = (FK.fotoNr || 0) + 1;
+    FK.fotoNr = nr;
+    FK.fotoGeladen = false;
+    var px = Math.round(FK.P * Math.min(2, window.devicePixelRatio || 1));
+    var url = sicher(function () { return F.vorschau(t, px); });
+    function aktuell() { return FK.offen && FK.tag === t && FK.fotoNr === nr; }
+    function zeige(src) {
+      var bild = document.createElement('img'); bild.alt = ''; bild.draggable = false; bild.src = src;
+      halter.innerHTML = ''; halter.appendChild(bild); FK.fotoGeladen = true;
+    }
+    halter.innerHTML = '<span class="ersatz laedt">Foto kommt …</span>'; // liegt anfangs ohnehin verdeckt in der Schachtel
+    ladeBild(url).then(function (img) {
+      if (aktuell()) zeige(img.src);
+    }, function () {
+      if (!aktuell()) return;
+      var p = platzhalterVon(t, px);
+      if (!p) { halter.innerHTML = '<span class="ersatz">Foto folgt</span>'; return; }
+      ladeBild(p).then(function (img) { if (aktuell()) zeige(img.src); }, function () { if (aktuell()) halter.innerHTML = '<span class="ersatz">Foto folgt</span>'; });
+    });
+  }
+  function oeffneFokus(t, quelle, nochmal) {
+    if (!K.darfOeffnen(t)) return;
+    if (FK.offen) schliesseFokus(true);
+    versteckeBlase();
+    FK.offen = true; FK.tag = t; FK.info = gabeInfo(t); FK.nochmal = !!nochmal; FK.quelle = quelle || null;
+    FK.phase = 'schleife'; FK.fetzen = []; FK.konfetti = []; FK.stuecke = []; FK.reste = []; FK.wo = ''; FK.snap = null; FK.zeiger = null; FK.strich = null;
+    FK.hinweisStufe = 0; FK.leer = 0; FK.strichVor = undefined; FK.wackel = 0; FK.auto = null; FK.gegriffen = false; FK.wind = null; FK.griffK = 0; FK.glitzerWeg = 0; FK.fotoWackel = 0;
+    el.fkNummer.textContent = 'Tag ' + t; el.fkDatum.textContent = K.datumText(t);
+    el.fkAuspacken.lastChild.textContent = 'Auspacken'; el.fkZurueck.hidden = true;
+    el.fkBuehne.classList.remove('reisst', 'fertig');
+    el.fkLeiste.classList.remove('an'); el.fkLeiste.style.setProperty('--wert', '0');
+    el.fkLeiste.style.setProperty('--band', FK.info.band);
+    el.fkDeckel.classList.remove('hinten'); el.fkDeckel.style.transform = ''; el.fkFoto.style.transform = ''; el.fkFoto.tabIndex = -1;
+    el.fkGeschenk.style.transform = '';
+    schritte(0);
+    setzeHinweis(TEXT.schleife);
+    document.documentElement.classList.add('vollansicht');
+    if (el.fokus.showModal) el.fokus.showModal(); else el.fokus.setAttribute('open', '');
+    fxGroesse(); fkLayout(); baueSchachtel(); malPapier(); baueSchwaenze(); fxMuster = null;
+    ladeFokusFoto(t);
+    fokussiere(el.fkAuspacken);
+    sage('Geschenk ' + t + '. ' + el.fkHinweis.textContent + ' Oder drück auf Auspacken.');
+    flug();
+    uhr(function () { stups(5); }, REDUZIERT ? 0 : 900);
+    uhr(function () { if (FK.phase === 'schleife' && !FK.gegriffen) { stups(6); setzeHinweis(TEXT.schleife, true); } }, 4200);
+  }
+  function flug() {
+    var q = FK.quelle;
+    if (q) q.classList.add('weg');
+    if (REDUZIERT || !q || !el.fkGeschenk.animate) { zeichneFx(); return; }
+    var r = q.getBoundingClientRect();
+    if (!r.width) { zeichneFx(); return; }
+    var u = r.width / 100, m = masse(FK.info, false);
+    var k = (m.B * u) / FK.B, dx = r.left + m.x0 * u - FK.ox, dy = r.top + (m.yf - m.T) * u - FK.oy;
+    FK.phase = 'flug';
+    var a = el.fkGeschenk.animate([
+      { transform: 'translate(' + f1(dx) + 'px,' + f1(dy) + 'px) scale(' + k.toFixed(3) + ')' },
+      { transform: 'translate(0,-16px) scale(1.03)', offset: .72 },
+      { transform: 'none' }
+    ], { duration: 580, easing: 'cubic-bezier(.2,.8,.25,1)' });
+    el.fkGrund.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: 'ease-out' });
+    el.fkTisch.animate([{ opacity: 0 }, { opacity: 0, offset: .5 }, { opacity: 1 }], { duration: 580 });
+    [el.fkInnen.firstElementChild, el.fkInnen.lastElementChild].forEach(function (x) { x.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 300, delay: 260, fill: 'backwards' }); });
+    a.onfinish = function () { if (FK.phase === 'flug') FK.phase = 'schleife'; zeichneFx(); };
+    starte();
+  }
+  function schliesseFokus(still) {
+    if (!FK.offen) return;
+    FK.stillZu = !!still;
+    if (el.fokus.open) { if (el.fokus.close) el.fokus.close(); else el.fokus.removeAttribute('open'); }
+    nachFokus();
+  }
+  function nachFokus() {
+    if (!FK.offen) return;
+    FK.offen = false;
+    FK.uhren.forEach(clearTimeout); FK.uhren = [];
+    if (raf) cancelAnimationFrame(raf); raf = 0;
+    FK.auto = null; FK.zeiger = null; FK.wind = null; FK.seile = []; FK.fetzen = []; FK.konfetti = []; FK.stuecke = []; FK.reste = []; FK.snap = null; FK.schwaenze = null;
+    el.fkGeschenk.getAnimations && el.fkGeschenk.getAnimations().forEach(function (a) { a.cancel(); });
+    if (!el.ansicht.open) document.documentElement.classList.remove('vollansicht');
+    var q = FK.quelle, t = FK.tag;
+    if (q) q.classList.remove('weg');
+    fuelleGabe(t); kopf();
+    if (!FK.stillZu) fokussiere(knoepfe[t] || q);
+    FK.stillZu = false;
+    fxctx.setTransform(1, 0, 0, 1, 0, 0); fxctx.clearRect(0, 0, el.fkFx.width, el.fkFx.height);
+  }
+  el.fokus.addEventListener('close', nachFokus);
+  el.fkZu.addEventListener('click', function () { schliesseFokus(false); });
+  el.fkZurueck.addEventListener('click', function () { schliesseFokus(false); });
+  function zumBild() {
+    var t = FK.tag, q = knoepfe[t] || FK.quelle;
+    schliesseFokus(true);
+    oeffneAnsicht(t, q);
+  }
+  // Foto antippen → Bildansicht. Normalweg ist click (auch Tastatur). Chrome verschluckt am Tablet aber manchmal
+  // den click eines Tipps direkt nach schnellem Wischen (Tap-Unterdrückung nach Fling) – deshalb merkt sich ein
+  // kurzer, ruhiger Finger-Tipp aufs Foto selbst vor: kommt binnen 350 ms kein click, öffnet er die Bildansicht.
+  var fotoTipp = null;
+  el.fkFoto.addEventListener('pointerdown', function (e) {
+    fotoTipp = e.pointerType !== 'mouse' && FK.offen && FK.phase === 'fertig' ? { id: e.pointerId, x: e.clientX, y: e.clientY, t: e.timeStamp, uhr: 0 } : null;
+  });
+  el.fkFoto.addEventListener('pointerup', function (e) {
+    var tp = fotoTipp;
+    if (!tp || tp.id !== e.pointerId) return;
+    if (Math.hypot(e.clientX - tp.x, e.clientY - tp.y) > 10 || e.timeStamp - tp.t > 800) { fotoTipp = null; return; }
+    tp.uhr = uhr(function () {
+      if (fotoTipp !== tp) return;
+      fotoTipp = null;
+      if (FK.offen && FK.phase === 'fertig') zumBild();
+    }, 350);
+  });
+  el.fkFoto.addEventListener('pointercancel', function () { fotoTipp = null; });
+  el.fkFoto.addEventListener('click', function () {
+    if (fotoTipp) { clearTimeout(fotoTipp.uhr); fotoTipp = null; }
+    if (FK.offen && FK.phase === 'fertig') zumBild();
+  });
+  el.fkAuspacken.addEventListener('click', autoAuspacken);
+
+  /* --- Finger / Maus auf der Bühne --- */
+  function lokal(e) { return { x: e.clientX - FK.ox, y: e.clientY - FK.oy }; }
+  function nahAmGeschenk(q, rand) { return q.x > -rand && q.x < FK.B + rand && q.y > -rand - FK.S && q.y < FK.T + FK.HH + rand; }
+  function greife(q) {
+    var best = -1, bd = 1e9, bk = 0, n = FK.schwaenze[0].length;
+    for (var s = 0; s < 2; s++) for (var k = 0; k < n; k++) {
+      var p = FK.schwaenze[s][k], d = Math.hypot(p.x - q.x, p.y - q.y);
+      if (d < bd) { bd = d; best = s; bk = k; }
+    }
+    var dm = Math.hypot(q.x - FK.B / 2, q.y - FK.T / 2);
+    if (dm < FK.S * 1.35) {
+      // die große Schleife selbst (Knoten oder Schlaufen) – da greifen Kinder zuerst: sofort greifbar
+      best = q.x < FK.B / 2 ? 0 : 1; bk = 1;
+    } else if (bd > 46) {
+      // verzeihend: irgendwo am Geschenk greift das Bandende auf dieser Seite
+      if (!nahAmGeschenk(q, 34)) return false;
+      best = q.x < FK.B / 2 ? 0 : 1; bk = n - 1;
+    }
+    bk = Math.max(1, bk);
+    FK.gehalten = best; FK.griffK = bk; FK.gegriffen = true;
+    FK.finger.x = q.x; FK.finger.y = q.y;
+    // Fortschritt = Fingerweg ab dem Griff; Leerweg nur so viel Band, wie zwischen Knoten und Griffstelle liegt
+    FK.d0 = Math.max(dm, FK.laenge[best] * bk / (n - 1) * .9) + 4;
+    FK.stufe = 0;
+    setzeHinweis('Weiter ziehen …');
+    return true;
+  }
+  el.fkBuehne.addEventListener('pointerdown', function (e) {
+    if (!FK.offen || FK.auto || FK.zeiger !== null || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    if (FK.phase === 'faellt' || FK.phase === 'auf' || FK.phase === 'fertig') {
+      // Weiterspiel: wer weiterwischt, pustet Schnipsel und Bänder über den Tisch (das Foto selbst bleibt antippbar)
+      if (e.target.closest && e.target.closest('#fkFoto')) return;
+      var w = lokal(e);
+      FK.wind = { x: w.x, y: w.y, t: e.timeStamp };
+      FK.zeiger = e.pointerId;
+      if (e.pointerType === 'mouse') e.preventDefault();
+      try { el.fkBuehne.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+      return;
+    }
+    if (FK.phase !== 'schleife' && FK.phase !== 'papier') return;
+    var q = lokal(e), ok = false;
+    if (FK.phase === 'schleife') ok = greife(q);
+    else { ok = true; FK.strich = { x: q.x, y: q.y, t: e.timeStamp }; FK.strichRiss = 0; FK.strichVor = FK.anteil; FK.strichStart = { x: q.x, y: q.y }; } // Wischen darf überall auf der Bühne beginnen
+    if (!ok) { if (FK.phase === 'schleife') { stups(4); setzeHinweis(TEXT.schleife, true); } return; }
+    e.preventDefault();
+    FK.zeiger = e.pointerId;
+    try { el.fkBuehne.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+    starte();
+  });
+  el.fkBuehne.addEventListener('pointermove', function (e) {
+    if (FK.zeiger !== e.pointerId) return;
+    e.preventDefault();
+    var liste = e.getCoalescedEvents ? e.getCoalescedEvents() : null;
+    if (!liste || !liste.length) liste = [e];
+    var q = lokal(liste[liste.length - 1]);
+    FK.finger.x = q.x; FK.finger.y = q.y;
+    if (FK.wind) {
+      var zuletztP = liste[liste.length - 1], wq = lokal(zuletztP), wt = zuletztP.timeStamp || e.timeStamp;
+      if (Math.hypot(wq.x - FK.wind.x, wq.y - FK.wind.y) >= 4) { puste(FK.wind, wq, wt - FK.wind.t); FK.wind = { x: wq.x, y: wq.y, t: wt }; }
+      starte();
+      return;
+    }
+    if (FK.phase === 'papier' && FK.strich) {
+      for (var i = 0; i < liste.length && FK.phase === 'papier'; i++) {
+        var p = lokal(liste[i]), s = FK.strich, d = Math.hypot(p.x - s.x, p.y - s.y);
+        if (d < 7) continue;
+        var dt = Math.max(4, (liste[i].timeStamp || e.timeStamp) - s.t) / 1000, tempo = Math.min(3200, d / dt);
+        // schneller Wisch reißt nur wenig breiter (höchstens +15 %); wie bei echtem Papier läuft ein langer Streifen
+        // spitz aus: ab knapp der halben Geschenkbreite vom Ansatzpunkt wird der Riss schmaler (bis 60 %).
+        // So sind lange, schnelle Reihen quer über das Geschenk nicht in 4–5 Zügen fertig.
+        var weit = Math.hypot(p.x - FK.strichStart.x, p.y - FK.strichStart.y), lauf = klemme(1 - (weit - FK.B * .45) / (FK.B * .7) * .4, .6, 1);
+        riss(s, p, FK.rissBreite * (.95 + Math.min(.15, tempo / 8000)) * lauf, true, tempo);
+        FK.strich = { x: p.x, y: p.y, t: liste[i].timeStamp || e.timeStamp };
+        pruefePapier();
+      }
+    }
+    starte();
+  });
+  function zeigerEnde(e) {
+    if (FK.zeiger !== e.pointerId) return;
+    var nurGetippt = FK.phase === 'papier' && FK.strich && FK.strichRiss === 0;
+    FK.zeiger = null; FK.strich = null; FK.wind = null;
+    if (nurGetippt) setzeHinweis(MAUS ? '<b>Nicht nur klicken – wischen!</b>Maustaste halten und übers Papier ziehen.' : '<b>Nicht nur tippen – wischen!</b>Zieh den Finger kräftig übers Papier.', true);
+    if (FK.phase === 'schleife' && FK.gehalten >= 0) {
+      var f = FK.fortschritt;
+      FK.gehalten = -1;
+      if (f >= .68 && e.type !== 'pointercancel') loese();
+      else setzeHinweis(f > .15 ? '<b>Fast!</b>Zieh noch ein Stück weiter.' : TEXT.schleife, true);
+    }
+    FK.gehalten = -1;
+    for (var s = 0; s < FK.seile.length; s++) FK.seile[s].halt = -1;
+    if (FK.phase === 'papier') { pruefePapier(true); if (!nurGetippt) pruefeLeerlauf(); }
+    FK.strichVor = undefined;
+    starte();
+  }
+  el.fkBuehne.addEventListener('pointerup', zeigerEnde);
+  el.fkBuehne.addEventListener('pointercancel', zeigerEnde);
+  el.fkBuehne.addEventListener('lostpointercapture', zeigerEnde);
+
+  /* --- Knopf „Auspacken“: macht beide Gesten selbst --- */
+  function sofortAuspacken() {
+    FK.lose = true; FK.schwaenze = null; FK.seile = [];
+    FK.phase = 'papier'; papierFaellt();
+  }
+  function autoAuspacken() {
+    if (FK.phase === 'fertig') { zumBild(); return; }
+    if (FK.auto || (FK.phase !== 'schleife' && FK.phase !== 'papier')) return;
+    if (REDUZIERT) { sofortAuspacken(); return; }
+    FK.zeiger = null;
+    if (FK.phase === 'schleife') {
+      var r = FK.schwaenze[0], e = r[r.length - 1];
+      FK.gehalten = 0; FK.griffK = r.length - 1; FK.gegriffen = true; FK.finger.x = e.x; FK.finger.y = e.y;
+      FK.d0 = Math.max(FK.laenge[0] * .92, Math.hypot(e.x - FK.B / 2, e.y - FK.T / 2));
+      var dx = -.55, dy = .84, weit = FK.Pmax * 1.45;
+      FK.auto = { art: 'schleife', t0: performance.now(), dauer: 760, von: { x: e.x, y: e.y }, nach: { x: e.x + dx * weit, y: e.y + dy * weit } };
+    } else autoPapier();
+    starte();
+  }
+  function autoPapier() {
+    if (FK.phase !== 'papier') return;
+    var B = FK.B, T = FK.T, H = FK.HH, Bf = B - FK.D;
+    var striche = [
+      [[Bf * .12, T + H * .08], [Bf * .9, T + H * .92]],
+      [[Bf * .88, T + H * .1], [Bf * .1, T + H * .95]],
+      [[-4, T + H * .5], [B + 4, T + H * .46]],
+      [[B * .15, T * .6], [B * .95, T * .3]],
+      [[Bf * .5, T], [Bf * .52, T + H]]
+    ];
+    FK.auto = { art: 'papier', striche: striche, i: 0, t0: performance.now(), letzter: null };
+    starte();
+  }
+  function autoSchritt(jetzt) {
+    var a = FK.auto;
+    if (a.art === 'schleife') {
+      var k = Math.min(1, (jetzt - a.t0) / a.dauer), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      FK.finger.x = a.von.x + (a.nach.x - a.von.x) * e; FK.finger.y = a.von.y + (a.nach.y - a.von.y) * e;
+      if (k >= 1 || FK.lose) {
+        if (!FK.lose) loese();
+        FK.gehalten = -1; for (var s = 0; s < FK.seile.length; s++) FK.seile[s].halt = -1;
+        FK.auto = null; uhr(autoPapier, 360);
+      }
+      return;
+    }
+    if (FK.phase !== 'papier') { FK.auto = null; return; }
+    var st = a.striche[a.i], d = 250, k2 = Math.min(1, (jetzt - a.t0) / d);
+    var p = { x: st[0][0] + (st[1][0] - st[0][0]) * k2, y: st[0][1] + (st[1][1] - st[0][1]) * k2 };
+    if (a.letzter) riss(a.letzter, p, FK.rissBreite * 1.1, true, 1400);
+    a.letzter = p;
+    pruefePapier();
+    if (FK.phase !== 'papier') { FK.auto = null; return; }
+    if (k2 >= 1) {
+      a.i++; a.letzter = null; a.t0 = jetzt + 70;
+      if (a.i >= a.striche.length) { FK.auto = null; papierFaellt(); }
+    }
+  }
+
+  /* --- Animationsschleife (läuft nur, solange sich etwas bewegt) --- */
+  var imTakt = false, weiter = false;
+  function starte() {
+    if (imTakt) { weiter = true; return; }   // innerhalb eines Takts: keine zweite Schleife anstoßen
+    if (raf || !FK.offen || document.hidden) return;
+    zuletzt = performance.now();
+    raf = requestAnimationFrame(tick);
+  }
+  function tick(jetzt) {
+    raf = 0; imTakt = true; weiter = false;
+    var dt = Math.min(.034, Math.max(.008, (jetzt - zuletzt) / 1000)); zuletzt = jetzt;
+    var aktiv = false;
+    if (FK.auto) { autoSchritt(jetzt); aktiv = true; }
+    if (FK.schwaenze && !FK.lose && simSchwaenze()) aktiv = true;
+    if (FK.seile.length && simSeile(dt)) aktiv = true;
+    if (bewegeTeilchen(dt)) aktiv = true;
+    if (FK.wackel > .25 && !REDUZIERT) {
+      el.fkGeschenk.style.transform = 'translate(' + f1((Math.random() - .5) * FK.wackel) + 'px,' + f1((Math.random() - .5) * FK.wackel * .6) + 'px)';
+      FK.wackel *= .8; aktiv = true;
+    } else if (FK.wackel) { FK.wackel = 0; el.fkGeschenk.style.transform = ''; }
+    if (FK.phase === 'flug') aktiv = true;
+    zeichneFx();
+    imTakt = false;
+    if ((aktiv || weiter) && !raf && FK.offen && !document.hidden) raf = requestAnimationFrame(tick);
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; } else starte();
+  });
+
+  function bewegeTeilchen(dt) {
+    var aktiv = false, g = 1500, i, boden = FK.boden;
+    for (i = FK.fetzen.length - 1; i >= 0; i--) {
+      var f = FK.fetzen[i];
+      if (f.liegt) continue;
+      f.vy += g * dt; f.vx *= .985; f.vy *= .985;
+      f.x += f.vx * dt; f.y += f.vy * dt; f.rot += f.vr * dt; f.flip += f.vf * dt;
+      if (f.y > boden - 2 + f.tf && f.vy > 0) { f.y = boden - 2 + f.tf; f.liegt = true; f.flip = Math.random() < .5 ? 0 : Math.PI; }
+      // vom Tisch gepustet: weg damit
+      if (f.y > fxH + 40 || f.x + FK.ox < -60 || f.x + FK.ox > fxW + 60) FK.fetzen.splice(i, 1);
+      aktiv = true;
+    }
+    for (i = FK.konfetti.length - 1; i >= 0; i--) {
+      var c = FK.konfetti[i];
+      c.alter += dt;
+      c.vy += 900 * dt; c.vx *= .975; c.vy *= .975;
+      c.x += (c.vx + Math.sin(c.alter * 6 + c.rot) * 40) * dt; c.y += c.vy * dt; c.rot += c.vr * dt; c.flip += c.vf * dt;
+      if (c.alter > c.max) FK.konfetti.splice(i, 1);
+      aktiv = true;
+    }
+    for (i = FK.stuecke.length - 1; i >= 0; i--) {
+      var s = FK.stuecke[i];
+      s.alter += dt; s.vy += 2100 * dt; s.dx += s.vx * dt; s.dy += s.vy * dt; s.rot += s.vr * dt;
+      if (s.alter > .55) s.alpha = Math.max(0, 1 - (s.alter - .55) / .5);
+      if (s.alpha <= 0) FK.stuecke.splice(i, 1);
+      aktiv = true;
+    }
+    // abgerissene Papierreste: kurz lockern, dann flattern sie herunter und landen als Schnipsel auf dem Tisch
+    for (i = FK.reste.length - 1; i >= 0; i--) {
+      var r = FK.reste[i];
+      aktiv = true;
+      r.alter += dt;
+      if (r.alter < 0) continue;
+      if (r.alter < r.lockern) { r.rot = Math.sin(r.alter * 62 + r.flip) * (.025 + .07 * r.alter / r.lockern); continue; } // wackelt immer stärker, dann löst es sich
+      if (!r.gelandet) r.vy += 1900 * dt;
+      r.vx *= r.gelandet ? .85 : .99;
+      r.dx += r.vx * dt; r.dy += r.vy * dt; r.rot += r.vr * dt; r.flip += r.vf * dt;
+      if (!r.gelandet && r.vy > 0 && r.y + r.h / 2 + r.dy > boden - 4) {
+        r.gelandet = true; r.vy = 0; r.vr *= .3; r.dy = boden - 4 - r.y - r.h / 2; // liegt auf dem Tisch, wird zum Schnipsel
+        var gr = klemme(Math.sqrt(r.w * r.h) * .32, 4, 13);
+        fetzen(r.x + r.w / 2 + r.dx, boden - 8, r.vx * .3, -40 - Math.random() * 60, gr);
+      }
+      if (r.gelandet || r.alter > 1.8) r.alpha -= dt * 6;
+      if (r.alpha <= 0) FK.reste.splice(i, 1);
+    }
+    if (!FK.stuecke.length) FK.snap = null;
+    return aktiv;
+  }
+
+  /* --- Zeichnen: Bänder, Seile, Papierstücke, Fetzen, Konfetti --- */
+  function dunkler(hex, f) {
+    var n = parseInt(hex.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    return 'rgb(' + Math.round(r * f) + ',' + Math.round(g * f) + ',' + Math.round(b * f) + ')';
+  }
+  function zugPfad(g, pk) {
+    g.beginPath(); g.moveTo(pk[0].x, pk[0].y);
+    for (var i = 1; i < pk.length - 1; i++) { var mx = (pk[i].x + pk[i + 1].x) / 2, my = (pk[i].y + pk[i + 1].y) / 2; g.quadraticCurveTo(pk[i].x, pk[i].y, mx, my); }
+    g.lineTo(pk[pk.length - 1].x, pk[pk.length - 1].y);
+  }
+  function malBand(g, pk, breite, farbe) {
+    g.lineJoin = 'round'; g.lineCap = 'butt';
+    zugPfad(g, pk);
+    g.strokeStyle = 'rgba(40,8,24,.28)'; g.lineWidth = breite + 1.4; g.stroke();
+    g.strokeStyle = farbe; g.lineWidth = breite; g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = breite * .22; g.stroke();
+  }
+  function malSchleife(g, kx, ky, S, ls, farbe) {
+    if (ls <= .04) return;
+    var dk = dunkler(farbe.length === 7 ? farbe : '#c8203f', .72);
+    for (var sd = -1; sd <= 1; sd += 2) {
+      g.beginPath(); g.moveTo(kx, ky);
+      g.bezierCurveTo(kx + sd * S * .25 * ls, ky - S * .95 * ls, kx + sd * S * 1.25 * ls, ky - S * .9 * ls, kx + sd * S * 1.15 * ls, ky - S * .12 * ls);
+      g.bezierCurveTo(kx + sd * S * 1.05 * ls, ky + S * .3 * ls, kx + sd * S * .45 * ls, ky + S * .22 * ls, kx, ky);
+      g.fillStyle = farbe; g.fill(); g.strokeStyle = 'rgba(40,8,24,.4)'; g.lineWidth = 1.2; g.stroke();
+      g.beginPath(); g.moveTo(kx, ky);
+      g.bezierCurveTo(kx + sd * S * .3 * ls, ky - S * .62 * ls, kx + sd * S * .9 * ls, ky - S * .6 * ls, kx + sd * S * .82 * ls, ky - S * .16 * ls);
+      g.bezierCurveTo(kx + sd * S * .7 * ls, ky + S * .05 * ls, kx + sd * S * .4 * ls, ky + S * .05 * ls, kx, ky);
+      g.fillStyle = dk; g.globalAlpha = .45; g.fill(); g.globalAlpha = 1;
+    }
+    var kw = S * .34, kh = S * .3;
+    g.beginPath();
+    if (g.roundRect) g.roundRect(kx - kw / 2, ky - kh / 2, kw, kh, kh * .35); else g.rect(kx - kw / 2, ky - kh / 2, kw, kh);
+    g.fillStyle = farbe; g.fill(); g.strokeStyle = 'rgba(40,8,24,.45)'; g.lineWidth = 1.2; g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(kx - kw * .3, ky - kh * .32, kw * .6, kh * .18);
+  }
+  function malFesteBaender(g) {
+    var m = lm(), bf = bandFlaechen(m, FK.bw), farbe = FK.info.band;
+    for (var k = 0; k < bf.length; k++) {
+      var pk = bf[k];
+      g.beginPath(); g.moveTo(pk[0][0], pk[0][1]); for (var j = 1; j < 4; j++) g.lineTo(pk[j][0], pk[j][1]); g.closePath();
+      g.fillStyle = farbe; g.fill(); g.strokeStyle = 'rgba(40,8,24,.3)'; g.lineWidth = 1; g.stroke();
+      if (k === 3) { g.fillStyle = 'rgba(42,12,30,.25)'; g.fill(); }
+    }
+    g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(m.xF - FK.bw * .2, m.yf, FK.bw * .16, m.HH);
+  }
+  function zeichneFx() {
+    var g = fxctx;
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, el.fkFx.width, el.fkFx.height);
+    if (!FK.offen) return;
+    var ox = FK.ox, oy = FK.oy, s = 1;
+    if (FK.phase === 'flug') { var r = el.fkGeschenk.getBoundingClientRect(); s = r.width / FK.B; ox = r.left; oy = r.top; }
+    g.setTransform(DPR * s, 0, 0, DPR * s, DPR * ox, DPR * oy);
+    var farbe = FK.info.band, i;
+    if (FK.schwaenze && !FK.lose) {
+      malFesteBaender(g);
+      var ls = 1 - .82 * Math.min(1, FK.fortschritt);
+      malBand(g, FK.schwaenze[0], FK.bw * .82, farbe);
+      malBand(g, FK.schwaenze[1], FK.bw * .82, farbe);
+      malSchleife(g, FK.knoten.x, FK.knoten.y, FK.S, ls, farbe);
+    }
+    for (i = 0; i < FK.seile.length; i++) {
+      // liegt das Band flach auf dem Tisch, sieht man es von schräg oben: schmaler
+      var sp = FK.seile[i].p, liegt = 0, bo = FK.boden - FK.bw * .4 - 1.5;
+      for (var u = 0; u < sp.length; u++) if (sp[u].y >= bo + (sp[u].tf || 0)) liegt++;
+      malBand(g, sp, FK.bw * .82 * (1 - .42 * liegt / sp.length), farbe);
+    }
+    if (FK.snap) {
+      for (i = 0; i < FK.stuecke.length; i++) {
+        var st = FK.stuecke[i], M = FK.M;
+        g.save(); g.globalAlpha = st.alpha;
+        g.translate(st.cx + st.dx, st.cy + st.dy); g.rotate(st.rot); g.translate(-st.cx, -st.cy);
+        g.beginPath(); g.moveTo(st.pk[0][0], st.pk[0][1]); for (var j = 1; j < st.pk.length; j++) g.lineTo(st.pk[j][0], st.pk[j][1]); g.closePath(); g.clip();
+        g.drawImage(FK.snap, -M, -M, FK.B + 2 * M, FK.T + FK.HH + 2 * M);
+        g.restore();
+      }
+    }
+    for (i = 0; i < FK.reste.length; i++) {
+      var rs = FK.reste[i];
+      g.save(); g.globalAlpha = Math.max(0, Math.min(1, rs.alpha));
+      g.translate(rs.x + rs.w / 2 + rs.dx, rs.y + rs.h / 2 + rs.dy); g.rotate(rs.rot);
+      if (rs.alter > rs.lockern) g.scale(1, .78 + .22 * Math.cos(rs.flip)); // flattert beim Fallen
+      g.drawImage(rs.bild, -rs.w / 2, -rs.h / 2, rs.w, rs.h);
+      g.restore();
+    }
+    if (FK.fetzen.length) {
+      var muster = holeFxMuster();
+      for (i = 0; i < FK.fetzen.length; i++) {
+        var f = FK.fetzen[i], cf = Math.cos(f.flip);
+        g.save(); g.translate(f.x, f.y); g.rotate(f.rot); g.scale(1, Math.abs(cf) < .15 ? .15 : Math.abs(cf));
+        g.beginPath(); g.moveTo(f.form[0][0], f.form[0][1]); for (var q = 1; q < f.form.length; q++) g.lineTo(f.form[q][0], f.form[q][1]); g.closePath();
+        g.fillStyle = cf > 0 ? muster : RUECKSEITE; g.fill();
+        g.strokeStyle = 'rgba(40,8,24,.18)'; g.lineWidth = .8; g.stroke();
+        g.restore();
+      }
+    }
+    for (i = 0; i < FK.konfetti.length; i++) {
+      var c = FK.konfetti[i], a = c.alter > c.max - .5 ? Math.max(0, (c.max - c.alter) / .5) : 1;
+      g.globalAlpha = a;
+      if (c.glanz) {
+        var fl = (.6 + (.5 + .5 * Math.sin(c.alter * 18 + c.rot)) * .7) * (c.gr < 2 ? c.gr : 1);
+        g.fillStyle = '#ffe8a8'; g.save(); g.translate(c.x, c.y); g.scale(fl, fl);
+        g.beginPath(); g.moveTo(0, -7); g.lineTo(1.6, -1.6); g.lineTo(7, 0); g.lineTo(1.6, 1.6); g.lineTo(0, 7); g.lineTo(-1.6, 1.6); g.lineTo(-7, 0); g.lineTo(-1.6, -1.6); g.closePath(); g.fill(); g.restore();
+      } else if (c.form) {
+        g.save(); g.translate(c.x, c.y); g.rotate(c.rot); g.scale(c.gr, c.gr * Math.cos(c.flip));
+        g.fillStyle = c.farbe; g.fill(FORMEN[c.form]); g.restore();
+      } else {
+        g.save(); g.translate(c.x, c.y); g.rotate(c.rot); g.scale(1, Math.cos(c.flip));
+        g.fillStyle = c.farbe; g.fillRect(-c.w / 2, -c.h / 2, c.w, c.h); g.restore();
+      }
+    }
+    g.globalAlpha = 1;
+    // Konfetti und Schnipsel nie über Hinweis und Knöpfen: dort weich ausblenden
+    var fu = FK.fuss;
+    if (fu && (FK.konfetti.length || FK.fetzen.length || FK.stuecke.length || FK.reste.length || FK.seile.length)) {
+      var weich = 26, v;
+      g.setTransform(DPR, 0, 0, DPR, 0, 0);
+      g.globalCompositeOperation = 'destination-out';
+      if (fu.quer) {
+        v = g.createLinearGradient(fu.l - weich, 0, fu.l, 0);
+        v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, '#000');
+        g.fillStyle = v; g.fillRect(fu.l - weich, 0, weich, fxH);
+        g.fillStyle = '#000'; g.fillRect(fu.l, 0, fxW - fu.l, fxH);
+      } else {
+        v = g.createLinearGradient(0, fu.t - weich, 0, fu.t);
+        v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, '#000');
+        g.fillStyle = v; g.fillRect(0, fu.t - weich, fxW, weich);
+        g.fillStyle = '#000'; g.fillRect(0, fu.t, fxW, fxH - fu.t);
+      }
+      g.globalCompositeOperation = 'source-over';
+    }
+  }
+
+  /* --- Größe ändern, während das Geschenk offen ist (Risse bleiben erhalten) --- */
+  function fkNeuVermessen() {
+    if (!FK.offen) return;
+    fxGroesse();
+    var altB = FK.B, altC = null;
+    if (FK.phase === 'papier' || FK.phase === 'schleife' || FK.phase === 'flug') { altC = leinwand(el.fkPapier.width, el.fkPapier.height); altC.getContext('2d').drawImage(el.fkPapier, 0, 0); }
+    fkLayout();
+    var f = FK.B / altB;
+    baueSchachtel();
+    if (FK.phase === 'fertig' || FK.phase === 'auf') {
+      el.fkDeckel.classList.add('hinten');
+      el.fkDeckel.style.transform = 'translate(' + f1(-FK.B * .04) + 'px,' + f1(-(FK.T * .5 + FK.HH * .24)) + 'px) rotate(-8deg)';
+      el.fkFoto.style.transform = 'translateY(' + f1(FK.rise) + 'px) rotate(-2deg)';
+      ['fkSeideH', 'fkSeideV'].forEach(function (id) { var s = document.getElementById(id); if (s) s.style.transform = 'none'; });
+    }
+    malPapier(); // baut auch das Mess-Raster für die neue Größe
+    if (altC) {
+      pctx.setTransform(1, 0, 0, 1, 0, 0); pctx.clearRect(0, 0, el.fkPapier.width, el.fkPapier.height);
+      pctx.drawImage(altC, 0, 0, el.fkPapier.width, el.fkPapier.height);
+      if (FK.phase === 'papier') { messePapier(); zeigeLeiste(FK.anteil); } // ehrlich neu messen
+    } else { pctx.setTransform(1, 0, 0, 1, 0, 0); pctx.clearRect(0, 0, el.fkPapier.width, el.fkPapier.height); }
+    pctx.setTransform(DPR, 0, 0, DPR, FK.M * DPR, FK.M * DPR); // weitere Risse wieder in Geschenk-Koordinaten
+    function skaliere(p) { p.x *= f; p.y *= f; p.px *= f; p.py *= f; if (p.tf) p.tf *= f; }
+    if (FK.schwaenze) baueSchwaenze();
+    FK.seile.forEach(function (s) { s.p.forEach(skaliere); s.rest = s.rest.map(function (r) { return r * f; }); s.ruhig = 0; });
+    FK.fetzen.forEach(function (x) { x.x *= f; x.tf *= f; x.y = x.liegt ? FK.boden - 2 + x.tf : x.y * f; });
+    FK.reste.forEach(function (r) { r.x *= f; r.y *= f; r.w *= f; r.h *= f; r.dx *= f; r.dy *= f; });
+    fxMuster = null;
+    zeichneFx(); starte();
+  }
+
+  /* ================================================================
+     Bildansicht
+     ================================================================ */
+  var A = { liste: [], i: 0, opener: null, zug: null, token: 0 };
+  function oeffneAnsicht(t, opener) {
+    A.liste = K.geoeffnet(); A.i = A.liste.indexOf(t);
+    if (A.i < 0) return;
+    A.opener = opener || document.activeElement;
+    A.offen = true;
+    zeigeAnsichtsBild(0);
+    if (!el.ansicht.open) {
+      if (el.ansicht.showModal) el.ansicht.showModal(); else el.ansicht.setAttribute('open', '');
+      document.documentElement.classList.add('vollansicht');
+      if (!REDUZIERT && el.ansicht.animate) el.ansicht.firstElementChild.animate([{ opacity: 0, transform: 'scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: 'ease-out' });
+    }
+    fokussiere(el.aZu);
+  }
+  function schliesseAnsicht() {
+    if (!A.offen) return;
+    if (el.ansicht.open) { if (el.ansicht.close) el.ansicht.close(); else el.ansicht.removeAttribute('open'); }
+    nachAnsicht();
+  }
+  function nachAnsicht() {
+    if (!A.offen) return;
+    A.offen = false;
+    A.token++;
+    if (!FK.offen) document.documentElement.classList.remove('vollansicht');
+    if (A.nochmalWeiter) { A.nochmalWeiter = false; return; }
+    var t = A.liste[A.i], z = knoepfe[t] && document.contains(knoepfe[t]) ? knoepfe[t] : A.opener;
+    fokussiere(z);
+  }
+  el.ansicht.addEventListener('close', nachAnsicht);
+  el.aZu.addEventListener('click', schliesseAnsicht);
+  el.nochmal.addEventListener('click', function () {
+    var t = A.liste[A.i];
+    A.nochmalWeiter = true;
+    schliesseAnsicht();
+    oeffneFokus(t, knoepfe[t], true);
+  });
+
+  // Rahmen für Ladezustand/Fehler in der echten Bildform, so groß wie das Foto später (object-fit: contain)
+  function platzAnpassen() {
+    var sw = el.spur.clientWidth, sh = el.spur.clientHeight, r = A.form || 1;
+    if (!sw || !sh) return;
+    var w = Math.min(sw, sh * r);
+    el.aPlatz.style.width = Math.round(w) + 'px'; el.aPlatz.style.height = Math.round(w / r) + 'px';
+  }
+  function zeigePlatz(text, fehler) {
+    el.aStatus.textContent = text;
+    el.aNochmal.hidden = !fehler;
+    el.aPlatz.classList.toggle('laedt', !fehler);
+    el.aPlatz.hidden = false;
+    platzAnpassen();
+  }
+  // Großes Bild (F.bild) nur hier – und zusätzlich höchstens die beiden Nachbarn vorladen
+  function setzeAnsicht(t, sofort) {
+    var titel = titelVon(t), mein = ++A.token, url = sicher(function () { return F.bild(t); });
+    el.aTitel.textContent = titel || 'Tag ' + t;
+    el.aTitel.classList.toggle('lang', titel.split(/\s+/).some(function (wort) { return wort.length > 14; }));
+    el.aDatum.textContent = titel ? 'Tag ' + t + ' – ' + K.datumText(t) : K.datumText(t);
+    el.aZaehler.textContent = (A.i + 1) + ' von ' + A.liste.length;
+    el.zurueck.disabled = A.i <= 0; el.weiter.disabled = A.i >= A.liste.length - 1;
+    el.aBild.classList.add('laedt-noch');
+    el.aBild.alt = titel ? 'Fotocollage von Tag ' + t + ': ' + titel : 'Fotocollage von Tag ' + t;
+    A.form = seitenVerhaeltnis(t);
+    el.aPlatz.style.setProperty('--fb', farbeVon(t));
+    el.aPlatz.hidden = true;
+    // kurz warten: Bilder aus dem Speicher sollen nicht mit einem Ladezustand aufblitzen
+    var warte = setTimeout(function () { if (mein === A.token) zeigePlatz('Foto wird ausgepackt …', false); }, sofort ? 0 : 140);
+    ladeBild(url).then(function (img) {
+      if (mein !== A.token) return;
+      clearTimeout(warte);
+      el.aBild.src = img.src; el.aBild.classList.remove('laedt-noch'); el.aPlatz.hidden = true;
+      if (url.indexOf('data:') !== 0) vkErneuern(t); // Netz ist (wieder) da → Platzhalter im Regal ersetzen
+      setTimeout(function () {
+        if (mein !== A.token || !el.ansicht.open) return;
+        [A.liste[A.i + 1], A.liste[A.i - 1]].forEach(function (n) { if (n && K.istGeoeffnet(n)) ladeBild(sicher(function () { return F.bild(n); })).catch(function () { /* egal */ }); });
+      }, 350);
+    }, function () {
+      if (mein !== A.token) return;
+      clearTimeout(warte);
+      el.aBild.removeAttribute('src');
+      zeigePlatz('Dieses Foto kommt gerade nicht an.', true);
+    });
+  }
+  el.aNochmal.addEventListener('click', function () {
+    if (!A.offen) return;
+    var hatteFokus = document.activeElement === el.aNochmal;
+    setzeAnsicht(A.liste[A.i], true);
+    if (hatteFokus) fokussiere(el.aZu);
+  });
+  function zeigeAnsichtsBild(richtung) {
+    var t = A.liste[A.i];
+    if (!richtung || REDUZIERT || !el.spur.animate) { setzeAnsicht(t); el.spur.style.transform = ''; return; }
+    var von = el.spur.style.transform || 'translateX(0px)';
+    var aus = el.spur.animate([{ transform: von, opacity: 1 }, { transform: 'translateX(' + (-richtung * 34) + '%)', opacity: 0 }], { duration: 160, easing: 'ease-in', fill: 'forwards' });
+    aus.onfinish = function () {
+      setzeAnsicht(t); el.spur.style.transform = ''; aus.cancel();
+      el.spur.animate([{ transform: 'translateX(' + (richtung * 34) + '%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, easing: 'cubic-bezier(.2,.7,.2,1)' });
+    };
+  }
+  function blaettern(d) {
+    var n = A.i + d;
+    if (n < 0 || n >= A.liste.length) { zurueckfedern(); return; }
+    A.i = n; zeigeAnsichtsBild(d);
+  }
+  function zurueckfedern() {
+    var von = el.spur.style.transform || 'translateX(0px)';
+    el.spur.style.transform = '';
+    if (el.spur.animate && !REDUZIERT) el.spur.animate([{ transform: von }, { transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1.2)' });
+  }
+  el.zurueck.addEventListener('click', function () { blaettern(-1); });
+  el.weiter.addEventListener('click', function () { blaettern(1); });
+  el.ansicht.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); blaettern(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); blaettern(1); }
+  });
+  el.aBuehne.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  el.aBuehne.addEventListener('pointerdown', function (e) {
+    if (e.button > 0) return;
+    // Knöpfe auf der Bühne („Nochmal versuchen“) bekommen ihren Klick – nicht als Wischgeste einfangen
+    if (e.target.closest && e.target.closest('button')) return;
+    if (e.pointerType === 'mouse') e.preventDefault();
+    A.zug = { id: e.pointerId, x: e.clientX, t: performance.now(), dx: 0 };
+    try { el.aBuehne.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+  });
+  el.aBuehne.addEventListener('pointermove', function (e) {
+    var z = A.zug;
+    if (!z || e.pointerId !== z.id) return;
+    var dx = e.clientX - z.x;
+    if ((dx > 0 && A.i <= 0) || (dx < 0 && A.i >= A.liste.length - 1)) dx *= .3;
+    z.dx = dx; el.spur.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+  });
+  function ansichtZugEnde(e) {
+    var z = A.zug;
+    if (!z || e.pointerId !== z.id) return;
+    A.zug = null;
+    var dx = z.dx, dauer = performance.now() - z.t, grenze = Math.min(90, el.aBuehne.clientWidth * .18);
+    if (e.type !== 'pointercancel' && (Math.abs(dx) > grenze || (Math.abs(dx) > 28 && dauer < 260))) blaettern(dx < 0 ? 1 : -1);
+    else if (dx !== 0) zurueckfedern();
+  }
+  el.aBuehne.addEventListener('pointerup', ansichtZugEnde);
+  el.aBuehne.addEventListener('pointercancel', ansichtZugEnde);
+
+  /* ================================================================
+     Start, Datum wechseln, Größe
+     ================================================================ */
+  function renderAlles() {
+    if (FK.offen) schliesseFokus(true);
+    A.nochmalWeiter = false;
+    schliesseAnsicht(); versteckeBlase();
+    kopf(); baueTisch();
+    beobachteHeute(true);
+  }
+  renderAlles();
+  K.onChange(renderAlles);
+  var groesseUhr = 0;
+  window.addEventListener('resize', function () {
+    clearTimeout(groesseUhr);
+    groesseUhr = setTimeout(function () {
+      if (spalten() !== aktSpalten) { versteckeBlase(); baueTisch(); beobachteHeute(false); }
+      if (FK.offen) fkNeuVermessen();
+      if (A.offen && !el.aPlatz.hidden) platzAnpassen();
+    }, 120);
+  });
+  // Die einmalige Einladung (heutiges Geschenk hüpft, sobald es zu sehen ist) steckt in beobachteHeute().
+})();
+</script>
+</body>
+</html>

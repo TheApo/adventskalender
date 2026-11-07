@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1430">
+<title>Advent-Stories – {{TITEL}}</title>
+<link rel="stylesheet" href="../fonts/stories.css">
+<style>
+:root{
+  /* Farben: Mitternacht, Samt, Kerzenwachs, Kerzengold, Weihnachtsrot, Glut */
+  --mitternacht:#0a1430;
+  --samt:#14234a;
+  --wachs:#f8ecd6;
+  --kerzengold:#f4b740;
+  --weihnachtsrot:#e1302a;
+  --glut:#ff7b3a;
+  --leise:rgba(248,236,214,.7);
+  --hauch:rgba(248,236,214,.15);
+  --ringfarben:var(--weihnachtsrot),var(--glut),var(--kerzengold),#fff0c4,var(--kerzengold),var(--glut),var(--weihnachtsrot);
+  /* Schrift */
+  --schrift:'Familjen Grotesk','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --gr-s:13px; --gr-m:16px; --gr-l:20px; --gr-xl:26px;
+  --rand:16px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--mitternacht);color-scheme:dark;-webkit-text-size-adjust:100%;
+  /* Tastatur-Fokus und scrollIntoView halten Chips und Kacheln oberhalb der Ecke des festen Knopfs unten links */
+  scroll-padding-bottom:calc(var(--menue-knopf-zone,64px) + env(safe-area-inset-bottom,0px))}
+html.gesperrt{overflow:hidden}
+body{margin:0;min-height:100vh;font-family:var(--schrift);font-size:var(--gr-m);line-height:1.45;color:var(--wachs);
+  background:
+    radial-gradient(80% 420px at 92% -60px,rgba(244,183,64,.17),transparent 70%),
+    var(--mitternacht);
+  -webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+img{display:block}
+:focus-visible{outline:3px solid var(--kerzengold);outline-offset:3px}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Kopf ---------- */
+/* Unten mindestens die Knopf-Zone (--menue-knopf-zone, 64 px) plus Luft: ganz nach unten gescrollt liegt der
+   letzte Abschnitt über dem Menü-Knopf, nicht darunter */
+.start{max-width:1280px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 0 calc(env(safe-area-inset-bottom,0px) + var(--menue-knopf-zone,64px) + 20px)}
+/* Menü-Knopf aus kalender.js (runder 40-px-Knopf, id kalender-reset): bleibt direkt an body und sitzt – wie in
+   allen Ansichten – fest unten links (Lage setzt kalender.js, hier nur die Farben). Beim Scrollen gleitet der
+   Inhalt kurz darunter durch; feste Leisten gibt es unten keine. Solange der Story-Player offen ist (html.gesperrt), ist er ausgeblendet. */
+html #kalender-reset{font-family:var(--schrift);background:rgba(10,20,48,.76);border-color:rgba(248,236,214,.3);color:var(--wachs)}
+html.gesperrt #kalender-reset{display:none}
+.kopf{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:0 calc(var(--rand) + env(safe-area-inset-right,0px)) 0 calc(var(--rand) + env(safe-area-inset-left,0px))}
+h1{margin:0;font-weight:700;line-height:1}
+.m-name{display:block;font-size:31px;letter-spacing:-.03em}
+.m-sub{display:block;margin-top:5px;font-size:15px;font-weight:500;color:var(--leise)}
+.kerzen{display:flex;align-items:flex-end;gap:7px;padding-bottom:3px}
+.kerzen svg{width:13px;height:40px;overflow:visible}
+.kerzen .wachs{fill:var(--wachs)}
+.kerzen .aus .wachs{fill:rgba(248,236,214,.42)}
+.kerzen .docht{stroke:#3b2a1d;stroke-width:1.3;stroke-linecap:round}
+.kerzen .aus .docht{stroke:rgba(248,236,214,.5)}
+.kerzen .flamme{fill:var(--kerzengold);filter:drop-shadow(0 0 3px rgba(255,170,60,.95)) drop-shadow(0 0 9px rgba(255,140,40,.55));transform-box:fill-box;transform-origin:50% 100%;animation:flackern 3.2s ease-in-out infinite}
+.kerzen .an:nth-child(2) .flamme{animation-delay:-1.1s}.kerzen .an:nth-child(3) .flamme{animation-delay:-2s}.kerzen .an:nth-child(4) .flamme{animation-delay:-.6s}
+@keyframes flackern{0%,100%{transform:scale(1,1) rotate(0)}30%{transform:scale(.94,1.06) rotate(-2deg)}60%{transform:scale(1.03,.96) rotate(1.5deg)}}
+
+/* ---------- Story-Leiste ---------- */
+.leiste-wrap{position:relative;margin-top:18px}
+.leiste{position:relative;display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x proximity;
+  padding:6px calc(var(--rand) + env(safe-area-inset-right,0px)) 8px calc(var(--rand) + env(safe-area-inset-left,0px));scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 24px),transparent)}
+.leiste::-webkit-scrollbar{display:none}
+.kreis{flex:0 0 auto;width:84px;display:flex;flex-direction:column;align-items:center;gap:7px;padding:4px 0 2px;border:0;background:none;cursor:pointer;border-radius:16px;scroll-snap-align:center;touch-action:manipulation}
+.ring{position:relative;width:72px;height:72px;border-radius:50%;display:grid;place-items:center;flex:none}
+.ring::before{content:'';position:absolute;inset:0;border-radius:50%;background:var(--hauch)}
+.ring>img{position:relative;width:calc(100% - 6px);height:calc(100% - 6px);border-radius:50%;object-fit:cover;border:2px solid var(--mitternacht)}
+.st-neu .ring::before,.ring.lebt::before{background:conic-gradient(from 0deg,var(--ringfarben));animation:drehen 7s linear infinite}
+.st-neu .ring>img,.ring.lebt>img{width:calc(100% - 8px);height:calc(100% - 8px);border-width:3px}
+.st-gesehen .ring::before{background:rgba(248,236,214,.28)}
+.st-gesehen .ring>img{width:calc(100% - 4px);height:calc(100% - 4px)}
+@keyframes drehen{to{transform:rotate(1turn)}}
+.st-zu .ring::before{display:none}
+.strich{position:absolute;inset:0;width:100%;height:100%}
+.strich circle{fill:rgba(20,35,74,.55);stroke:rgba(248,236,214,.45);stroke-width:1.6;stroke-dasharray:3.2 1.8;stroke-linecap:round}
+.k-datum{position:relative;display:flex;flex-direction:column;align-items:center;line-height:1}
+.k-datum b{font-size:24px;font-weight:700;letter-spacing:-.03em}
+.k-datum small{margin-top:3px;font-size:13px;color:var(--leise)}
+.k-text{font-size:14px;font-weight:700;line-height:1.2;color:var(--leise);white-space:nowrap;font-variant-numeric:tabular-nums}
+.k-text small{font-size:14px;font-weight:500}
+.st-neu .k-text{color:var(--kerzengold)}
+.ist-nachholen .k-text{margin-top:3px}
+.ist-heute .ring{filter:drop-shadow(0 0 14px rgba(244,183,64,.38))}
+.ist-heute .k-text{color:var(--wachs);font-weight:700;margin-top:3px}
+.k-marke{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);padding:1px 8px 2px;border-radius:99px;border:2px solid var(--mitternacht);background:var(--weihnachtsrot);color:#fff;font-size:12.5px;font-weight:700;line-height:1.25;white-space:nowrap}
+.k-marke.gold{padding:1px 6px 2px;background:var(--kerzengold);color:var(--mitternacht);font-size:12px}
+.wackeln .ring{animation:wackeln .5s ease}
+@keyframes wackeln{0%,100%{transform:rotate(0)}18%{transform:rotate(-11deg)}38%{transform:rotate(9deg)}58%{transform:rotate(-6deg)}78%{transform:rotate(3deg)}}
+.leiste-pfeil{display:none;position:absolute;top:30px;z-index:2;width:44px;height:44px;border-radius:50%;border:1px solid var(--hauch);background:rgba(20,35,74,.94);color:var(--wachs);place-items:center;cursor:pointer;transition:opacity .2s}
+.leiste-pfeil svg{width:22px;height:22px}
+.leiste-pfeil[disabled]{opacity:0;pointer-events:none}
+.leiste-pfeil.links{left:6px}.leiste-pfeil.rechts{right:6px}
+
+.blase{position:absolute;z-index:6;top:0;left:0;width:max-content;max-width:min(300px,calc(100% - 24px));padding:11px 15px 12px;border-radius:16px;background:var(--wachs);color:var(--mitternacht);box-shadow:0 14px 34px rgba(0,0,0,.4);opacity:0;transform:translateY(-6px) scale(.96);transform-origin:var(--px,50%) 0;transition:opacity .18s,transform .22s cubic-bezier(.3,1.4,.5,1);pointer-events:none}
+.blase.zeigen{opacity:1;transform:none}
+.blase::before{content:'';position:absolute;top:-6px;left:var(--px,50%);width:14px;height:14px;margin-left:-7px;background:inherit;border-radius:3px;transform:rotate(45deg)}
+.blase b{display:block;font-size:17px;line-height:1.2}
+.blase span{display:block;margin-top:3px;font-size:14px;line-height:1.3;color:#3a4566}
+
+/* ---------- Heute-Karte ---------- */
+.inhalt{padding:0 calc(var(--rand) + env(safe-area-inset-right,0px)) 0 calc(var(--rand) + env(safe-area-inset-left,0px))}
+.heute-karte{position:relative;margin-top:14px;padding:28px 20px 20px;border-radius:28px;text-align:center;overflow:hidden;
+  background:radial-gradient(110% 62% at 50% 16%,rgba(244,183,64,.2),transparent 64%),linear-gradient(180deg,#182b5a,#111f45);
+  border:1px solid rgba(248,236,214,.09)}
+.hk-ring{position:relative;width:150px;height:150px;margin:0 auto;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.hk-ring::before{content:'';position:absolute;inset:0;border-radius:50%;background:rgba(248,236,214,.3)}
+.hk-ring.lebt::before{background:conic-gradient(from 0deg,var(--ringfarben));animation:drehen 7s linear infinite}
+.hk-ring.zu{cursor:default}
+.hk-ring.zu::before{display:none}
+.hk-foto{position:absolute;inset:5px;border-radius:50%;overflow:hidden;border:4px solid #152854;background:var(--samt)}
+.hk-ring.lebt .hk-foto{inset:6px}
+.hk-foto img{width:100%;height:100%;object-fit:cover}
+.hk-foto.verhuellt img{filter:blur(8px) brightness(.6) saturate(1.25);transform:scale(1.2)}
+.hk-zahl{position:relative;font-size:64px;font-weight:700;line-height:1;letter-spacing:-.05em;text-shadow:0 2px 20px rgba(0,0,0,.45);font-variant-numeric:tabular-nums}
+.hk-ring.zu .hk-zahl{font-size:52px}
+.hk-ring.zu small{display:block;font-size:15px;font-weight:500;letter-spacing:0;color:var(--leise);text-align:center;margin-top:2px}
+.hk-ring.zu .strich circle{stroke-width:1.1;stroke-dasharray:2.4 1.6}
+.hk-text{margin-top:20px}
+.hk-datum{margin:0;font-size:15px;color:var(--leise)}
+.hk-titel{margin:3px 0 0;font-size:var(--gr-xl);font-weight:700;line-height:1.12;letter-spacing:-.02em;text-wrap:balance}
+.hk-info{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0 0;font-size:14px;color:var(--leise)}
+.hk-segmente{display:flex;gap:4px}
+.hk-segmente i{width:20px;height:3px;border-radius:2px;background:rgba(248,236,214,.3)}
+.hk-segmente.voll i{background:var(--kerzengold)}
+.hk-absatz{max-width:34ch;margin:10px auto 0;font-size:15.5px;color:var(--leise);text-wrap:pretty}
+.los{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;margin-top:20px;padding:0 22px;border:0;border-radius:99px;
+  background:var(--wachs);color:var(--mitternacht);font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 10px 34px rgba(244,183,64,.22);touch-action:manipulation}
+.los svg{width:18px;height:18px;fill:currentColor;flex:none}
+.los.leise{background:transparent;color:var(--wachs);border:1.5px solid rgba(248,236,214,.4);box-shadow:none}
+.los:active{transform:scale(.98)}
+
+/* ---------- Abschnitte ---------- */
+.abschnitt{margin-top:34px}
+.abschnitt h2{margin:0;font-size:var(--gr-l);font-weight:700;letter-spacing:-.015em;line-height:1.2}
+.hinweis{margin:4px 0 16px;font-size:14.5px;color:var(--leise)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:flex;align-items:center;gap:11px;min-height:58px;padding:6px 18px 6px 6px;border-radius:99px;border:1px solid var(--hauch);background:rgba(248,236,214,.06);text-align:left;cursor:pointer;touch-action:manipulation}
+.chip .ring{width:46px;height:46px}
+.chip b{display:block;font-size:15.5px;line-height:1.2}
+.chip small{display:block;font-size:14px;line-height:1.25;color:var(--leise)}
+.raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:16px 10px}
+.kachel{display:block;align-self:start;width:100%;padding:0;border:0;background:none;text-align:left;cursor:pointer;border-radius:16px;touch-action:manipulation}
+.kb{position:relative;display:block;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:var(--samt)}
+.kb img{width:100%;height:100%;object-fit:cover}
+.kb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 52%,rgba(6,12,32,.7))}
+.kn{position:absolute;z-index:1;left:9px;bottom:7px;font-size:22px;font-weight:700;line-height:1;letter-spacing:-.03em}
+.kh{position:absolute;z-index:1;top:8px;right:8px;width:20px;height:20px;fill:var(--weihnachtsrot);filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+.kt{display:-webkit-box;margin-top:7px;font-size:14px;line-height:1.25;color:var(--leise);-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.leer{padding:20px;border:1.5px dashed var(--hauch);border-radius:18px;color:var(--leise);font-size:15px}
+.anleitung{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.anleitung li{display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:20px;background:rgba(248,236,214,.05);border:1px solid rgba(248,236,214,.08)}
+.anleitung p{margin:0;font-size:15.5px;line-height:1.4}
+.anleitung b{display:block;font-size:16.5px;color:var(--wachs)}
+.anleitung span{color:var(--leise)}
+.a-bild{flex:none;width:56px;height:56px;display:grid;place-items:center}
+.a-bild .ring{width:52px;height:52px}
+.a-bild .ring i{position:relative;width:calc(100% - 8px);height:calc(100% - 8px);border-radius:50%;border:3px solid var(--mitternacht);background:linear-gradient(160deg,#c4557a,#f59a4a 55%,#2a2a4a)}
+.a-seg{display:flex;gap:3px;width:52px}
+.a-seg i{flex:1;height:4px;border-radius:2px;background:rgba(248,236,214,.3)}
+.a-seg i:first-child{background:var(--wachs)}
+.a-bild svg{width:46px;height:46px;fill:none;stroke:var(--kerzengold);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.weihnachten .st-gesehen .ring::before{background:linear-gradient(140deg,var(--kerzengold),#fff0c4 45%,var(--glut))}
+
+
+/* ---------- Story-Player ---------- */
+.player{--oben:env(safe-area-inset-top,0px);--unten:env(safe-area-inset-bottom,0px);--links:env(safe-area-inset-left,0px);--rechts:env(safe-area-inset-right,0px);position:fixed;inset:0;z-index:50;display:none;overflow:hidden;background:rgb(10,20,48);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.player.offen{display:block}
+.player:focus{outline:none}
+.hinter{position:absolute;inset:0;display:none;overflow:hidden}
+.player.breit .hinter{display:block}
+.hinter i{position:absolute;inset:-80px;background-size:cover;background-position:center;filter:blur(40px) brightness(.42) saturate(1.3)}
+.hinter::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 25%,rgba(5,10,26,.72))}
+.buehne{position:absolute;inset:0}
+.player.breit{--oben:0px;--unten:0px;--links:0px;--rechts:0px}
+.player.breit .buehne{inset:auto;left:calc(50% - var(--bw) / 2);top:calc(50% - var(--bh) / 2);width:var(--bw);height:var(--bh);
+  transition:width .34s cubic-bezier(.3,.7,.2,1),height .34s cubic-bezier(.3,.7,.2,1),left .34s cubic-bezier(.3,.7,.2,1),top .34s cubic-bezier(.3,.7,.2,1)}
+.player.sofort .buehne,.player.sofort .pfeil{transition:none!important}
+.wuerfel{position:absolute;inset:0;transform-style:preserve-3d}
+.seite{position:absolute;inset:0;overflow:hidden;background:#081024;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.player.breit .seite{border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.seite.vorne{transform:rotateY(0deg) translateZ(var(--halb))}
+.seite.rechts{transform:rotateY(90deg) translateZ(var(--halb))}
+.seite.links{transform:rotateY(-90deg) translateZ(var(--halb))}
+.seite.aus{visibility:hidden}
+.wuerfel.ruhe,.wuerfel.ruhe .seite.vorne{transform:none}
+.s-hg{position:absolute;inset:-24px;background-size:cover;background-position:center;opacity:.9}
+/* Solange das Foto lädt: unscharfe Vorschau als Grund (meist schon im Browser-Cache) */
+.s-hg.vorab{filter:blur(26px) brightness(.7) saturate(1.2);transform:scale(1.12)}
+.foto{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;transition:opacity .25s}
+/* Ladezustand: Foto erst zeigen, wenn es fertig dekodiert ist; Kreis dreht sich (erst nach kurzer Zeit sichtbar, damit nichts flackert) */
+.seite.laedt .foto{opacity:0}
+.s-lader{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid rgba(248,236,214,.22);border-top-color:var(--wachs);opacity:0;transition:opacity .2s;pointer-events:none;animation:drehen .9s linear infinite paused}
+.seite.laedt .s-lader{opacity:1;transition-delay:.25s;animation-play-state:running}
+.s-titel:empty,.s-text:empty,.s-zahl:empty{display:none}
+.s-text:empty+.s-zahl{margin-top:0}
+.foto.frei{box-shadow:0 0 0 1px rgba(255,255,255,.05),0 14px 50px rgba(3,6,18,.5)}
+.v-oben,.v-unten{position:absolute;left:0;right:0;pointer-events:none}
+.v-oben{top:0;height:150px;background:linear-gradient(rgba(6,12,32,.7),rgba(6,12,32,.25) 60%,transparent)}
+.v-unten{bottom:0;height:200px;background:linear-gradient(transparent,rgba(6,12,32,.4) 40%,rgba(6,12,32,.82))}
+.balken{position:absolute;left:calc(10px + var(--links));right:calc(10px + var(--rechts));top:calc(var(--oben) + 10px);display:flex;gap:4px}
+.seg{flex:1;height:3px;border-radius:2px;background:rgba(248,236,214,.3);overflow:hidden}
+.seg i{display:block;height:100%;background:var(--wachs);transform:scaleX(0);transform-origin:0 50%}
+.s-kopf{position:absolute;left:calc(12px + var(--links));right:calc(104px + var(--rechts));top:calc(var(--oben) + 24px);display:flex;align-items:center;gap:10px}
+.s-avatar{flex:none;width:42px;height:42px;padding:2.5px;border-radius:50%;background:conic-gradient(var(--ringfarben))}
+.s-avatar img{width:100%;height:100%;border-radius:50%;border:2px solid #0b1636;object-fit:cover}
+.s-kopftext{flex:1;min-width:0}
+.s-datum{margin:0;font-size:14.5px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 8px rgba(0,0,0,.45)}
+.s-titel{margin:1px 0 0;font-size:14px;line-height:1.25;color:var(--leise);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 8px rgba(0,0,0,.45)}
+.s-fuss{position:absolute;left:calc(16px + var(--links));right:calc(86px + var(--rechts));bottom:calc(var(--unten) + 20px)}
+.s-text{margin:0;font-size:21px;font-weight:700;line-height:1.18;letter-spacing:-.015em;text-wrap:balance;text-shadow:0 1px 14px rgba(0,0,0,.5)}
+.s-zahl{margin:6px 0 0;font-size:14px;color:var(--leise)}
+.schatten{position:absolute;inset:0;background:#02050f;opacity:0;pointer-events:none}
+.balken,.s-kopf,.s-fuss,.v-oben,.v-unten{transition:opacity .22s}
+.player.halten .balken,.player.halten .s-kopf,.player.halten .s-fuss,.player.halten .v-oben,.player.halten .v-unten,.player.halten .steuer{opacity:0}
+.tipp{position:absolute;inset:0;z-index:2;touch-action:none;cursor:pointer}
+.steuer{position:absolute;inset:0;z-index:4;pointer-events:none;transition:opacity .22s}
+.steuer button{pointer-events:auto;touch-action:manipulation}
+.knopf{position:absolute;top:calc(var(--oben) + 23px);width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;cursor:pointer}
+.knopf svg{width:24px;height:24px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.55))}
+.k-pause{right:calc(52px + var(--rechts))}.k-pause svg{fill:var(--wachs)}
+.k-zu{right:calc(6px + var(--rechts))}.k-zu svg{stroke:var(--wachs);stroke-width:2.4;stroke-linecap:round;fill:none}
+.k-herz{position:absolute;right:calc(14px + var(--rechts));bottom:calc(var(--unten) + 16px);width:58px;height:58px;display:grid;place-items:center;border:1px solid rgba(248,236,214,.2);border-radius:50%;background:rgba(10,20,48,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer}
+.k-herz svg{width:28px;height:28px;fill:none;stroke:var(--wachs);stroke-width:2;stroke-linejoin:round;transition:fill .2s,stroke .2s}
+.k-herz.voll svg{fill:var(--weihnachtsrot);stroke:var(--weihnachtsrot)}
+.flug{position:absolute;left:0;top:0;width:26px;height:26px;margin:-13px 0 0 -13px;pointer-events:none}
+.flug svg{width:100%;height:100%}
+.pause-hinweis{position:absolute;left:50%;top:50%;z-index:3;display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:99px;background:rgba(10,20,48,.72);font-size:14.5px;font-weight:700;transform:translate(-50%,-50%);opacity:0;transition:opacity .2s;pointer-events:none}
+.pause-hinweis svg{width:16px;height:16px;fill:var(--wachs)}
+.player.nutzerpause .pause-hinweis{opacity:1}
+.p-hinweis{position:absolute;left:50%;top:40%;z-index:3;width:max-content;max-width:calc(100% - 48px);padding:12px 18px 13px;border-radius:18px;background:var(--wachs);color:var(--mitternacht);text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.4);transform:translate(-50%,-50%) scale(.94);opacity:0;transition:opacity .18s,transform .24s cubic-bezier(.3,1.4,.5,1);pointer-events:none}
+.p-hinweis.zeigen{opacity:1;transform:translate(-50%,-50%)}
+.p-hinweis b{display:block;font-size:17px;line-height:1.2}
+.p-hinweis span{display:block;margin-top:3px;font-size:14px;color:#3a4566}
+.zwischen{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(var(--oben) + 76px) calc(28px + var(--rechts)) calc(var(--unten) + 32px) calc(28px + var(--links));text-align:center;background:rgba(8,15,38,.78);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);opacity:0;transition:opacity .25s}
+.zwischen[hidden]{display:none}
+.zwischen.zeigen{opacity:1}
+.zw-ring.hk-ring{width:136px;height:136px;flex:none;margin:0;cursor:default}
+.hk-ring.gold::before{background:linear-gradient(140deg,var(--kerzengold),#fff0c4 45%,var(--glut))}
+.zw-ring.wackelt{animation:wackeln .55s ease .3s}
+.zw-inhalt{display:flex;flex-direction:column;align-items:center}
+.zw-titel{margin:22px 0 0;font-size:28px;font-weight:700;line-height:1.1;letter-spacing:-.02em;text-wrap:balance}
+.zw-text{max-width:30ch;margin:8px 0 0;font-size:16px;color:var(--leise);text-wrap:pretty}
+.zw-knoepfe{display:flex;flex-direction:column;gap:10px;width:min(100%,300px);margin-top:24px}
+.zw-knoepfe .los{margin-top:0}
+.player.zwischen-offen .k-pause,.player.zwischen-offen .k-herz{display:none}
+@media (max-height:500px){
+  .v-oben{height:100px}.v-unten{height:130px}
+  .s-text{font-size:18px}
+  .zwischen{flex-direction:row;gap:32px;padding-top:calc(var(--oben) + 60px);padding-bottom:20px;text-align:left}
+  .zw-ring.hk-ring{width:112px;height:112px}
+  .zw-inhalt{align-items:flex-start}
+  .zw-titel{margin-top:0;font-size:24px}
+  .zw-knoepfe{flex-direction:row;width:auto;margin-top:18px}
+  .zw-knoepfe .los{min-width:0;width:auto}
+}
+.pfeil{display:none;position:absolute;top:50%;z-index:4;width:56px;height:56px;margin-top:-28px;border-radius:50%;border:1px solid rgba(248,236,214,.24);background:rgba(248,236,214,.1);color:var(--wachs);place-items:center;cursor:pointer;transition:background .15s,opacity .2s}
+.pfeil svg{width:26px;height:26px}
+.pfeil[disabled]{opacity:.3;cursor:default}
+.pfeil:not([disabled]):active{background:rgba(248,236,214,.22)}
+.player.breit .pfeil{display:grid;transition:left .34s cubic-bezier(.3,.7,.2,1),background .15s,opacity .2s}
+.pfeil-l{left:calc(50% - var(--bw) / 2 - 84px)}
+.pfeil-r{left:calc(50% + var(--bw) / 2 + 28px)}
+.pfeil-text{display:none}
+
+/* ---------- Breitere Bildschirme ---------- */
+@media (min-width:768px){
+  :root{--rand:32px}
+  .m-name{font-size:42px}
+  .m-sub{font-size:17px}
+  .kerzen svg{width:16px;height:48px}
+  .leiste{gap:12px;padding-left:60px;padding-right:60px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 56px,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 56px,#000 calc(100% - 56px),transparent)}
+  .leiste-pfeil{display:grid}
+  .leiste{scroll-padding-inline:64px}
+  .kreis{width:88px}
+  .ring{width:78px;height:78px}
+  .heute-karte{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:34px;padding:32px 36px;text-align:left}
+  .heute-karte .hk-ring{width:190px;height:190px;margin:0}
+  .hk-text{margin-top:0}
+  .hk-info{justify-content:flex-start}
+  .hk-absatz{margin-left:0}
+  .los{width:auto;display:inline-flex;min-width:250px}
+  .raster{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:20px 14px}
+}
+@media (min-width:1024px){
+  .inhalt{display:grid;grid-template-columns:minmax(330px,370px) 1fr;gap:44px;align-items:start;margin-top:8px}
+  .heute-karte{position:sticky;top:20px;display:block;padding:36px 30px 30px;text-align:center}
+  .heute-karte .hk-ring{width:196px;height:196px;margin:0 auto}
+  .hk-text{margin-top:22px}
+  .hk-info{justify-content:center}
+  .hk-absatz{margin-left:auto}
+  .los{display:flex;width:100%}
+  .abschnitt{margin-top:14px}
+  .abschnitt+.abschnitt{margin-top:38px}
+  .abschnitt h2{font-size:24px}
+  .anleitung{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .anleitung li{flex-direction:column;align-items:flex-start;padding:20px}
+  .raster{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+}
+@media (prefers-reduced-motion:reduce){
+  .st-neu .ring::before,.ring.lebt::before,.hk-ring.lebt::before,.kerzen .flamme{animation:none}
+  .wackeln .ring{animation:none}
+  .blase,.p-hinweis,.zwischen{transition:opacity .15s}
+  .player.breit .buehne,.player.breit .pfeil{transition:none}
+  .zw-ring.wackelt{animation:none}
+  .s-lader{animation:none}
+  .seite.laedt .s-lader{animation:pulsieren 1.8s ease-in-out infinite}
+}
+@keyframes pulsieren{0%,100%{opacity:1}50%{opacity:.35}}
+</style>
+</head>
+<body>
+<main class="start" id="start">
+  <header class="kopf">
+    <h1><span class="m-name">{{TITEL_A}}</span> <span class="m-sub">{{TITEL_B}}</span></h1>
+    <div class="kerzen" id="kerzen" role="img" aria-label="Adventskerzen"></div>
+  </header>
+
+  <section class="leiste-wrap" aria-label="Alle 24 Tage als Stories. Mit den Pfeiltasten von Tag zu Tag.">
+    <button class="leiste-pfeil links" id="l-links" type="button" tabindex="-1" aria-label="Frühere Tage zeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
+    <div class="leiste" id="leiste"></div>
+    <button class="leiste-pfeil rechts" id="l-rechts" type="button" tabindex="-1" aria-label="Spätere Tage zeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
+    <div class="blase" id="blase" role="status" aria-live="polite"></div>
+  </section>
+
+  <div class="inhalt">
+    <section class="heute-karte" id="heute" aria-label="Heute"></section>
+    <div class="spalte">
+      <section class="abschnitt" id="nachholen" aria-labelledby="nh-titel" hidden></section>
+      <section class="abschnitt" id="rueckblick" aria-labelledby="rb-titel"></section>
+    </div>
+  </div>
+</main>
+
+
+<div class="player" id="player" role="dialog" aria-modal="true" aria-label="Story" tabindex="-1">
+  <div class="hinter" id="hinter" aria-hidden="true"><i id="hinter1"></i><i id="hinter2" style="opacity:0"></i></div>
+  <div class="buehne" id="buehne">
+    <div class="wuerfel ruhe" id="wuerfel">
+      <section class="seite vorne" id="seiteA">
+        <div class="s-hg"></div><img class="foto" alt=""><div class="s-lader" aria-hidden="true"></div>
+        <div class="v-oben"></div><div class="v-unten"></div>
+        <div class="balken" aria-hidden="true"></div>
+        <div class="s-kopf"><span class="s-avatar"><img alt=""></span><div class="s-kopftext"><p class="s-datum"></p><p class="s-titel"></p></div></div>
+        <div class="s-fuss"><p class="s-text"></p><p class="s-zahl"></p></div>
+        <div class="schatten"></div>
+      </section>
+      <section class="seite aus" id="seiteB" aria-hidden="true">
+        <div class="s-hg"></div><img class="foto" alt=""><div class="s-lader" aria-hidden="true"></div>
+        <div class="v-oben"></div><div class="v-unten"></div>
+        <div class="balken" aria-hidden="true"></div>
+        <div class="s-kopf"><span class="s-avatar"><img alt=""></span><div class="s-kopftext"><p class="s-datum"></p><p class="s-titel"></p></div></div>
+        <div class="s-fuss"><p class="s-text"></p><p class="s-zahl"></p></div>
+        <div class="schatten"></div>
+      </section>
+    </div>
+    <div class="tipp" id="tipp" aria-hidden="true"></div>
+    <div class="p-hinweis" id="p-hinweis" aria-hidden="true"></div>
+    <div class="zwischen" id="zwischen" role="group" aria-labelledby="zw-titel" hidden></div>
+    <div class="pause-hinweis" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg>Pausiert</div>
+    <div class="steuer" id="steuer">
+      <button class="knopf k-pause" id="k-pause" type="button" aria-label="Pause"></button>
+      <button class="knopf k-zu" id="k-zu" type="button" aria-label="Story schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button class="k-herz" id="k-herz" type="button" aria-label="Herz schicken"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.4s-7.4-4.5-9.2-9.1C1.6 8 3.4 4.7 6.7 4.5c2.1-.1 3.7 1 5.3 3 1.6-2 3.2-3.1 5.3-3 3.3.2 5.1 3.5 3.9 6.8-1.8 4.6-9.2 9.1-9.2 9.1z"/></svg></button>
+    </div>
+  </div>
+  <button class="pfeil pfeil-l" id="pfeil-l" type="button" aria-label="Voriges Foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
+  <button class="pfeil pfeil-r" id="pfeil-r" type="button" aria-label="Nächstes Foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
+  <p class="sr" id="ansage" aria-live="polite"></p>
+</div>
+
+<script src="../shared/kalender.js"></script>
+<script src="../shared/fotos.js"></script>
+<script>
+(function () {
+  'use strict';
+  var K = window.Kalender.init('stories');
+  var F = window.Fotos;
+  var RUHIG = !!K.bewegungReduziert;
+  var DAUER = 5000;
+
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  var leerlauf = window.requestIdleCallback
+    ? function (fn) { window.requestIdleCallback(fn, { timeout: 1500 }); }
+    : function (fn) { setTimeout(fn, 300); };
+
+  /* Echte Fotos vom Server (Produktions-Baustein fotos.js mit laden()) oder gemalte Platzhalter (Prototyp)?
+     Bei echten Fotos laden die Bilder asynchron über das Netz, und es gibt keine Unterschriften je Einzelfoto. */
+  var ECHT = typeof F.laden === 'function';
+
+  /* Beispiel-Unterschriften je Foto – nur für die gemalten Platzhalter des Prototyps.
+     Über echte Familienfotos gehören keine erfundenen Texte: dort gilt nur F.titel(t) (texte.txt, darf leer sein). */
+  var TEXTE = [null,
+    ['Frisch gefallen über Nacht', 'Die ersten Spuren im Garten', 'Mützen auf, raus geht’s', 'Wer baut den größten Schneemann?'],
+    ['Oben angekommen', 'Und los!', 'Fast bis zum Zaun gerutscht', 'Noch eine Runde, bitte', 'Kakao zum Aufwärmen'],
+    ['Wer steckt unter der Maske?', 'Die Parade zieht los', 'Konfetti überall'],
+    ['Die Würfel liegen bereit', 'Wer gewinnt diesmal?', 'Knapp verloren', 'Revanche am Sonntag'],
+    ['Endlich wieder draußen', 'Die ersten Blüten', 'Jacken aus, Sonne an', 'Picknick auf der Decke', 'Barfuß im Gras'],
+    ['Wo hat der Hase sie versteckt?', 'Eins im Blumenbeet!', 'Der Korb wird voll'],
+    ['Helme auf, Sattel hoch', 'Kurze Pause am Feldweg', 'Da vorne glitzert der See', 'Füße ins Wasser'],
+    ['Kerzen zählen', 'Einmal kräftig pusten', 'Wünsch dir was!', 'Das erste Stück', 'Krümel auf dem Teller'],
+    ['Ein Tag am Wasser', 'Steine flitschen', 'Bis zum Abend geblieben'],
+    ['Endlich Ferien!', 'Die erste Welle', 'Muscheln sammeln', 'Eis mit Meerblick'],
+    ['Der Plan steht', 'Graben, graben, graben', 'Der Wassergraben hält', 'Fast fertig', 'Unsere Burg!'],
+    ['Die Sonne geht baden', 'Alle schauen aufs Meer', 'Noch fünf Minuten'],
+    ['Die Schultüte ist fast so groß wie du', 'Vor dem Schultor', 'Der erste Platz im Klassenzimmer', 'Geschafft: der erste Tag!'],
+    ['Ab in den Wald', 'Wer findet den dicksten Baum?', 'Pilze nur anschauen', 'Rast auf dem Baumstamm', 'Zurück mit vollen Taschen'],
+    ['Der Wind ist perfekt', 'Höher, höher!', 'Er fliegt!'],
+    ['Welcher Kürbis wird’s?', 'Erst mal aushöhlen', 'Gruselig oder lustig?', 'Fertig zum Leuchten'],
+    ['Ein riesiger Blätterhaufen', 'Achtung, Angriff!', 'Laub in der Kapuze', 'Alle liegen im Laub', 'Nochmal von vorn'],
+    ['Die Laternen sind fertig', 'Laterne, Laterne …', 'Durch die dunkle Straße'],
+    ['Teig ausrollen', 'Sterne, Herzen, Monde', 'Nur einmal naschen', 'Das erste Blech ist fertig'],
+    ['Zwischen den Buden', 'Es duftet nach Mandeln', 'Einmal Karussell', 'Warme Hände am Becher', 'Lichter über dem Platz'],
+    ['Schlittschuhe an', 'Erste wackelige Runde', 'Hand in Hand übers Eis'],
+    ['Ein Tunnel aus Licht', 'Alles glitzert', 'Kalte Nasen, warme Herzen', 'Der schönste Baum im Park'],
+    ['Der Baum steht', 'Erst die Lichterkette', 'Kugel für Kugel', 'Wer darf den Stern aufsetzen?', 'Licht an!'],
+    ['Endlich Heiligabend', 'Alle zusammen unterm Baum', 'Danke für dieses schöne Jahr']
+  ];
+  function titel(t) { var x = F.titel(t); return typeof x === 'string' ? x : ''; }
+  function bildText(t, i) { return (!ECHT && TEXTE[t] && TEXTE[t][i]) || titel(t); }
+  /* Texte aus texte.txt können &, <, " enthalten → für innerHTML/Attribute maskieren */
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+  }
+  /* Vorschaubild (quadratisch, klein): Leitfarbe als Grund, bis es geladen ist */
+  function vorschauImg(t, faul) {
+    return '<img src="' + esc(F.vorschau(t, 320)) + '" alt="" decoding="async"' + (faul ? ' loading="lazy"' : '') +
+      ' style="background-color:' + esc(F.farbe(t)) + '">';
+  }
+
+  var ICON = {
+    pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg>',
+    play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 4.9v14.2a1 1 0 0 0 1.53.85l11.2-7.1a1 1 0 0 0 0-1.7L9.03 4.05A1 1 0 0 0 7.5 4.9z"/></svg>',
+    herz: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.4s-7.4-4.5-9.2-9.1C1.6 8 3.4 4.7 6.7 4.5c2.1-.1 3.7 1 5.3 3 1.6-2 3.2-3.1 5.3-3 3.3.2 5.1 3.5 3.9 6.8-1.8 4.6-9.2 9.1-9.2 9.1z"/></svg>'
+  };
+
+  /* Herzen nur lokal merken – neben dem gemeinsamen Speicher (ADVENTSKALENDER.speicher) und wie dieser während eines
+     Testdatums getrennt, damit Tests im November keine Herzen in den echten Dezember schmuggeln */
+  var HERZ_KEY = (function () {
+    var M = window.ADVENTSKALENDER, basis = (M && typeof M.speicher === 'string' && M.speicher) ? M.speicher : 'adventskalender';
+    var test = K.testmodus === true && (/(?:^|;\s*)adventskalender_testtag=\d/.test(document.cookie || '') ||
+      (typeof K.echtHeute === 'function' && K.echtHeute() !== K.heute()));
+    return basis + (test ? ':test' : '') + ':stories:herzen';
+  })();
+  var herzen = {};
+  try { herzen = JSON.parse(window.localStorage.getItem(HERZ_KEY)) || {}; } catch (e) { herzen = {}; }
+  if (!herzen || typeof herzen !== 'object') herzen = {};
+  function herzSichern() { try { window.localStorage.setItem(HERZ_KEY, JSON.stringify(herzen)); } catch (e) { /* egal */ } }
+  /* "Alle wieder zu" löscht auch die lokalen Herzen. Prototyp: der Test-Knopf setzt direkt zurück.
+     Produktion: der Knopf öffnet nur das Menü (aria-haspopup); dessen „Alle wieder zu“ meldet {kalender:'reset', ausMenue:true}. */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('#kalender-reset');
+    if (b && !b.hasAttribute('aria-haspopup')) { herzen = {}; herzSichern(); }
+  }, true);
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (d && typeof d === 'object' && d.kalender === 'reset' && (d.ausMenue || K.testmodus !== false)) { herzen = {}; herzSichern(); }
+  });
+
+  var el = {
+    start: $('#start'), leiste: $('#leiste'), blase: $('#blase'), heute: $('#heute'),
+    nachholen: $('#nachholen'), rueckblick: $('#rueckblick'), kerzen: $('#kerzen'),
+    hinweis: $('#p-hinweis'), zwischen: $('#zwischen'),
+    lLinks: $('#l-links'), lRechts: $('#l-rechts'),
+    player: $('#player'), hinter: $('#hinter'), hinter1: $('#hinter1'), hinter2: $('#hinter2'),
+    buehne: $('#buehne'), wuerfel: $('#wuerfel'), tipp: $('#tipp'), steuer: $('#steuer'),
+    pause: $('#k-pause'), zu: $('#k-zu'), herz: $('#k-herz'), pfeilL: $('#pfeil-l'), pfeilR: $('#pfeil-r'),
+    ansage: $('#ansage')
+  };
+  var A = $('#seiteA'), B = $('#seiteB');
+  /* Der Menü-Knopf (#kalender-reset) bleibt, wo kalender.js ihn einhängt: direkt an body, fest unten links */
+
+  /* ---------- Zustände ---------- */
+  function maxTag() { var h = K.heute(); return h >= 25 ? 24 : h; }
+  function istHeute(t) { var h = K.heute(); return h >= 1 && h <= 24 && t === h; }
+  function status(t) {
+    if (!K.darfOeffnen(t)) return 'zu';
+    if (K.istGeoeffnet(t)) return 'gesehen';
+    return 'neu';
+  }
+  function kurz(t) { return K.wochentag(t).slice(0, 2) + ' ' + t + '.'; }
+  /* Anzeige-Reihenfolge: chronologisch 1–24 */
+  var REIHE = []; for (var tg = 1; tg <= 24; tg++) REIHE.push(tg);
+  /* Anzahl Fotos eines Tages. Echte Fotos: aus der URL-Liste (billig). Prototyp: Formel des Platzhalter-Malers,
+     damit nicht schon beim Rendern 3–5 große Canvas-Bilder gemalt werden. */
+  function fotoAnzahl(t) {
+    if (tage[t]) return tage[t].bilder.length;
+    return ECHT ? tagDaten(t).bilder.length : 3 + (t % 3);
+  }
+  function ariaKreis(t) {
+    var st = status(t), basis = 'Tag ' + t + ', ' + K.datumText(t) + ' – ';
+    if (st === 'zu') return basis + 'gesperrt. ' + K.sperrText(t);
+    if (istHeute(t)) return basis + (st === 'gesehen' ? 'heute, geöffnet' : 'heute, neu');
+    if (st === 'gesehen') return basis + 'geöffnet';
+    return basis + (K.heute() >= 25 ? 'noch nicht angesehen' : 'verpasst, jetzt nachholen');
+  }
+  function datumsSvg() { return '<svg class="strich" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="38.5" pathLength="120"/></svg>'; }
+
+  /* ---------- Bilder pro Tag (gecacht, vordekodiert, mit weichem Hintergrund) ----------
+     Echte Fotos kommen asynchron übers Netz. Deshalb: erst laden, wenn sie gebraucht werden (bzw. kurz vorher),
+     auf Canvas erst nach dem Dekodieren zeichnen, und Ladefehler (404/403/Netz) durch den gemalten Platzhalter ersetzen. */
+  var tage = {};
+  function weichzeichnen(im) {
+    var a = document.createElement('canvas'); a.width = 18; a.height = 32;
+    var ga = a.getContext('2d'); ga.imageSmoothingQuality = 'high'; ga.drawImage(im, 0, 0, 18, 32);
+    var b = document.createElement('canvas'); b.width = 72; b.height = 128;
+    var gb = b.getContext('2d'); gb.imageSmoothingQuality = 'high'; gb.drawImage(a, 0, 0, 72, 128);
+    return b.toDataURL('image/jpeg', 0.72);
+  }
+  function tagDaten(t) {
+    if (tage[t]) return tage[t];
+    var bilder = F.einzelbilder(t);
+    if (!bilder || !bilder.length) bilder = [F.bild(t)];
+    tage[t] = { bilder: bilder.slice(), blur: [], img: [], bereit: [], fertig: [] };
+    return tage[t];
+  }
+  /* Ein Bild laden und dekodieren. Produktion: Fotos.laden (liefert bei Fehlern den Platzhalter, nie reject). */
+  function ladeBild(url, t) {
+    if (ECHT) return F.laden(url, t);
+    return new Promise(function (ok) {
+      var im = new Image();
+      im.decoding = 'async';
+      im.onload = function () {
+        if (im.decode) im.decode().then(function () { ok(im); }, function () { ok(im); });
+        else ok(im);
+      };
+      im.onerror = function () { ok(null); };
+      im.src = url;
+    });
+  }
+  function bildLaden(t, i) {
+    var d = tagDaten(t);
+    if (!(i >= 0 && i < d.bilder.length)) return Promise.resolve();
+    if (d.bereit[i]) return d.bereit[i];
+    d.bereit[i] = ladeBild(d.bilder[i], t).then(function (im) {
+      if (im && im.naturalWidth > 0) {
+        d.img[i] = im;
+        /* Ladefehler → fotos.js hat den gemalten Platzhalter geliefert: ab jetzt diesen zeigen */
+        if (im.getAttribute('data-platzhalter')) d.bilder[i] = im.src;
+        try { d.blur[i] = weichzeichnen(im); } catch (e) { d.blur[i] = null; }
+      }
+      d.fertig[i] = true;
+      blurFertig(t, i);
+    }, function () { d.fertig[i] = true; blurFertig(t, i); });
+    return d.bereit[i];
+  }
+
+  /* ---------- Startseite ---------- */
+  function renderKerzen() {
+    var h = K.heute(), n;
+    if (h >= 25) n = 4;
+    else if (h >= 1) n = K.adventsSonntag(h);
+    else { var d = new Date(); n = (d.getFullYear() === K.JAHR && d.getMonth() === 10 && d.getDate() >= 29) ? 1 : 0; }
+    var html = '';
+    for (var i = 0; i < 4; i++) {
+      var an = i < n, hoehe = an ? 25 - (n - i) * 2.6 : 25, y = 40 - hoehe;
+      html += '<svg class="' + (an ? 'an' : 'aus') + '" viewBox="0 0 14 40" aria-hidden="true">' +
+        (an ? '<path class="flamme" d="M7 ' + (y - 14) + 'C9.7 ' + (y - 9.6) + ' 10.7 ' + (y - 7.6) + ' 10.7 ' + (y - 5.7) + 'A3.7 3.7 0 0 1 3.3 ' + (y - 5.7) + 'C3.3 ' + (y - 7.6) + ' 4.3 ' + (y - 9.6) + ' 7 ' + (y - 14) + 'Z"/>' : '') +
+        '<line class="docht" x1="7" y1="' + (y - 3.4) + '" x2="7" y2="' + (y + 0.5) + '"/>' +
+        '<rect class="wachs" x="2" y="' + y + '" width="10" height="' + hoehe + '" rx="2"/></svg>';
+    }
+    el.kerzen.innerHTML = html;
+    var worte = ['Noch brennt keine Adventskerze', 'Eine Adventskerze brennt', 'Zwei Adventskerzen brennen', 'Drei Adventskerzen brennen', 'Alle vier Adventskerzen brennen'];
+    el.kerzen.setAttribute('aria-label', worte[n]);
+  }
+
+  function kreisHTML(t) {
+    var st = status(t), heute = istHeute(t), nachholen = st === 'neu' && !heute && K.heute() < 25;
+    var innen, text = '<small>' + K.wochentag(t).slice(0, 2) + '</small> ' + t + '.';
+    if (st === 'zu') {
+      innen = datumsSvg() + '<span class="k-datum" aria-hidden="true"><b>' + t + '</b><small>Dez</small></span>';
+      text = '<small>' + K.wochentag(t) + '</small>';
+    } else {
+      innen = vorschauImg(t, true);
+    }
+    if (heute) innen += '<span class="k-marke" aria-hidden="true">Heute</span>';
+    else if (nachholen) innen += '<span class="k-marke gold" aria-hidden="true">Nachholen</span>';
+    return '<button type="button" class="kreis st-' + st + (heute ? ' ist-heute' : '') + (nachholen ? ' ist-nachholen' : '') + '" data-tag="' + t + '" data-quelle="leiste" aria-label="' + ariaKreis(t) + '">' +
+      '<span class="ring">' + innen + '</span><span class="k-text" aria-hidden="true">' + text + '</span></button>';
+  }
+  function renderLeiste() {
+    el.leiste.innerHTML = REIHE.map(kreisHTML).join('');
+  }
+
+  function tageBisDezember() {
+    var d = new Date();
+    if (d.getFullYear() === K.JAHR && d.getMonth() === 10) return 31 - d.getDate();
+    return null;
+  }
+  var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.9v14.2a1 1 0 0 0 1.53.85l11.2-7.1a1 1 0 0 0 0-1.7L8.53 4.05A1 1 0 0 0 7 4.9z"/></svg>';
+  function segmente(n, voll) {
+    var s = '<span class="hk-segmente' + (voll ? ' voll' : '') + '" aria-hidden="true">';
+    for (var i = 0; i < n; i++) s += '<i></i>';
+    return s + '</span>';
+  }
+  function renderHeute() {
+    var h = K.heute(), html;
+    if (h === 0) {
+      var n = tageBisDezember();
+      html = '<div class="hk-ring zu" aria-hidden="true">' + datumsSvg() + '<span class="hk-zahl">1.<small>Dezember</small></span></div>' +
+        '<div class="hk-text"><p class="hk-datum">Wir haben noch November</p>' +
+        '<h2 class="hk-titel">Bald geht’s los</h2>' +
+        '<p class="hk-absatz">Ab dem 1. Dezember wartet hier jeden Morgen eine neue Story mit Fotos aus unserem Jahr.' +
+        (n ? ' Noch ' + n + '× schlafen!' : '') + '</p></div>';
+    } else if (h >= 25) {
+      html = '<div class="hk-ring lebt" data-tag="1" data-quelle="heute" aria-hidden="true"><span class="hk-foto">' + vorschauImg(24) + '</span></div>' +
+        '<div class="hk-text"><p class="hk-datum">' + K.datumText(25) + '</p>' +
+        '<h2 class="hk-titel">Frohe Weihnachten!</h2>' +
+        '<p class="hk-absatz">Alle 24 Tage sind offen. Schau dir den ganzen Advent noch einmal am Stück an.</p>' +
+        '<button type="button" class="los" data-tag="1" data-quelle="heute">' + PLAY + 'Den ganzen Advent ansehen</button></div>';
+    } else {
+      var offen = K.istGeoeffnet(h), anz = fotoAnzahl(h);
+      html = '<div class="hk-ring' + (offen ? '' : ' lebt') + '" data-tag="' + h + '" data-quelle="heute" aria-hidden="true">' +
+        '<span class="hk-foto' + (offen ? '' : ' verhuellt') + '">' + vorschauImg(h) + '</span>' +
+        (offen ? '' : '<span class="hk-zahl">' + h + '</span>') + '</div>' +
+        '<div class="hk-text"><p class="hk-datum">Heute ist ' + K.datumText(h) + '</p>' +
+        '<h2 class="hk-titel">' + (offen ? (esc(titel(h)) || 'Deine Story von heute') : (h === 24 ? 'Die letzte Story vor Weihnachten' : 'Eine neue Story wartet')) + '</h2>' +
+        '<p class="hk-info">' + segmente(anz, offen) + '<span>' + anz + ' Fotos' + (offen ? ', schon angesehen' : '') + '</span></p>' +
+        '<button type="button" class="los' + (offen ? ' leise' : '') + '" data-tag="' + h + '" data-quelle="heute">' + PLAY +
+        (offen ? 'Tag ' + h + ' nochmal ansehen' : 'Tag ' + h + ' ansehen') + '</button></div>';
+    }
+    el.heute.innerHTML = html;
+  }
+
+  function renderNachholen() {
+    var liste = [];
+    for (var t = 1; t <= maxTag(); t++) if (status(t) === 'neu' && !istHeute(t)) liste.push(t);
+    if (!liste.length) { el.nachholen.hidden = true; el.nachholen.innerHTML = ''; return; }
+    el.nachholen.hidden = false;
+    var h = K.heute();
+    var hinweis = (liste.length === 1 && liste[0] === h - 1) ? 'Gestern verpasst? Kein Problem.' :
+      (liste.length === 1 ? 'Ein Tag wartet noch auf dich.' : liste.length + ' Tage warten noch auf dich.');
+    var html = '<h2 id="nh-titel">Noch nicht angesehen</h2><p class="hinweis">' + hinweis + '</p><div class="chips">';
+    liste.forEach(function (t) {
+      html += '<button type="button" class="chip" data-tag="' + t + '" data-quelle="nachholen" aria-label="' + ariaKreis(t) + '">' +
+        '<span class="ring lebt">' + vorschauImg(t, true) + '</span>' +
+        '<span><b>Tag ' + t + '</b><small>' + K.wochentag(t) + '</small></span></button>';
+    });
+    el.nachholen.innerHTML = html + '</div>';
+  }
+
+  function renderRueckblick() {
+    var offen = K.geoeffnet(), h = K.heute();
+    var html = '<h2 id="rb-titel">Rückblick</h2>';
+    if (h === 0) {
+      html = '<h2 id="rb-titel">So funktioniert’s</h2><p class="hinweis">Ab Dezember sammeln sich hier alle Tage, die du angesehen hast.</p>' +
+        '<ul class="anleitung">' +
+        '<li><span class="a-bild" aria-hidden="true"><span class="ring lebt"><i></i></span></span><p><b>Kreis antippen</b><span>Jeden Tag leuchtet ein neuer Kreis auf. Antippen, und die Story startet.</span></p></li>' +
+        '<li><span class="a-bild" aria-hidden="true"><span class="a-seg"><i></i><i></i><i></i></span></span><p><b>Zuschauen oder anhalten</b><span>Die Fotos laufen von selbst weiter. Gedrückt halten hält sie an.</span></p></li>' +
+        '<li><span class="a-bild" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 24h30M15 17l-7 7 7 7M33 17l7 7-7 7"/></svg></span><p><b>Wischen</b><span>Zur Seite geht’s zum nächsten oder vorigen Tag, nach unten zurück zur Übersicht.</span></p></li>' +
+        '</ul>';
+    } else if (!offen.length) {
+      html += '<p class="hinweis">Jede Story, die du ansiehst, landet hier.</p>';
+      html += '<div class="leer">Noch nichts angesehen. Fang mit Tag ' + (h >= 25 ? 1 : h) + ' an!</div>';
+    } else {
+      html += '<p class="hinweis">' + (offen.length === 24 ? 'Alle 24 Tage angesehen.' : offen.length + ' von 24 Tagen angesehen') + '</p><div class="raster">';
+      offen.forEach(function (t) {
+        html += '<button type="button" class="kachel" data-tag="' + t + '" data-quelle="rueckblick" aria-label="' + esc(ariaKreis(t) + (titel(t) ? ': ' + titel(t) : '')) + '">' +
+          '<span class="kb">' + vorschauImg(t, true) + '<span class="kn" aria-hidden="true">' + t + '</span>' +
+          (herzen[t] ? '<svg class="kh" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.4s-7.4-4.5-9.2-9.1C1.6 8 3.4 4.7 6.7 4.5c2.1-.1 3.7 1 5.3 3 1.6-2 3.2-3.1 5.3-3 3.3.2 5.1 3.5 3.9 6.8-1.8 4.6-9.2 9.1-9.2 9.1z"/></svg>' : '') +
+          '</span><span class="kt" aria-hidden="true">' + (esc(titel(t)) || K.wochentag(t)) + '</span></button>';
+      });
+      html += '</div>';
+    }
+    el.rueckblick.innerHTML = html;
+  }
+
+  var letzterHeute = null, rovingTag = 0;
+  function setzeRoving(t) {
+    rovingTag = t;
+    $$('.kreis', el.leiste).forEach(function (b) { b.tabIndex = +b.dataset.tag === t ? 0 : -1; });
+  }
+  function render() {
+    var h = K.heute();
+    document.documentElement.classList.toggle('weihnachten', h >= 25);
+    renderKerzen(); renderLeiste(); renderHeute(); renderNachholen(); renderRueckblick();
+    setzeRoving(letzterHeute === h && rovingTag ? rovingTag : (fokusTag() || 1));
+    if (letzterHeute !== h) zentriere(fokusTag());
+    letzterHeute = h;
+    leistePfeile();
+    /* Nur das erste Foto von heute vorab laden (wahrscheinlichster Tipp) – alles andere erst bei Bedarf */
+    if (h >= 1 && h <= 24) leerlauf(function () { bildLaden(h, 0); });
+  }
+  function fokusTag() {
+    var h = K.heute();
+    if (h === 0) return 1;
+    if (h <= 24) return h;
+    for (var i = 0; i < 24; i++) if (!K.istGeoeffnet(REIHE[i])) return REIHE[i];
+    return 0;
+  }
+  function zentriere(t, nurWennVerdeckt) {
+    var l = el.leiste, k = l.querySelector('[data-tag="' + t + '"]');
+    if (!k) { if (!nurWennVerdeckt) l.scrollLeft = 0; return; }
+    var rand = l.clientWidth >= 700 ? 64 : 24;
+    if (nurWennVerdeckt && k.offsetLeft >= l.scrollLeft + rand && k.offsetLeft + k.offsetWidth <= l.scrollLeft + l.clientWidth - rand) return;
+    l.scrollLeft = Math.max(0, k.offsetLeft - (l.clientWidth - k.offsetWidth) / 2);
+  }
+  function leistePfeile() {
+    var l = el.leiste;
+    el.lLinks.disabled = l.scrollLeft <= 4;
+    el.lRechts.disabled = l.scrollLeft + l.clientWidth >= l.scrollWidth - 4;
+  }
+  el.leiste.addEventListener('scroll', function () { leistePfeile(); versteckeBlase(); }, { passive: true });
+  el.leiste.addEventListener('keydown', function (e) {
+    var b = e.target.closest('.kreis');
+    if (!b) return;
+    var t = +b.dataset.tag, n;
+    if (e.key === 'ArrowRight') n = Math.min(24, t + 1);
+    else if (e.key === 'ArrowLeft') n = Math.max(1, t - 1);
+    else if (e.key === 'Home') n = 1;
+    else if (e.key === 'End') n = 24;
+    else return;
+    e.preventDefault();
+    setzeRoving(n);
+    el.leiste.querySelector('[data-tag="' + n + '"]').focus({ preventScroll: true });
+    zentriere(n, true);
+  });
+  el.leiste.addEventListener('focusin', function (e) {
+    var b = e.target.closest('.kreis');
+    if (b && +b.dataset.tag !== rovingTag) setzeRoving(+b.dataset.tag);
+  });
+  el.lLinks.addEventListener('click', function () { el.leiste.scrollBy({ left: -el.leiste.clientWidth * 0.7, behavior: RUHIG ? 'auto' : 'smooth' }); });
+  el.lRechts.addEventListener('click', function () { el.leiste.scrollBy({ left: el.leiste.clientWidth * 0.7, behavior: RUHIG ? 'auto' : 'smooth' }); });
+
+  /* Gesperrt: Wackeln + Sprechblase */
+  var blaseTimer = 0;
+  function versteckeBlase() { el.blase.classList.remove('zeigen'); }
+  function gesperrt(btn, t) {
+    if (!RUHIG) { btn.classList.remove('wackeln'); void btn.offsetWidth; btn.classList.add('wackeln'); }
+    var wrap = el.blase.parentNode.getBoundingClientRect(), r = btn.getBoundingClientRect(), ring = (btn.querySelector('.ring') || btn).getBoundingClientRect();
+    el.blase.innerHTML = '<b>' + K.sperrText(t) + '</b><span>Tag\u00a0' + t + ' kommt am ' + datumFest(t) + '.</span>';
+    var bw = el.blase.offsetWidth;
+    var cx = ring.left + ring.width / 2 - wrap.left;
+    var links = Math.max(12, Math.min(wrap.width - bw - 12, cx - bw / 2));
+    el.blase.style.left = links + 'px';
+    el.blase.style.top = (r.bottom - wrap.top + 8) + 'px';
+    el.blase.style.setProperty('--px', Math.max(24, Math.min(bw - 24, cx - links)) + 'px');
+    el.blase.classList.remove('zeigen'); void el.blase.offsetWidth;
+    el.blase.classList.add('zeigen');
+    clearTimeout(blaseTimer);
+    blaseTimer = setTimeout(versteckeBlase, 2600);
+  }
+
+  /* Datum ohne Umbruch zwischen Tageszahl und Monat */
+  function datumFest(t) { return K.datumText(t).replace(/(\d+\.) /, '$1\u00a0'); }
+
+  el.start.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-tag]');
+    if (!b || !el.start.contains(b)) return;
+    var t = +b.dataset.tag;
+    if (!K.darfOeffnen(t)) { gesperrt(b, t); return; }
+    versteckeBlase();
+    oeffneStory(t, b);
+  });
+  document.addEventListener('pointerdown', function (e) {
+    if (el.blase.classList.contains('zeigen') && !e.target.closest('.st-zu')) versteckeBlase();
+  }, { passive: true });
+
+  /* ---------- Story-Player ---------- */
+  var P = null, halb = 200, hoch = 700, winkel = 0, tween = 0, breit = false, vw0 = 390, vh0 = 844;
+
+  /* Breiter Modus (Spalte + Pfeile) nur auf großen Schirmen – ein quer gehaltenes Handy bekommt Vollbild */
+  function masse() {
+    vw0 = window.innerWidth; vh0 = window.innerHeight;
+    breit = vw0 >= 600 && vw0 / vh0 > 0.66 && vh0 >= 560;
+    el.player.classList.toggle('breit', breit);
+    if (P) passeBuehne(true); else setzeBuehne(buehnenMass(720, 1280), true);
+  }
+  function buehnenMass(nw, nh) {
+    if (!breit) return { bw: vw0, bh: vh0 };
+    var r = Math.max(9 / 16, Math.min(16 / 9, nw / nh));
+    var bh = Math.min(vh0 - 48, 1100), bw = bh * r, maxW = vw0 - 2 * 104;
+    if (bw > maxW) { bw = maxW; bh = bw / r; }
+    return { bw: Math.round(bw), bh: Math.round(bh) };
+  }
+  function setzeBuehne(m, sofort) {
+    if (sofort) el.player.classList.add('sofort');
+    halb = m.bw / 2; hoch = m.bh;
+    el.player.style.setProperty('--bw', m.bw + 'px');
+    el.player.style.setProperty('--bh', m.bh + 'px');
+    el.player.style.setProperty('--halb', halb + 'px');
+    el.buehne.style.perspective = Math.round(breit ? Math.max(1300, m.bw * 2.8) : Math.max(820, m.bw * 2.3)) + 'px';
+    if (sofort) { void el.buehne.offsetWidth; requestAnimationFrame(function () { requestAnimationFrame(function () { el.player.classList.remove('sofort'); }); }); }
+  }
+  /* Seitenverhältnis des gezeigten Fotos: geladen → echte Maße; sonst Schätzung (Produktion: Maße der Collage aus
+     den Metadaten, Einzelfotos werden nach dem Laden nachjustiert; Prototyp: 720×1280) */
+  function bildMass(S) {
+    var t = +S.dataset.tag, d = tage[t], im = d && d.img[+S.dataset.idx];
+    if (im && im.naturalWidth > 0 && im.naturalHeight > 0) return { nw: im.naturalWidth, nh: im.naturalHeight };
+    if (t >= 1 && typeof F.masse === 'function') {
+      var m = F.masse(t);
+      if (m && m.w > 0 && m.h > 0) return { nw: m.w, nh: m.h };
+    }
+    return { nw: 720, nh: 1280 };
+  }
+  /* Bühne an das aktuelle Foto anpassen (Desktop: Hoch-, Quadrat- oder Querformat; Handy: Vollbild) */
+  function passeBuehne(sofort) {
+    if (!P) return;
+    var b = bildMass(A), m = buehnenMass(b.nw, b.nh);
+    if (sofort || Math.abs(m.bw - halb * 2) > 1 || Math.abs(m.bh - hoch) > 1) setzeBuehne(m, sofort || RUHIG);
+    einpassen(A);
+    if (!B.classList.contains('aus')) einpassen(B);
+    setzeWinkel(winkel);
+  }
+  /* Foto immer ganz zeigen (object-fit: contain auf unscharfem Hintergrund), nie anschneiden */
+  function einpassen(S) {
+    var foto = $('.foto', S);
+    if (breit) { foto.style.cssText = ''; foto.classList.remove('frei'); return; }
+    var b = bildMass(S), fw = halb * 2, fh = hoch, k = Math.min(fw / b.nw, fh / b.nh), w = b.nw * k, h = b.nh * k;
+    foto.style.width = w + 'px'; foto.style.height = h + 'px';
+    foto.style.left = (fw - w) / 2 + 'px'; foto.style.top = (fh - h) / 2 + 'px';
+    foto.classList.toggle('frei', fw - w > 3 || fh - h > 3);
+  }
+
+  /* Unscharfer Grund hinter dem Foto: fertiges Weichbild; während des Ladens die (meist schon gecachte) Vorschau,
+     per CSS weichgezeichnet; notfalls die Leitfarbe des Tages */
+  function setzeHg(S, t, i) {
+    var d = tage[t], s = $('.s-hg', S);
+    if (d && d.blur[i]) {
+      s.style.backgroundImage = 'url("' + d.blur[i] + '")'; s.style.backgroundColor = ''; s.classList.remove('vorab');
+    } else if (d && d.fertig[i]) {
+      s.style.backgroundImage = 'none'; s.style.backgroundColor = F.farbe(t); s.classList.remove('vorab');
+    } else {
+      s.style.backgroundImage = 'url("' + F.vorschau(t, 320) + '")'; s.style.backgroundColor = F.farbe(t); s.classList.add('vorab');
+    }
+  }
+  function hinterSetzen(schicht, t, i) {
+    var d = tage[t];
+    schicht.style.backgroundImage = 'url("' + ((d && d.blur[i]) || F.vorschau(t, 320)) + '")';
+  }
+  /* Ein Bild ist fertig geladen (oder durch den Platzhalter ersetzt): überall nachziehen, wo es gerade zu sehen ist */
+  function blurFertig(t, i) {
+    var d = tage[t];
+    [A, B].forEach(function (S) {
+      if (+S.dataset.tag !== t || +S.dataset.idx !== i) return;
+      var foto = $('.foto', S);
+      if (d && foto.getAttribute('src') !== d.bilder[i]) foto.src = d.bilder[i];
+      S.classList.remove('laedt');
+      setzeHg(S, t, i); einpassen(S);
+    });
+    if (P && +A.dataset.tag === t && +A.dataset.idx === i) passeBuehne(false);
+    if (P && P.tag === t && P.idx === i) hinterSetzen(el.hinter1, t, i);
+    if (P && !B.classList.contains('aus') && +B.dataset.tag === t && +B.dataset.idx === i) hinterSetzen(el.hinter2, t, i);
+  }
+  function fuelleSeite(S, t, i) {
+    var d = tagDaten(t);
+    S.dataset.tag = t;
+    var av = $('.s-avatar img', S);
+    av.src = F.vorschau(t, 320);
+    av.style.backgroundColor = F.farbe(t);
+    $('.s-datum', S).textContent = K.datumText(t);
+    $('.balken', S).innerHTML = d.bilder.map(function () { return '<span class="seg"><i></i></span>'; }).join('');
+    zeigeAufSeite(S, t, i);
+  }
+  /* "Foto 2 von 3: Text" – ohne Doppelpunkt, wenn es keinen Text gibt */
+  function fotoBeschreibung(t, i) {
+    var x = bildText(t, i);
+    return 'Foto ' + (i + 1) + ' von ' + tagDaten(t).bilder.length + (x ? ': ' + x : '');
+  }
+  function zeigeAufSeite(S, t, i) {
+    var d = tagDaten(t), foto = $('.foto', S), n = d.bilder.length, text = bildText(t, i), tt = titel(t);
+    S.dataset.idx = i;
+    S.classList.toggle('laedt', !d.fertig[i]);
+    if (foto.getAttribute('src') !== d.bilder[i]) foto.src = d.bilder[i];
+    foto.alt = fotoBeschreibung(t, i);
+    einpassen(S);
+    setzeHg(S, t, i);
+    /* Kopfzeile: Datum + Tagestitel; steht der Titel schon groß unten (echte Fotos), oben nicht doppelt */
+    $('.s-titel', S).textContent = tt && tt !== text ? tt : '';
+    $('.s-text', S).textContent = text;
+    $('.s-zahl', S).textContent = n > 1 ? 'Foto ' + (i + 1) + ' von ' + n : '';
+    $$('.seg i', S).forEach(function (s, k) { s.style.transform = 'scaleX(' + (k < i ? 1 : 0) + ')'; });
+    bildLaden(t, i);
+  }
+
+  function ansage(text) { el.ansage.textContent = text; }
+  function pausiert() { var p = P.pause; return p.halten || p.nutzer || p.versteckt || p.drag || p.wechsel || p.laden || p.zwischen; }
+
+  /* Die Zeit für ein Foto läuft erst, wenn es da ist (Sicherheitsnetz nach 15 s, falls das Netz hängt) */
+  function warteAufBild() {
+    var t = P.tag, i = P.idx;
+    P.pause.laden = true;
+    var fertig = function () { if (P && P.tag === t && P.idx === i) P.pause.laden = false; };
+    bildLaden(t, i).then(fertig, fertig);
+    setTimeout(fertig, 15000);
+  }
+  /* Vorausladen, sobald das aktuelle Foto da ist: nächstes Foto des Tages und das erste Foto der Nachbartage
+     (nur freigegebene Tage – gesperrte fordern nie ein Bild an). Höchstens drei große Bilder auf einmal. */
+  function vorausLaden() {
+    if (!P) return;
+    var t = P.tag, i = P.idx;
+    bildLaden(t, i).then(function () {
+      leerlauf(function () {
+        if (!P || P.tag !== t) return;
+        if (i + 1 < tagDaten(t).bilder.length) bildLaden(t, i + 1);
+        if (t + 1 <= maxTag()) bildLaden(t + 1, 0);
+        if (i === 0 && t - 1 >= 1) bildLaden(t - 1, 0);
+      });
+    });
+  }
+
+  function zeigeBild(i) {
+    P.idx = i; P.elapsed = 0;
+    zeigeAufSeite(A, P.tag, i);
+    passeBuehne(false);
+    hinterSetzen(el.hinter1, P.tag, i);
+    warteAufBild();
+    vorausLaden();
+    pfeileAktualisieren();
+    ansage(fotoBeschreibung(P.tag, i));
+  }
+
+  function tagBeginnt() {
+    var t = P.tag, tt = titel(t);
+    K.oeffne(t);
+    el.player.setAttribute('aria-label', 'Story Tag ' + t + ', ' + K.datumText(t) + (tt ? ': ' + tt : ''));
+    el.herz.classList.toggle('voll', !!herzen[t]);
+    el.herz.setAttribute('aria-label', herzen[t] ? 'Noch ein Herz schicken' : 'Herz schicken');
+    hinterSetzen(el.hinter1, t, P.idx);
+    warteAufBild();
+    vorausLaden();
+    pfeileAktualisieren();
+    ansage('Tag ' + t + ', ' + K.datumText(t) + (tt ? ': ' + tt : '') + '. ' + fotoBeschreibung(t, 0));
+  }
+
+  function pfeileAktualisieren() {
+    if (!P) return;
+    el.pfeilL.disabled = !zw && P.tag === 1 && P.idx === 0;
+    el.pfeilL.setAttribute('aria-label', zw ? 'Zurück zum letzten Foto' : 'Voriges Foto');
+    el.pfeilR.setAttribute('aria-label', zw === 'ende' ? 'Story beenden' : zw === 'heute' ? 'Tag ' + (P.tag + 1) + ' ansehen' : 'Nächstes Foto');
+  }
+
+  function setzePause(an) {
+    P.pause.nutzer = an;
+    el.player.classList.toggle('nutzerpause', an);
+    el.pause.innerHTML = an ? ICON.play : ICON.pause;
+    el.pause.setAttribute('aria-label', an ? 'Weiter abspielen' : 'Pause');
+    ansage(an ? 'Pausiert' : 'Läuft weiter');
+  }
+  function setzeHalten(an) {
+    if (!P) return;
+    P.pause.halten = an;
+    el.player.classList.toggle('halten', an);
+  }
+
+  function tick(jetzt) {
+    if (!P) return;
+    var dt = Math.min(100, jetzt - P.zuletzt);
+    P.zuletzt = jetzt;
+    if (!pausiert()) {
+      P.elapsed += dt;
+      if (P.elapsed >= DAUER) { P.elapsed = DAUER; fuellung(); weiter(); }
+    }
+    if (P) { fuellung(); P.raf = requestAnimationFrame(tick); }
+  }
+  function fuellung() {
+    var seg = $$('.seg i', A)[P.idx];
+    if (seg) seg.style.transform = 'scaleX(' + Math.min(1, P.elapsed / DAUER).toFixed(4) + ')';
+  }
+
+  function weiter() {
+    if (!P || P.pause.wechsel || zw) return;
+    var n = tagDaten(P.tag).bilder.length;
+    if (P.idx < n - 1) zeigeBild(P.idx + 1);
+    else if (P.tag < maxTag()) {
+      /* Den heutigen Tag nie ungefragt per Autoplay "verbrauchen" */
+      if (istHeute(P.tag + 1) && !K.istGeoeffnet(P.tag + 1)) zeigeZwischen('heute');
+      else tagWechsel(1);
+    } else zeigeZwischen('ende');
+  }
+  function vorwaerts() {
+    if (zw === 'heute') { versteckeZwischen(); tagWechsel(1); }
+    else if (zw === 'ende') schliesse('knopf');
+    else weiter();
+  }
+  function zurueck() {
+    if (!P || P.pause.wechsel) return;
+    if (zw) { versteckeZwischen(); P.elapsed = 0; return; }
+    if (P.idx > 0) zeigeBild(P.idx - 1);
+    else if (P.tag > 1) tagWechsel(-1);
+    else { P.elapsed = 0; fuellung(); }
+  }
+
+  /* Zwischen- und Ende-Karte im Player */
+  var zw = null;
+  function zeigeZwischen(art) {
+    var h = K.heute(), t = P.tag, ring, titel, text, knoepfe;
+    if (art === 'heute') {
+      var n = t + 1;
+      ring = '<div class="hk-ring lebt zw-ring" aria-hidden="true"><span class="hk-foto verhuellt">' + vorschauImg(n) + '</span><span class="hk-zahl">' + n + '</span></div>';
+      titel = 'Und jetzt: dein Tag von heute';
+      text = 'Tag ' + n + ' ist noch eine Überraschung. Willst du sie jetzt ansehen?';
+      knoepfe = '<button type="button" class="los" data-aktion="weiter">' + PLAY + 'Tag ' + n + ' ansehen</button>' +
+        '<button type="button" class="los leise" data-aktion="zu">Später</button>';
+    } else {
+      if (h <= 23) {
+        ring = '<div class="hk-ring zu zw-ring' + (RUHIG ? '' : ' wackelt') + '" aria-hidden="true">' + datumsSvg() + '<span class="hk-zahl">' + (h + 1) + '<small>Dezember</small></span></div>';
+        titel = 'Bis morgen!';
+        text = 'Morgen früh wartet Tag\u00a0' + (h + 1) + ' auf dich.';
+      } else {
+        ring = '<div class="hk-ring gold zw-ring" aria-hidden="true"><span class="hk-foto">' + vorschauImg(24) + '</span></div>';
+        titel = h >= 25 ? 'Das war der ganze Advent' : 'Frohe Weihnachten!';
+        text = h >= 25 ? 'Frohe Weihnachten und danke fürs Zuschauen!' : 'Das war die letzte Story vor Weihnachten.';
+      }
+      knoepfe = '<button type="button" class="los" data-aktion="zu">Zur Übersicht</button>' +
+        '<button type="button" class="los leise" data-aktion="nochmal">Tag ' + t + ' nochmal ansehen</button>';
+    }
+    zw = art;
+    P.pause.zwischen = true;
+    el.zwischen.innerHTML = ring + '<div class="zw-inhalt"><h2 class="zw-titel" id="zw-titel">' + titel + '</h2><p class="zw-text">' + text + '</p><div class="zw-knoepfe">' + knoepfe + '</div></div>';
+    el.zwischen.hidden = false;
+    el.player.classList.add('zwischen-offen');
+    void el.zwischen.offsetWidth;
+    el.zwischen.classList.add('zeigen');
+    pfeileAktualisieren();
+    ansage(titel + '. ' + text);
+    $('.los', el.zwischen).focus({ preventScroll: true });
+  }
+  function versteckeZwischen() {
+    if (!zw) return;
+    zw = null;
+    el.zwischen.classList.remove('zeigen');
+    el.zwischen.hidden = true;
+    el.zwischen.innerHTML = '';
+    el.player.classList.remove('zwischen-offen');
+    if (P) { P.pause.zwischen = false; el.player.focus({ preventScroll: true }); pfeileAktualisieren(); }
+  }
+  el.zwischen.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-aktion]');
+    if (!b || !P) return;
+    var a = b.dataset.aktion;
+    if (a === 'zu') schliesse('knopf');
+    else if (a === 'weiter') { versteckeZwischen(); tagWechsel(1); }
+    else if (a === 'nochmal') { versteckeZwischen(); zeigeBild(0); }
+  });
+
+  /* Kurzer Hinweis im Player, z. B. beim Wischen zu einem gesperrten Tag */
+  var hinweisTimer = 0;
+  function zeigeHinweis(haupt, neben) {
+    el.hinweis.innerHTML = '<b>' + haupt + '</b>' + (neben ? '<span>' + neben + '</span>' : '');
+    el.hinweis.classList.remove('zeigen'); void el.hinweis.offsetWidth;
+    el.hinweis.classList.add('zeigen');
+    ansage(haupt + (neben ? ' ' + neben : ''));
+    clearTimeout(hinweisTimer);
+    hinweisTimer = setTimeout(function () { el.hinweis.classList.remove('zeigen'); }, 1800);
+  }
+  function grenzHinweis(r) {
+    if (!P) return;
+    if (r < 0) { zeigeHinweis('Das ist der erste Tag.'); return; }
+    var n = P.tag + 1;
+    if (n > 24) zeigeHinweis('Das war der letzte Tag.', 'Frohe Weihnachten!');
+    else zeigeHinweis(K.sperrText(n), 'Tag\u00a0' + n + ' kommt am ' + datumFest(n) + '.');
+  }
+
+  /* Würfel */
+  function ruhe(an) { el.wuerfel.classList.toggle('ruhe', an); }
+  function setzeWinkel(a) {
+    winkel = a;
+    var anteil = Math.min(1, Math.abs(a) / 90);
+    if (a === 0 && B.classList.contains('aus')) {
+      ruhe(true); el.wuerfel.style.transform = '';
+    } else {
+      ruhe(false);
+      el.wuerfel.style.transform = 'translateZ(' + (-halb) + 'px) rotateY(' + a + 'deg)';
+    }
+    $('.schatten', A).style.opacity = (anteil * 0.78).toFixed(3);
+    $('.schatten', B).style.opacity = ((1 - anteil) * 0.78).toFixed(3);
+    el.steuer.style.opacity = a === 0 ? '' : String(Math.max(0, 1 - Math.abs(a) / 18));
+    el.hinter2.style.opacity = B.classList.contains('aus') ? '0' : anteil.toFixed(3);
+  }
+  function animiereWinkel(von, bis, dauer, kurve) {
+    cancelAnimationFrame(tween);
+    return new Promise(function (fertig) {
+      var t0 = performance.now();
+      (function schritt(jetzt) {
+        var p = Math.min(1, (jetzt - t0) / dauer);
+        setzeWinkel(von + (bis - von) * kurve(p));
+        if (p < 1) tween = requestAnimationFrame(schritt); else fertig();
+      })(t0);
+    });
+  }
+  function rein(p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+  function raus(p) { return 1 - Math.pow(1 - p, 3); }
+
+  function bereiteB(ziel, r) {
+    fuelleSeite(B, ziel, 0);
+    B.className = 'seite ' + (r > 0 ? 'rechts' : 'links');
+    B.setAttribute('aria-hidden', 'true');
+    hinterSetzen(el.hinter2, ziel, 0);
+  }
+  function tauschen(ziel) {
+    var alt = A; A = B; B = alt;
+    A.className = 'seite vorne'; A.removeAttribute('aria-hidden');
+    B.className = 'seite aus'; B.setAttribute('aria-hidden', 'true');
+    setzeWinkel(0);
+    P.tag = ziel; P.idx = 0; P.elapsed = 0; P.pause.wechsel = false;
+    passeBuehne(false);
+    tagBeginnt();
+    if (RUHIG && A.animate) A.animate([{ opacity: 0.35 }, { opacity: 1 }], { duration: 180 });
+  }
+  function tagWechsel(r) {
+    if (!P || P.pause.wechsel) return;
+    var ziel = P.tag + r;
+    if (ziel < 1 || ziel > maxTag()) { grenzHinweis(r); return; }
+    if (zw) versteckeZwischen();
+    P.pause.wechsel = true;
+    bereiteB(ziel, r);
+    if (RUHIG) { tauschen(ziel); return; }
+    animiereWinkel(0, -90 * r, 640, rein).then(function () { tauschen(ziel); });
+  }
+
+  /* Öffnen / Schließen */
+  function oeffneStory(t, ausloeser) {
+    if (P || !K.darfOeffnen(t)) return;
+    masse();
+    tagDaten(t);
+    P = { tag: t, idx: 0, elapsed: 0, zuletzt: performance.now(), raf: 0,
+      pause: { halten: false, nutzer: false, versteckt: document.hidden, drag: false, wechsel: false, laden: false, zwischen: false },
+      quelle: ausloeser ? { q: ausloeser.dataset.quelle, tag: t } : null };
+    B.className = 'seite aus';
+    A.className = 'seite vorne';
+    fuelleSeite(A, t, 0);
+    passeBuehne(true);
+    el.player.classList.remove('halten', 'nutzerpause');
+    el.pause.innerHTML = ICON.pause; el.pause.setAttribute('aria-label', 'Pause');
+    el.player.style.backgroundColor = '';
+    el.buehne.style.transform = '';
+    el.hinter.style.opacity = '';
+    el.player.classList.add('offen');
+    el.start.inert = true;
+    document.documentElement.classList.add('gesperrt');
+    tagBeginnt();
+    aufdecken(ausloeser);
+    el.player.focus({ preventScroll: true });
+    P.raf = requestAnimationFrame(tick);
+  }
+  function aufdecken(ausloeser) {
+    if (!el.player.animate) return;
+    if (RUHIG || !ausloeser) { el.player.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160 }); return; }
+    var ursprung = ausloeser.querySelector('.ring');
+    if (!ursprung && ausloeser.dataset.quelle === 'heute') ursprung = el.heute.querySelector('.hk-ring');
+    var r = (ursprung || ausloeser).getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2, r0 = Math.max(10, Math.min(r.width, r.height) / 2);
+    var R = Math.hypot(Math.max(cx, window.innerWidth - cx), Math.max(cy, window.innerHeight - cy)) + 20;
+    var kurve = 'cubic-bezier(.3,.75,.2,1)';
+    el.player.animate([{ clipPath: 'circle(' + r0 + 'px at ' + cx + 'px ' + cy + 'px)' }, { clipPath: 'circle(' + R + 'px at ' + cx + 'px ' + cy + 'px)' }], { duration: 520, easing: kurve });
+    el.buehne.animate([{ transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 520, easing: kurve });
+  }
+  function schliesse(art) {
+    if (!P) return;
+    cancelAnimationFrame(P.raf);
+    cancelAnimationFrame(tween);
+    var quelle = P.quelle, tag = P.tag;
+    P = null;
+    setzeHaltenAus();
+    var fertig = function () {
+      zw = null; el.zwischen.hidden = true; el.zwischen.classList.remove('zeigen'); el.zwischen.innerHTML = '';
+      el.hinweis.classList.remove('zeigen');
+      el.player.classList.remove('offen', 'halten', 'nutzerpause', 'zwischen-offen');
+      el.buehne.style.transform = '';
+      el.player.style.backgroundColor = '';
+      el.hinter.style.opacity = '';
+      B.className = 'seite aus';
+      winkel = 0; ruhe(true); el.wuerfel.style.transform = '';
+      el.start.inert = false;
+      document.documentElement.classList.remove('gesperrt');
+      render();
+      /* Ist der Tag inzwischen gesperrt (Datum während der Story geändert), nicht zu ihm zurück, sondern zu „Heute“ */
+      var gueltig = K.darfOeffnen(quelle ? quelle.tag : tag);
+      var ziel = gueltig && quelle && el.start.querySelector('button[data-quelle="' + quelle.q + '"][data-tag="' + quelle.tag + '"]');
+      if (!ziel) {
+        /* Auslöser gibt es nicht mehr (z. B. Nachholen-Chip): zurück nach oben zur Leiste */
+        window.scrollTo(0, 0);
+        ziel = el.leiste.querySelector('[data-tag="' + (gueltig ? (quelle ? quelle.tag : tag) : (fokusTag() || 1)) + '"]');
+      }
+      if (ziel && ziel.classList.contains('kreis')) { setzeRoving(+ziel.dataset.tag); zentriere(+ziel.dataset.tag, true); }
+      else if (art !== 'sofort') zentriere(tag, true);
+      leistePfeile();
+      if (ziel) ziel.focus({ preventScroll: true });
+    };
+    if (RUHIG || !el.player.animate || art === 'sofort') { fertig(); return; }
+    var anim;
+    if (art === 'runter') {
+      anim = el.buehne.animate([{ transform: el.buehne.style.transform || 'none' }, { transform: 'translateY(' + window.innerHeight + 'px) scale(.8)' }], { duration: 260, easing: 'cubic-bezier(.4,0,.8,.4)', fill: 'forwards' });
+      el.player.animate([{ backgroundColor: el.player.style.backgroundColor || 'rgb(10,20,48)' }, { backgroundColor: 'rgba(10,20,48,0)' }], { duration: 260, fill: 'forwards' });
+      el.hinter.animate([{ opacity: el.hinter.style.opacity || 1 }, { opacity: 0 }], { duration: 260, fill: 'forwards' });
+    } else {
+      el.buehne.animate([{ transform: 'scale(1)' }, { transform: 'scale(.92)' }], { duration: 220, easing: 'ease-in', fill: 'forwards' });
+      anim = el.player.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: 'ease-in', fill: 'forwards' });
+    }
+    anim.onfinish = function () {
+      fertig();
+      el.buehne.getAnimations().forEach(function (a) { a.cancel(); });
+      el.player.getAnimations().forEach(function (a) { a.cancel(); });
+      el.hinter.getAnimations().forEach(function (a) { a.cancel(); });
+    };
+  }
+  function setzeHaltenAus() { el.player.classList.remove('halten'); }
+
+  /* Gesten: Tippen, Halten, Wischen */
+  var g = null;
+  el.tipp.addEventListener('pointerdown', function (e) {
+    if (!P || P.pause.wechsel || g || zw) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    g = { id: e.pointerId, x0: e.clientX, y0: e.clientY, t0: performance.now(), modus: null, gehalten: false, dx: 0, dy: 0, ziel: null };
+    try { el.tipp.setPointerCapture(e.pointerId); } catch (err) { /* synthetisch */ }
+    g.timer = setTimeout(function () { if (g && !g.modus) { g.gehalten = true; setzeHalten(true); } }, 220);
+  });
+  el.tipp.addEventListener('pointermove', function (e) {
+    if (!g || e.pointerId !== g.id || !P) return;
+    var dx = e.clientX - g.x0, dy = e.clientY - g.y0;
+    g.dx = dx; g.dy = dy;
+    if (!g.modus) {
+      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) g.modus = 'quer';
+      else if (dy > 10 && dy > Math.abs(dx)) g.modus = 'runter';
+      else return;
+      clearTimeout(g.timer);
+      P.pause.drag = true;
+      setzeHalten(false);
+    }
+    if (g.modus === 'quer') zieheQuer(dx);
+    else zieheRunter(dy);
+  });
+  function gesteEnde(e, abbruch) {
+    if (!g || e.pointerId !== g.id) return;
+    clearTimeout(g.timer);
+    var gg = g; g = null;
+    if (!P) return;
+    var dt = Math.max(1, performance.now() - gg.t0);
+    if (gg.modus === 'quer') loslassenQuer(gg.dx, gg.dx / dt, gg.ziel);
+    else if (gg.modus === 'runter') loslassenRunter(gg.dy, gg.dy / dt);
+    else if (gg.gehalten) setzeHalten(false);
+    else if (!abbruch) {
+      var r = el.tipp.getBoundingClientRect();
+      if (gg.x0 - r.left < r.width * 0.3) zurueck(); else weiter();
+    }
+    if (P && gg.modus !== 'quer') P.pause.drag = false;
+  }
+  el.tipp.addEventListener('pointerup', function (e) { gesteEnde(e, false); });
+  el.tipp.addEventListener('pointercancel', function (e) { gesteEnde(e, true); });
+  el.player.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  function zieheQuer(dx) {
+    var W = halb * 2, r = dx < 0 ? 1 : -1, ziel = P.tag + r;
+    var gueltig = ziel >= 1 && ziel <= maxTag();
+    if (RUHIG) { g.ziel = gueltig ? ziel : null; return; }
+    if (!gueltig) {
+      if (!B.classList.contains('aus')) B.className = 'seite aus';
+      g.ziel = null;
+      setzeWinkel(Math.max(-14, Math.min(14, dx / W * 90 * 0.22)));
+      return;
+    }
+    if (g.ziel !== ziel) { bereiteB(ziel, r); g.ziel = ziel; }
+    setzeWinkel(Math.max(-90, Math.min(90, dx / W * 90)));
+  }
+  function loslassenQuer(dx, v, ziel) {
+    var W = halb * 2, r = dx < 0 ? 1 : -1;
+    var schnell = Math.abs(v) > 0.45;
+    if (ziel && (Math.abs(dx) > W * 0.28 || schnell)) {
+      P.pause.drag = false;
+      P.pause.wechsel = true;
+      if (RUHIG) { bereiteB(ziel, r); tauschen(ziel); return; }
+      var rest = 1 - Math.abs(winkel) / 90;
+      animiereWinkel(winkel, -90 * r, 140 + 300 * rest, raus).then(function () { if (P) tauschen(ziel); });
+    } else {
+      if (!ziel && Math.abs(dx) > W * 0.15) grenzHinweis(r);
+      P.pause.wechsel = true;
+      animiereWinkel(winkel, 0, RUHIG ? 1 : 240, raus).then(function () {
+        B.className = 'seite aus';
+        setzeWinkel(0);
+        if (P) { P.pause.wechsel = false; P.pause.drag = false; }
+      });
+    }
+  }
+  function zieheRunter(dy) {
+    var d = Math.max(0, dy), H = window.innerHeight;
+    el.buehne.style.transform = 'translateY(' + d + 'px) scale(' + (1 - Math.min(d, H) / H * 0.22).toFixed(4) + ')';
+    var a = Math.max(0.25, 1 - d / (H * 0.7));
+    el.player.style.backgroundColor = 'rgba(10,20,48,' + a.toFixed(3) + ')';
+    el.hinter.style.opacity = a.toFixed(3);
+    el.steuer.style.opacity = String(Math.max(0, 1 - d / 60));
+  }
+  function loslassenRunter(dy, v) {
+    if (dy > 110 || (v > 0.55 && dy > 30)) { schliesse('runter'); return; }
+    var start = el.buehne.style.transform || 'none';
+    el.buehne.style.transform = '';
+    el.player.style.backgroundColor = '';
+    el.hinter.style.opacity = '';
+    el.steuer.style.opacity = '';
+    if (!RUHIG && el.buehne.animate) el.buehne.animate([{ transform: start }, { transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.2,.8,.3,1)' });
+  }
+
+  /* Knöpfe */
+  el.zu.addEventListener('click', function () { schliesse('knopf'); });
+  el.pause.addEventListener('click', function () { if (P) setzePause(!P.pause.nutzer); });
+  el.pfeilL.addEventListener('click', function () { zurueck(); });
+  el.pfeilR.addEventListener('click', function () { vorwaerts(); });
+  el.hinter.addEventListener('click', function () { schliesse('knopf'); });
+  el.herz.addEventListener('click', function () {
+    if (!P) return;
+    herzen[P.tag] = (herzen[P.tag] || 0) + 1;
+    herzSichern();
+    el.herz.classList.add('voll');
+    el.herz.setAttribute('aria-label', 'Noch ein Herz schicken');
+    herzRegen();
+    ansage('Herz für Tag ' + P.tag + ' geschickt');
+  });
+  function herzRegen() {
+    var sr = el.steuer.getBoundingClientRect(), hr = el.herz.getBoundingClientRect();
+    var x = hr.left + hr.width / 2 - sr.left, y = hr.top + hr.height / 2 - sr.top;
+    if (el.herz.animate) el.herz.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.22)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.3,1.6,.5,1)' });
+    if (!el.herz.animate) return;
+    var farben = ['var(--weihnachtsrot)', 'var(--glut)', 'var(--kerzengold)', '#ff5a6e', 'var(--wachs)'];
+    var n = RUHIG ? 1 : 9, hoehe = Math.min(sr.height * 0.6, 420);
+    for (var i = 0; i < n; i++) {
+      var f = document.createElement('span');
+      f.className = 'flug';
+      f.innerHTML = ICON.herz;
+      f.style.left = x + 'px'; f.style.top = y + 'px';
+      f.firstChild.style.fill = farben[i % farben.length];
+      el.steuer.appendChild(f);
+      var dx = (Math.random() - 0.65) * 120, h = hoehe * (0.55 + Math.random() * 0.45), s = 0.6 + Math.random() * 0.9, rot = (Math.random() - 0.5) * 50;
+      var anim = RUHIG
+        ? f.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1.3)' }, { opacity: 0, transform: 'scale(1.3)' }], { duration: 700 })
+        : f.animate([
+          { opacity: 0, transform: 'translate(0,0) scale(.3)' },
+          { opacity: 1, transform: 'translate(' + (dx * 0.15) + 'px,' + (-h * 0.12) + 'px) scale(' + s + ')', offset: 0.14 },
+          { opacity: 0.9, transform: 'translate(' + (dx * 0.6) + 'px,' + (-h * 0.6) + 'px) scale(' + s + ') rotate(' + (rot * 0.6) + 'deg)', offset: 0.6 },
+          { opacity: 0, transform: 'translate(' + dx + 'px,' + (-h) + 'px) scale(' + (s * 0.85) + ') rotate(' + rot + 'deg)' }
+        ], { duration: 1300 + Math.random() * 700, delay: i * 55, easing: 'cubic-bezier(.25,.6,.35,1)', fill: 'backwards' });
+      anim.onfinish = (function (k) { return function () { k.remove(); }; })(f);
+    }
+  }
+
+  /* Tastatur */
+  document.addEventListener('keydown', function (e) {
+    if (!P) return;
+    var k = e.key;
+    if (k === 'Escape') { e.preventDefault(); schliesse('knopf'); return; }
+    if (k === 'ArrowRight') { e.preventDefault(); vorwaerts(); return; }
+    if (k === 'ArrowLeft') { e.preventDefault(); zurueck(); return; }
+    if (k === 'ArrowDown' || k === 'PageDown') { e.preventDefault(); tagWechsel(1); return; }
+    if (k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); tagWechsel(-1); return; }
+    if (k === ' ' || k === 'Spacebar') {
+      if (e.target.closest && e.target.closest('button')) return;
+      e.preventDefault(); if (!zw) setzePause(!P.pause.nutzer); return;
+    }
+    if (k === 'Tab') {
+      var liste = $$('button', el.zwischen).concat([el.pause, el.zu, el.herz, el.pfeilL, el.pfeilR]).filter(function (b) { return b.offsetParent !== null && !b.disabled; });
+      if (!liste.length) return;
+      var i = liste.indexOf(document.activeElement);
+      e.preventDefault();
+      var n = e.shiftKey ? (i <= 0 ? liste.length - 1 : i - 1) : (i === -1 || i === liste.length - 1 ? 0 : i + 1);
+      liste[n].focus();
+    }
+  });
+
+  document.addEventListener('visibilitychange', function () { if (P) P.pause.versteckt = document.hidden; });
+  var groesseTimer = 0;
+  window.addEventListener('resize', function () {
+    clearTimeout(groesseTimer);
+    groesseTimer = setTimeout(function () { if (P) masse(); leistePfeile(); versteckeBlase(); }, 80);
+  });
+
+  K.onChange(function () {
+    /* schliesse('sofort') rendert selbst und setzt den Fokus – danach nicht noch einmal rendern (Fokus ginge verloren) */
+    if (P && P.tag > maxTag()) { schliesse('sofort'); return; }
+    if (P) pfeileAktualisieren();
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

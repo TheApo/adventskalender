@@ -1,0 +1,20 @@
+{
+  "name": "dein-adventskalender",
+  "version": "1.0.0",
+  "description": "Foto-Adventskalender für die Familie: jeden Tag im Advent ein Foto, zwölf Arten es zu öffnen. Rein statisch, ohne PHP.",
+  "license": "CC-BY-NC-4.0",
+  "author": "Dirk Aporius (https://www.apo-games.de)",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "bauen": "node werkzeuge/bauen.mjs",
+    "ansehen": "node werkzeuge/ansehen.mjs",
+    "demo": "node werkzeuge/demo-bauen.mjs"
+  },
+  "dependencies": {
+    "sharp": "0.35.5"
+  }
+}

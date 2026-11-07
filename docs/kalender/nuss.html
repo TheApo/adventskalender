@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Der Nussknacker – Dein Adventskalender</title>
+<link rel="stylesheet" href="../fonts/nuss.css">
+<style>
+:root{
+  --tisch:#2a1a10;     /* dunkle Eichenplatte, Bildansicht */
+  --holz:#d9a86c;      /* Buchenholz des Nussknackers */
+  --leinen:#efe5d2;    /* Leinentuch, helle Schrift */
+  --lack:#b8352b;      /* roter Drechslerlack */
+  --gold:#e8b84a;      /* die goldene Nuss */
+  --kerze:#ffd58f;     /* Kerzenschein */
+  --schrift-titel:'Young Serif','Iowan Old Style','Palatino Linotype',Georgia,serif;
+  --schrift-text:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
+  --schrift-zahl:'Bree Serif','Rockwell',Georgia,serif;
+}
+*{box-sizing:border-box}
+html{background:var(--tisch);-webkit-text-size-adjust:100%}
+html.ansicht-offen{overflow:hidden}
+/* Menü-Knopf aus kalender.js (#kalender-reset, runder 40-px-Knopf: Ansicht wechseln, Testmodus): kalender.js
+   setzt ihn fest unten links (Inline-Stil, nicht verschiebbar). Die Seite lässt unten genug Rand
+   (--menue-knopf-zone), damit am Seitenende nichts darunter liegt; in der Bildansicht ist er ausgeblendet. */
+html.ansicht-offen #kalender-reset{display:none}
+body{position:relative;margin:0;min-height:100vh;color:var(--leinen);font-family:var(--schrift-text);font-size:1.0625rem;line-height:1.5;overflow-x:clip}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(70% 42% at 12% 4%,rgba(255,196,110,.22),transparent 70%),
+    radial-gradient(90% 60% at 50% 110%,rgba(0,0,0,.5),transparent 70%),
+    repeating-linear-gradient(90deg,transparent 0 calc(25% - 2px),rgba(0,0,0,.32) calc(25% - 2px) 25%),
+    repeating-linear-gradient(91deg,rgba(255,222,170,.028) 0 3px,transparent 3px 11px,rgba(0,0,0,.06) 11px 13px,transparent 13px 23px,rgba(255,222,170,.02) 23px 24px,transparent 24px 37px),
+    linear-gradient(180deg,#3d2717 0%,var(--tisch) 46%,#1d120a 100%)}
+body.november::before{background:
+    radial-gradient(70% 42% at 12% 4%,rgba(255,196,110,.13),transparent 70%),
+    radial-gradient(90% 60% at 50% 110%,rgba(0,0,0,.55),transparent 70%),
+    repeating-linear-gradient(90deg,transparent 0 calc(25% - 2px),rgba(0,0,0,.32) calc(25% - 2px) 25%),
+    repeating-linear-gradient(91deg,rgba(255,222,170,.025) 0 3px,transparent 3px 11px,rgba(0,0,0,.06) 11px 13px,transparent 13px 23px),
+    linear-gradient(180deg,#33200f 0%,#25170d 46%,#190f08 100%)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--kerze);outline-offset:3px}
+/* Nach Tippen/Klicken setzt das Skript den Fokus weiter (Screenreader, spätere Tastaturbedienung) – der Ring
+   erscheint aber nur bei Tastaturbedienung (html.per-zeiger: letzte Eingabe war Finger, Maus oder Stift) */
+html.per-zeiger :focus-visible{outline:none}
+.unsichtbar{position:absolute!important;top:0;left:0;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+
+/* ---------- Seite ---------- */
+.seite{max-width:1320px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) calc(max(18px,env(safe-area-inset-bottom)) + 58px) max(14px,env(safe-area-inset-left))}
+.kopf{position:relative;text-align:center;padding:2px 6px 0}
+.kopf h1,.tafel h2,.a-text h2,.blase strong{font-variant-numeric:lining-nums}
+.kopf h1{margin:0;font-family:var(--schrift-titel);font-weight:400;font-size:clamp(1.7rem,7.2vw,2.75rem);line-height:1.08;letter-spacing:.005em;color:#f8ecd6;text-wrap:balance;text-shadow:0 2px 18px rgba(0,0,0,.55)}
+.heute-zeile{margin:.35rem 0 0;color:var(--kerze);font-size:1.02rem;text-wrap:balance}
+.lichterkette{display:none;position:absolute;left:-14px;right:-14px;top:-14px;height:34px;pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 70%,#fff1c2 0 2.4px,rgba(255,206,120,.55) 3.4px,transparent 8px) 0 0/58px 34px,
+    radial-gradient(150% 60% at 50% -20%,transparent 0 60%,rgba(60,40,20,.7) 61% 64%,transparent 65%) 0 0/58px 34px}
+body.fest .lichterkette{display:block}
+body.fest .kopf{padding-top:24px}
+
+.tisch{display:grid;grid-template-columns:minmax(0,1fr);row-gap:26px;margin-top:10px}
+.werkbank{position:relative;min-width:0}
+.werkbank::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(48% 34% at 14% 36%,rgba(255,190,105,.2),rgba(255,170,90,.07) 55%,transparent 75%)}
+
+/* ---------- Bühne mit Nussknacker ---------- */
+.buehne{--bw:min(100%,560px);position:relative;width:var(--bw);aspect-ratio:100/74;margin:0 auto;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.buehne canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* Nur Griff- und Nusszone fangen Touch-Gesten; König, Kerze und Brett lassen die Seite scrollen */
+.zone{position:absolute;z-index:1;-webkit-tap-highlight-color:transparent}
+.zone-griff{left:60%;top:0;right:0;height:52%;touch-action:none;cursor:grab}
+.zone-nuss{left:37%;top:28%;width:26%;height:48%}
+.buehne.scharf .zone-nuss{touch-action:none;cursor:grab}
+.buehne.scharf{cursor:pointer}
+.buehne.zieht,.buehne.zieht .zone{cursor:grabbing}
+.sagt{position:absolute;left:27%;top:8.5%;z-index:3;max-width:46%;padding:.28rem .7rem .34rem;border-radius:13px 13px 13px 4px;background:#fbf4e6;color:#3a200d;
+  font-family:var(--schrift-titel);font-size:clamp(.92rem,3.7vw,1.12rem);line-height:1.15;white-space:nowrap;box-shadow:0 8px 18px -8px rgba(0,0,0,.75);pointer-events:none;opacity:0;transform-origin:0 100%}
+.sagt::after{content:"";position:absolute;left:-7px;bottom:5px;border:7px solid transparent;border-left:0;border-right-color:#fbf4e6}
+.ton{position:absolute;left:0;top:0;z-index:3;display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:50%;cursor:pointer;
+  color:rgba(239,229,210,.62);background:rgba(239,229,210,.05);box-shadow:inset 0 0 0 1px rgba(239,229,210,.2);-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.ton::before{content:"";position:absolute;inset:-3px}
+.ton svg{width:21px;height:21px}
+.ton[aria-pressed="true"] .aus,.ton[aria-pressed="false"] .an{display:none}
+.ton:active{background:rgba(239,229,210,.14)}
+.knall{position:absolute;left:0;top:0;z-index:2;pointer-events:none;font-family:var(--schrift-titel);font-size:clamp(1.3rem,5.6vw,2.1rem);line-height:1;color:#fff3d6;white-space:nowrap;
+  text-shadow:0 0 1px #3a200d,0 2px 0 #3a200d,0 0 14px rgba(255,190,90,.65);opacity:0}
+
+.tafel{text-align:center;max-width:34rem;margin:4px auto 0;padding:0 4px}
+.tafel h2{margin:0 0 .2rem;font-family:var(--schrift-titel);font-weight:400;font-size:clamp(1.35rem,5.4vw,1.75rem);line-height:1.15;color:#f8ecd6;text-wrap:balance}
+.tafel p{margin:0 auto .85rem;max-width:30rem;color:rgba(239,229,210,.86);text-wrap:pretty}
+.knoepfe{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.tafel .knoepfe{margin:2px 0 14px}
+.knopf{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:48px;padding:.6rem 1.25rem;border:0;border-radius:14px;font-weight:700;font-size:1.04rem;line-height:1.1;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.knopf svg{width:1.35em;height:1.35em;flex:none}
+.knopf[hidden]{display:none}
+.knopf-lack{color:#fff4e2;background:linear-gradient(180deg,#d9503f 0%,var(--lack) 52%,#8e231a 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -2px 0 rgba(0,0,0,.25),0 8px 16px -8px rgba(0,0,0,.8)}
+.knopf-lack:active{transform:translateY(1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.25),0 4px 10px -6px rgba(0,0,0,.8)}
+.knopf-leinen{color:var(--leinen);background:rgba(239,229,210,.07);box-shadow:inset 0 0 0 1.5px rgba(239,229,210,.55)}
+.knopf-leinen:active{background:rgba(239,229,210,.15)}
+.knopf-klein{min-height:44px;padding:.45rem 1rem;font-size:.98rem;color:var(--kerze);background:rgba(239,229,210,.05);box-shadow:inset 0 0 0 1px rgba(232,184,74,.6)}
+.knopf-klein svg{width:1.2em;height:1.2em}
+
+/* ---------- Leinentuch mit Nüssen ---------- */
+.tuch-bereich{position:relative;min-width:0;max-width:640px;width:100%;margin:0 auto}
+.tuch-bereich h2{margin:0;font-family:var(--schrift-titel);font-weight:400;font-size:clamp(1.3rem,5vw,1.65rem);line-height:1.15;color:#f8ecd6}
+.legende{display:grid;grid-template-columns:repeat(2,max-content);gap:4px 22px;margin:.4rem 0 .9rem;padding:0;list-style:none;font-size:.95rem;color:rgba(239,229,210,.85)}
+.legende li{display:inline-flex;align-items:center;gap:6px}
+.legende li[hidden]{display:none}
+.legende svg,.legende .mini-offen{width:26px;height:26px;flex:none}
+.mini-offen{position:relative;display:inline-block}
+.mini-offen i{position:absolute;left:18%;top:6%;width:64%;height:58%;border-radius:2px;background:linear-gradient(135deg,#8fc0e0,#e9c27a);box-shadow:0 0 0 1.5px #f6ecd6}
+.mini-offen svg{position:absolute;bottom:0;width:58%;height:auto}
+.mini-offen svg:first-of-type{left:-4%;transform:rotate(-14deg)}
+.mini-offen svg:last-of-type{right:-4%;transform:scaleX(-1) rotate(-14deg)}
+
+.tuch{--sp:4;position:relative;display:grid;grid-template-columns:repeat(var(--sp),minmax(0,1fr));grid-auto-rows:clamp(68px,19.5vw,92px);
+  padding:38px clamp(10px,3.4vw,22px) 38px;border-radius:5px;color:#3a200d;
+  background:
+    linear-gradient(180deg,transparent 0 13px,rgba(184,53,43,.88) 13px 18px,transparent 18px 22px,rgba(184,53,43,.75) 22px 24px,transparent 24px) top/100% 30px no-repeat,
+    linear-gradient(0deg,transparent 0 13px,rgba(184,53,43,.88) 13px 18px,transparent 18px 22px,rgba(184,53,43,.75) 22px 24px,transparent 24px) bottom/100% 30px no-repeat,
+    repeating-linear-gradient(0deg,rgba(120,92,55,.075) 0 1px,transparent 1px 3px,rgba(120,92,55,.05) 3px 4px,transparent 4px 7px),
+    repeating-linear-gradient(90deg,rgba(120,92,55,.085) 0 1px,transparent 1px 3px,rgba(255,255,255,.12) 3px 4px,transparent 4px 9px),
+    repeating-linear-gradient(90deg,transparent 0 41px,rgba(120,92,55,.06) 41px 43px,transparent 43px 97px),
+    radial-gradient(120% 90% at 20% 0%,#f6eedd 0%,var(--leinen) 45%,#e2d4b9 100%);
+  box-shadow:0 22px 34px -18px rgba(0,0,0,.85),0 3px 0 rgba(0,0,0,.25),inset 0 0 0 1px rgba(255,255,255,.45),inset 0 0 30px rgba(120,90,50,.12)}
+.tuch::before{content:"";position:absolute;inset:6px;border:1.5px dashed rgba(140,100,60,.42);border-radius:3px;pointer-events:none}
+.nuss{position:relative;display:grid;place-items:center;min-width:0;min-height:56px;margin:0;padding:0;border:0;border-radius:26%;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transform:translate(var(--dx,0),var(--dy,0)) rotate(var(--r,0deg))}
+.nuss:focus-visible{outline:3px solid #7d2418;outline-offset:-2px}
+.figur{position:relative;display:block;width:min(88%,78px);aspect-ratio:1}
+.figur>svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 3px 2px rgba(70,40,15,.4))}
+.nuss-svg text{font-family:var(--schrift-zahl);font-size:33px;text-anchor:middle}
+.nuss-svg .z{fill:#3a200d;fill-opacity:.84}
+.nuss-svg .zl{fill:#ffe9c4;fill-opacity:.4}
+.nuss-svg.gold .z{fill:#5a3604;fill-opacity:.88}
+.nuss-svg.gold .zl{fill:#fff7d8;fill-opacity:.6}
+.z-heute .figur::before{content:"";position:absolute;inset:-22%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,214,120,.75),rgba(255,196,90,.32) 55%,rgba(255,196,90,0) 100%);animation:gluehen 2.6s ease-in-out 8}
+@keyframes gluehen{50%{opacity:.45;transform:scale(.9)}}
+.leer .figur::before{display:none}
+.z-heute.gefunden .figur::before{animation:none;inset:-34%;background:radial-gradient(closest-side,rgba(255,224,140,.95),rgba(255,196,90,.4) 55%,rgba(255,196,90,0) 100%)}
+.offen .foto{position:absolute;left:17%;top:3%;width:66%;height:66%;border-radius:3px;overflow:hidden;transform:rotate(-4deg);
+  background:repeating-linear-gradient(135deg,#e9dcc2 0 4px,#f3e9d6 4px 8px);box-shadow:0 0 0 2.5px #f8f0df,0 3px 5px 1px rgba(70,40,15,.38)}
+.offen .foto img{display:block;width:100%;height:100%;object-fit:cover;transition:opacity .3s ease-out}
+/* Vorschau lädt (echte Bilder kommen asynchron vom Server): Tagesfarbe unter den Leinenstreifen, das Bild
+   blendet erst nach dem Laden ein – nie ein leeres, schwarzes oder kaputtes Feld, keine Dauer-Animation */
+.offen .foto.laedt{background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.2) 0 4px,rgba(255,255,255,0) 4px 8px)}
+.offen .foto.laedt img{opacity:0;transition:none}
+.offen .schale{position:absolute;bottom:5%;width:51%;height:auto;filter:drop-shadow(0 2px 1.5px rgba(70,40,15,.45))}
+.offen .sl{left:-3%;transform:rotate(-16deg)}
+.offen .sr{right:-3%;transform:scaleX(-1) rotate(-14deg)}
+.offen .nr{position:absolute;right:-6%;top:-6%;min-width:25px;height:25px;padding:0 5px;border-radius:13px;display:grid;place-items:center;font-family:var(--schrift-zahl);font-size:14px;line-height:1;color:#3a200d;background:#f8f0df;box-shadow:0 0 0 1.5px rgba(140,100,60,.55),0 2px 3px rgba(70,40,15,.3)}
+.mulde{position:absolute;inset:12% 8% 8%;border-radius:50%;display:grid;place-items:center;font-family:var(--schrift-zahl);font-size:20px;color:rgba(120,85,45,.55);
+  background:radial-gradient(closest-side,rgba(110,80,45,.26),rgba(110,80,45,.12) 70%,transparent);box-shadow:inset 0 2px 4px rgba(90,60,30,.18)}
+.z-heute.leer .mulde{color:#8a5d12;background:radial-gradient(closest-side,rgba(232,184,74,.32),rgba(232,184,74,.12) 70%,transparent);box-shadow:inset 0 2px 4px rgba(90,60,30,.18),0 0 0 1.5px rgba(193,142,44,.55)}
+.neu .figur{animation:aufploppen .5s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes aufploppen{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.zurueckrollen .figur{animation:zurueckrollen .7s cubic-bezier(.3,.7,.3,1)}
+@keyframes zurueckrollen{0%{transform:none}28%{transform:translate(9px,-5px) rotate(38deg)}58%{transform:translate(-4px,0) rotate(-14deg)}80%{transform:translate(2px,0) rotate(6deg)}100%{transform:none}}
+.hopst .figur{animation:hopsen .9s cubic-bezier(.3,.7,.3,1)}
+@keyframes hopsen{0%,100%{transform:none}20%{transform:translateY(-16px) scale(1.08)}40%{transform:translateY(0) scale(1.03,.95)}58%{transform:translateY(-9px) scale(1.05)}76%{transform:none}}
+.kaputt{background:repeating-linear-gradient(135deg,#d9c7a6 0 5px,#ebdfc6 5px 10px)!important}
+
+.blase{position:absolute;z-index:20;width:max-content;max-width:min(270px,88%);padding:.55rem .85rem .65rem;border-radius:14px;background:#fbf4e6;color:#3a200d;font-size:.95rem;line-height:1.3;box-shadow:0 12px 28px -10px rgba(0,0,0,.75);pointer-events:none;animation:blaseRein .3s cubic-bezier(.2,.9,.3,1.25)}
+.blase strong{display:block;font-family:var(--schrift-titel);font-weight:400;font-size:1.22rem;line-height:1.15;margin-bottom:.1rem}
+.blase::after{content:"";position:absolute;top:100%;left:var(--pfeil,50%);margin-left:-8px;border:8px solid transparent;border-top-color:#fbf4e6}
+.blase.unten::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#fbf4e6}
+.blase[hidden]{display:none}
+@keyframes blaseRein{from{opacity:0;transform:translateY(6px) scale(.94)}to{opacity:1;transform:none}}
+
+.flug{position:fixed;left:0;top:0;z-index:40;pointer-events:none;will-change:transform}
+.flug svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 5px rgba(0,0,0,.4))}
+
+/* ---------- Bildansicht: das ausgerollte Pergament ---------- */
+.ansicht{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;overflow:hidden;background:transparent;color:var(--leinen)}
+.ansicht::backdrop{background:transparent}
+.a-hg{position:absolute;inset:0;
+  background:
+    radial-gradient(70% 48% at 50% 40%,rgba(255,196,110,.2),transparent 70%),
+    repeating-linear-gradient(91deg,rgba(255,222,170,.03) 0 3px,transparent 3px 11px,rgba(0,0,0,.07) 11px 13px,transparent 13px 23px),
+    radial-gradient(90% 70% at 50% 40%,#4a2f1b 0%,#2e1c10 60%,#170e07 100%)}
+.a-innen{position:relative;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:6px;
+  padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.a-kopf{display:flex;align-items:center;gap:10px;min-height:50px;max-width:1100px;width:100%;margin:0 auto}
+.a-zaehler{flex:1;min-width:0;margin:0 0 0 4px;font-size:.98rem;color:var(--kerze);white-space:nowrap}
+.a-buehne{position:relative;min-height:0;overflow:hidden;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none;cursor:grab}
+.spur{position:absolute;inset:0}
+.papier{position:absolute;left:0;top:0;--rh:14px;--pad:10px}
+.blatt{position:absolute;left:0;right:0;top:calc(var(--rh) / 2);bottom:calc(var(--rh) / 2);padding:var(--pad);
+  background:
+    radial-gradient(120% 80% at 30% 20%,rgba(255,255,255,.5),transparent 60%),
+    repeating-linear-gradient(0deg,rgba(150,115,70,.05) 0 1px,transparent 1px 4px),
+    linear-gradient(180deg,#f6ecd8,#eadcc0);
+  box-shadow:0 22px 40px -14px rgba(0,0,0,.8),inset 0 0 18px rgba(150,110,60,.25)}
+.blatt img{display:block;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none;user-select:none;pointer-events:none;background:#e9dcc2}
+.blatt img[hidden]{display:none}
+.rolle{position:absolute;left:-7px;right:-7px;height:var(--rh);border-radius:calc(var(--rh) / 2);z-index:1;
+  background:linear-gradient(180deg,#fff9ec 0%,#efe1c4 38%,#cfb68c 78%,#a88b60 100%);box-shadow:0 3px 6px rgba(0,0,0,.4)}
+.rolle::before,.rolle::after{content:"";position:absolute;top:0;width:var(--rh);height:var(--rh);border-radius:50%;
+  background:radial-gradient(circle,#b89a6c 0 12%,#f3e6cb 14% 30%,#c9ad80 32% 40%,#f3e6cb 42% 58%,#c9ad80 60% 66%,#efe1c4 68%)}
+.rolle::before{left:0}.rolle::after{right:0}
+.rolle.oben{top:0}.rolle.unten{bottom:0}
+.rolle .band{position:absolute;left:50%;top:-2px;bottom:-2px;width:9px;margin-left:-4.5px;border-radius:2px;background:linear-gradient(90deg,#8e231a,#d9503f 50%,#8e231a);opacity:0}
+.zu-gerollt .rolle.unten .band{opacity:1}
+.a-laden{position:absolute;inset:var(--pad);display:grid;place-items:center;align-content:center;gap:10px;text-align:center;padding:12px;color:#6a4a2a;font-size:1rem;
+  background:repeating-linear-gradient(135deg,#e9dcc2 0 10px,#efe4cf 10px 20px)}
+.a-laden[hidden]{display:none}
+.a-laden>svg{width:46px;height:46px;animation:drehen 1.1s linear infinite}
+@keyframes drehen{to{transform:rotate(360deg)}}
+/* Ladeanzeige erst nach kurzer Wartezeit – schnell geladene Fotos sollen sie nicht aufblitzen lassen */
+.a-laden.laedt>*{animation:spaetEin .25s ease-out .3s both}
+.a-laden.laedt>svg{animation:drehen 1.1s linear infinite,spaetEin .25s ease-out .3s both}
+@keyframes spaetEin{from{opacity:0}to{opacity:1}}
+.a-laden p{margin:0;max-width:20rem;text-wrap:balance}
+.a-laden .knopf{color:#fff4e2}
+.a-status{position:absolute;left:0;right:0;text-align:center;font-size:.95rem;color:var(--kerze);pointer-events:none}
+.a-status[hidden]{display:none}
+.a-fuss{display:grid;grid-template-columns:52px minmax(0,1fr) 52px;align-items:center;gap:8px;max-width:780px;width:100%;margin:0 auto}
+.a-text{text-align:center;min-width:0}
+.a-text h2{margin:0;font-family:var(--schrift-titel);font-weight:400;font-size:clamp(1.25rem,4.8vw,1.75rem);line-height:1.15;color:#f8ecd6;text-wrap:balance}
+.a-text p{margin:.15rem 0 0;color:var(--kerze);font-size:.98rem}
+.rund{display:grid;place-items:center;width:52px;height:52px;flex:none;padding:0;border:0;border-radius:50%;cursor:pointer;color:var(--leinen);background:rgba(239,229,210,.08);box-shadow:inset 0 0 0 1.5px rgba(232,184,74,.8);-webkit-tap-highlight-color:transparent}
+.rund svg{width:24px;height:24px}
+.rund:disabled{opacity:.3;cursor:default}
+.rund:not(:disabled):active{background:rgba(239,229,210,.16)}
+.a-nochmal{min-height:44px;padding:.4rem .9rem}
+@media (max-width:380px){.a-nochmal{padding:.4rem .7rem;font-size:.92rem}.a-kopf{gap:8px}}
+/* Handy quer: Pfeile und Texte an die Seiten, das Foto nutzt die volle Höhe */
+@media (max-height:500px) and (orientation:landscape){
+  .a-innen{grid-template-columns:clamp(116px,23vw,250px) minmax(0,1fr) clamp(116px,23vw,250px);grid-template-rows:auto minmax(0,1fr) auto;gap:6px 8px}
+  .a-kopf,.a-fuss{display:contents}
+  .a-zaehler{grid-column:1;grid-row:1;align-self:start;margin:4px 0 0 4px;white-space:normal}
+  #aZu{grid-column:3;grid-row:1;justify-self:end;align-self:start}
+  .a-nochmal{grid-column:3;grid-row:3;justify-self:end;align-self:end;max-width:100%;text-align:left}
+  #aVor{grid-column:1;grid-row:2;align-self:center;justify-self:start}
+  #aNach{grid-column:3;grid-row:2;align-self:center;justify-self:end}
+  .a-text{grid-column:1;grid-row:3;align-self:end;text-align:left;padding-left:4px}
+  .a-text h2{font-size:1.15rem}
+  .a-text p{font-size:.9rem}
+  .a-buehne{grid-column:2;grid-row:1/4}
+}
+
+/* ---------- Tablet & Desktop ---------- */
+@media (min-width:600px){
+  .legende{display:flex;flex-wrap:wrap}
+  .tuch{--sp:6;padding:40px 24px}
+  .tuch-bereich{max-width:660px}
+}
+@media (min-width:960px){
+  .seite{padding-left:max(28px,env(safe-area-inset-left));padding-right:max(28px,env(safe-area-inset-right));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+  .tisch{grid-template-columns:minmax(0,1.06fr) minmax(0,1fr);align-items:start;column-gap:clamp(28px,4vw,64px);margin-top:14px}
+  .tuch-bereich{margin-top:clamp(8px,3vh,34px)}
+  .buehne{--bw:min(100%,660px,calc((100vh - 320px) * 1.351))}
+  @supports (height:100svh){.buehne{--bw:min(100%,660px,calc((100svh - 320px) * 1.351))}}
+  .tuch-bereich{max-width:620px}
+  .tuch{grid-auto-rows:clamp(76px,7.4vw,96px)}
+}
+/* Schmaler Desktop/Tablet quer: Die Tafel-Texte reichen hier bis an den linken Rand – unten links die Ecke des
+   Menü-Knopfs (--menue-knopf-zone) freihalten, die Bühne rechnet den Platz mit ein (sonst läge der Knopf über Text) */
+@media (min-width:960px) and (max-width:1129px){
+  .werkbank{padding-bottom:44px}
+  .buehne{--bw:min(100%,660px,calc((100vh - 364px) * 1.351))}
+  @supports (height:100svh){.buehne{--bw:min(100%,660px,calc((100svh - 364px) * 1.351))}}
+}
+/* Handy quer: Bühne so klein, dass Nussknacker und goldene Nuss ohne Scrollen zu sehen sind */
+@media (max-height:500px) and (orientation:landscape) and (max-width:959px){
+  .buehne{--bw:min(100%,560px,calc((100vh - 104px) * 1.351))}
+  @supports (height:100svh){.buehne{--bw:min(100%,560px,calc((100svh - 104px) * 1.351))}}
+}
+@media (prefers-reduced-motion:reduce){
+  .z-heute .figur::before{animation:none}
+  .neu .figur,.zurueckrollen .figur,.hopst .figur,.blase{animation:none}
+  .a-laden>svg,.a-laden.laedt>svg{animation-duration:3s}
+}
+</style>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="g-braun" cx="38%" cy="30%" r="78%"><stop offset="0" stop-color="#d9a066"/><stop offset=".42" stop-color="#a5683a"/><stop offset=".82" stop-color="#6c3f1e"/><stop offset="1" stop-color="#4a2a12"/></radialGradient>
+    <radialGradient id="g-gold" cx="38%" cy="30%" r="78%"><stop offset="0" stop-color="#fff4c8"/><stop offset=".3" stop-color="#f3cd62"/><stop offset=".72" stop-color="#c18e2c"/><stop offset="1" stop-color="#7c5512"/></radialGradient>
+    <linearGradient id="g-narbe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8c09a"/><stop offset="1" stop-color="#a5865c"/></linearGradient>
+    <linearGradient id="g-narbe-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e6ad"/><stop offset="1" stop-color="#c79f45"/></linearGradient>
+    <pattern id="p-narbe" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".75" fill="rgba(90,60,30,.35)"/><circle cx="3.5" cy="3.2" r=".6" fill="rgba(255,250,235,.45)"/></pattern>
+    <radialGradient id="g-glanz"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="g-band" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e5604f"/><stop offset=".55" stop-color="#b8352b"/><stop offset="1" stop-color="#7f1f16"/></linearGradient>
+    <linearGradient id="g-schale" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5683a"/><stop offset="1" stop-color="#5a3317"/></linearGradient>
+    <radialGradient id="g-innen" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#f6e7c8"/><stop offset="1" stop-color="#d2b384"/></radialGradient>
+  </defs>
+  <symbol id="nuss-braun" viewBox="0 0 100 100">
+    <path d="M50 8.5C55.5 8.5 60.5 12 64.5 16.5C76.5 25.5 85 39.5 85 56.5C85 76.5 69.5 91 50 91C30.5 91 15 76.5 15 56.5C15 39.5 23.5 25.5 35.5 16.5C39.5 12 44.5 8.5 50 8.5Z" fill="url(#g-braun)"/>
+    <g fill="none" stroke="#4a2a12" stroke-opacity=".24" stroke-width="1.4" stroke-linecap="round"><path d="M50 10C42 27 37.5 47 39.5 75"/><path d="M50 10C58 27 62.5 47 60.5 75"/><path d="M48 11C34 25 26.5 42 26 64"/><path d="M52 11C66 25 73.5 42 74 64"/></g>
+    <path d="M19.5 69C29 79.5 71 79.5 80.5 69C77 83 65 91 50 91C35 91 23 83 19.5 69Z" fill="url(#g-narbe)"/>
+    <path d="M19.5 69C29 79.5 71 79.5 80.5 69C77 83 65 91 50 91C35 91 23 83 19.5 69Z" fill="url(#p-narbe)"/>
+    <path d="M19.5 69C29 79.5 71 79.5 80.5 69" fill="none" stroke="#5a3418" stroke-opacity=".45" stroke-width="1.2"/>
+    <ellipse cx="35" cy="31" rx="10" ry="15" transform="rotate(-24 35 31)" fill="url(#g-glanz)" opacity=".75"/>
+    <path d="M46 13.5C47.6 9.5 48.8 6.2 50 4.5C51.2 6.2 52.4 9.5 54 13.5C52 12.6 48 12.6 46 13.5Z" fill="#4a2a12"/>
+  </symbol>
+  <symbol id="nuss-gold" viewBox="0 0 100 100">
+    <path d="M50 8.5C55.5 8.5 60.5 12 64.5 16.5C76.5 25.5 85 39.5 85 56.5C85 76.5 69.5 91 50 91C30.5 91 15 76.5 15 56.5C15 39.5 23.5 25.5 35.5 16.5C39.5 12 44.5 8.5 50 8.5Z" fill="url(#g-gold)"/>
+    <g fill="none" stroke="#7c5512" stroke-opacity=".3" stroke-width="1.4" stroke-linecap="round"><path d="M50 10C42 27 37.5 47 39.5 75"/><path d="M50 10C58 27 62.5 47 60.5 75"/><path d="M48 11C34 25 26.5 42 26 64"/><path d="M52 11C66 25 73.5 42 74 64"/></g>
+    <path d="M19.5 69C29 79.5 71 79.5 80.5 69C77 83 65 91 50 91C35 91 23 83 19.5 69Z" fill="url(#g-narbe-gold)"/>
+    <path d="M19.5 69C29 79.5 71 79.5 80.5 69C77 83 65 91 50 91C35 91 23 83 19.5 69Z" fill="url(#p-narbe)"/>
+    <ellipse cx="35" cy="31" rx="10" ry="15" transform="rotate(-24 35 31)" fill="url(#g-glanz)"/>
+    <path d="M46 13.5C47.6 9.5 48.8 6.2 50 4.5C51.2 6.2 52.4 9.5 54 13.5C52 12.6 48 12.6 46 13.5Z" fill="#8a5d12"/>
+    <path fill="#fffbe8" d="M74 22c.6 3 .9 3.3 4 4-3.1.7-3.4 1-4 4-.6-3-.9-3.3-4-4 3.1-.7 3.4-1 4-4Z"/>
+    <path fill="#fffbe8" d="M26 45c.4 2 .6 2.2 2.7 2.7-2.1.5-2.3.7-2.7 2.7-.4-2-.6-2.2-2.7-2.7 2.1-.5 2.3-.7 2.7-2.7Z"/>
+  </symbol>
+  <symbol id="schleife" viewBox="0 0 100 100">
+    <path d="M48 16L38.5 33.5L44.5 31L46.5 36.5L51.5 17Z" fill="url(#g-band)"/>
+    <path d="M52 16L61.5 33.5L55.5 31L53.5 36.5L48.5 17Z" fill="url(#g-band)"/>
+    <path d="M50 15C43 3 27 1 27.5 10.5C28 19.5 41 20.5 50 15Z" fill="url(#g-band)"/>
+    <path d="M50 15C57 3 73 1 72.5 10.5C72 19.5 59 20.5 50 15Z" fill="url(#g-band)"/>
+    <path d="M47 14C42 8 34 6.5 33 10C35 9.5 41 10.5 47 14ZM53 14C58 8 66 6.5 67 10C65 9.5 59 10.5 53 14Z" fill="#7f1f16" opacity=".55"/>
+    <ellipse cx="50" cy="15.5" rx="4.6" ry="3.8" fill="#c8402f"/>
+    <ellipse cx="48.8" cy="14.3" rx="1.6" ry="1" fill="#ffb3a0" opacity=".7"/>
+  </symbol>
+  <symbol id="schale" viewBox="0 0 100 64">
+    <path d="M4 24C5 47 26 61 50 61C74 61 95 47 96 24Z" fill="url(#g-schale)"/>
+    <path d="M14 34C24 50 76 50 86 34" fill="none" stroke="#3e220e" stroke-opacity=".3" stroke-width="2"/>
+    <ellipse cx="50" cy="24" rx="46" ry="12" fill="url(#g-innen)"/>
+    <ellipse cx="50" cy="26" rx="37" ry="7.5" fill="#9c7444" opacity=".32"/>
+    <path d="M4 24L11 21.5L17 25L24 21L31 24.5L38 21.5L45 25L52 21L59 24.5L66 21.5L73 25L80 21.5L87 24.5L96 24" fill="none" stroke="#5a3317" stroke-width="1.6" stroke-linejoin="round" opacity=".7"/>
+  </symbol>
+  <symbol id="i-hebel" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6 20V8"/><path d="M6 8l12 3.5"/><circle cx="19.5" cy="12" r="1.8"/><path d="M12 15.5v1.5"/><ellipse cx="12" cy="18.2" rx="2.4" ry="1.6"/></g></symbol>
+  <symbol id="i-suchen" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/><path d="M10.5 7.5v6M7.5 10.5h6" stroke-width="1.6"/></g></symbol>
+  <symbol id="i-bild" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1.5"/><path d="M4 16l4.5-4.5 4 4 2.5-2.5L20 18"/><circle cx="15.5" cy="9.5" r="1.4"/></g></symbol>
+  <symbol id="i-nochmal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 4.5V9h4.5"/></g></symbol>
+  <symbol id="i-zurueck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 20h14"/></g></symbol>
+  <symbol id="i-zu" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-links" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-rechts" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="seite">
+  <header class="kopf">
+    <div class="lichterkette" aria-hidden="true"></div>
+    <h1>Dein Adventskalender</h1>
+    <p class="heute-zeile" id="heuteZeile"></p>
+  </header>
+
+  <main class="tisch">
+    <section class="werkbank" aria-labelledby="bankTitel">
+      <div class="buehne" id="buehne">
+        <canvas id="leinwand" role="img" aria-label="Hölzerner Nussknacker"></canvas>
+        <div class="zone zone-griff" aria-hidden="true"></div>
+        <div class="zone zone-nuss" aria-hidden="true"></div>
+        <div class="knall" id="knall" aria-hidden="true"></div>
+        <div class="sagt" id="sagt" aria-hidden="true"></div>
+        <button type="button" class="ton" id="bTon" aria-pressed="true" aria-label="Knackgeräusch" title="Knackgeräusch an oder aus"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" fill="currentColor" fill-opacity=".18"/><g class="an"><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.2 6.8a7.4 7.4 0 0 1 0 10.4"/></g><g class="aus"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g></g></svg></button>
+      </div>
+      <div class="tafel">
+        <div class="knoepfe">
+          <button type="button" class="knopf knopf-lack" id="bKnacken" hidden><svg aria-hidden="true"><use href="#i-hebel"/></svg><span>Knacken</span></button>
+          <button type="button" class="knopf knopf-lack" id="bFinden" hidden><svg aria-hidden="true"><use href="#i-suchen"/></svg><span>Heute finden</span></button>
+          <button type="button" class="knopf knopf-lack" id="bAnsehen" hidden><svg aria-hidden="true"><use href="#i-bild"/></svg><span>Foto ansehen</span></button>
+          <button type="button" class="knopf knopf-lack" id="bUebung" hidden><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Neue Übungsnuss</span></button>
+          <button type="button" class="knopf knopf-leinen" id="bNochmal" hidden><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Nochmal knacken</span></button>
+          <button type="button" class="knopf knopf-leinen" id="bZurueck" hidden><svg aria-hidden="true"><use href="#i-zurueck"/></svg><span>Zurücklegen</span></button>
+          <button type="button" class="knopf knopf-klein" id="bNachholen" hidden><svg viewBox="0 0 100 40" aria-hidden="true"><use href="#schleife" x="0" y="0" width="100" height="100"/></svg><span></span></button>
+        </div>
+        <h2 id="bankTitel">Der Nussknacker</h2>
+        <p id="bankText"></p>
+      </div>
+    </section>
+
+    <section class="tuch-bereich" id="tuchBereich" aria-labelledby="tuchTitel">
+      <h2 id="tuchTitel">Das Nusstuch</h2>
+      <ul class="legende" aria-label="Zeichenerklärung">
+        <li id="lgHeute"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-gold"/></svg>Heute</li>
+        <li id="lgNach"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-braun"/><use href="#schleife"/></svg>Nachholen</li>
+        <li id="lgOffen"><span class="mini-offen" aria-hidden="true"><i></i><svg viewBox="0 0 100 64"><use href="#schale"/></svg><svg viewBox="0 0 100 64"><use href="#schale"/></svg></span>Offen</li>
+        <li id="lgZu"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-braun"/></svg>Kommt noch</li>
+      </ul>
+      <div class="tuch" id="tuch"></div>
+      <div class="blase" id="blase" hidden></div>
+    </section>
+  </main>
+</div>
+<div id="flugraum" aria-hidden="true"></div>
+<p class="unsichtbar" id="ansage" role="status" aria-live="polite"></p>
+
+<dialog class="ansicht" id="ansicht" aria-labelledby="aTitel">
+  <div class="a-hg" id="aHg"></div>
+  <div class="a-innen">
+    <div class="a-kopf" id="aKopf">
+      <p class="a-zaehler" id="aZaehler"></p>
+      <button type="button" class="knopf knopf-klein a-nochmal" id="aNochmal"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Nochmal knacken</span></button>
+      <button type="button" class="rund" id="aZu" aria-label="Bildansicht schließen"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+    </div>
+    <div class="a-buehne" id="aBuehne">
+      <div class="spur" id="spur">
+        <div class="papier" id="papier">
+          <div class="rolle oben"></div>
+          <div class="blatt" id="blatt">
+            <img id="aBild" alt="" draggable="false" hidden>
+            <div class="a-laden" id="aLaden" hidden></div>
+          </div>
+          <div class="rolle unten" id="rolleUnten"><span class="band"></span></div>
+        </div>
+        <p class="a-status" id="aStatus" hidden>Das Foto wird geladen …</p>
+      </div>
+    </div>
+    <div class="a-fuss" id="aFuss">
+      <button type="button" class="rund" id="aVor" aria-label="Vorheriges Foto"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
+      <div class="a-text"><h2 id="aTitel"></h2><p id="aDatum"></p></div>
+      <button type="button" class="rund" id="aNach" aria-label="Nächstes Foto"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
+    </div>
+  </div>
+</dialog>
+
+<script src="../shared/start.js" data-ansicht="nuss"></script>
+<script src="../shared/kalender.js"></script>
+<script src="../shared/fotos.js"></script>
+<script>
+(function () {
+  'use strict';
+  var K = window.Kalender.init('nuss');
+  var F = window.Fotos;
+  var REDUZIERT = !!K.bewegungReduziert;
+  var DPR = Math.min(2, window.devicePixelRatio || 1);
+  var TAU = Math.PI * 2, GRAD = Math.PI / 180;
+  function $(s) { return document.getElementById(s); }
+  var el = {
+    heuteZeile: $('heuteZeile'), buehne: $('buehne'), lw: $('leinwand'), knall: $('knall'), sagt: $('sagt'), bTon: $('bTon'),
+    titel: $('bankTitel'), text: $('bankText'),
+    bKnacken: $('bKnacken'), bFinden: $('bFinden'), bAnsehen: $('bAnsehen'), bUebung: $('bUebung'),
+    bNochmal: $('bNochmal'), bZurueck: $('bZurueck'), bNachholen: $('bNachholen'),
+    tuchBereich: $('tuchBereich'), tuch: $('tuch'), blase: $('blase'), flugraum: $('flugraum'), ansage: $('ansage'),
+    dlg: $('ansicht'), aHg: $('aHg'), aKopf: $('aKopf'), aFuss: $('aFuss'), aZaehler: $('aZaehler'), aNochmal: $('aNochmal'), aZu: $('aZu'),
+    aBuehne: $('aBuehne'), spur: $('spur'), papier: $('papier'), blatt: $('blatt'), aBild: $('aBild'), aLaden: $('aLaden'),
+    rolleUnten: $('rolleUnten'), aStatus: $('aStatus'), aTitel: $('aTitel'), aDatum: $('aDatum'), aVor: $('aVor'), aNach: $('aNach')
+  };
+
+  /* ================================================================
+     Hilfen
+     ================================================================ */
+  function zufall(seed) {
+    var a = seed >>> 0;
+    return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function klemme(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function leinwand(w, h) { var c = document.createElement('canvas'); c.width = Math.max(1, w); c.height = Math.max(1, h); return c; }
+  function sage(text) { el.ansage.textContent = ''; setTimeout(function () { el.ansage.textContent = text; }, 40); }
+  function vibriere(m) { if (REDUZIERT) return; try { if (navigator.vibrate) navigator.vibrate(m); } catch (e) { /* egal */ } }
+  function fokus(b) { if (!b || b.hidden) return; try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
+  // Letzte Eingabeart merken: Fokusring nur bei Tastatur (Chrome zeigt ihn sonst auch nach focus() aus dem Skript)
+  document.addEventListener('pointerdown', function () { document.documentElement.classList.add('per-zeiger'); }, true);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
+    document.documentElement.classList.remove('per-zeiger');
+  }, true);
+  function noop() {}
+  function merkeLesen(k, d) { try { var v = window.localStorage.getItem('adventskalender:nuss:' + k); return v === null ? d : v; } catch (e) { return d; } }
+  function merkeSchreiben(k, v) { try { window.localStorage.setItem('adventskalender:nuss:' + k, String(v)); } catch (e) { /* egal */ } }
+  // Bildunterschrift kann leer sein (echte Bilder ohne Eintrag in texte.txt) – nie „undefined“ zeigen
+  function bildTitel(t) { var s; try { s = F.titel(t); } catch (e) { s = ''; } return typeof s === 'string' ? s.trim() : ''; }
+  // Seitenverhältnis (Breite/Höhe) für den Ladezustand: echte Maße, falls fotos.js sie kennt, sonst aus dem Format
+  function seitenVerhaeltnis(t) {
+    var m = null;
+    try { m = typeof F.masse === 'function' ? F.masse(t) : null; } catch (e) { m = null; }
+    if (m && m.w > 0 && m.h > 0) return klemme(m.w / m.h, 0.25, 4);
+    var f = ''; try { f = F.format ? F.format(t) : ''; } catch (e) { f = ''; }
+    return f === 'hoch' ? 2 / 3 : 1;
+  }
+  function tagesFarbe(t) { var c = ''; try { c = F.farbe ? F.farbe(t) : ''; } catch (e) { c = ''; } return /^#[0-9a-f]{3,8}$/i.test(c || '') ? c : '#d9b48a'; }
+
+  /* ================================================================
+     Ton: leises Knacken, erst nach der ersten Berührung, abschaltbar
+     ================================================================ */
+  var ton = { an: merkeLesen('ton', '1') !== '0', ctx: null, rauschen: null };
+  function tonKontext() {
+    if (!ton.an) return null;
+    try {
+      if (!ton.ctx) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ton.ctx = new AC(); }
+      if (ton.ctx.state === 'suspended') ton.ctx.resume();
+      if (!ton.rauschen) {
+        var n = Math.floor(ton.ctx.sampleRate * 0.25), b = ton.ctx.createBuffer(1, n, ton.ctx.sampleRate), d = b.getChannelData(0);
+        for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+        ton.rauschen = b;
+      }
+      return ton.ctx;
+    } catch (e) { return null; }
+  }
+  function tonKlick(c, t0, laut, freq, dauer) {
+    var q = c.createBufferSource(), f = c.createBiquadFilter(), v = c.createGain();
+    q.buffer = ton.rauschen; f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 1.2;
+    v.gain.setValueAtTime(laut, t0); v.gain.exponentialRampToValueAtTime(0.0001, t0 + dauer);
+    q.connect(f); f.connect(v); v.connect(c.destination);
+    q.start(t0, Math.random() * 0.2, dauer + 0.02);
+  }
+  function tonHolz(c, t0, f0, f1, laut, dauer) {
+    var o = c.createOscillator(), v = c.createGain();
+    o.type = 'triangle'; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(f1, t0 + dauer * 0.7);
+    v.gain.setValueAtTime(0.0001, t0); v.gain.exponentialRampToValueAtTime(laut, t0 + 0.004); v.gain.exponentialRampToValueAtTime(0.0001, t0 + dauer);
+    o.connect(v); v.connect(c.destination); o.start(t0); o.stop(t0 + dauer + 0.02);
+  }
+  function knackTon(staerke) {
+    var c = tonKontext(); if (!c) return;
+    try {
+      var t0 = c.currentTime + 0.005, n = staerke > 1 ? 7 : 3, s = Math.min(1.4, staerke), t = t0;
+      for (var i = 0; i < n; i++) { tonKlick(c, t, (0.2 - i * 0.02) * s, 1700 + Math.random() * 2000, 0.025 + Math.random() * 0.03); t += 0.01 + Math.random() * (staerke > 1 ? 0.03 : 0.016); }
+      tonHolz(c, t0, staerke > 1 ? 200 : 250, 85, 0.08 * s, 0.12);
+    } catch (e) { /* ohne Ton */ }
+  }
+  function tockTon(hoch) {
+    var c = tonKontext(); if (!c) return;
+    try { tonHolz(c, c.currentTime + 0.005, hoch ? 520 : 340, hoch ? 300 : 170, 0.06, 0.09); } catch (e) { /* ohne Ton */ }
+  }
+  function tonEntsperren() {
+    if (ton.ctx || !ton.an) return;
+    var c = tonKontext();
+    if (c) { try { var s = c.createBufferSource(); s.buffer = c.createBuffer(1, 1, 22050); s.connect(c.destination); s.start(0); } catch (e) { /* egal */ } }
+  }
+  document.addEventListener('pointerup', tonEntsperren, true);
+  document.addEventListener('keydown', tonEntsperren, true);
+  function tonKnopf() { el.bTon.setAttribute('aria-pressed', ton.an ? 'true' : 'false'); el.bTon.title = ton.an ? 'Knackgeräusch ist an – zum Ausschalten tippen' : 'Knackgeräusch ist aus – zum Einschalten tippen'; }
+  el.bTon.addEventListener('click', function () {
+    ton.an = !ton.an; merkeSchreiben('ton', ton.an ? '1' : '0'); tonKnopf();
+    if (ton.an) knackTon(0.6);
+    sage(ton.an ? 'Knackgeräusch an.' : 'Knackgeräusch aus.');
+  });
+  tonKnopf();
+
+  function anordnung() {
+    var r = K.reihenfolge ? K.reihenfolge() : null, ok = r && r.length === 24, i, gesehen = {};
+    if (ok) for (i = 0; i < 24; i++) { if (!(r[i] >= 1 && r[i] <= 24) || gesehen[r[i]]) ok = false; gesehen[r[i]] = 1; }
+    if (ok) return r;
+    r = []; for (i = 1; i <= 24; i++) r.push(i); return r;
+  }
+  function zustand(t) {
+    if (!K.darfOeffnen(t)) return 'zu';
+    if (K.istGeoeffnet(t)) return 'offen';
+    return t === K.heute() ? 'heute' : 'verpasst';
+  }
+  function juengsterVerpasst(ausser) {
+    for (var d = Math.min(24, K.heute()); d >= 1; d--) if (zustand(d) === 'verpasst' && d !== ausser) return d;
+    return 0;
+  }
+
+  // Fensterweit scrollen (nicht scrollIntoView: die Übersichtsseite soll nicht mitscrollen); löst aus, wenn angekommen
+  function scrolleZu(y) {
+    return new Promise(function (fertig) {
+      var ziel = Math.max(0, Math.min(Math.round(y), document.documentElement.scrollHeight - window.innerHeight));
+      if (Math.abs(window.scrollY - ziel) < 2) { fertig(false); return; }
+      var erledigt = false, uhr = 0;
+      function ende() { if (erledigt) return; erledigt = true; clearTimeout(uhr); window.removeEventListener('scrollend', ende); fertig(true); }
+      window.addEventListener('scrollend', ende);
+      uhr = setTimeout(ende, REDUZIERT ? 80 : 700);
+      try { window.scrollTo({ top: ziel, behavior: REDUZIERT ? 'auto' : 'smooth' }); } catch (x) { window.scrollTo(0, ziel); }
+      (function warte() { if (erledigt) return; if (Math.abs(window.scrollY - ziel) < 2) { ende(); return; } requestAnimationFrame(warte); })();
+    });
+  }
+  function zurBuehne() {
+    var r = el.lw.getBoundingClientRect(), vh = window.innerHeight;
+    if (r.top >= -r.height * 0.08 && r.bottom <= vh + r.height * 0.12) return Promise.resolve(false);
+    return scrolleZu(window.scrollY + r.top - 12);
+  }
+
+  /* ================================================================
+     Bilder: immer über Image + onload/decode, Fehler abfangen.
+     Große Bilder (F.bild) nur bei Bedarf: wenn eine Nuss im Knacker liegt, beim Platzen und in der
+     Bildansicht (dort zusätzlich die beiden Nachbarn). Gesperrte Tage werden nie angefragt.
+     ================================================================ */
+  var bildCache = {};
+  function ladeBild(t) {
+    var c = bildCache[t];
+    if (c && c.status !== 'fehler') return c.promise;
+    c = bildCache[t] = { status: 'laden' };
+    c.promise = new Promise(function (ok, fail) {
+      var quelle;
+      if (!(t >= 1 && t <= 24) || !K.darfOeffnen(t)) { fail(new Error('Tag gesperrt')); return; }
+      try { quelle = F.bild(t); } catch (e) { fail(e); return; }
+      Promise.resolve(quelle).then(function (url) {
+        if (!url) { fail(new Error('keine Bildadresse')); return; }
+        var img = new Image();
+        img.decoding = 'async';
+        img.onload = function () {
+          var fertig = function () { ok({ url: url, w: img.naturalWidth || 1, h: img.naturalHeight || 1 }); };
+          if (img.decode) img.decode().then(fertig, fertig); else fertig();
+        };
+        img.onerror = function () { fail(new Error('Bild nicht ladbar')); };
+        img.src = url;
+      }, fail);
+    }).then(function (d) { c.status = 'ok'; c.daten = d; return d; }, function (e) { c.status = 'fehler'; throw e; });
+    return c.promise;
+  }
+  function vorladen(t) { if (t >= 1 && t <= 24 && K.darfOeffnen(t)) setTimeout(function () { ladeBild(t).catch(noop); }, 60); }
+
+  /* ================================================================
+     Nuss-Formen (gleiche Pfade wie die SVG-Symbole, viewBox 0..100)
+     ================================================================ */
+  var NUSS_D = 'M50 8.5C55.5 8.5 60.5 12 64.5 16.5C76.5 25.5 85 39.5 85 56.5C85 76.5 69.5 91 50 91C30.5 91 15 76.5 15 56.5C15 39.5 23.5 25.5 35.5 16.5C39.5 12 44.5 8.5 50 8.5Z';
+  var NARBE_D = 'M19.5 69C29 79.5 71 79.5 80.5 69C77 83 65 91 50 91C35 91 23 83 19.5 69Z';
+  var SPITZE_D = 'M46 13.5C47.6 9.5 48.8 6.2 50 4.5C51.2 6.2 52.4 9.5 54 13.5C52 12.6 48 12.6 46 13.5Z';
+  var STREIFEN_D = ['M50 10C42 27 37.5 47 39.5 75', 'M50 10C58 27 62.5 47 60.5 75', 'M48 11C34 25 26.5 42 26 64', 'M52 11C66 25 73.5 42 74 64'];
+  var P_NUSS = new Path2D(NUSS_D), P_NARBE = new Path2D(NARBE_D), P_SPITZE = new Path2D(SPITZE_D);
+  var P_STREIFEN = STREIFEN_D.map(function (d) { return new Path2D(d); });
+  var probe = leinwand(4, 4).getContext('2d');
+  var FARBEN = {
+    braun: ['#d9a066', '#a5683a', '#6c3f1e', '#4a2a12', '#d8c09a', '#a5865c', '#4a2a12'],
+    gold: ['#fff4c8', '#f3cd62', '#c18e2c', '#7c5512', '#f7e6ad', '#c79f45', '#8a5d12']
+  };
+
+  /* ================================================================
+     Bühne: Maße in Einheiten (Breite = 100, Höhe = 74)
+     ================================================================ */
+  var S = { W: 0, H: 0, u: 1 };
+  var PIV = { x: 20, y: 27 };                // Drehpunkt des Hebels
+  var HEBEL_L = 64.6, STEMPEL_D = 32, STEMPEL_L = 7.8;
+  var NUSS = { x: 52, y: 41.5, s: 0.2375, unten: 51.24 };
+  var A_REST = -16 * GRAD, A_KONTAKT = -5.5 * GRAD, A_MAX = 12 * GRAD, RISS_TIEFE = 0.95 * GRAD, WEICH = 1.3 * GRAD;
+  var BRETT_OBEN = 55.6, TISCH_Y = 69.8;
+  var BRETT_X = 77;                           // hier wartet am Handy die goldene Nuss
+  var SCHALE_X = 77;                          // November: Schälchen für die Kerne
+  var ctx = el.lw.getContext('2d');
+  var hg = null;                              // vorberechneter Hintergrund
+
+  function boden(x) { return x >= 10.4 && x <= 91.6 ? BRETT_OBEN : TISCH_Y; }
+  function stempelY(a) { return PIV.y + STEMPEL_D * Math.sin(a) + STEMPEL_L * Math.cos(a); }
+
+  function messen() {
+    var W = el.buehne.clientWidth;
+    if (!W) return false;
+    S.W = W; S.H = W * 0.74; S.u = W / 100;
+    el.lw.width = Math.round(W * DPR); el.lw.height = Math.round(S.H * DPR);
+    baueHintergrund();
+    return true;
+  }
+
+  function rr(g, x, y, w, h, r) {
+    g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+  }
+  function lin(g, x0, y0, x1, y1, stops) { var v = g.createLinearGradient(x0, y0, x1, y1); for (var i = 0; i < stops.length; i++) v.addColorStop(stops[i][0], stops[i][1]); return v; }
+  function holzQuer(g, x0, x1) { return lin(g, x0, 0, x1, 0, [[0, '#9a6233'], [0.28, '#e9c28a'], [0.55, '#d9a465'], [1, '#93592b']]); }
+  function lackQuer(g, x0, x1) { return lin(g, x0, 0, x1, 0, [[0, '#7d1d14'], [0.3, '#e0604f'], [0.55, '#bf3a2d'], [1, '#6d170f']]); }
+  function goldVerlauf(g, y0, y1) { return lin(g, 0, y0, 0, y1, [[0, '#fff0b0'], [0.4, '#e8b84a'], [1, '#9a6a1c']]); }
+  function maserung(g, x, y, w, h, n, seed, a) {
+    var r = zufall(seed);
+    g.lineWidth = 0.16;
+    for (var i = 0; i < n; i++) {
+      var yy = y + r() * h, ph = r() * 6;
+      g.strokeStyle = 'rgba(110,60,24,' + (a * (0.5 + r() * 0.5)).toFixed(3) + ')';
+      g.beginPath(); g.moveTo(x, yy);
+      for (var xx = x; xx <= x + w + 0.1; xx += w / 8) g.lineTo(xx, yy + Math.sin(xx * 0.22 + ph) * h * 0.06);
+      g.stroke();
+    }
+  }
+
+  /* --- Ruhende Teile: Kerze, Brett, Säule mit Nussknacker-König, Mulde (hinten) --- */
+  function baueHintergrund() {
+    hg = leinwand(el.lw.width, el.lw.height);
+    var g = hg.getContext('2d'), k = S.u * DPR;
+    g.setTransform(k, 0, 0, k, 0, 0);
+    var v;
+    // (Kerzenschein liegt als CSS-Verlauf hinter der Bühne – im Canvas gäbe er eine harte Kante)
+    // Schatten unter dem Brett
+    g.save(); g.translate(51, 66.3); g.scale(1, 0.085);
+    v = g.createRadialGradient(0, 0, 4, 0, 0, 47); v.addColorStop(0, 'rgba(8,4,2,.62)'); v.addColorStop(0.75, 'rgba(8,4,2,.3)'); v.addColorStop(1, 'rgba(8,4,2,0)');
+    g.fillStyle = v; g.beginPath(); g.arc(0, 0, 47, 0, TAU); g.fill(); g.restore();
+    // Brett: Deckfläche und Vorderseite
+    rr(g, 10, 54.9, 82, 3.4, 1.3); g.fillStyle = lin(g, 0, 54.9, 0, 58.3, [[0, '#f6d9a8'], [1, '#d8a96d']]); g.fill();
+    rr(g, 10, 57.4, 82, 8.8, 1.4); g.fillStyle = lin(g, 0, 57.4, 0, 66.2, [[0, '#dcaa6c'], [0.55, '#b77d45'], [1, '#875427']]); g.fill();
+    g.save(); rr(g, 10, 57.4, 82, 8.8, 1.4); g.clip();
+    maserung(g, 10, 57.6, 82, 8.4, 14, 5, 0.32);
+    g.fillStyle = lin(g, 0, 62.4, 0, 64.4, [[0, '#d9503f'], [0.5, '#b8352b'], [1, '#7f1f16']]); g.fillRect(10, 62.5, 82, 1.9);
+    g.fillStyle = 'rgba(255,244,226,.85)';
+    for (var px = 12; px < 91; px += 2.6) { g.beginPath(); g.arc(px, 63.45, 0.33, 0, TAU); g.fill(); }
+    g.restore();
+    g.fillStyle = 'rgba(255,240,210,.55)'; g.fillRect(11, 57.45, 80, 0.3);
+    // Messingschild
+    rr(g, 66, 58.5, 20.5, 3.4, 0.8); g.fillStyle = goldVerlauf(g, 58.5, 61.9); g.fill();
+    g.strokeStyle = 'rgba(90,60,15,.6)'; g.lineWidth = 0.18; g.stroke();
+    g.font = '2.3px "Young Serif", Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = 'rgba(255,250,225,.7)'; g.fillText('Dein Advent', 76.25, 60.45);
+    g.fillStyle = '#4a3208'; g.fillText('Dein Advent', 76.25, 60.25);
+    // Säule: Fuß, Schaft, Ringe
+    rr(g, 12.4, 52, 15.2, 3.8, 1.6); g.fillStyle = holzQuer(g, 12.4, 27.6); g.fill();
+    g.fillStyle = 'rgba(255,240,210,.35)'; g.fillRect(13.4, 52.1, 13.2, 0.35);
+    rr(g, 16.6, 33, 6.8, 19.6, 0.8); g.fillStyle = holzQuer(g, 16.6, 23.4); g.fill();
+    rr(g, 16.1, 44.2, 7.8, 2.1, 0.7); g.fillStyle = lackQuer(g, 16.1, 23.9); g.fill();
+    rr(g, 16.3, 39, 7.4, 1.4, 0.6); g.fillStyle = lin(g, 16.3, 0, 23.7, 0, [[0, '#183a28'], [0.35, '#4f8f68'], [1, '#14301f']]); g.fill();
+    g.fillStyle = goldVerlauf(g, 46.4, 47); g.fillRect(16.4, 46.4, 7.2, 0.55);
+    // Rock des Königs
+    rr(g, 14.2, 21.4, 11.6, 13, 2.4); g.fillStyle = lackQuer(g, 14.2, 25.8); g.fill();
+    g.fillStyle = goldVerlauf(g, 31, 34);
+    [31.6, 33.4].forEach(function (y) { g.beginPath(); g.arc(20, y, 0.62, 0, TAU); g.fill(); });
+    g.fillStyle = 'rgba(30,14,6,.85)'; g.fillRect(14.3, 30.2, 11.4, 0.9);
+    g.fillStyle = goldVerlauf(g, 30, 31.4); rr(g, 19, 30.05, 2, 1.2, 0.2); g.fill();
+    // Bart
+    g.beginPath(); g.moveTo(15.2, 16); g.bezierCurveTo(14.6, 21.4, 16.8, 25.4, 20, 26.2); g.bezierCurveTo(23.2, 25.4, 25.4, 21.4, 24.8, 16); g.closePath();
+    g.fillStyle = lin(g, 0, 16, 0, 26, [[0, '#ffffff'], [1, '#d9d2c6']]); g.fill();
+    g.strokeStyle = 'rgba(150,140,125,.45)'; g.lineWidth = 0.16;
+    for (var b = 0; b < 6; b++) { g.beginPath(); g.moveTo(16.4 + b * 1.4, 18.5); g.quadraticCurveTo(16.6 + b * 1.35, 22, 18 + b * 0.8, 24.6); g.stroke(); }
+    // Haare an den Seiten
+    g.fillStyle = '#f4efe6';
+    g.beginPath(); g.ellipse(14.6, 14.6, 1.6, 3, -0.2, 0, TAU); g.fill();
+    g.beginPath(); g.ellipse(25.4, 14.6, 1.6, 3, 0.2, 0, TAU); g.fill();
+    // Kopf
+    v = g.createRadialGradient(18.4, 12.2, 0.6, 20, 14.2, 6);
+    v.addColorStop(0, '#fde6c4'); v.addColorStop(0.7, '#f0c696'); v.addColorStop(1, '#d9a272');
+    g.fillStyle = v; g.beginPath(); g.arc(20, 14.2, 5.6, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(230,90,80,.42)';
+    g.beginPath(); g.arc(16.9, 15.7, 1.15, 0, TAU); g.fill(); g.beginPath(); g.arc(23.1, 15.7, 1.15, 0, TAU); g.fill();
+    g.fillStyle = '#ea9b7a'; g.beginPath(); g.ellipse(20, 15.1, 0.95, 1.15, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.5)'; g.beginPath(); g.arc(19.7, 14.7, 0.3, 0, TAU); g.fill();
+    // Krone
+    g.beginPath(); g.moveTo(14.6, 7.9); g.lineTo(15.1, 3.8); g.lineTo(17.4, 6.2); g.lineTo(20, 2.6); g.lineTo(22.6, 6.2); g.lineTo(24.9, 3.8); g.lineTo(25.4, 7.9); g.closePath();
+    g.fillStyle = goldVerlauf(g, 2.6, 8); g.fill();
+    rr(g, 14.4, 7.3, 11.2, 2.3, 0.6); g.fillStyle = goldVerlauf(g, 7.3, 9.6); g.fill();
+    g.strokeStyle = 'rgba(110,70,10,.55)'; g.lineWidth = 0.15; g.stroke();
+    [[15.1, 3.8], [20, 2.6], [24.9, 3.8]].forEach(function (p) { g.fillStyle = '#fff0b0'; g.beginPath(); g.arc(p[0], p[1], 0.65, 0, TAU); g.fill(); });
+    g.fillStyle = '#c8302a'; g.beginPath(); g.arc(20, 8.45, 0.8, 0, TAU); g.fill();
+    g.fillStyle = '#2f7a55'; g.beginPath(); g.arc(16.7, 8.45, 0.55, 0, TAU); g.fill(); g.beginPath(); g.arc(23.3, 8.45, 0.55, 0, TAU); g.fill();
+    // Kerze mit Messingschale
+    g.save(); g.translate(5.6, 70.3); g.scale(1, 0.26);
+    g.fillStyle = lin(g, 0, -5.6, 0, 5.6, [[0, '#fff0b0'], [0.5, '#d2a043'], [1, '#7a5212']]); g.beginPath(); g.arc(0, 0, 5.4, 0, TAU); g.fill(); g.restore();
+    rr(g, 2.5, 43.6, 6.2, 26.6, 1); g.fillStyle = lin(g, 2.5, 0, 8.7, 0, [[0, '#d9c49c'], [0.35, '#fffaf0'], [0.7, '#f3e6c8'], [1, '#c8b086']]); g.fill();
+    g.fillStyle = '#fbf3e0';
+    g.beginPath(); g.moveTo(2.6, 44.4); g.quadraticCurveTo(3, 48.6, 3.6, 47.6); g.quadraticCurveTo(4.1, 46, 4.6, 44.4); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(6.6, 44.2); g.quadraticCurveTo(7.1, 50.4, 7.7, 49.4); g.quadraticCurveTo(8.2, 47, 8.6, 44.2); g.closePath(); g.fill();
+    g.save(); g.translate(5.6, 43.8); g.scale(1, 0.3); g.fillStyle = '#efe1c2'; g.beginPath(); g.arc(0, 0, 3.1, 0, TAU); g.fill(); g.restore();
+    g.strokeStyle = '#2a1a10'; g.lineWidth = 0.35; g.beginPath(); g.moveTo(5.6, 43.8); g.quadraticCurveTo(5.5, 42.8, 5.8, 42.1); g.stroke();
+    // Mulde hinten (Innenraum)
+    g.save(); g.translate(52, 47.6); g.scale(1, 0.22);
+    v = g.createRadialGradient(0, 2, 1, 0, 0, 10.6); v.addColorStop(0, '#2a170a'); v.addColorStop(1, '#6b4223');
+    g.fillStyle = v; g.beginPath(); g.arc(0, 0, 10.6, 0, TAU); g.fill(); g.restore();
+  }
+
+  function zeichneFlamme(g, flacker) {
+    var f = 1 + flacker * 0.08, x = 5.75 + flacker * 0.15;
+    var v = g.createRadialGradient(x, 39.6, 0.3, x, 39.6, 6);
+    v.addColorStop(0, 'rgba(255,220,140,.55)'); v.addColorStop(1, 'rgba(255,200,110,0)');
+    g.fillStyle = v; g.beginPath(); g.arc(x, 39.6, 6, 0, TAU); g.fill();
+    g.save(); g.translate(x, 42.2); g.scale(1, f);
+    g.beginPath(); g.moveTo(0, -6.2); g.bezierCurveTo(1.7, -3.6, 1.9, -1.2, 0, 0); g.bezierCurveTo(-1.9, -1.2, -1.7, -3.6, 0, -6.2); g.closePath();
+    g.fillStyle = lin(g, 0, -6.2, 0, 0, [[0, '#ffb347'], [0.45, '#ffe08a'], [0.8, '#fffbe8'], [1, '#8ab4ff']]); g.fill();
+    g.restore();
+  }
+
+  /* --- Gesicht des Königs: lächelt, kneift beim Drücken, strahlt nach dem Knacken --- */
+  function zeichneGesicht(g, druck, freudeAktiv) {
+    var streng = druck > 0.3 && !freudeAktiv;
+    g.lineCap = 'round';
+    if (freudeAktiv) {
+      g.strokeStyle = '#3a200d'; g.lineWidth = 0.5;
+      g.beginPath(); g.arc(17.9, 14.1, 0.9, Math.PI * 1.1, Math.PI * 1.9); g.stroke();
+      g.beginPath(); g.arc(22.1, 14.1, 0.9, Math.PI * 1.1, Math.PI * 1.9); g.stroke();
+      g.fillStyle = '#7d1d14'; g.beginPath(); g.ellipse(20, 17.6, 1.4, 1.1, 0, 0, Math.PI); g.fill();
+    } else if (streng) {
+      g.strokeStyle = '#3a200d'; g.lineWidth = 0.45;
+      g.beginPath(); g.moveTo(17, 12.9); g.lineTo(18.6, 13.5); g.lineTo(17, 14.1); g.stroke();
+      g.beginPath(); g.moveTo(23, 12.9); g.lineTo(21.4, 13.5); g.lineTo(23, 14.1); g.stroke();
+      g.fillStyle = '#fffdf6'; rr(g, 18, 16.9, 4, 1.5, 0.3); g.fill();
+      g.strokeStyle = 'rgba(80,50,30,.7)'; g.lineWidth = 0.14;
+      g.beginPath(); for (var i = 1; i < 4; i++) { g.moveTo(18 + i, 16.9); g.lineTo(18 + i, 18.4); } g.moveTo(18, 17.65); g.lineTo(22, 17.65); g.stroke();
+    } else {
+      [[17.9, 13.5], [22.1, 13.5]].forEach(function (p) {
+        g.fillStyle = '#fffdf8'; g.beginPath(); g.ellipse(p[0], p[1], 0.95, 1.05, 0, 0, TAU); g.fill();
+        g.fillStyle = '#2a1a10'; g.beginPath(); g.arc(p[0] + 0.25, p[1] + 0.2, 0.58, 0, TAU); g.fill();
+        g.fillStyle = '#fff'; g.beginPath(); g.arc(p[0] + 0.05, p[1] - 0.05, 0.2, 0, TAU); g.fill();
+      });
+    }
+    // Augenbrauen
+    g.strokeStyle = '#efe7da'; g.lineWidth = 0.55;
+    var bh = streng ? 0.5 : freudeAktiv ? -0.5 : 0;
+    g.beginPath(); g.moveTo(16.6, 12 - bh * 0.4); g.lineTo(18.9, 12.2 + bh); g.stroke();
+    g.beginPath(); g.moveTo(23.4, 12 - bh * 0.4); g.lineTo(21.1, 12.2 + bh); g.stroke();
+    // Schnurrbart
+    var sy = streng ? -0.35 : 0;
+    g.fillStyle = '#fbf7f0';
+    g.beginPath(); g.moveTo(20, 16.2 + sy);
+    g.bezierCurveTo(18.6, 15.6 + sy, 16.4, 16 + sy, 15.6, 17.4 + sy); g.bezierCurveTo(17.2, 17.2 + sy, 18.6, 17.6 + sy, 20, 16.9 + sy);
+    g.bezierCurveTo(21.4, 17.6 + sy, 22.8, 17.2 + sy, 24.4, 17.4 + sy); g.bezierCurveTo(23.6, 16 + sy, 21.4, 15.6 + sy, 20, 16.2 + sy);
+    g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(150,140,125,.5)'; g.lineWidth = 0.12; g.stroke();
+  }
+
+  function zeichneMuldeVorne(g) {
+    g.beginPath(); g.moveTo(41.4, 47.6);
+    g.bezierCurveTo(41.8, 51.4, 43.4, 54.6, 45.4, 55.6); g.lineTo(58.6, 55.6); g.bezierCurveTo(60.6, 54.6, 62.2, 51.4, 62.6, 47.6);
+    g.ellipse(52, 47.6, 10.6, 2.33, 0, 0, Math.PI, false);
+    g.closePath();
+    g.fillStyle = holzQuer(g, 41.4, 62.6); g.fill();
+    g.save(); g.clip();
+    g.fillStyle = lackQuer(g, 41.4, 62.6); g.fillRect(40, 51.6, 24, 1.25);
+    g.fillStyle = goldVerlauf(g, 53, 53.5); g.fillRect(40, 53.1, 24, 0.4);
+    g.restore();
+    g.strokeStyle = 'rgba(255,240,210,.65)'; g.lineWidth = 0.35;
+    g.beginPath(); g.ellipse(52, 47.6, 10.45, 2.2, 0, 0.1, Math.PI - 0.1, false); g.stroke();
+    rr(g, 44.2, 54.9, 15.6, 1.4, 0.6); g.fillStyle = holzQuer(g, 44.2, 59.8); g.fill();
+  }
+
+  /* --- Der Hebel (lokal: Drehpunkt im Ursprung, zeigt nach rechts) --- */
+  function zeichneHebel(g, a, hinweis) {
+    g.save(); g.translate(PIV.x, PIV.y); g.rotate(a);
+    var sx = STEMPEL_D;
+    // Stempel mit rotem Druckkopf
+    rr(g, sx - 2.4, 1, 4.8, STEMPEL_L - 1.6, 1); g.fillStyle = holzQuer(g, sx - 2.4, sx + 2.4); g.fill();
+    rr(g, sx - 2.8, STEMPEL_L - 2, 5.6, 2, 0.95); g.fillStyle = lackQuer(g, sx - 2.8, sx + 2.8); g.fill();
+    g.fillStyle = goldVerlauf(g, 2.1, 3); g.fillRect(sx - 2.7, 2.1, 5.4, 0.8);
+    // Balken
+    var v = lin(g, 0, -2.4, 0, 2.4, [[0, '#f6d7a2'], [0.4, '#dcaa6c'], [0.85, '#b07642'], [1, '#86532a']]);
+    rr(g, 0, -2.35, 59, 4.7, 2.3); g.fillStyle = v; g.fill();
+    g.save(); rr(g, 0, -2.35, 59, 4.7, 2.3); g.clip(); maserung(g, 0, -2.2, 59, 4.4, 7, 9, 0.3);
+    g.fillStyle = 'rgba(184,53,43,.9)'; g.fillRect(6.5, -0.95, 47, 0.45);
+    g.restore();
+    g.beginPath(); g.arc(0, 0, 3.55, 0, TAU); g.fillStyle = v; g.fill();
+    g.strokeStyle = 'rgba(90,50,20,.35)'; g.lineWidth = 0.18; g.stroke();
+    // Hals und roter Kugelgriff
+    rr(g, 57, -1.55, 4.6, 3.1, 1); g.fillStyle = lin(g, 0, -1.6, 0, 1.6, [[0, '#f0c98f'], [1, '#9a6233']]); g.fill();
+    var k = g.createRadialGradient(63.2, -1.8, 0.4, 64.7, 0, 5.4);
+    k.addColorStop(0, '#ff9c8a'); k.addColorStop(0.35, '#d9483a'); k.addColorStop(0.85, '#9a261b'); k.addColorStop(1, '#6d160f');
+    g.fillStyle = k; g.beginPath(); g.ellipse(64.7, 0, 5.1, 4.6, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.ellipse(63, -2, 1.5, 0.85, -0.4, 0, TAU); g.fill();
+    if (hinweis) {
+      g.strokeStyle = 'rgba(255,213,143,.55)'; g.lineWidth = 0.45; g.setLineDash([1.1, 1.1]);
+      g.beginPath(); g.ellipse(64.7, 0, 7.2, 6.7, 0, 0, TAU); g.stroke(); g.setLineDash([]);
+    }
+    // Messingzapfen
+    g.fillStyle = goldVerlauf(g, -1.3, 1.3); g.beginPath(); g.arc(0, 0, 1.25, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.arc(-0.35, -0.35, 0.35, 0, TAU); g.fill();
+    g.restore();
+  }
+
+  function zeichnePfeil(g, a) {
+    var x = PIV.x + HEBEL_L * Math.cos(a) + 9.2, y = PIV.y + HEBEL_L * Math.sin(a) - 1;
+    if (x > 98) x = 98;
+    g.strokeStyle = 'rgba(255,226,170,.85)'; g.fillStyle = 'rgba(255,226,170,.85)'; g.lineWidth = 0.7; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 9.5); g.stroke();
+    g.beginPath(); g.moveTo(x - 1.8, y + 8); g.lineTo(x, y + 11.2); g.lineTo(x + 1.8, y + 8); g.closePath(); g.fill();
+  }
+
+  /* --- Die Nuss: Körper, Zahl, Risse (in viewBox-Koordinaten) --- */
+  function nussKoerper(g, art) {
+    var f = FARBEN[art === 'gold' ? 'gold' : 'braun'];
+    var v = g.createRadialGradient(38, 30, 2, 42, 40, 64);
+    v.addColorStop(0, f[0]); v.addColorStop(0.42, f[1]); v.addColorStop(0.82, f[2]); v.addColorStop(1, f[3]);
+    g.fillStyle = v; g.fill(P_NUSS);
+    g.save(); g.clip(P_NUSS);
+    g.strokeStyle = art === 'gold' ? 'rgba(124,85,18,.32)' : 'rgba(74,42,18,.26)'; g.lineWidth = 1.4; g.lineCap = 'round';
+    for (var i = 0; i < P_STREIFEN.length; i++) g.stroke(P_STREIFEN[i]);
+    g.fillStyle = lin(g, 0, 69, 0, 91, [[0, f[4]], [1, f[5]]]); g.fill(P_NARBE);
+    g.fillStyle = 'rgba(90,60,30,.22)';
+    var r = zufall(77);
+    for (var p = 0; p < 40; p++) { var x = 22 + r() * 56, y = 73 + r() * 17; g.fillRect(x, y, 0.9, 0.9); }
+    var gl = g.createRadialGradient(35, 31, 0, 35, 31, 15);
+    gl.addColorStop(0, 'rgba(255,255,255,' + (art === 'gold' ? 0.62 : 0.45) + ')'); gl.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gl; g.beginPath(); g.ellipse(35, 31, 10, 15, -0.42, 0, TAU); g.fill();
+    g.restore();
+    g.fillStyle = f[6]; g.fill(P_SPITZE);
+    if (art === 'gold') {
+      g.fillStyle = '#fffbe8';
+      stern(g, 74, 26, 4); stern(g, 26, 47.6, 2.7);
+    }
+  }
+  function stern(g, x, y, s) {
+    g.beginPath(); g.moveTo(x, y - s); g.quadraticCurveTo(x + s * 0.15, y - s * 0.15, x + s, y); g.quadraticCurveTo(x + s * 0.15, y + s * 0.15, x, y + s);
+    g.quadraticCurveTo(x - s * 0.15, y + s * 0.15, x - s, y); g.quadraticCurveTo(x - s * 0.15, y - s * 0.15, x, y - s); g.fill();
+  }
+  function nussZahl(g, n) {
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    if (n.uebung) {
+      g.fillStyle = 'rgba(255,233,196,.4)'; stern(g, 50, 52.4, 9);
+      g.fillStyle = 'rgba(58,32,13,.75)'; stern(g, 50, 51.4, 9);
+      return;
+    }
+    g.font = '33px "Bree Serif", Rockwell, Georgia, serif';
+    var gold = n.art === 'gold';
+    g.fillStyle = gold ? 'rgba(255,247,216,.6)' : 'rgba(255,233,196,.4)'; g.fillText(String(n.tag), 50, 64.2);
+    g.fillStyle = gold ? 'rgba(90,54,4,.88)' : 'rgba(58,32,13,.84)'; g.fillText(String(n.tag), 50, 63);
+  }
+  function rissLinie(x, y, w, len, r, breite) {
+    var pts = [{ x: x, y: y }], n = 4 + Math.round(len / 6), s = len / n;
+    for (var i = 0; i < n; i++) { w += (r() - 0.5) * 0.9; x += Math.cos(w) * s; y += Math.sin(w) * s; pts.push({ x: x, y: y }); }
+    return { pts: pts, b: breite };
+  }
+  // Deterministisch je Tag: jeder Druck fügt Risse hinzu, frühere bleiben gleich
+  function risseFuer(seed, n) {
+    var r = zufall(seed * 977 + 13), liste = [];
+    for (var k = 1; k <= n; k++) {
+      var w, x, y;
+      if (k === 1) { x = 50 + (r() - 0.5) * 4; y = 11; w = 90 * GRAD + (r() - 0.5) * 0.3; }
+      else { var l = liste[Math.floor(r() * liste.length)], p = l.pts[1 + Math.floor(r() * (l.pts.length - 1))]; x = p.x; y = p.y; w = (90 + (r() < 0.5 ? -1 : 1) * (35 + r() * 40)) * GRAD; }
+      liste.push(rissLinie(x, y, w, 20 + r() * 18 + k * 5, r, 2.9 - k * 0.22));
+      var l2 = liste[Math.floor(r() * liste.length)], p2 = l2.pts[Math.floor(l2.pts.length / 2)];
+      liste.push(rissLinie(p2.x, p2.y, (r() < 0.5 ? 30 : 150) * GRAD + (r() - 0.5) * 0.6, 7 + r() * 9, r, 1.7));
+      if (k >= 3) liste.push(rissLinie(50 + (r() - 0.5) * 30, 18 + r() * 10, (60 + r() * 60) * GRAD, 14 + r() * 10, r, 1.9));
+    }
+    return liste;
+  }
+  function nussRisse(g, linien, ab, fort) {
+    if (!linien.length) return;
+    g.save(); g.clip(P_NUSS); g.lineJoin = 'round'; g.lineCap = 'round';
+    for (var i = 0; i < linien.length; i++) {
+      var L = linien[i], pts = L.pts, m = pts.length - 1;
+      if (i >= ab && fort < 1) m = Math.max(1, Math.round(m * fort));
+      var j;
+      g.beginPath(); g.moveTo(pts[0].x, pts[0].y);
+      for (j = 1; j <= m; j++) g.lineTo(pts[j].x, pts[j].y);
+      g.strokeStyle = 'rgba(40,20,5,.2)'; g.lineWidth = L.b * 2.4; g.stroke();
+      g.beginPath(); g.moveTo(pts[0].x + 0.7, pts[0].y + 0.6);
+      for (j = 1; j <= m; j++) g.lineTo(pts[j].x + 0.7, pts[j].y + 0.6);
+      g.strokeStyle = 'rgba(255,232,190,.5)'; g.lineWidth = L.b * 0.7; g.stroke();
+      g.beginPath(); g.moveTo(pts[0].x, pts[0].y);
+      for (j = 1; j <= m; j++) g.lineTo(pts[j].x, pts[j].y);
+      g.strokeStyle = 'rgba(30,15,6,.94)'; g.lineWidth = L.b; g.stroke();
+    }
+    g.restore();
+  }
+  function nussMalen(g, n, fort) {
+    nussKoerper(g, n.art);
+    nussZahl(g, n);
+    nussRisse(g, n.linien, n.rissAb, fort);
+  }
+
+  function halbschale(g, x, y, s, rot) {
+    g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s);
+    g.beginPath(); g.moveTo(-7, -1.2); g.bezierCurveTo(-6.6, 3.4, -3.6, 4.6, 0, 4.6); g.bezierCurveTo(3.6, 4.6, 6.6, 3.4, 7, -1.2); g.closePath();
+    g.fillStyle = lin(g, 0, -1.2, 0, 4.6, [[0, '#a5683a'], [1, '#5a3317']]); g.fill();
+    g.fillStyle = lin(g, 0, -3, 0, 0.6, [[0, '#f6e7c8'], [1, '#d2b384']]); g.beginPath(); g.ellipse(0, -1.2, 7, 1.85, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(156,116,68,.35)'; g.beginPath(); g.ellipse(0, -0.95, 5.6, 1.1, 0, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(90,51,23,.7)'; g.lineWidth = 0.22; g.beginPath(); g.ellipse(0, -1.2, 7, 1.85, 0, 0, TAU); g.stroke();
+    g.restore();
+  }
+  function zeichneRolle(g, ro) {
+    var R = 2.9, bx = 3.6, by = -2.1, nx = -by, ny = bx, nl = Math.sqrt(nx * nx + ny * ny); nx = nx / nl * R; ny = ny / nl * R;
+    g.save(); g.translate(ro.x, ro.y);
+    g.fillStyle = '#e3d1ad'; g.beginPath(); g.arc(bx, by, R, 0, TAU); g.fill();
+    g.beginPath(); g.moveTo(nx, ny); g.lineTo(bx + nx, by + ny); g.lineTo(bx - nx, by - ny); g.lineTo(-nx, -ny); g.closePath();
+    g.fillStyle = lin(g, nx, ny, -nx, -ny, [[0, '#bfa278'], [0.55, '#f5ead2'], [1, '#fffaf0']]); g.fill();
+    g.strokeStyle = '#b8352b'; g.lineWidth = 0.9;
+    g.beginPath(); g.moveTo(bx * 0.5 + nx * 1.02, by * 0.5 + ny * 1.02); g.lineTo(bx * 0.5 - nx * 1.02, by * 0.5 - ny * 1.02); g.stroke();
+    g.fillStyle = '#f7eedb'; g.beginPath(); g.arc(0, 0, R, 0, TAU); g.fill();
+    g.strokeStyle = '#b39466'; g.lineWidth = 0.22; g.stroke();
+    g.strokeStyle = 'rgba(150,115,70,.8)'; g.lineWidth = 0.22; g.beginPath();
+    for (var i = 0; i <= 40; i++) { var t = i / 40, w = ro.rot + t * TAU * 2.4, rr2 = R * (0.86 - t * 0.66); if (i) g.lineTo(Math.cos(w) * rr2, Math.sin(w) * rr2); else g.moveTo(Math.cos(w) * rr2, Math.sin(w) * rr2); }
+    g.stroke();
+    g.restore();
+  }
+  function zeichneKern(g, ke) {
+    g.save(); g.translate(ke.x, ke.y); g.rotate(ke.rot);
+    var v = g.createRadialGradient(-1.2, -1.2, 0.3, 0, 0, 4.4); v.addColorStop(0, '#ecc791'); v.addColorStop(0.6, '#c08a52'); v.addColorStop(1, '#8a5a2c');
+    g.fillStyle = v; g.beginPath(); g.ellipse(0, 0, 3.6, 3.2, 0, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(110,64,28,.55)'; g.lineWidth = 0.2;
+    g.beginPath(); g.moveTo(-2.4, -1.4); g.quadraticCurveTo(-0.6, 0.4, -1.6, 2.2); g.moveTo(0.6, -2.6); g.quadraticCurveTo(1.6, -0.4, 0.8, 2.6); g.moveTo(2.2, -1.2); g.quadraticCurveTo(2.8, 0.4, 2.4, 1.6); g.stroke();
+    g.restore();
+  }
+  // Freie Nuss (wartet auf dem Brett oder hüpft) – Drehpunkt in der Nussmitte
+  function zeichneNussFrei(g, n, x, unten, rot, glanz, schatten) {
+    var my = unten - 41 * NUSS.s, v;
+    if (glanz > 0) {
+      v = g.createRadialGradient(x, my, 1, x, my, 16);
+      v.addColorStop(0, 'rgba(255,214,120,' + (0.55 * glanz).toFixed(3) + ')'); v.addColorStop(0.55, 'rgba(255,196,90,' + (0.2 * glanz).toFixed(3) + ')'); v.addColorStop(1, 'rgba(255,196,90,0)');
+      g.fillStyle = v; g.beginPath(); g.arc(x, my, 16, 0, TAU); g.fill();
+    }
+    if (schatten) {
+      g.save(); g.translate(x, BRETT_OBEN + 0.2); g.scale(1, 0.2);
+      v = g.createRadialGradient(0, 0, 1, 0, 0, 8.5); v.addColorStop(0, 'rgba(40,20,8,.5)'); v.addColorStop(1, 'rgba(40,20,8,0)');
+      g.fillStyle = v; g.beginPath(); g.arc(0, 0, 8.5, 0, TAU); g.fill(); g.restore();
+    }
+    g.save(); g.translate(x, my); if (rot) g.rotate(rot); g.scale(NUSS.s, NUSS.s); g.translate(-50, -50);
+    nussMalen(g, n, 1);
+    g.restore();
+  }
+  // November: hölzernes Schälchen, in dem sich die Kerne der Übungsnüsse sammeln
+  var KERN_PLATZ = [[-3.3, 0.6, 0.4], [0.3, 0.9, -0.3], [3.5, 0.5, 0.9], [-1.6, -0.9, -0.8], [1.9, -0.8, 0.2], [0.1, -2.3, 1.2], [-3.9, -1.5, 0.6], [3.8, -1.7, -0.5]];
+  function zeichneSchaelchen(g, anzahl) {
+    var x = SCHALE_X, y = BRETT_OBEN, rx = 7.8, ry = 2.1, rim = y - 5, v, i;
+    g.save(); g.translate(x, y + 0.15); g.scale(1, 0.2);
+    v = g.createRadialGradient(0, 0, 1, 0, 0, 9.5); v.addColorStop(0, 'rgba(40,20,8,.45)'); v.addColorStop(1, 'rgba(40,20,8,0)');
+    g.fillStyle = v; g.beginPath(); g.arc(0, 0, 9.5, 0, TAU); g.fill(); g.restore();
+    g.save(); g.translate(x, rim); g.scale(1, ry / rx);
+    v = g.createRadialGradient(0, 1, 0.5, 0, 0, rx); v.addColorStop(0, '#3a2210'); v.addColorStop(1, '#7a4c26');
+    g.fillStyle = v; g.beginPath(); g.arc(0, 0, rx, 0, TAU); g.fill(); g.restore();
+    var liste = KERN_PLATZ.slice(0, Math.min(anzahl, KERN_PLATZ.length)).sort(function (a, b) { return a[1] - b[1]; });
+    for (i = 0; i < liste.length; i++) { g.save(); g.translate(x + liste[i][0], rim + liste[i][1]); g.scale(0.62, 0.62); zeichneKern(g, { x: 0, y: 0, rot: liste[i][2] }); g.restore(); }
+    g.beginPath(); g.moveTo(x - rx, rim);
+    g.bezierCurveTo(x - rx + 0.4, y - 1.6, x - 4.6, y, x - 3, y); g.lineTo(x + 3, y); g.bezierCurveTo(x + 4.6, y, x + rx - 0.4, y - 1.6, x + rx, rim);
+    g.ellipse(x, rim, rx, ry, 0, 0, Math.PI, false); g.closePath();
+    g.fillStyle = holzQuer(g, x - rx, x + rx); g.fill();
+    g.save(); g.clip(); g.fillStyle = lackQuer(g, x - rx, x + rx); g.fillRect(x - rx - 1, rim + 2.6, 2 * rx + 2, 0.9); g.restore();
+    g.strokeStyle = 'rgba(255,240,210,.6)'; g.lineWidth = 0.3;
+    g.beginPath(); g.ellipse(x, rim, rx - 0.15, ry - 0.12, 0, 0.1, Math.PI - 0.1, false); g.stroke();
+  }
+
+  /* ================================================================
+     Zustand der Bühne
+     ================================================================ */
+  var hebel = { a: A_REST, v: 0, af: A_REST, gedrueckt: false, r: HEBEL_L, kontakt: false, zugKnack: false, maxDruck: 0 };
+  var auto = null, autoSchlange = 0, druck = 0;
+  var nuss = null;            // { tag, art, uebung, nochmal, risse, ziel, linien, rissAb, rissT, fall }
+  var phase = 'leer';         // 'leer' | 'bereit' | 'geknackt'
+  var letzter = null;         // zuletzt geknackt: { tag, uebung, nochmal }
+  var teile = [], krumen = [], rolle = null;
+  var wackel = { t: 0, d: 0, a: 0 }, freude = 0, flacker = 0, ersterDruck = true;
+  var rissStand = {};         // angefangene Nüsse behalten ihre Risse
+  var unterwegs = {};         // Tage, deren Nuss gerade fliegt oder im Knacker liegt
+  var raf = 0, zuletzt = 0, token = 0, offenUhr = 0;
+  var DRUCK_PX = 34;          // Fingerweg über den Kontakt hinaus für einen Riss (wächst je Riss um 9 %)
+  var WORTE = ['Knack!', 'Knirsch!', 'Krrk!', 'Knack!'];
+  var huepfer = null;         // Nuss hüpft zwischen Brett und Mulde: { tag, n, t, d, von, nach, hub, rein, fertig }
+  var kernFlug = null, kerne = parseInt(merkeLesen('kerne', '0'), 10) || 0;
+  var brettAnim = 0, brettBild = null, sperreBis = 0;
+  var mqSchmal = window.matchMedia('(max-width: 959px)');
+  // Finger-Pixel je Hebelwinkel: auf großen Bühnen gedeckelt, damit der Weg am Desktop nicht länger wird
+  function uZug() { return Math.min(S.u, 4.4); }
+  function druckNoetig() { return DRUCK_PX * (1 + 0.09 * (nuss ? nuss.risse : 0)); }
+  // Einspaltig (Handy, Tablet): die goldene Nuss liegt schon sichtbar auf dem Brett neben der Mulde
+  function aufBrett() { var h = K.heute(); return mqSchmal.matches && h >= 1 && h <= 24 && zustand(h) === 'heute' ? h : 0; }
+  function brettNussDa() { var h = aufBrett(); return h && !unterwegs[h] && !(huepfer && huepfer.tag === h) ? h : 0; }
+  function brettNuss(t) {
+    var r = rissStand[t] || 0;
+    if (!brettBild || brettBild.tag !== t || brettBild.risse !== r) brettBild = neueNuss(t);
+    return brettBild;
+  }
+  function brettHuepf() {
+    if (brettAnim <= 0 || REDUZIERT) return 0;
+    var p = 2.4 - brettAnim - 0.7;
+    return p > 0 && p < 0.9 ? Math.abs(Math.sin(p * Math.PI / 0.45)) * 2.6 * (1 - p / 0.9) : 0;
+  }
+  function huepferLage(h) {
+    var q = klemme(h.t / h.d, 0, 1), e = q < 0.5 ? 2 * q * q : 1 - Math.pow(-2 * q + 2, 2) / 2;
+    return { x: h.von.x + (h.nach.x - h.von.x) * e, y: h.von.y + (h.nach.y - h.von.y) * q - h.hub * 4 * q * (1 - q), rot: h.nach.rot * e, q: q };
+  }
+
+  function kontaktWinkel() {
+    return nuss && phase === 'bereit' && !nuss.fall ? A_KONTAKT + nuss.risse * RISS_TIEFE : null;
+  }
+  function nussZielFuer(t) { return 3 + ((t * 7) % 3); }
+
+  function neueNuss(t, opt) {
+    opt = opt || {};
+    var uebung = !!opt.uebung, nochmal = !!opt.nochmal;
+    var seed = uebung ? 99 + Math.floor(Math.random() * 1000) : t;
+    var risse = (!uebung && !nochmal && rissStand[t]) || 0;
+    var n = { tag: t, art: uebung ? 'braun' : (t === K.heute() ? 'gold' : 'braun'), uebung: uebung, nochmal: nochmal, seed: seed,
+      risse: risse, ziel: uebung ? 3 : nussZielFuer(t), linien: [], rissAb: 0, rissT: 1, fall: null };
+    n.linien = risseFuer(seed, risse); n.rissAb = n.linien.length;
+    return n;
+  }
+
+  /* --- Schritt: Hebel mit Widerstand, Federn, Splitter, Schalen --- */
+  function schritt(dt) {
+    var ac = kontaktWinkel();
+    if (auto) { auto.t += dt; var q = Math.min(1, auto.t / auto.dauer); hebel.af = auto.von + (auto.zu - auto.von) * q * q; }
+    var aktiv = hebel.gedrueckt || !!auto;
+    if (aktiv) {
+      var ziel = hebel.af;
+      if (ac !== null && hebel.af > ac) {
+        if (!hebel.kontakt) { hebel.kontakt = true; vibriere(8); }
+        var radius = auto ? HEBEL_L : hebel.r;
+        druck = Math.max(0, (hebel.af - ac) * radius * uZug() / druckNoetig());
+        if (!auto && druck > hebel.maxDruck) hebel.maxDruck = druck;
+        // genau ein Riss pro Zug: der nächste zählt erst, wenn der Hebel losgelassen oder wieder hochgeführt wurde
+        if (druck >= 1) {
+          if (auto) { if (!auto.geknackt) { auto.geknackt = true; knack(); ac = kontaktWinkel(); } }
+          else if (!hebel.zugKnack) { hebel.zugKnack = true; knack(); ac = kontaktWinkel(); }
+        }
+      } else {
+        druck = 0;
+        if (hebel.gedrueckt && hebel.kontakt) {
+          if (!hebel.zugKnack && hebel.maxDruck >= 0.3 && phase === 'bereit') fester();
+          hebel.kontakt = false; hebel.zugKnack = false; hebel.maxDruck = 0;
+        }
+      }
+      if (ac !== null && hebel.af > ac) ziel = ac + WEICH * Math.tanh((hebel.af - ac) / WEICH);
+      else if (ac === null && hebel.af > A_MAX) ziel = A_MAX + 0.4 * GRAD * Math.tanh((hebel.af - A_MAX) / (2 * GRAD));
+      if (ziel < A_REST - 6 * GRAD) ziel = A_REST - 6 * GRAD + 2 * GRAD * Math.tanh((ziel - A_REST + 6 * GRAD) / (2 * GRAD));
+      if (druck > 0.6 && !REDUZIERT) ziel += (Math.random() - 0.5) * 0.3 * GRAD * druck;
+      var alt = hebel.a;
+      hebel.a += (ziel - hebel.a) * (1 - Math.exp(-dt * 38));
+      hebel.v = (hebel.a - alt) / dt;
+      if (auto && auto.t >= auto.dauer) {
+        var schonGeknackt = auto.geknackt;
+        auto = null;
+        if (!schonGeknackt && phase === 'bereit') knack();   // jeder Tipp zählt genau einmal
+        loslassen(true);
+        if (autoSchlange > 0 && phase === 'bereit') { autoSchlange--; starteAuto(); } else autoSchlange = 0;
+      }
+    } else {
+      druck = 0;
+      var acc = -240 * (hebel.a - A_REST) - 17 * hebel.v;
+      hebel.v += acc * dt; hebel.a += hebel.v * dt;
+      if (ac !== null && hebel.a > ac) { hebel.a = ac; if (hebel.v > 0) hebel.v = -hebel.v * 0.2; }
+    }
+    if (nuss) {
+      if (nuss.rissT < 1) nuss.rissT = Math.min(1, nuss.rissT + dt / 0.14);
+      if (nuss.fall) {
+        var f = nuss.fall;
+        f.vy += 300 * dt; f.y += f.vy * dt;
+        if (f.y >= 0) { f.y = 0; if (f.vy > 25) { f.vy = -f.vy * 0.3; vibriere(6); } else { nuss.fall = null; } }
+      }
+    }
+    if (huepfer) { huepfer.t += dt; if (huepfer.t >= huepfer.d) { var hf = huepfer; huepfer = null; hf.fertig(); } }
+    if (kernFlug) {
+      kernFlug.t += dt;
+      if (kernFlug.t >= kernFlug.d) { kernFlug = null; kernInsSchaelchen(); }
+    }
+    if (brettAnim > 0) brettAnim = Math.max(0, brettAnim - dt);
+    if (wackel.t > 0) wackel.t = Math.max(0, wackel.t - dt);
+    if (freude > 0) freude = Math.max(0, freude - dt);
+    flacker = Math.sin(performance.now() / 90) * 0.6 + Math.sin(performance.now() / 37) * 0.4;
+    physik(teile, dt, true); physik(krumen, dt, false);
+    if (rolle) physik1(rolle, dt, 2.9, true);
+  }
+
+  function physik1(p, dt, rad, rollt) {
+    if (p.weg) { p.alpha -= dt / 0.28; return; }
+    if (p.ruhe) return;
+    p.vy += 170 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+    if (p.x < 1 || p.x > 99) { p.x = klemme(p.x, 1, 99); p.vx = -p.vx * 0.4; }
+    var b = boden(p.x) - rad;
+    if (p.y >= b) {
+      p.y = b;
+      if (p.vy > 9) { p.vy = -p.vy * 0.32; p.vx *= 0.72; p.vr *= 0.6; }
+      else {
+        p.vy = 0;
+        p.vx *= Math.exp(-dt * (rollt ? 2.2 : 7));
+        if (rollt) p.vr = p.vx / rad; else p.vr *= Math.exp(-dt * 9);
+        if (Math.abs(p.vx) < 0.4) { p.vx = 0; p.vr = 0; p.ruhe = true; }
+      }
+    }
+  }
+  function physik(liste, dt, gross) {
+    for (var i = liste.length - 1; i >= 0; i--) {
+      var p = liste[i];
+      if (p.leben !== undefined) { p.leben -= dt; if (p.leben <= 0) { liste.splice(i, 1); continue; } }
+      physik1(p, dt, p.rad, false);
+      if (p.weg && p.alpha <= 0) liste.splice(i, 1);
+    }
+    if (!gross && liste.length > 70) liste.splice(0, liste.length - 70);
+  }
+
+  function inBewegung() {
+    if (hebel.gedrueckt || auto || autoSchlange) return true;
+    if (Math.abs(hebel.a - A_REST) > 0.0004 && !(kontaktWinkel() !== null && Math.abs(hebel.a - kontaktWinkel()) < 0.0004)) return true;
+    if (Math.abs(hebel.v) > 0.003) return true;
+    if (wackel.t > 0 || freude > 0) return true;
+    if (nuss && (nuss.fall || nuss.rissT < 1)) return true;
+    if (huepfer || kernFlug) return true;
+    if (brettAnim > 0 && !REDUZIERT && brettNussDa()) return true;
+    var i;
+    for (i = 0; i < teile.length; i++) if (!teile[i].ruhe || teile[i].weg) return true;
+    for (i = 0; i < krumen.length; i++) if (!krumen[i].ruhe || krumen[i].weg || krumen[i].leben !== undefined) return true;
+    if (rolle && (!rolle.ruhe || rolle.weg)) return true;
+    return false;
+  }
+
+  function zeichne() {
+    if (!hg) return;
+    var g = ctx, u = S.u;
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    g.clearRect(0, 0, S.W, S.H);
+    g.save();
+    if (wackel.t > 0 && !REDUZIERT) {
+      var st = wackel.t / wackel.d * wackel.a * u;
+      g.translate((Math.random() - 0.5) * 2 * st, (Math.random() - 0.5) * 1.4 * st);
+    }
+    g.drawImage(hg, 0, 0, S.W, S.H);
+    g.scale(u, u);
+    zeichneFlamme(g, raf ? flacker : 0);
+    zeichneGesicht(g, druck, freude > 0);
+    var statisch = phase === 'leer' && !nuss && anzeigeTag() && !teile.length;
+    if (statisch) { halbschale(g, 34.5, 51.8, 1, -0.12); halbschale(g, 71.5, 51.8, 1, 0.16); }
+    if (nuss) {
+      var a = Math.max(hebel.a, kontaktWinkel() !== null ? kontaktWinkel() : -1);
+      var basisSy = 1 - 0.029 * nuss.risse, sy = basisSy, sx = 1;
+      var ac = kontaktWinkel();
+      if (ac !== null && hebel.a > ac) {
+        var h0 = NUSS.unten - stempelY(ac), h1 = NUSS.unten - stempelY(hebel.a);
+        sy = basisSy * klemme(h1 / h0, 0.8, 1); sx = 1 + (1 - sy / basisSy) * 0.6;
+      }
+      void a;
+      var fy = nuss.fall ? nuss.fall.y : 0;
+      g.save(); g.translate(NUSS.x, NUSS.unten + fy); g.scale(NUSS.s * sx, NUSS.s * sy); g.translate(-50, -91);
+      nussMalen(g, nuss, nuss.rissT);
+      g.restore();
+    }
+    var hl = huepfer ? huepferLage(huepfer) : null, hVorne = hl && (huepfer.rein ? hl.q < 0.5 : hl.q >= 0.5);
+    if (hl && !hVorne) zeichneNussFrei(g, huepfer.n, hl.x, hl.y, hl.rot, 0.5, false);
+    zeichneMuldeVorne(g);
+    var bt = brettNussDa();
+    if (bt) {
+      var puls = brettAnim > 0 && !REDUZIERT ? 0.8 + 0.3 * Math.sin((2.4 - brettAnim) * 5.2) : 0.8;
+      zeichneNussFrei(g, brettNuss(bt), BRETT_X, BRETT_OBEN - brettHuepf(), 0, puls, true);
+    }
+    if (hl && hVorne) zeichneNussFrei(g, huepfer.n, hl.x, hl.y, hl.rot, 0.5, false);
+    if (rolle) { g.globalAlpha = rolle.weg ? Math.max(0, rolle.alpha) : 1; zeichneRolle(g, rolle); g.globalAlpha = 1; }
+    var i, p;
+    for (i = 0; i < teile.length; i++) {
+      p = teile[i];
+      g.save(); g.globalAlpha = p.weg ? Math.max(0, p.alpha) : 1;
+      g.translate(p.x, p.y); g.rotate(p.rot); g.scale(NUSS.s, NUSS.s);
+      g.drawImage(p.spr, -p.cx, -p.cy, 100, 100);
+      g.restore();
+    }
+    for (i = 0; i < krumen.length; i++) {
+      p = krumen[i];
+      var al = p.weg ? Math.max(0, p.alpha) : p.leben !== undefined ? Math.min(1, p.leben / 0.4) : 1;
+      g.globalAlpha = al; g.fillStyle = p.farbe;
+      g.save(); g.translate(p.x, p.y); g.rotate(p.rot);
+      g.beginPath(); g.moveTo(p.form[0], p.form[1]); for (var j = 2; j < p.form.length; j += 2) g.lineTo(p.form[j], p.form[j + 1]); g.closePath(); g.fill();
+      g.restore();
+    }
+    g.globalAlpha = 1;
+    if (K.heute() === 0) zeichneSchaelchen(g, kerne);   // vor den Schalenstücken: der Kern bleibt sichtbar
+    if (kernFlug) {
+      var kq = klemme(kernFlug.t / kernFlug.d, 0, 1), ke = 1 - (1 - kq) * (1 - kq);
+      g.save();
+      g.translate(kernFlug.von.x + (kernFlug.nach.x - kernFlug.von.x) * ke, kernFlug.von.y + (kernFlug.nach.y - kernFlug.von.y) * kq - kernFlug.hub * 4 * kq * (1 - kq));
+      g.scale(1 - 0.38 * kq, 1 - 0.38 * kq); zeichneKern(g, { x: 0, y: 0, rot: kq * 7 });
+      g.restore();
+    }
+    var hinweis = phase === 'bereit' && nuss && nuss.risse === 0 && ersterDruck && !hebel.gedrueckt && !auto && !nuss.fall;
+    zeichneHebel(g, hebel.a, hinweis);
+    if (hinweis) zeichnePfeil(g, hebel.a);
+    g.restore();
+  }
+
+  function tick(jetzt) {
+    raf = 0;
+    var dt = Math.min(0.033, Math.max(0.001, (jetzt - zuletzt) / 1000)); zuletzt = jetzt;
+    schritt(dt);
+    if (inBewegung()) { raf = requestAnimationFrame(tick); zeichne(); }
+    else { hebel.v = 0; if (kontaktWinkel() === null || hebel.a < kontaktWinkel()) hebel.a = A_REST; zeichne(); }
+  }
+  function starte() {
+    if (raf || document.hidden || !S.W) return;
+    zuletzt = performance.now();
+    raf = requestAnimationFrame(tick);
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; hebel.gedrueckt = false; }
+    else starte();
+  });
+
+  /* ================================================================
+     Knacken
+     ================================================================ */
+  function wackle(d, a) { wackel.t = d; wackel.d = d; wackel.a = a; }
+  function splitter(anzahl, kraft, staub) {
+    var r = Math.random;
+    for (var i = 0; i < anzahl; i++) {
+      var s = (0.5 + r() * 1.1) * (staub ? 0.5 : 1), n = 3 + Math.floor(r() * 3), form = [];
+      for (var k = 0; k < n; k++) { var w = k / n * TAU + r() * 0.8; form.push(Math.cos(w) * s * (0.6 + r() * 0.5), Math.sin(w) * s * (0.6 + r() * 0.5)); }
+      krumen.push({ x: NUSS.x + (r() - 0.5) * 8, y: 33 + r() * 9, vx: (r() - 0.5) * 70 * kraft, vy: -(22 + r() * 42) * kraft, rot: r() * 6, vr: (r() - 0.5) * 20,
+        rad: s * 0.5, form: form, farbe: staub ? 'rgba(236,214,174,.9)' : ['#6c3f1e', '#a5683a', '#8a5530', '#d9b48a'][Math.floor(r() * 4)],
+        ruhe: false, leben: staub ? 0.7 + r() * 0.6 : undefined });
+    }
+  }
+  function knallWort(text, gross) {
+    var k = el.knall;
+    k.textContent = text;
+    k.style.left = (gross ? NUSS.x : NUSS.x + 19) + '%'; k.style.top = (gross ? 9 : 34) / 0.74 + '%';
+    if (REDUZIERT || !k.animate) { k.style.opacity = '1'; setTimeout(function () { k.style.opacity = '0'; }, 700); return; }
+    var rot = (Math.random() - 0.5) * 16;
+    k.animate([
+      { opacity: 0, transform: 'translate(-50%,-50%) scale(.5) rotate(' + rot + 'deg)' },
+      { opacity: 1, transform: 'translate(-50%,-70%) scale(' + (gross ? 1.25 : 1.08) + ') rotate(' + rot + 'deg)', offset: 0.25 },
+      { opacity: 1, transform: 'translate(-50%,-82%) scale(1) rotate(' + rot + 'deg)', offset: 0.65 },
+      { opacity: 0, transform: 'translate(-50%,-100%) scale(.96) rotate(' + rot + 'deg)' }
+    ], { duration: gross ? 1500 : 720, easing: 'ease-out' });
+  }
+
+  function knack() {
+    if (!nuss || phase !== 'bereit') return;
+    ersterDruck = false;
+    nuss.risse++;
+    if (!nuss.uebung && !nuss.nochmal) rissStand[nuss.tag] = nuss.risse;
+    if (nuss.risse >= nuss.ziel) { platzen(); return; }
+    var alt = nuss.linien.length;
+    nuss.linien = risseFuer(nuss.seed, nuss.risse); nuss.rissAb = alt; nuss.rissT = REDUZIERT ? 1 : 0;
+    splitter(6 + Math.floor(Math.random() * 4), 1, false); splitter(8, 0.8, true);
+    wackle(0.16, 1.1 + nuss.risse * 0.15);
+    vibriere(18 + nuss.risse * 6);
+    knackTon(0.55 + nuss.risse * 0.12);
+    knallWort(WORTE[(nuss.risse - 1) % WORTE.length], false);
+    var rest = nuss.ziel - nuss.risse;
+    koenigSagt(rest <= 1 ? 'Fast! Noch einmal!' : nuss.risse === 1 ? 'Noch einmal!' : 'Weiter so!', 260);
+    tafel();
+    sage(rest <= 1 ? 'Knack! Noch einmal kräftig drücken.' : 'Knack! Ein Riss in der Schale. Noch einmal drücken.');
+  }
+  // Kontakt ohne Riss: kleine Rückmeldung, damit man weiß, dass es fester gehen muss
+  function fester() {
+    wackle(0.12, 0.55); vibriere(6);
+    koenigSagt('Fester!', 0);
+  }
+  var sagtUhr = 0, sagtAnim = null;
+  function koenigSagt(text, verzug) {
+    var s = el.sagt;
+    clearTimeout(sagtUhr);
+    sagtUhr = setTimeout(function () {
+      s.textContent = text;
+      if (sagtAnim) { try { sagtAnim.cancel(); } catch (e) { /* egal */ } sagtAnim = null; }
+      if (REDUZIERT || !s.animate) { s.style.opacity = '1'; sagtUhr = setTimeout(function () { s.style.opacity = '0'; }, 1400); return; }
+      s.style.opacity = '0';
+      sagtAnim = s.animate([
+        { opacity: 0, transform: 'scale(.6) translateY(6px)' },
+        { opacity: 1, transform: 'scale(1.06)', offset: 0.12 },
+        { opacity: 1, transform: 'scale(1)', offset: 0.2 },
+        { opacity: 1, transform: 'scale(1)', offset: 0.85 },
+        { opacity: 0, transform: 'scale(.96) translateY(-3px)' }
+      ], { duration: 1600, easing: 'ease-out' });
+    }, verzug || 0);
+  }
+  function koenigStill() { clearTimeout(sagtUhr); if (sagtAnim) { try { sagtAnim.cancel(); } catch (e) { /* egal */ } sagtAnim = null; } el.sagt.style.opacity = '0'; }
+  function kernInsSchaelchen() {
+    kerne++; merkeSchreiben('kerne', kerne);
+    tockTon(true); vibriere(8);
+    if (K.heute() === 0) koenigSagt(kerne === 1 ? 'Lecker!' : 'Schon ' + kerne + ' Kerne!', 0);
+    tafel(); starte();
+  }
+
+  function platzen() {
+    var n = nuss;
+    letzter = { tag: n.tag, uebung: n.uebung, nochmal: n.nochmal };
+    teile = zerbrich(n);
+    nuss = null; phase = 'geknackt';
+    delete rissStand[n.tag];
+    splitter(14, 1.5, false); splitter(14, 1.2, true);
+    // Übungsnuss: der Kern hüpft ins Schälchen (bleibt sichtbar liegen), sonst rollt das Foto heraus
+    if (n.uebung) { if (REDUZIERT) kernInsSchaelchen(); else kernFlug = { t: 0, d: 0.75, von: { x: NUSS.x, y: 42 }, nach: { x: SCHALE_X + KERN_PLATZ[Math.min(kerne, KERN_PLATZ.length - 1)][0], y: BRETT_OBEN - 5 + KERN_PLATZ[Math.min(kerne, KERN_PLATZ.length - 1)][1] }, hub: 17 }; }
+    else rolle = { x: NUSS.x, y: 41, vx: brettNussDa() ? -18 : 21, vy: -50, rot: 0, vr: 5, ruhe: false };
+    if (REDUZIERT) { for (var s = 0; s < 160; s++) schritt(1 / 60); }
+    wackle(0.3, 2.3); freude = 1.9;
+    vibriere([30, 40, 80]);
+    knackTon(1.6);
+    koenigStill();
+    knallWort('Geschafft!', true);
+    el.buehne.classList.remove('scharf');
+    sperreBis = performance.now() + (n.uebung ? 700 : 1500);
+    if (!n.uebung && !n.nochmal) {
+      K.oeffne(n.tag);
+      delete unterwegs[n.tag];
+      fuelleNuss(n.tag, true);
+    }
+    tafel();
+    if (n.uebung) { sage('Geschafft! Drinnen war eine Haselnuss, der Kern liegt jetzt im Schälchen.'); return; }
+    sage('Geschafft! Die Nuss ist offen, ein Foto rollt heraus.');
+    ladeBild(n.tag).catch(noop);
+    var mein = token;
+    clearTimeout(offenUhr);
+    offenUhr = setTimeout(function () {
+      if (mein !== token || !rolle) return;
+      hebel.gedrueckt = false; el.buehne.classList.remove('zieht');
+      var r = el.lw.getBoundingClientRect();
+      var von = { x: r.left + (rolle.x + 1.8) * S.u, y: r.top + (rolle.y - 1) * S.u, w: 9 * S.u };
+      rolle = null; zeichne();
+      oeffneAnsicht(n.tag, { opener: el.bAnsehen, ausRolle: von });
+    }, REDUZIERT ? 450 : 1050);
+  }
+
+  // Schale in Stücke brechen: Keile um einen inneren Punkt, gezackte Kanten
+  function zerbrich(n) {
+    var px = Math.max(16, Math.ceil(100 * NUSS.s * S.u * DPR));
+    var quelle = leinwand(px, px), q = quelle.getContext('2d');
+    q.scale(px / 100, px / 100);
+    nussMalen(q, n, 1);
+    var r = zufall(n.seed * 131 + 7);
+    var O = { x: 50 + (r() - 0.5) * 10, y: 55 + (r() - 0.5) * 8 };
+    var anteile = [1.7, 0.55, 0.8, 1.6, 0.6, 0.75], summe = 0, i;
+    for (i = 0; i < anteile.length; i++) summe += anteile[i];
+    var winkel = [], acc = r() * TAU;
+    for (i = 0; i < anteile.length; i++) { winkel.push(acc); acc += anteile[i] / summe * TAU; }
+    var kanten = winkel.map(function (w) {
+      var pts = [];
+      for (var k = 1; k <= 4; k++) { var ww = w + (r() - 0.5) * 0.4; pts.push({ x: O.x + Math.cos(ww) * k * 14, y: O.y + Math.sin(ww) * k * 14 }); }
+      pts.push({ x: O.x + Math.cos(w) * 80, y: O.y + Math.sin(w) * 80 });
+      return pts;
+    });
+    var liste = [];
+    for (i = 0; i < winkel.length; i++) {
+      var w1 = winkel[i], w2 = i + 1 < winkel.length ? winkel[i + 1] : winkel[0] + TAU;
+      var poly = [O].concat(kanten[i]);
+      for (var s = 1; s < 6; s++) { var ww = w1 + (w2 - w1) * s / 6; poly.push({ x: O.x + Math.cos(ww) * 80, y: O.y + Math.sin(ww) * 80 }); }
+      poly = poly.concat(kanten[(i + 1) % winkel.length].slice().reverse());
+      var spr = leinwand(px, px), sg = spr.getContext('2d');
+      sg.scale(px / 100, px / 100);
+      sg.beginPath(); for (var j = 0; j < poly.length; j++) { if (j) sg.lineTo(poly[j].x, poly[j].y); else sg.moveTo(poly[j].x, poly[j].y); } sg.closePath();
+      sg.save(); sg.clip(); sg.setTransform(1, 0, 0, 1, 0, 0); sg.drawImage(quelle, 0, 0); sg.restore();
+      sg.strokeStyle = 'rgba(40,20,8,.55)'; sg.lineWidth = 1.4; sg.save(); sg.clip(P_NUSS); sg.stroke(); sg.restore();
+      var sx = 0, sy = 0, cnt = 0;
+      for (var yy = 7; yy < 92; yy += 4) for (var xx = 15; xx < 86; xx += 4) {
+        if (!probe.isPointInPath(P_NUSS, xx, yy)) continue;
+        var aw = Math.atan2(yy - O.y, xx - O.x);
+        while (aw < w1) aw += TAU;
+        while (aw >= w1 + TAU) aw -= TAU;
+        if (aw < w2) { sx += xx; sy += yy; cnt++; }
+      }
+      if (!cnt) continue;
+      var cx = sx / cnt, cy = sy / cnt, mitte = (w1 + w2) / 2, kraft = 0.8 + r() * 0.5;
+      liste.push({ spr: spr, cx: cx, cy: cy, x: NUSS.x + (cx - 50) * NUSS.s, y: NUSS.unten + (cy - 91) * NUSS.s,
+        vx: Math.cos(mitte) * (16 + r() * 22) * kraft, vy: Math.sin(mitte) * 10 - (30 + r() * 26) * kraft, rot: 0, vr: (r() - 0.5) * 14,
+        rad: Math.sqrt(cnt) * 4 * NUSS.s * 0.42, ruhe: false, alpha: 1 });
+    }
+    return liste;
+  }
+
+  function starteAuto() {
+    var ac = kontaktWinkel();
+    if (ac === null) return;
+    var zu = ac + 1.15 * druckNoetig() / (HEBEL_L * uZug());
+    hebel.r = HEBEL_L; hebel.kontakt = hebel.a >= ac;
+    auto = { t: 0, von: Math.min(hebel.a, ac), zu: zu, dauer: 0.11 + Math.max(0, ac - hebel.a) / 2.4 };
+    starte();
+  }
+  function druecke() {
+    if (phase !== 'bereit' || !nuss) return;
+    if (nuss.fall) { autoSchlange = Math.min(2, autoSchlange + 1); return; }
+    if (auto || hebel.gedrueckt) { autoSchlange = Math.min(2, autoSchlange + 1); return; }
+    starteAuto();
+  }
+  function loslassen(vonAuto) {
+    // Wer fast genug gedrückt hat, bekommt den Riss beim Loslassen – aber nie zwei in einem Zug
+    var offen = !vonAuto && phase === 'bereit' && !hebel.zugKnack;
+    var nachsichtig = offen && druck >= 0.6, schwach = offen && !nachsichtig && hebel.maxDruck >= 0.3;
+    hebel.gedrueckt = false; hebel.kontakt = false; hebel.zugKnack = false; hebel.maxDruck = 0;
+    if (nachsichtig) knack(); else if (schwach) fester();
+    druck = 0;
+    el.buehne.classList.remove('zieht');
+    starte();
+  }
+
+  /* --- Geste auf der Bühne: Hebel herunterziehen oder antippen --- */
+  var zug = null;
+  function inEinheiten(e) { var r = el.lw.getBoundingClientRect(); return { x: (e.clientX - r.left) / S.u, y: (e.clientY - r.top) / S.u }; }
+  el.buehne.addEventListener('pointerdown', function (e) {
+    if (e.button > 0 || !S.W) return;
+    if (e.target.closest && e.target.closest('button')) return;
+    var zone = e.target.closest ? e.target.closest('.zone') : null, scharf = phase === 'bereit' && !!nuss;
+    // Ziehen: mit der Maus überall, per Touch nur in Griff- bzw. Nusszone (dort ist touch-action gesperrt)
+    var darf = e.pointerType === 'mouse' || (zone && (zone.classList.contains('zone-griff') || scharf));
+    zug = { id: e.pointerId, x: e.clientX, y: e.clientY, y0: e.clientY, t: performance.now(), weit: 0, runter: 0, scharf: scharf,
+      touch: e.pointerType !== 'mouse', scroll: false, zieh: !!darf && !huepfer && !fluege && !holt };
+    if (!zug.zieh) return;
+    var p = inEinheiten(e);
+    zug.r = klemme(Math.sqrt((p.x - PIV.x) * (p.x - PIV.x) + (p.y - PIV.y) * (p.y - PIV.y)), 26, 68);
+    zug.a0 = hebel.a;
+    try { el.buehne.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+    e.preventDefault();
+  });
+  el.buehne.addEventListener('pointermove', function (e) {
+    if (!zug || e.pointerId !== zug.id) return;
+    if (zug.scroll) { scrolleMit(e); return; }
+    if (!zug.zieh) return;
+    var dy = e.clientY - zug.y, dx = e.clientX - zug.x;
+    zug.weit = Math.max(zug.weit, Math.abs(dx) + Math.abs(dy));
+    zug.runter = Math.max(zug.runter, e.clientY - zug.y0);
+    if (!hebel.gedrueckt && zug.weit > 6) {
+      // Touch: Wer zuerst nach oben wischt, will die Seite scrollen (in den Zonen ist touch-action gesperrt,
+      // deshalb scrollt die Seite hier selbst mit) – nur ein Zug nach unten fasst den Hebel
+      if (zug.touch && dy < 0 && -dy >= Math.abs(dx) * 0.6) { beginneScroll(e); return; }
+      if (auto) return;
+      hebel.gedrueckt = true; hebel.kontakt = false; hebel.zugKnack = false; hebel.maxDruck = 0; autoSchlange = 0; hebel.r = zug.r;
+      el.buehne.classList.add('zieht');
+      zug.y = e.clientY; zug.a0 = hebel.a; dy = 0;
+    }
+    // Am leeren Knacker erst seitlich, dann deutlich nach oben gewischt: doch scrollen statt Hebel halten
+    if (hebel.gedrueckt && zug.touch && !zug.scharf && zug.runter < 10 && e.clientY - zug.y0 < -24) {
+      loslassen(false); beginneScroll(e); return;
+    }
+    if (hebel.gedrueckt) {
+      var su = hebel.r * uZug(), af = zug.a0 + dy / su, ac = kontaktWinkel();
+      // Fingerweg unter dem Kontakt begrenzen: wer hochführt, hebt den Hebel sofort an
+      if (ac !== null) { var grenze = ac + 1.2 * druckNoetig() / su; if (af > grenze) { zug.a0 -= af - grenze; af = grenze; } }
+      hebel.af = af; starte();
+    }
+  });
+  // Seite mit dem Finger mitscrollen (samt kurzem Nachlauf wie beim normalen Wischen)
+  var schwungRaf = 0;
+  function schwungStopp() { if (schwungRaf) cancelAnimationFrame(schwungRaf); schwungRaf = 0; }
+  function beginneScroll(e) {
+    schwungStopp();
+    zug.scroll = true; zug.zieh = false;
+    zug.sy = zug.y0; zug.proben = [];
+    scrolleMit(e);
+  }
+  function scrolleMit(e) {
+    var d = e.clientY - zug.sy, jetzt = performance.now();
+    zug.sy = e.clientY;
+    if (d) window.scrollBy(0, -d);
+    zug.proben.push({ t: jetzt, y: e.clientY });
+    while (zug.proben.length > 2 && jetzt - zug.proben[0].t > 100) zug.proben.shift();
+  }
+  function schwung(z) {
+    var p = z.proben || [], a = p[0], b = p[p.length - 1];
+    if (!a || b.t - a.t < 12 || performance.now() - b.t > 90) return;
+    var v = klemme((b.y - a.y) / (b.t - a.t), -4, 4);   // Finger-px je ms
+    if (Math.abs(v) < 0.15) return;
+    schwungStopp();
+    // eigene Soll-Lage mitführen: Bruchteile von Pixeln gehen so nicht verloren
+    var soll = window.scrollY, max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight), vorher = performance.now();
+    function lauf(jetzt) {
+      var dt = klemme(jetzt - vorher, 1, 32); vorher = jetzt;
+      v *= Math.pow(0.997, dt);
+      soll = klemme(soll - v * dt, 0, max);
+      window.scrollTo(0, soll);
+      if (Math.abs(v) < 0.03 || soll <= 0 || soll >= max) { schwungRaf = 0; return; }
+      schwungRaf = requestAnimationFrame(lauf);
+    }
+    schwungRaf = requestAnimationFrame(lauf);
+  }
+  document.addEventListener('pointerdown', schwungStopp, true);
+  window.addEventListener('wheel', schwungStopp, { passive: true });
+  function zugEnde(e) {
+    if (!zug || e.pointerId !== zug.id) return;
+    var z = zug; zug = null;
+    if (z.scroll) { if (e.type === 'pointerup') schwung(z); return; }
+    var kurz = z.weit < 9 && performance.now() - z.t < 420;
+    if (hebel.gedrueckt) {
+      loslassen(false);
+      // Am leeren Knacker nach unten gezogen: die nächste Nuss hüpft hinein (nach oben wischen scrollt nur)
+      if (!z.scharf && z.runter > 24 && e.type !== 'pointercancel') holeNaechste(false);
+      return;
+    }
+    if (e.type !== 'pointerup' || !kurz) return;
+    if (z.scharf) { druecke(); return; }
+    tippLeer();
+  }
+  el.buehne.addEventListener('pointerup', zugEnde);
+  el.buehne.addEventListener('pointercancel', zugEnde);
+  el.buehne.addEventListener('lostpointercapture', zugEnde);
+
+  function tippLeer() {
+    hebel.v += 1.6; starte();
+    holeNaechste(false);
+  }
+  // Leerer Knacker angetippt oder am Griff gezogen: heute → sonst jüngste verpasste → im November Übungsnuss
+  function holeNaechste(perTaste) {
+    if (performance.now() < sperreBis || huepfer || fluege || holt) return;
+    var h = K.heute(), v;
+    if (h === 0) { if (phase !== 'bereit') lassFallen(0, { uebung: true }, perTaste); return; }
+    if (brettNussDa()) { einrollen(perTaste); return; }
+    if (h <= 24 && zustand(h) === 'heute' && !unterwegs[h]) { legeEin(h, slots[h], perTaste); return; }
+    v = juengsterVerpasst();
+    if (v) { lassFallen(v, null, perTaste); return; }
+    koenigSagt(h >= 25 ? 'Frohe Weihnachten!' : 'Heute schon geknackt!', 0);
+    if (h <= 24) el.text.textContent = 'Die Nuss von heute ist schon offen. Morgen wartet die nächste – oder knack sie einfach nochmal.';
+  }
+
+  /* ================================================================
+     Nüsse einlegen, zurücklegen, fliegen lassen
+     ================================================================ */
+  function nussSvg(t, art, schleife) {
+    return '<svg class="nuss-svg' + (art === 'gold' ? ' gold' : '') + '" viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-' + art + '"/>' +
+      '<text class="zl" x="50" y="64.2">' + t + '</text><text class="z" x="50" y="63">' + t + '</text>' + (schleife ? '<use href="#schleife"/>' : '') + '</svg>';
+  }
+  function nussZiel() {
+    var r = el.lw.getBoundingClientRect();
+    return { x: r.left + NUSS.x * S.u, y: r.top + NUSS.y * S.u, size: 100 * NUSS.s * S.u, rot: 0 };
+  }
+  function slotQuelle(t) {
+    var b = slots[t]; if (!b) return null;
+    var f = b.querySelector('.figur'), r = f.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2, size: f.offsetWidth, rot: parseFloat(b.style.getPropertyValue('--r')) || 0 };
+  }
+  function fliege(t, art, von, nach, fertig) {
+    var d = document.createElement('div');
+    d.className = 'flug';
+    d.style.width = von.size + 'px'; d.style.height = von.size + 'px';
+    d.innerHTML = nussSvg(t, art, false);
+    el.flugraum.appendChild(d);
+    var dx = nach.x - von.x, dy = nach.y - von.y, dist = Math.sqrt(dx * dx + dy * dy);
+    var hub = Math.min(170, 40 + dist * 0.28), cx = von.x + dx * 0.5, cy = Math.min(von.y, nach.y) - hub;
+    var umdr = klemme(dist / (Math.PI * von.size) * 360, 120, 600) * (dx >= 0 ? 1 : -1);
+    var frames = [], N = 16;
+    for (var i = 0; i <= N; i++) {
+      var s = i / N, x = (1 - s) * (1 - s) * von.x + 2 * (1 - s) * s * cx + s * s * nach.x, y = (1 - s) * (1 - s) * von.y + 2 * (1 - s) * s * cy + s * s * nach.y;
+      var k = (von.size + (nach.size - von.size) * s) / von.size, rot = von.rot + (nach.rot - von.rot + umdr) * s;
+      if (i === N) rot = nach.rot + Math.round(umdr / 360) * 360;
+      frames.push({ transform: 'translate(' + (x - von.size / 2).toFixed(1) + 'px,' + (y - von.size / 2).toFixed(1) + 'px) scale(' + k.toFixed(3) + ') rotate(' + rot.toFixed(1) + 'deg)' });
+    }
+    var fertigGerufen = false;
+    function ende() { if (fertigGerufen) return; fertigGerufen = true; if (d.parentNode) d.parentNode.removeChild(d); fertig(); }
+    if (REDUZIERT || !d.animate) {
+      d.style.transform = frames[N].transform; d.style.opacity = '0';
+      setTimeout(ende, 120);
+      return d;
+    }
+    var an = d.animate(frames, { duration: klemme(480 + dist * 0.4, 520, 900), easing: 'cubic-bezier(.35,.05,.3,1)', fill: 'forwards' });
+    an.onfinish = ende; an.oncancel = ende;
+    return d;
+  }
+
+  var fluege = 0;
+  // Sperre, solange nach dem Antippen erst zur Bühne gescrollt wird (bis zu 0,7 s): Eine zweite Wahl in dieser
+  // Zeit würde sonst eine zweite Nuss als leere Mulde auf dem Tuch hängen lassen – die erste Wahl gilt.
+  var holt = 0, holtNr = 0;
+  function zurBuehneGesperrt() {
+    var nr = ++holtNr;
+    holt = nr;
+    return zurBuehne().then(function () { if (holt === nr) holt = 0; });
+  }
+  // Eine Nuss vom Tuch in den Knacker rollen lassen
+  function legeEin(t, btn, perTaste) {
+    if (holt) return;
+    if (fluege || huepfer || (nuss && nuss.tag === t && !nuss.nochmal)) { if (nuss && nuss.tag === t) zurBuehne(); return; }
+    if (t === brettNussDa()) { einrollen(perTaste); return; }
+    raeumeAuf();
+    var mein = token;
+    zurBuehneGesperrt().then(function () {
+      if (mein !== token) return;
+      var von = slotQuelle(t), nach = nussZiel(), art = t === K.heute() ? 'gold' : 'braun';
+      unterwegs[t] = 1; fuelleNuss(t); kopf();
+      fluege++;
+      fliege(t, art, von || nach, nach, function () {
+        fluege--;
+        if (mein !== token) return;
+        landen(t, perTaste, false);
+      });
+    });
+  }
+  // Die Nuss ist in der Mulde angekommen
+  function landen(t, perTaste, huepft) {
+    nuss = neueNuss(t); phase = 'bereit'; ersterDruck = true;
+    if (huepft && !REDUZIERT) nuss.fall = { y: 0, vy: 95 };
+    hebel.v = 0.9;            // kleiner Ruck: der Hebel nickt, wenn die Nuss landet
+    vibriere(10); tockTon(false);
+    el.buehne.classList.add('scharf');
+    tafel(); starte();
+    sage('Nuss ' + t + ' liegt im Nussknacker. Drück den Hebel nach unten oder tipp auf „Knacken“.');
+    if (perTaste) fokus(el.bKnacken);
+    vorladen(t);
+  }
+  // Handy/Tablet: die goldene Nuss hüpft vom Brett in die Mulde
+  function einrollen(perTaste) {
+    var t = brettNussDa();
+    if (!t || fluege || huepfer || holt || performance.now() < sperreBis) return;
+    raeumeAuf();
+    var mein = token;
+    zurBuehneGesperrt().then(function () {
+      if (mein !== token || unterwegs[t] || huepfer) return;
+      unterwegs[t] = 1; fuelleNuss(t); kopf();
+      koenigStill();
+      if (REDUZIERT) { landen(t, perTaste, false); zeichne(); return; }
+      tockTon(true);
+      huepfer = { tag: t, n: brettNuss(t), t: 0, d: 0.56, hub: 13, rein: true,
+        von: { x: BRETT_X, y: BRETT_OBEN }, nach: { x: NUSS.x, y: NUSS.unten, rot: -TAU },
+        fertig: function () { if (mein === token) landen(t, perTaste, true); } };
+      tafel(); starte();
+    });
+  }
+  // Per Knopf: Nuss fällt von oben in die Mulde (nachholen, nochmal, Übung)
+  function lassFallen(t, opt, perTaste) {
+    if (fluege || huepfer || holt) return;
+    raeumeAuf();
+    var mein = token;
+    zurBuehneGesperrt().then(function () {
+      if (mein !== token) return;
+      nuss = neueNuss(t, opt); phase = 'bereit'; ersterDruck = true;
+      if (!nuss.uebung && !nuss.nochmal) { unterwegs[t] = 1; fuelleNuss(t); }
+      nuss.fall = REDUZIERT ? null : { y: -46, vy: 0 };
+      el.buehne.classList.add('scharf');
+      tafel(); starte(); zeichne();
+      if (!nuss.uebung) vorladen(t);
+      sage((nuss.uebung ? 'Eine Übungsnuss' : 'Nuss ' + t) + ' liegt im Nussknacker.');
+      if (perTaste) fokus(el.bKnacken);
+    });
+  }
+  // Nuss aus dem Knacker zurück aufs Tuch
+  function legeZurueck(perTaste) {
+    if (!nuss || fluege || huepfer) return;
+    var n = nuss; nuss = null; phase = 'leer';
+    auto = null; autoSchlange = 0; hebel.gedrueckt = false;
+    el.buehne.classList.remove('scharf');
+    if (!n.nochmal && !n.uebung && n.tag === aufBrett()) {
+      // zurück aufs Brett neben die Mulde
+      delete unterwegs[n.tag];
+      if (!REDUZIERT) {
+        huepfer = { tag: n.tag, n: n, t: 0, d: 0.5, hub: 11, rein: false,
+          von: { x: NUSS.x, y: NUSS.unten }, nach: { x: BRETT_X, y: BRETT_OBEN, rot: TAU },
+          fertig: function () { tockTon(true); vibriere(6); } };
+      }
+      fuelleNuss(n.tag, true); tafel(); starte(); zeichne();
+      if (perTaste) fokus(ersterKnopf());
+      return;
+    }
+    var ziel = n.nochmal || n.uebung ? null : slotQuelle(n.tag);
+    if (!ziel) { tafel(); starte(); zeichne(); if (perTaste) fokus(ersterKnopf()); return; }
+    var von = nussZiel(); von.rot = 0;
+    fluege++;
+    var mein = token;
+    zeichne(); tafel(); if (perTaste) fokus(ersterKnopf());
+    fliege(n.tag, n.art, von, ziel, function () {
+      fluege--;
+      if (mein !== token) return;
+      delete unterwegs[n.tag]; fuelleNuss(n.tag, true);
+    });
+  }
+  // Reste vom letzten Knacken wegfegen, eine liegende Nuss zurücklegen
+  function raeumeAuf() {
+    clearTimeout(offenUhr);
+    if (nuss) {
+      if (!nuss.nochmal && !nuss.uebung) { var t = nuss.tag; delete unterwegs[t]; fuelleNuss(t, true); }
+      nuss = null;
+    }
+    teile.forEach(function (p) { p.weg = true; p.alpha = 1; });
+    krumen.forEach(function (p) { p.weg = true; p.alpha = 1; });
+    if (rolle) { rolle.weg = true; rolle.alpha = 1; }
+    setTimeout(function () { teile = teile.filter(function (p) { return !p.weg; }); krumen = krumen.filter(function (p) { return !p.weg; }); if (rolle && rolle.weg) rolle = null; }, 320);
+    auto = null; autoSchlange = 0; hebel.gedrueckt = false;
+    phase = 'leer'; letzter = null;
+    starte();
+  }
+
+  /* ================================================================
+     Das Nusstuch
+     ================================================================ */
+  var slots = [];
+  var mqBreit = window.matchMedia('(min-width: 600px)');
+  function baueTuch() {
+    var sp = mqBreit.matches ? 6 : 4, folge = anordnung(), r = zufall(2026);
+    el.tuch.style.setProperty('--sp', sp);
+    el.tuch.innerHTML = ''; slots = [];
+    for (var i = 0; i < 24; i++) {
+      var t = folge[i], b = document.createElement('button');
+      b.type = 'button'; b.className = 'nuss'; b.dataset.tag = t;
+      b.style.setProperty('--dx', ((r() - 0.5) * 16).toFixed(1) + '%');
+      b.style.setProperty('--dy', ((r() - 0.5) * 12).toFixed(1) + '%');
+      b.style.setProperty('--r', ((r() - 0.5) * 44).toFixed(1) + 'deg');
+      slots[t] = b; el.tuch.appendChild(b); fuelleNuss(t);
+    }
+  }
+  function layoutWechsel() {
+    versteckeBlase(); baueTuch();
+    if (brettNussDa()) brettAnim = 2.4;
+    kopf(); tafel(); zeichne(); starte();
+  }
+  [mqBreit, mqSchmal].forEach(function (mq) {
+    if (mq.addEventListener) mq.addEventListener('change', layoutWechsel);
+    else if (mq.addListener) mq.addListener(layoutWechsel);
+  });
+
+  function fuelleNuss(t, neu) {
+    var b = slots[t];
+    if (!b) return;
+    var z = zustand(t), brett = z === 'heute' && aufBrett() === t, weg = !!unterwegs[t] || brett, html, status;
+    b.className = 'nuss z-' + z + (weg ? ' leer' : '') + (neu ? ' neu' : '');
+    if (weg) {
+      html = '<span class="figur"><span class="mulde">' + t + '</span></span>';
+      status = unterwegs[t] ? 'liegt gerade im Nussknacker' : 'heute – die goldene Nuss liegt schon beim Nussknacker bereit';
+    } else if (z === 'offen') {
+      html = '<span class="figur offen"><span class="foto"><img alt="" decoding="async" draggable="false"></span><svg class="schale sl" viewBox="0 0 100 64" aria-hidden="true"><use href="#schale"/></svg><svg class="schale sr" viewBox="0 0 100 64" aria-hidden="true"><use href="#schale"/></svg><span class="nr" aria-hidden="true">' + t + '</span></span>';
+      status = 'geöffnet, Foto ansehen';
+    } else {
+      html = '<span class="figur">' + nussSvg(t, z === 'heute' ? 'gold' : 'braun', z === 'verpasst') + '</span>';
+      status = z === 'heute' ? 'heute, die goldene Nuss – zum Knacken antippen' : z === 'verpasst' ? 'verpasst, jetzt nachholen' : 'noch zu';
+    }
+    var altesBild = vorschauIO && b.querySelector('img');
+    if (altesBild) vorschauIO.unobserve(altesBild);
+    b.innerHTML = html;
+    b.setAttribute('aria-label', 'Tag ' + t + ', ' + K.datumText(t) + ' – ' + status);
+    if (z === 'offen' && !weg) {
+      var img = b.querySelector('img'), foto = img.parentNode, schon = vorschauFertig[t];
+      img.setAttribute('data-tag', t);
+      if (schon) img.src = schon;
+      else {
+        foto.classList.add('laedt'); foto.style.backgroundColor = tagesFarbe(t);
+        if (vorschauIO) vorschauIO.observe(img); else ladeVorschau(img);
+      }
+    }
+    if (neu) setTimeout(function () { b.classList.remove('neu'); }, 600);
+  }
+
+  /* Vorschauen auf dem Tuch: nur kleine quadratische Bilder (F.vorschau), und erst, wenn die Nuss in die
+     Nähe des Bildschirms kommt. Einmal geladene kommen beim Neuaufbau einer Nuss sofort aus dem Speicher.
+     Fehler (403/404/Netz): in der Produktion tauscht fotos.js die Quelle selbst gegen den gemalten Platzhalter
+     (sein Fehler-Hörer auf window läuft vor diesem); sonst F.platzhalter, falls vorhanden, sonst Leinenstreifen. */
+  var VORSCHAU_PX = 160, vorschauFertig = {};
+  var vorschauIO = window.IntersectionObserver ? new IntersectionObserver(function (eintraege) {
+    for (var i = 0; i < eintraege.length; i++) {
+      if (!eintraege[i].isIntersecting) continue;
+      vorschauIO.unobserve(eintraege[i].target);
+      ladeVorschau(eintraege[i].target);
+    }
+  }, { rootMargin: '100px 0px' }) : null;   // knapp vor dem Bildschirmrand: am Handy erst beim Scrollen zum Tuch
+  function ladeVorschau(img) {
+    var t = +img.getAttribute('data-tag'), foto = img.parentNode, url = null, erledigt = false;
+    if (!img.isConnected || img.getAttribute('src') || !K.istGeoeffnet(t)) return;
+    function fertig() {
+      if (erledigt) return; erledigt = true;
+      img.onload = img.onerror = null;
+      var s = img.getAttribute('src');
+      if (s && img.complete && img.naturalWidth > 0) vorschauFertig[t] = s;   // echtes Bild oder Platzhalter
+      if (foto) foto.classList.remove('laedt');
+    }
+    function kaputt() {
+      erledigt = true; img.onload = img.onerror = null;
+      if (foto) { foto.classList.remove('laedt'); foto.classList.add('kaputt'); }
+      if (img.parentNode) img.parentNode.removeChild(img);
+    }
+    img.onload = fertig;
+    img.onerror = function () {
+      var s = img.getAttribute('src') || '';
+      if (s !== url && img.hasAttribute('data-platzhalter')) return;   // fotos.js hat schon getauscht → dessen load abwarten
+      var ersatz = '';
+      try { ersatz = s === url && typeof F.platzhalter === 'function' ? F.platzhalter(t, VORSCHAU_PX) : ''; } catch (e) { ersatz = ''; }
+      if (ersatz && ersatz !== s) { img.setAttribute('data-platzhalter', '1'); img.src = ersatz; }
+      else kaputt();
+    };
+    var q;
+    try { q = F.vorschau(t, VORSCHAU_PX); } catch (e) { q = null; }
+    Promise.resolve(q).then(function (u) {
+      if (!u || !img.isConnected) { if (!u) kaputt(); return; }
+      url = u; img.src = u;
+    }, kaputt);
+  }
+
+  el.tuch.addEventListener('animationend', function (e) {
+    var b = e.target.closest && e.target.closest('.nuss');
+    if (b && (e.animationName === 'zurueckrollen' || e.animationName === 'hopsen')) b.classList.remove('zurueckrollen', 'hopst');
+  });
+  el.tuch.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.nuss');
+    if (!b || holt) return;   // eine Nuss ist schon gewählt, die Seite scrollt gerade zur Bühne
+    var t = +b.dataset.tag, perTaste = e.detail === 0, z = zustand(t);
+    if (unterwegs[t]) { versteckeBlase(); zurBuehne().then(function () { hebel.v += 1.4; starte(); if (perTaste) fokus(el.bKnacken); }); return; }
+    if (t === brettNussDa()) { versteckeBlase(); einrollen(perTaste); return; }
+    if (z === 'zu') { sperre(b, t); return; }
+    versteckeBlase();
+    if (z === 'offen') { oeffneAnsicht(t, { opener: b }); return; }
+    legeEin(t, b, perTaste);
+  });
+
+  var blaseUhr = 0;
+  function versteckeBlase() { clearTimeout(blaseUhr); el.blase.hidden = true; }
+  function zeigeBlase(btn, kopfText, unterText) {
+    var bl = el.blase;
+    bl.innerHTML = '<strong></strong><span></span>';
+    bl.firstChild.textContent = kopfText; bl.lastChild.textContent = unterText;
+    bl.hidden = false; bl.classList.remove('unten');
+    bl.style.animation = 'none'; void bl.offsetWidth; bl.style.animation = '';
+    var rb = el.tuchBereich.getBoundingClientRect(), br = btn.getBoundingClientRect();
+    var w = bl.offsetWidth, mitte = br.left + br.width / 2 - rb.left;
+    var left = Math.max(2, Math.min(rb.width - w - 2, mitte - w / 2));
+    var top = br.top - rb.top - bl.offsetHeight + 2;
+    if (br.top - bl.offsetHeight < 8) { top = br.bottom - rb.top + 6; bl.classList.add('unten'); }
+    bl.style.left = left + 'px'; bl.style.top = top + 'px';
+    bl.style.setProperty('--pfeil', Math.max(16, Math.min(w - 16, mitte - left)) + 'px');
+    sage(kopfText + ' ' + unterText);
+    clearTimeout(blaseUhr); blaseUhr = setTimeout(versteckeBlase, 2800);
+  }
+  function sperre(b, t) {
+    b.classList.remove('zurueckrollen'); void b.offsetWidth; b.classList.add('zurueckrollen');
+    vibriere(12);
+    zeigeBlase(b, K.sperrText(t), K.heute() === 0 ? 'Nuss ' + t + ' ist am ' + K.datumText(t) + ' dran.' : 'Nuss ' + t + ' ist am ' + K.datumText(t) + ' dran.');
+  }
+  document.addEventListener('pointerdown', function (e) { if (!el.blase.hidden && !(e.target.closest && e.target.closest('.nuss'))) versteckeBlase(); });
+
+  function findeHeute() {
+    var t = K.heute(), b = slots[t];
+    if (!b || t < 1 || t > 24) return;
+    var r = b.getBoundingClientRect(), vh = window.innerHeight;
+    var fertig = function () {
+      b.classList.remove('hopst'); void b.offsetWidth; b.classList.add('hopst', 'gefunden');
+      setTimeout(function () { b.classList.remove('gefunden'); }, 2600);
+      fokus(b);
+      sage('Da ist sie: die goldene Nuss von Tag ' + t + '. Tipp sie an.');
+    };
+    if (r.top < 70 || r.bottom > vh - 40) scrolleZu(window.scrollY + r.top - vh * 0.42).then(fertig); else fertig();
+  }
+
+  /* ================================================================
+     Tafel unter dem Knacker: Texte und Knöpfe
+     ================================================================ */
+  function anzeigeTag() {
+    var h = K.heute();
+    if (phase === 'geknackt' && letzter) return letzter.uebung ? 0 : letzter.tag;
+    if (h >= 1 && h <= 24) return K.istGeoeffnet(h) ? h : 0;
+    if (h >= 25) return K.istGeoeffnet(24) ? 24 : 0;
+    return 0;
+  }
+  function ersterKnopf() {
+    var k = [el.bKnacken, el.bFinden, el.bAnsehen, el.bUebung, el.bNachholen, el.bNochmal];
+    for (var i = 0; i < k.length; i++) if (!k[i].hidden) return k[i];
+    return null;
+  }
+  var nachholTag = 0, ansehenAlle = false;
+  function tafel() {
+    var h = K.heute(), titel, text, z = {};
+    if (phase === 'bereit' && nuss) {
+      var hilfe = 'Zieh den roten Griff nach unten – oder tipp auf die Nuss. Jeder Druck gibt einen Riss.';
+      if (nuss.uebung) { titel = 'Eine Nuss zum Üben'; text = 'Ab 1. Dezember steckt in jeder Nuss ein Foto. Bis dahin darfst du üben: ' + hilfe.charAt(0).toLowerCase() + hilfe.slice(1); }
+      else if (nuss.nochmal) { titel = 'Nuss ' + nuss.tag + ' nochmal knacken'; text = hilfe; }
+      else if (nuss.tag === h) { titel = 'Knack die goldene Nuss!'; text = hilfe; }
+      else { titel = 'Nuss ' + nuss.tag + ' nachholen'; text = K.datumText(nuss.tag) + '. ' + hilfe; }
+      if (nuss.risse > 0) {
+        var rest = nuss.ziel - nuss.risse;
+        text = rest <= 1 ? 'Gleich ist sie offen – noch einmal kräftig!' : nuss.risse === 1 ? 'Knack! Ein erster Riss. Hebel hoch – und gleich nochmal!' : 'Es knirscht schon ordentlich – weiter!';
+      }
+      z.knacken = 1; if (!nuss.uebung) z.zurueck = 1;
+      el.bZurueck.lastChild.textContent = nuss.nochmal ? 'Weglegen' : 'Zurücklegen';
+    } else if (phase === 'geknackt' && letzter && letzter.uebung) {
+      titel = 'Gut geknackt!';
+      text = (kernFlug ? 'Der Kern hüpft ins Schälchen. ' : kerne > 1 ? 'Schon ' + kerne + ' Kerne im Schälchen. ' : kerne === 1 ? 'Der erste Kern liegt im Schälchen. ' : '') + 'Ab 1. Dezember rollt aus jeder Nuss ein Foto.';
+      z.uebung = 1;
+    } else {
+      var t = anzeigeTag();
+      if (h === 0) { titel = 'Noch ist November'; text = 'Ab 1. Dezember liegt jeden Tag eine goldene Nuss bereit.' + (kerne ? ' Im Schälchen ' + (kerne === 1 ? 'liegt schon ein Kern.' : 'liegen schon ' + kerne + ' Kerne.') : ''); z.uebung = 1; }
+      else if (h <= 24 && unterwegs[h] && !nuss) { titel = 'Die goldene Nuss kommt'; text = 'Gleich liegt sie im Nussknacker.'; }
+      else if (h <= 24 && !K.istGeoeffnet(h) && !unterwegs[h]) {
+        titel = 'Die goldene Nuss wartet';
+        text = aufBrett() ? 'Sie liegt schon neben dem Nussknacker. Tipp sie an oder zieh am roten Griff – dann hüpft sie hinein.'
+          : 'Irgendwo auf dem Tuch liegt die goldene Nuss von heute. Tipp sie an oder zieh am roten Griff – dann rollt sie in den Nussknacker.';
+        z.finden = 1;
+      } else if (t) {
+        var ti = bildTitel(t);
+        titel = ti || 'Nuss ' + t + ' ist offen';
+        text = (ti ? 'Nuss ' + t + ' · ' : '') + K.datumText(t) + '.';
+        if (h >= 25 && !juengsterVerpasst() && phase !== 'geknackt') { titel = 'Alle 24 Nüsse sind geknackt'; text = 'Tipp eine offene Nuss auf dem Tuch an – oder schau dir alle Fotos nacheinander an.'; z.alle = 1; }
+        z.ansehen = 1; z.nochmal = 1;
+      } else if (h >= 25) {
+        titel = 'Ein paar Nüsse warten noch'; text = 'Die Nüsse mit Schleife darfst du jetzt in Ruhe nachholen.';
+        if (K.geoeffnet().length) z.ansehen = 1;
+      } else { titel = 'Der Nussknacker'; text = 'Tipp eine Nuss mit Schleife an, um sie nachzuholen.'; }
+    }
+    var t2 = phase === 'bereit' ? 0 : anzeigeTag();
+    nachholTag = phase !== 'bereit' && !z.uebung ? juengsterVerpasst() : 0;
+    el.titel.textContent = titel; el.text.textContent = text;
+    el.bKnacken.hidden = !z.knacken; el.bZurueck.hidden = !z.zurueck; el.bFinden.hidden = !z.finden;
+    el.bAnsehen.hidden = !z.ansehen; el.bNochmal.hidden = !z.nochmal; el.bUebung.hidden = !z.uebung;
+    ansehenAlle = !!(z.alle || !t2);
+    el.bAnsehen.lastChild.textContent = ansehenAlle ? 'Alle Fotos ansehen' : 'Foto ansehen';
+    el.bFinden.lastChild.textContent = aufBrett() ? 'Goldene Nuss einlegen' : 'Heute finden';
+    el.bFinden.firstChild.innerHTML = '<use href="' + (aufBrett() ? '#i-hebel' : '#i-suchen') + '"/>';
+    el.bNachholen.hidden = !nachholTag || !!z.finden && nachholTag === h;
+    if (nachholTag) el.bNachholen.lastChild.textContent = (nachholTag === h - 1 && h <= 24 ? 'Gestern verpasst: Nuss ' : 'Verpasst: Nuss ') + nachholTag + ' holen';
+    // Ohne goldene Nuss und ohne offenes Foto ist „Nachholen“ die Hauptsache
+    el.bNachholen.className = 'knopf ' + (!z.finden && !z.ansehen && !z.knacken ? 'knopf-lack' : 'knopf-klein');
+    var art = nuss ? (nuss.uebung ? 'eine Übungsnuss' : (nuss.art === 'gold' ? 'die goldene Nuss ' : 'Nuss ') + nuss.tag) + (nuss.risse ? ' mit ' + nuss.risse + (nuss.risse === 1 ? ' Riss' : ' Rissen') : '') : '';
+    el.lw.setAttribute('aria-label', nuss ? 'Hölzerner Nussknacker, im Knacker liegt ' + art
+      : 'Hölzerner Nussknacker, leer' + (brettNussDa() ? '. Daneben auf dem Brett wartet die goldene Nuss ' + brettNussDa() : '') + (h === 0 && kerne ? '. Im Schälchen ' + (kerne === 1 ? 'liegt ein Kern' : 'liegen ' + kerne + ' Kerne') : ''));
+    kopf();
+  }
+  function kopf() {
+    var h = K.heute();
+    document.body.classList.toggle('november', h === 0);
+    document.body.classList.toggle('fest', h >= 25);
+    el.heuteZeile.textContent = h === 0 ? 'Noch ist November – am 1. Dezember geht’s los.'
+      : h >= 25 ? 'Frohe Weihnachten!'
+      : 'Heute ist ' + K.datumText(h) + '.';
+    var nz = 0, nv = 0, no = 0;
+    for (var t = 1; t <= 24; t++) { var zz = zustand(t); if (zz === 'zu') nz++; else if (zz === 'verpasst' && !unterwegs[t]) nv++; else if (zz === 'offen') no++; }
+    if (h >= 25) el.heuteZeile.textContent = nv ? 'Frohe Weihnachten! Jetzt darf jede Nuss geknackt werden.' : 'Frohe Weihnachten und schöne Feiertage!';
+    // Legende zeigt nur, was gerade auf dem Tuch liegt
+    $('lgHeute').hidden = !(h >= 1 && h <= 24 && zustand(h) === 'heute' && !aufBrett() && !unterwegs[h]);
+    $('lgNach').hidden = !nv; $('lgOffen').hidden = !no && !(h >= 1 && h <= 24); $('lgZu').hidden = !nz;
+  }
+
+  el.bKnacken.addEventListener('click', druecke);
+  el.bFinden.addEventListener('click', function (e) { if (brettNussDa()) einrollen(e.detail === 0); else findeHeute(); });
+  el.bZurueck.addEventListener('click', function (e) { legeZurueck(e.detail === 0); });
+  el.bUebung.addEventListener('click', function (e) { lassFallen(0, { uebung: true }, e.detail === 0); });
+  el.bNochmal.addEventListener('click', function (e) { var t = anzeigeTag(); if (t) lassFallen(t, { nochmal: true }, e.detail === 0); });
+  el.bAnsehen.addEventListener('click', function () {
+    // „Alle Fotos ansehen“ beginnt beim ersten offenen Foto (vorwärts blättern), „Foto ansehen“ beim heutigen
+    var offen = K.geoeffnet();
+    var t = ansehenAlle ? (offen[0] || 0) : (anzeigeTag() || offen[offen.length - 1] || 0);
+    if (t) oeffneAnsicht(t, { opener: el.bAnsehen });
+  });
+  el.bNachholen.addEventListener('click', function (e) { if (nachholTag) lassFallen(nachholTag, null, e.detail === 0); });
+
+  /* ================================================================
+     Bildansicht: das Foto rollt sich aus wie ein kleines Pergament
+     ================================================================ */
+  var A = { liste: [], i: 0, opener: null, zug: null, ar: 1, rh: 14, token: 0, anims: [], nochmalPerTaste: false };
+
+  function passePapier(ar) {
+    A.ar = ar;
+    var bw = el.aBuehne.clientWidth, bh = el.aBuehne.clientHeight, m = Math.min(bw, bh);
+    var rh = Math.round(klemme(m * 0.03, 10, 16)), pad = Math.round(klemme(m * 0.022, 6, 14)), ueber = 8;
+    var maxW = bw - 2 * pad - 2 * ueber, maxH = bh - 2 * pad - rh - 6;
+    var iw = Math.max(40, Math.min(maxW, maxH * ar)), ih = iw / ar;
+    var pw = iw + 2 * pad, ph = ih + 2 * pad + rh;
+    var s = el.papier.style;
+    s.width = pw + 'px'; s.height = ph + 'px';
+    s.left = ((bw - pw) / 2) + 'px'; s.top = ((bh - ph) / 2) + 'px';
+    s.setProperty('--rh', rh + 'px'); s.setProperty('--pad', pad + 'px');
+    A.rh = rh;
+    el.aStatus.style.top = ((bh - ph) / 2 + rh + 10) + 'px';
+  }
+  function stoppeAnims() { A.anims.forEach(function (a) { try { a.cancel(); } catch (e) { /* egal */ } }); A.anims = []; }
+  function anim(elm, frames, opt) { if (!elm.animate) return null; var a = elm.animate(frames, opt); A.anims.push(a); return a; }
+
+  function oeffneAnsicht(t, opt) {
+    opt = opt || {};
+    A.liste = K.geoeffnet(); A.i = A.liste.indexOf(t);
+    if (A.i < 0) return;
+    A.opener = opt.opener || document.activeElement;
+    versteckeBlase();
+    var schonOffen = el.dlg.open;
+    if (!schonOffen) {
+      if (el.dlg.showModal) el.dlg.showModal(); else el.dlg.setAttribute('open', '');
+      document.documentElement.classList.add('ansicht-offen');
+    }
+    zeigeBild(0, schonOffen ? null : (opt.ausRolle ? { rolle: opt.ausRolle } : { schnell: true }));
+    fokus(el.aZu);
+  }
+  function schliesseAnsicht() {
+    if (!el.dlg.open) return;
+    if (el.dlg.close) el.dlg.close(); else { el.dlg.removeAttribute('open'); nachSchliessen(); }
+  }
+  function nachSchliessen() {
+    document.documentElement.classList.remove('ansicht-offen');
+    stoppeAnims(); A.token++;
+    el.papier.classList.remove('zu-gerollt');
+    var z = A.opener && document.contains(A.opener) && !A.opener.hidden ? A.opener : ersterKnopf();
+    fokus(z);
+    starte();
+  }
+  el.dlg.addEventListener('close', nachSchliessen);
+  el.aZu.addEventListener('click', schliesseAnsicht);
+  el.aNochmal.addEventListener('click', function (e) {
+    var t = A.liste[A.i], perTaste = e.detail === 0;
+    schliesseAnsicht();
+    if (t) setTimeout(function () { lassFallen(t, { nochmal: true }, perTaste); }, 30);
+  });
+
+  function setzeTexte(t) {
+    var ti = bildTitel(t);
+    el.aTitel.textContent = ti || 'Tag ' + t;
+    el.aDatum.textContent = ti ? 'Tag ' + t + ' · ' + K.datumText(t) : K.datumText(t);
+    el.aZaehler.textContent = (A.i + 1) + ' von ' + A.liste.length;
+    el.aZaehler.setAttribute('aria-label', 'Foto ' + (A.i + 1) + ' von ' + A.liste.length);
+    el.aVor.disabled = A.i <= 0; el.aNach.disabled = A.i >= A.liste.length - 1;
+    el.aBild.alt = 'Fotocollage von Tag ' + t + (ti ? ': ' + ti : '');
+  }
+  // Ladezustand im Pergament (Streifenpapier + Nuss, erscheint erst nach kurzer Wartezeit) bzw. bei Fehlern
+  // (403/404/Netz) ein Hinweis mit „Nochmal versuchen“ – nie ein leeres oder schwarzes Blatt
+  function zeigeLaden(t, fehler) {
+    var L = el.aLaden, hatteFokus = L.contains(document.activeElement) || A.nochmalPerTaste;
+    A.nochmalPerTaste = false;
+    L.hidden = false; el.aBild.hidden = true;
+    L.classList.toggle('laedt', !fehler);
+    if (fehler) {
+      L.innerHTML = '<p>Dieses Foto lässt sich gerade nicht laden.</p><button type="button" class="knopf knopf-lack"><svg aria-hidden="true"><use href="#i-nochmal"/></svg><span>Nochmal versuchen</span></button>';
+      var b = L.querySelector('button');
+      b.addEventListener('click', function (e) {
+        delete bildCache[t];
+        fokus(el.aZu);
+        zeigeBild(0, null);
+        A.nochmalPerTaste = e.detail === 0;   // per Tastatur: klappt es wieder nicht, landet der Fokus erneut hier
+      });
+      if (hatteFokus) fokus(b);
+      sage('Das Foto lässt sich gerade nicht laden.');
+    } else {
+      L.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#nuss-braun"/></svg><span>Das Foto wird geladen …</span>';
+    }
+  }
+
+  // richtung: 0 = Start/neu laden, ±1 = Blättern. art: { rolle } | { schnell } | null
+  function zeigeBild(richtung, art) {
+    var t = A.liste[A.i], mein = ++A.token;
+    var c = bildCache[t], fertigDaten = c && c.status === 'ok' ? c.daten : null;
+    function setze(d) {
+      if (mein !== A.token) return;
+      A.nochmalPerTaste = false;
+      el.aLaden.hidden = true; el.aBild.hidden = false;
+      if (el.aBild.getAttribute('src') !== d.url) el.aBild.src = d.url;
+      passePapier(d.w / d.h);
+    }
+    function vorbereiten() {
+      setzeTexte(t);
+      var cc = bildCache[t];
+      if (cc && cc.status === 'ok') setze(cc.daten);
+      else { zeigeLaden(t, !!cc && cc.status === 'fehler' && fehlgeschlagen); passePapier(seitenVerhaeltnis(t)); }
+    }
+    var fehlgeschlagen = false;
+    var geladen = fertigDaten ? Promise.resolve(fertigDaten) : ladeBild(t).then(function (d) { setze(d); return d; }, function () { fehlgeschlagen = true; if (mein === A.token) { zeigeLaden(t, true); passePapier(A.ar); } return null; });
+    geladen.then(function () {
+      if (mein !== A.token || !el.dlg.open) return;
+      setTimeout(function () {
+        if (!el.dlg.open) return;
+        if (A.i + 1 < A.liste.length) ladeBild(A.liste[A.i + 1]).catch(noop);
+        if (A.i - 1 >= 0) ladeBild(A.liste[A.i - 1]).catch(noop);
+      }, 250);
+    });
+    if (!richtung) { stoppeAnims(); el.spur.style.transform = ''; vorbereiten(); if (art) entrolle(art, geladen, mein); return; }
+    // Blättern: altes Blatt gleitet hinaus, neues herein
+    stoppeAnims();
+    if (REDUZIERT || !el.spur.animate) { vorbereiten(); el.spur.style.transform = ''; return; }
+    var von = el.spur.style.transform || 'translateX(0px)';
+    var aus = anim(el.spur, [{ transform: von, opacity: 1 }, { transform: 'translateX(' + (-richtung * 40) + '%)', opacity: 0 }], { duration: 170, easing: 'ease-in', fill: 'forwards' });
+    aus.onfinish = function () {
+      if (mein !== A.token) return;
+      vorbereiten(); el.spur.style.transform = '';
+      try { aus.cancel(); } catch (e) { /* egal */ }
+      anim(el.spur, [{ transform: 'translateX(' + (richtung * 40) + '%)', opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 250, easing: 'cubic-bezier(.2,.7,.2,1)' });
+    };
+  }
+
+  // Ausrollen: (1) die kleine Rolle fliegt von der Nuss in die Mitte, (2) wartet aufs Foto, (3) rollt sich auf
+  function entrolle(art, geladen, mein) {
+    var pap = el.papier, blatt = el.blatt, ru = el.rolleUnten;
+    if (REDUZIERT || !pap.animate) {
+      anim(el.aHg, [{ opacity: 0 }, { opacity: 1 }], { duration: 160 });
+      return;
+    }
+    var H = pap.offsetHeight, hub = H - A.rh;
+    var chrome = [el.aKopf, el.aFuss];
+    anim(el.aHg, [{ opacity: 0 }, { opacity: 1 }], { duration: art.rolle ? 420 : 220, easing: 'ease-out' });
+    chrome.forEach(function (c) { anim(c, [{ opacity: 0 }, { opacity: 0, offset: art.rolle ? 0.5 : 0 }, { opacity: 1 }], { duration: art.rolle ? 700 : 260, easing: 'ease-out' }); });
+    var zu = [{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)' }];
+    var ruZu = [{ transform: 'translateY(' + (-hub) + 'px)' }, { transform: 'translateY(0)' }];
+    function aufrollen(dauer) {
+      if (mein !== A.token) return;
+      pap.classList.remove('zu-gerollt'); el.aStatus.hidden = true;
+      var opt = { duration: dauer, easing: 'cubic-bezier(.32,.72,.24,1)', fill: 'both' };
+      H = pap.offsetHeight; hub = H - A.rh;
+      ruZu[0].transform = 'translateY(' + (-hub) + 'px)';
+      var a1 = anim(blatt, zu, opt); anim(ru, ruZu, opt);
+      if (a1) a1.onfinish = function () { if (mein !== A.token) return; stoppeAnims(); };
+    }
+    if (art.schnell) {
+      anim(pap, [{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 200, easing: 'ease-out' });
+      anim(blatt, [zu[0], zu[0]], { duration: 1, fill: 'both' }); anim(ru, [ruZu[0], ruZu[0]], { duration: 1, fill: 'both' });
+      var hinweisUhr = setTimeout(function () { if (mein === A.token) el.aStatus.hidden = false; }, 260);
+      geladen.then(function () { clearTimeout(hinweisUhr); aufrollen(460); });
+      return;
+    }
+    // Flug von der Rolle auf der Werkbank
+    var r = pap.getBoundingClientRect(), ox = r.left + r.width / 2, oy = r.top + A.rh / 2;
+    var s = klemme(art.rolle.w / (r.width + 14), 0.04, 1), dx = art.rolle.x - ox, dy = art.rolle.y - oy;
+    pap.style.transformOrigin = '50% ' + (A.rh / 2) + 'px';
+    pap.classList.add('zu-gerollt');
+    anim(blatt, [zu[0], zu[0]], { duration: 1, fill: 'both' });
+    anim(ru, [ruZu[0], ruZu[0]], { duration: 1, fill: 'both' });
+    var flug = anim(pap, [
+      { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ') rotate(-28deg)' },
+      { transform: 'translate(' + (dx * 0.45) + 'px,' + (dy * 0.45 - 40) + 'px) scale(' + (s + (1 - s) * 0.55) + ') rotate(-8deg)', offset: 0.55 },
+      { transform: 'none' }
+    ], { duration: 640, easing: 'cubic-bezier(.3,.6,.25,1)' });
+    var warten = setTimeout(function () { if (mein === A.token && pap.classList.contains('zu-gerollt')) el.aStatus.hidden = false; }, 700);
+    var flugFertig = new Promise(function (ok) { if (flug) { flug.onfinish = ok; flug.oncancel = ok; } else ok(); });
+    Promise.all([flugFertig, geladen]).then(function () { clearTimeout(warten); aufrollen(820); });
+  }
+
+  function blaettern(d) {
+    var n = A.i + d;
+    if (n < 0 || n >= A.liste.length) { zurueckfedern(); return; }
+    A.i = n; zeigeBild(d, null);
+  }
+  function zurueckfedern() {
+    var von = el.spur.style.transform || 'translateX(0px)';
+    el.spur.style.transform = '';
+    if (el.spur.animate && !REDUZIERT) el.spur.animate([{ transform: von }, { transform: 'translateX(0)' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1.2)' });
+  }
+  el.aVor.addEventListener('click', function () { blaettern(-1); });
+  el.aNach.addEventListener('click', function () { blaettern(1); });
+  el.dlg.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); blaettern(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); blaettern(1); }
+  });
+  el.aBuehne.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  el.aBuehne.addEventListener('pointerdown', function (e) {
+    if (e.button > 0 || (e.target.closest && e.target.closest('button'))) return;
+    if (e.pointerType === 'mouse') e.preventDefault();
+    A.zug = { id: e.pointerId, x: e.clientX, t: performance.now(), dx: 0 };
+    try { el.aBuehne.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+  });
+  el.aBuehne.addEventListener('pointermove', function (e) {
+    var z = A.zug;
+    if (!z || e.pointerId !== z.id) return;
+    var dx = e.clientX - z.x;
+    if ((dx > 0 && A.i <= 0) || (dx < 0 && A.i >= A.liste.length - 1)) dx *= 0.3;
+    z.dx = dx;
+    el.spur.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+  });
+  function ansichtZugEnde(e) {
+    var z = A.zug;
+    if (!z || e.pointerId !== z.id) return;
+    A.zug = null;
+    var dx = z.dx, dauer = performance.now() - z.t, grenze = Math.min(90, el.aBuehne.clientWidth * 0.18);
+    if (e.type !== 'pointercancel' && (Math.abs(dx) > grenze || (Math.abs(dx) > 28 && dauer < 260))) blaettern(dx < 0 ? 1 : -1);
+    else if (dx !== 0) zurueckfedern();
+  }
+  el.aBuehne.addEventListener('pointerup', ansichtZugEnde);
+  el.aBuehne.addEventListener('pointercancel', ansichtZugEnde);
+
+  /* ================================================================
+     Start, Datum, Größe
+     ================================================================ */
+  function renderAlles() {
+    token++;
+    clearTimeout(offenUhr);
+    schliesseAnsicht(); versteckeBlase();
+    el.flugraum.innerHTML = ''; fluege = 0; holt = 0;
+    unterwegs = {}; rissStand = {};
+    nuss = null; phase = 'leer'; letzter = null; teile = []; krumen = []; rolle = null;
+    huepfer = null; kernFlug = null; sperreBis = 0; brettBild = null;
+    auto = null; autoSchlange = 0; hebel.gedrueckt = false; hebel.a = A_REST; hebel.v = 0; hebel.zugKnack = false; hebel.maxDruck = 0; freude = 0;
+    el.buehne.classList.remove('scharf', 'zieht');
+    koenigStill();
+    kopf();
+    if (K.heute() === 0) { nuss = neueNuss(0, { uebung: true }); phase = 'bereit'; el.buehne.classList.add('scharf'); }
+    baueTuch();
+    tafel();
+    brettAnim = brettNussDa() ? 2.4 : 0;
+    zeichne(); starte();
+  }
+
+  messen();
+  renderAlles();
+  K.onChange(renderAlles);
+  // „Alle wieder zu“ (Menü bzw. Übersichtsseite meldet {kalender:'reset'}): auch das Kern-Schälchen leeren.
+  // #kalender-reset ist in der Produktion nur der Menü-Knopf – ein Klick darauf löscht hier nichts.
+  // Eigener Zusatzspeicher liegt unter 'adventskalender:nuss:…' und kollidiert nie mit dem gemeinsamen Schlüssel.
+  function kerneLeeren() { kerne = 0; merkeSchreiben('kerne', 0); tafel(); zeichne(); }
+  window.addEventListener('message', function (e) { if (e.data && typeof e.data === 'object' && e.data.kalender === 'reset') kerneLeeren(); });
+
+  if (window.ResizeObserver) {
+    var roWartet = false;
+    new ResizeObserver(function () {
+      if (roWartet) return; roWartet = true;
+      requestAnimationFrame(function () {
+        roWartet = false;
+        if (Math.abs(el.buehne.clientWidth - S.W) > 0.5) { messen(); zeichne(); }
+        if (el.dlg.open) passePapier(A.ar);
+      });
+    }).observe(document.documentElement);
+  } else window.addEventListener('resize', function () { messen(); zeichne(); if (el.dlg.open) passePapier(A.ar); });
+
+  if (document.fonts && document.fonts.load) {
+    Promise.all([document.fonts.load('31px "Young Serif"'), document.fonts.load('33px "Bree Serif"')]).then(function () { if (S.W) { baueHintergrund(); zeichne(); } }, noop);
+  }
+
+  // Einmalige, leise Einladung: liegt eine Nuss bereit, nickt der Hebel kurz
+  if (!REDUZIERT) setTimeout(function () { if (phase === 'bereit' && nuss && !nuss.risse && !hebel.gedrueckt && !auto) { hebel.v += 1.1; starte(); } }, 1400);
+})();
+</script>
+</body>
+</html>

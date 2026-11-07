@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>@@TITEL@@</title>
+<!--@@KOPF@@-->
+<!--
+  DEIN-ADVENTSKALENDER-AUSGABE – Lader des eigenen Kalenders.
+  Vorlage für werkzeuge/bauen.mjs: Das Werkzeug setzt die Einstellungen ein und legt die Datei als
+  ausgabe/index.html ab. Diese Vorlage selbst bitte nicht hochladen.
+
+  Ablauf im Browser:
+    1. „heute“ berechnen (Zeitzone aus einstellungen.json, Standard Europe/Berlin)
+    2. Testmodus nur mit Testschlüssel: ?test=<schlüssel> merkt ihn 30 Tage (Cookie adventskalender_test),
+       ?test=aus vergisst ihn. Nur dann gilt ein Testdatum aus dem Menü (Cookie adventskalender_testtag).
+    3. Ansicht wählen: ?v=<id> → Browser-Speicher (<speicher>:variante) → standard_ansicht
+    4. daten.json und varianten/<id>.html laden, window.ADVENTSKALENDER (nur freigegebene Tage) vor dem
+       ersten shared/-Skript einsetzen und die Ansicht anzeigen.
+  Ohne Server-Logik ist das nur ein Schutz gegen Erraten: daten.json verrät auch künftige Dateinamen.
+-->
+<style>
+  :root { --grund: #1d3a33; --schrift: #f6f1e6; --akzent: #f4c35a; --knopf: #2a2110; }
+  html, body { margin: 0; min-height: 100%; }
+  html { background: var(--grund); color: var(--schrift); }
+  body {
+    min-height: 100vh; min-height: 100dvh; display: grid; place-items: center;
+    font: 500 17px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    box-sizing: border-box;
+  }
+  .lader { text-align: center; opacity: 0; transition: opacity .4s; }
+  .lader.sichtbar { opacity: 1; }
+  .lader svg { width: 44px; height: 44px; display: block; margin: 0 auto 12px; fill: var(--akzent); animation: pulsieren 1.6s ease-in-out infinite; }
+  .karte { max-width: 26rem; text-align: center; }
+  .karte h1 { font-size: 1.3rem; margin: 0 0 .5rem; }
+  .karte p { margin: 0 0 1rem; opacity: .9; }
+  .karte button {
+    font: inherit; font-weight: 700; min-height: 44px; padding: 0 22px; border-radius: 999px; cursor: pointer;
+    border: 0; background: var(--akzent); color: var(--knopf);
+  }
+  .karte button:focus-visible { outline: 3px solid var(--schrift); outline-offset: 3px; }
+  @keyframes pulsieren { 0%, 100% { transform: scale(.88); opacity: .7; } 50% { transform: scale(1); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .lader svg { animation: none; } .lader { transition: none; } }
+</style>
+</head>
+<body>
+<div class="lader" id="lader" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5l2.6 6.9 7.4.4-5.8 4.6 2 7.1L12 16.4l-6.2 4.1 2-7.1L2 8.8l7.4-.4z"/></svg>
+  <span>Der Kalender wird geladen …</span>
+</div>
+<noscript><div class="karte"><h1>@@TITEL@@</h1><p>Bitte JavaScript einschalten – sonst lässt sich der Kalender nicht öffnen.</p></div></noscript>
+<script>
+(function () {
+  'use strict';
+
+  // Vom Werkzeug eingesetzt (siehe werkzeuge/bauen.mjs → „lader“)
+  var K = /*@@KONFIG@@*/null;
+
+  var KEKS_TESTTAG = 'adventskalender_testtag';
+  var KEKS_TEST = 'adventskalender_test';
+  var lader = document.getElementById('lader');
+
+  // ---- kleine Helfer ----------------------------------------------------------------------------
+
+  function meldung(titel, text, knopf) {
+    var karte = document.createElement('div');
+    karte.className = 'karte';
+    karte.setAttribute('role', 'alert');
+    var h = document.createElement('h1'); h.textContent = titel; karte.appendChild(h);
+    var p = document.createElement('p'); p.textContent = text; karte.appendChild(p);
+    if (knopf) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = knopf.text;
+      b.addEventListener('click', knopf.aktion);
+      karte.appendChild(b);
+    }
+    if (lader && lader.parentNode) lader.parentNode.removeChild(lader);
+    document.body.appendChild(karte);
+    if (knopf) b.focus();
+  }
+
+  function keks(name) {
+    var teile = document.cookie ? document.cookie.split(';') : [];
+    for (var i = 0; i < teile.length; i++) {
+      var s = teile[i].replace(/^\s+/, '');
+      var p = s.indexOf('=');
+      if (p > 0 && s.slice(0, p) === name) {
+        try { return decodeURIComponent(s.slice(p + 1)); } catch (e) { return s.slice(p + 1); }
+      }
+    }
+    return null;
+  }
+
+  function keksSetzen(name, wert, tage) {
+    document.cookie = name + '=' + encodeURIComponent(wert) + '; path=/; max-age=' + Math.round(tage * 86400) +
+      '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+  }
+
+  function speicherLesen(schluessel) {
+    try { return window.localStorage.getItem(schluessel); } catch (e) { return null; }
+  }
+
+  function speicherSchreiben(schluessel, wert) {
+    try { window.localStorage.setItem(schluessel, wert); } catch (e) { /* privat-Modus o. ä. */ }
+  }
+
+  // Datum in der Kalender-Zeitzone (nicht die des Geräts) – über Intl, Rückfall: Gerätezeit
+  function datumInZone(zone) {
+    var jetzt = new Date();
+    try {
+      var teile = new Intl.DateTimeFormat('en-US', { timeZone: zone, year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(jetzt);
+      var w = {};
+      for (var i = 0; i < teile.length; i++) w[teile[i].type] = parseInt(teile[i].value, 10);
+      if (w.year && w.month && w.day) return { j: w.year, m: w.month, t: w.day };
+    } catch (e) { /* alte Browser */ }
+    return { j: jetzt.getFullYear(), m: jetzt.getMonth() + 1, t: jetzt.getDate() };
+  }
+
+  // SHA-256 (für den Testschlüssel; crypto.subtle gibt es ohne HTTPS nicht)
+  function sha256(text) {
+    var k = [], hw = [], n = 2, p = 0;
+    function bruch(x) { return ((x - Math.floor(x)) * 4294967296) | 0; }
+    while (p < 64) {
+      var prim = true;
+      for (var d = 2; d * d <= n; d++) if (n % d === 0) { prim = false; break; }
+      if (prim) { if (p < 8) hw[p] = bruch(Math.sqrt(n)); k[p++] = bruch(Math.cbrt(n)); }
+      n++;
+    }
+    var bytes = new TextEncoder().encode(text);
+    var laenge = ((bytes.length + 9 + 63) >> 6) << 6;
+    var m = new Uint8Array(laenge);
+    m.set(bytes); m[bytes.length] = 0x80;
+    var dv = new DataView(m.buffer);
+    var bits = bytes.length * 8;
+    dv.setUint32(laenge - 4, bits >>> 0);
+    dv.setUint32(laenge - 8, Math.floor(bits / 4294967296));
+    function rr(x, s) { return (x >>> s) | (x << (32 - s)); }
+    var w = new Array(64);
+    for (var o = 0; o < laenge; o += 64) {
+      for (var i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4) | 0;
+      for (i = 16; i < 64; i++) {
+        var s0 = rr(w[i - 15], 7) ^ rr(w[i - 15], 18) ^ (w[i - 15] >>> 3);
+        var s1 = rr(w[i - 2], 17) ^ rr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+        w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+      }
+      var a = hw[0], b = hw[1], c = hw[2], e = hw[4], f = hw[5], g = hw[6], h = hw[7];
+      d = hw[3];
+      for (i = 0; i < 64; i++) {
+        var t1 = (h + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & f) ^ (~e & g)) + k[i] + w[i]) | 0;
+        var t2 = ((rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+        h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+      }
+      hw[0] = (hw[0] + a) | 0; hw[1] = (hw[1] + b) | 0; hw[2] = (hw[2] + c) | 0; hw[3] = (hw[3] + d) | 0;
+      hw[4] = (hw[4] + e) | 0; hw[5] = (hw[5] + f) | 0; hw[6] = (hw[6] + g) | 0; hw[7] = (hw[7] + h) | 0;
+    }
+    var aus = '';
+    for (i = 0; i < 8; i++) aus += ('0000000' + (hw[i] >>> 0).toString(16)).slice(-8);
+    return aus;
+  }
+
+  function schluesselPasst(wert) {
+    if (!K.testSchluessel || !wert) return false;
+    try { return sha256(K.testSchluessel.salz + wert) === K.testSchluessel.hash; } catch (e) { return false; }
+  }
+
+  function hell(farbe) {
+    var m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(farbe || '');
+    if (!m) return false;
+    var x = m[1].length === 3 ? m[1].replace(/(.)/g, '$1$1') : m[1];
+    var r = parseInt(x.slice(0, 2), 16), g = parseInt(x.slice(2, 4), 16), b = parseInt(x.slice(4, 6), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 150;
+  }
+
+  // ---- Start -----------------------------------------------------------------------------------
+
+  if (!K) {
+    meldung('Nur die Vorlage', 'Diese Datei befüllt „npm run bauen“. Bitte bauen und dann den Ordner ausgabe/ ansehen bzw. hochladen.');
+    return;
+  }
+  if (location.protocol === 'file:') {
+    meldung('Bitte über einen Webserver öffnen',
+      'Per Doppelklick (file://) kann der Browser die Kalenderdaten nicht laden. Lade den Ordner auf deinen Webspace hoch oder starte lokal „npm run ansehen“.');
+    return;
+  }
+
+  // Ladeanzeige erst nach kurzer Zeit zeigen (kein Flackern bei schnellem Laden)
+  setTimeout(function () { if (lader) lader.className = 'lader sichtbar'; }, 350);
+
+  // 1. Datum: vor Dezember 0 (alles zu), 1–24 im Dezember, ab dem 25. Dezember 25 (alles offen)
+  var d = datumInZone(K.zeitzone);
+  var echtHeute;
+  if (d.j < K.jahr || (d.j === K.jahr && d.m < 12)) echtHeute = 0;
+  else if (d.j === K.jahr) echtHeute = Math.min(d.t, 25);
+  else echtHeute = 25;
+
+  // 2. Testmodus (nur mit Testschlüssel)
+  var params;
+  try { params = new URLSearchParams(location.search); } catch (e) { params = { get: function () { return null; }, has: function () { return false; } }; }
+  var urlTest = params.get('test');
+  if (urlTest !== null) {
+    if (schluesselPasst(urlTest)) keksSetzen(KEKS_TEST, urlTest, 30);
+    else keksSetzen(KEKS_TEST, '', 0);
+  }
+  var testmodus = K.testmodus === true || schluesselPasst(keks(KEKS_TEST));
+
+  var heute = echtHeute;
+  if (testmodus) {
+    var tt = keks(KEKS_TESTTAG);
+    if (tt === null) tt = speicherLesen(KEKS_TESTTAG);   // Rückfall, falls Cookies blockiert sind
+    if (tt !== null && /^\d{1,2}$/.test(tt) && parseInt(tt, 10) <= 25) heute = parseInt(tt, 10);
+  }
+
+  // 3. Ansicht wählen: ?v= → Browser-Speicher → Standard
+  var ids = {};
+  for (var i = 0; i < K.varianten.length; i++) ids[K.varianten[i].id] = K.varianten[i];
+  var SPEICHER_VARIANTE = K.speicher + ':variante';
+  var variante = params.get('v');
+  if (variante !== null && ids.hasOwnProperty(variante)) {
+    speicherSchreiben(SPEICHER_VARIANTE, variante);
+  } else {
+    variante = speicherLesen(SPEICHER_VARIANTE);
+    if (variante === null || !ids.hasOwnProperty(variante)) variante = K.standardVariante;
+  }
+
+  // Hintergrund schon passend zur Ansicht färben (kein greller Wechsel beim Umschalten)
+  var grund = ids[variante].farbe || K.themeColor;
+  if (grund) {
+    document.documentElement.style.setProperty('--grund', grund);
+    if (hell(grund)) {
+      document.documentElement.style.setProperty('--schrift', '#1f2a28');
+      document.documentElement.style.setProperty('--akzent', '#1f5a4c');
+      document.documentElement.style.setProperty('--knopf', '#ffffff');
+    }
+  }
+
+  // ?v= und ?test= aus der Adresszeile entfernen (Lesezeichen bleiben sauber)
+  if ((params.has('v') || params.has('test')) && window.history && history.replaceState) {
+    try {
+      var rest = location.search.slice(1).split('&').filter(function (x) {
+        var name = x.split('=')[0];
+        return x && name !== 'v' && name !== 'test';
+      }).join('&');
+      history.replaceState(history.state, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+    } catch (e) { /* egal */ }
+  }
+
+  // 4. Laden und anzeigen
+  function holen(url, alsJson) {
+    return fetch(url, { cache: 'no-cache', credentials: 'same-origin' }).then(function (r) {
+      if (!r.ok) { var f = new Error('HTTP ' + r.status + ' bei ' + url); f.status = r.status; throw f; }
+      return alsJson ? r.json() : r.text();
+    });
+  }
+
+  function freigegeben(t) { return heute >= 25 || t <= heute; }
+
+  function kalenderDaten(daten, id) {
+    var tage = {};
+    var alle = (daten && daten.tage) || {};
+    for (var t = 1; t <= 24; t++) {
+      if (!freigegeben(t)) continue;               // gesperrte Tage: keinerlei Daten (auch kein Titel)
+      var q = alle[t] || alle[String(t)] || {};
+      // h = Bildhöhe; der nicht erratbare Namensteil der Bilddateien („hash“) wird als Version v weitergegeben
+      tage[String(t)] = {
+        bild: !!q.bild && !!q.hash,
+        w: q.w || 0,
+        h: q.h || 0,
+        farbe: q.farbe || '',
+        titel: q.titel || '',
+        v: q.hash || '',
+        einzel: q.hash ? (q.einzel || 0) : 0,
+        format: q.format || ''
+      };
+    }
+    return {
+      modus: 'statisch',
+      jahr: K.jahr,
+      titel: K.titel,
+      heute: heute,
+      echtHeute: echtHeute,
+      testmodus: testmodus,
+      testBis: '',
+      variante: id,
+      varianten: K.varianten.map(function (v) { return { id: v.id, name: v.name }; }),
+      wechselUrl: '?v={id}',
+      speicher: K.speicher,
+      bildUrl: 'web/{t}-{g}-{v}.webp',
+      einzelUrl: 'web/{t}-e{i}-{g}-{v}.webp',
+      testHinweis: 'Testdatum einstellen – nur in diesem Browser, getrennt vom echten Stand. „?test=aus“ beendet den Testmodus.',
+      fusszeile: K.fusszeile || null,
+      tage: tage
+    };
+  }
+
+  function jsonFuerScript(wert) {
+    return JSON.stringify(wert).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026')
+      .replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+  }
+
+  function attr(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+  // Pfade der Ansicht (../shared/, ../fonts/) auf diesen Ordner umschreiben und die Daten vor dem ersten
+  // shared/-Skript einsetzen
+  function umschreiben(html, daten) {
+    html = html.split('../shared/').join('shared/').split('../fonts/').join('fonts/');
+    var block = '<script>window.ADVENTSKALENDER = ' + jsonFuerScript(daten) + ';<\/script>\n';
+    var pos = html.search(/<script\b[^>]*\bsrc\s*=\s*["']?shared\//i);
+    if (pos < 0) pos = html.search(/<\/head\s*>/i);
+    if (pos < 0) pos = html.search(/<body\b/i);
+    html = pos < 0 ? block + html : html.slice(0, pos) + block + html.slice(pos);
+
+    var kopf = '';
+    if (K.manifest && !/<link\b[^>]*\brel\s*=\s*["']?manifest/i.test(html)) kopf += '<link rel="manifest" href="manifest.webmanifest">\n';
+    if (!/<meta\b[^>]*\bname\s*=\s*["']?theme-color/i.test(html)) kopf += '<meta name="theme-color" content="' + attr(ids[daten.variante].farbe || K.themeColor) + '">\n';
+    if (K.appleIcon && !/apple-touch-icon/i.test(html)) kopf += '<link rel="apple-touch-icon" href="apple-touch-icon.png">\n';
+    if (K.icon && !/<link\b[^>]*\brel\s*=\s*["']?(shortcut\s+)?icon\b/i.test(html)) {
+      kopf += '<link rel="icon" href="' + attr(K.icon) + '"' + (/\.svg$/i.test(K.icon) ? ' type="image/svg+xml"' : '') + '>\n';
+    }
+    if (!/<meta\b[^>]*\bname\s*=\s*["']?apple-mobile-web-app-title/i.test(html)) kopf += '<meta name="apple-mobile-web-app-title" content="' + attr(K.kurztitel || K.titel) + '">\n';
+    if (kopf) {
+      var ende = html.search(/<\/head\s*>/i);
+      if (ende >= 0) html = html.slice(0, ende) + kopf + html.slice(ende);
+    }
+    return html;
+  }
+
+  function anzeigen(html) {
+    document.open();
+    document.write(html);
+    document.close();
+  }
+
+  var bereit = new Promise(function (fertig) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fertig);
+    else fertig();
+  });
+
+  function variantenDatei(id) { return 'varianten/' + encodeURIComponent(id) + '.html?b=' + K.bau; }
+
+  function starten() {
+    var datenLaden = holen(K.daten, true);
+    var htmlLaden = holen(variantenDatei(variante), false).catch(function (fehler) {
+      // gemerkte Ansicht gibt es nicht mehr → Standard nehmen
+      if (variante === K.standardVariante) throw fehler;
+      variante = K.standardVariante;
+      speicherSchreiben(SPEICHER_VARIANTE, variante);
+      return holen(variantenDatei(variante), false);
+    });
+    Promise.all([datenLaden, htmlLaden, bereit]).then(function (erg) {
+      anzeigen(umschreiben(erg[1], kalenderDaten(erg[0], variante)));
+    }).catch(function (fehler) {
+      if (window.console) console.error('Kalender konnte nicht geladen werden:', fehler);
+      meldung('Der Kalender lädt gerade nicht',
+        navigator.onLine === false ? 'Keine Internetverbindung. Bitte prüfen und noch einmal versuchen.'
+          : 'Bitte gleich noch einmal versuchen. (' + (fehler && fehler.message ? fehler.message : 'Fehler') + ')',
+        { text: 'Noch einmal versuchen', aktion: function () { location.reload(); } });
+    });
+  }
+
+  starten();
+})();
+</script>
+</body>
+</html>

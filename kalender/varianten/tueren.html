@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#86d9cc">
+<title>Die Türchenwand – {{TITEL}}</title>
+<link rel="stylesheet" href="../fonts/tueren.css">
+<script>
+/* Papierkorn und Filzflor als winzige SVG-Rauschtexturen (werden vom Browser einmal gerastert und gecacht) */
+(function () {
+  function rauschen(freq, okt, matrix, px) {
+    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + px + "' height='" + px + "'>" +
+      "<filter id='n' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='" + freq +
+      "' numOctaves='" + okt + "' stitchTiles='stitch'/><feColorMatrix values='" + matrix + "'/></filter>" +
+      "<rect width='100%' height='100%' filter='url(#n)'/></svg>";
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+  }
+  var s = document.documentElement.style;
+  s.setProperty('--korn', rauschen(0.9, 3, '1.7 0 0 0 -.35  1.5 0 0 0 -.35  1.2 0 0 0 -.3  0 0 0 0 .085', 200));
+  s.setProperty('--flor', rauschen(0.7, 3, '2.2 0 0 0 -.6  2.2 0 0 0 -.6  2.2 0 0 0 -.6  0 0 0 0 .13', 150));
+  s.setProperty('--flor-dunkel', rauschen(1.6, 2, '2.5 0 0 0 -.75  2.5 0 0 0 -.75  2.5 0 0 0 -.75  0 0 0 0 .06', 120));
+})();
+</script>
+<style>
+:root {
+  /* Farb-Tokens: die Kalender-Palette auf frischem Mint */
+  --mint: #86d9cc;
+  --petrol: #2a9d8f;
+  --koralle: #ef5a3c;
+  --senf: #e8b45a;
+  --tanne: #3d7a2c;
+  --schiefer: #34494b;
+
+  /* Schrift-Tokens */
+  --schrift-titel: 'Courgette', 'Segoe Script', cursive;
+  --schrift-zahl: 'Kalam', 'Segoe Print', cursive;
+  --schrift-text: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+
+  /* daraus abgeleitete Materialien */
+  --karton: color-mix(in srgb, var(--senf) 9%, #fffdf8);
+  --kraft: color-mix(in srgb, var(--senf) 70%, var(--schiefer));
+  --kraft-kante: color-mix(in srgb, var(--kraft) 70%, #1c1408);
+  --creme: #fffaf0;
+  --koralle-tief: color-mix(in srgb, var(--koralle) 75%, #4a1408);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  background: var(--mint);
+  -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+}
+html.gesperrt { overflow: hidden; }
+body {
+  margin: 0;
+  min-height: 100svh;
+  font-family: var(--schrift-text);
+  color: var(--schiefer);
+  background:
+    radial-gradient(130% 55% at 50% -8%, rgba(255,255,255,.55), rgba(255,255,255,0) 62%),
+    radial-gradient(90% 40% at 50% 108%, color-mix(in srgb, var(--petrol) 22%, transparent), transparent 70%),
+    var(--mint);
+  overflow-x: clip;
+}
+.nur-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+html.still *, html.still *::before, html.still *::after { transition: none !important; animation: none !important; }
+
+/* ---------- Schnee ---------- */
+#schnee { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; }
+
+/* ---------- Wand / Raster ---------- */
+.huelle {
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) calc(104px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+}
+.wand {
+  --sp: 3;
+  --gap: 12px;
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(var(--sp), minmax(0, 1fr));
+  grid-auto-rows: calc((100cqi - (var(--sp) - 1) * var(--gap)) / var(--sp));
+  /* Handy und Tablet: aus Kalender.reihenfolge() berechnet (siehe Skript, --fl-3 / --fl-5) */
+  grid-template-areas: var(--fl-3);
+}
+@media (min-width: 600px) {
+  .huelle { padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); padding-top: 24px; }
+  .wand {
+    --sp: 5;
+    --gap: 15px;
+    grid-template-areas: var(--fl-5);
+  }
+}
+@media (min-width: 1024px) {
+  .huelle { padding-left: 32px; padding-right: 32px; padding-top: 30px; }
+  .wand {
+    --sp: 6;
+    --gap: 18px;
+    /* exakt die Anordnung des Kalenders 2025 */
+    grid-template-areas:
+      "t   t   t   d22 d1  d8"
+      "t   t   t   d18 d5  d13"
+      "t   t   t   d3  d11 d20"
+      "d2  d9  d24 d24 d17 d23"
+      "d21 d16 d24 d24 d4  d6"
+      "d19 d12 d7  d14 d10 d15";
+  }
+}
+
+/* ---------- Titel ---------- */
+.titel {
+  grid-area: t;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: 0;
+  position: relative;
+  --g1: 17.5cqi; --g2: 12.3cqi; --g3: 14.5cqi; --g4: clamp(14px, 4.6cqi, 26px);
+}
+.titel h1 {
+  margin: 0;
+  font-family: var(--schrift-titel);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: .005em;
+  text-shadow: 0 1px 0 rgba(255,255,255,.35), .04em .06em .06em rgba(25,62,60,.28);
+}
+.titel .zeile { display: block; white-space: nowrap; }
+.titel .z1 { font-size: var(--g1); }
+.titel .z2 { font-size: var(--g2); color: var(--schiefer); margin-top: .04em; }
+.titel .z3 { font-size: var(--g3); margin-top: .02em; }
+.c-p { color: var(--petrol); } .c-k { color: var(--koralle); } .c-s { color: var(--senf); } .c-t { color: var(--tanne); }
+/* feine dunklere Kontur, damit Senf, Koralle und Petrol auf Mint lesbar bleiben */
+.titel .z1 > span, .titel .z3 > span { -webkit-text-stroke: .028em color-mix(in srgb, currentColor 52%, var(--schiefer)); }
+.titel .c-s { -webkit-text-stroke-width: .036em; }
+.unterzeile {
+  margin: .5em 0 0;
+  font-family: var(--schrift-zahl);
+  font-weight: 700;
+  font-size: var(--g4);
+  line-height: 1.2;
+  color: var(--schiefer);
+  background: rgba(255,253,246,.55);
+  padding: .12em .8em .1em;
+  border-radius: 1em;
+  text-wrap: balance;
+  box-shadow: inset 0 0 0 1.5px rgba(52,73,75,.14);
+}
+body[data-phase="weihnachten"] .unterzeile { color: #fff; background: var(--koralle); background-image: var(--flor); box-shadow: 0 2px 0 rgba(0,0,0,.12); }
+.girlande { display: none; }
+@media (min-width: 600px) {
+  .titel { --g1: 13.6cqi; --g2: 9.7cqi; --g3: 11.2cqi; --g4: clamp(15px, 3.4cqi, 24px); }
+}
+@media (min-width: 1024px) {
+  .titel { --g1: 18.5cqi; --g2: 13cqi; --g3: 16cqi; --g4: clamp(16px, 4.4cqi, 25px); justify-content: flex-end; padding-bottom: 4cqi; }
+  .girlande { display: block; position: absolute; left: 3%; right: 3%; top: 0; height: 26cqi; }
+}
+.girlande svg.schnur { position: absolute; inset: 0 0 auto 0; width: 100%; height: 10cqi; overflow: visible; }
+.girlande .schnur path { fill: none; stroke: var(--schiefer); stroke-opacity: .55; stroke-width: 1.4; stroke-dasharray: 3 2; vector-effect: non-scaling-stroke; }
+.girlande .anh { position: absolute; width: 11cqi; height: 11cqi; margin-left: -5.5cqi; transform-origin: 50% -2cqi; }
+.girlande .anh::before { content: ""; position: absolute; left: 50%; top: -2.2cqi; height: 2.4cqi; border-left: 1.4px solid rgba(52,73,75,.5); }
+.girlande .anh .filz { inset: 0; width: 100%; height: 100%; } /* inset: sonst rutscht die Kugel um eine halbe Breite nach rechts vom Faden weg */
+
+/* ---------- Filz-Plakette ---------- */
+.filz {
+  --f: var(--petrol);
+  --zf: var(--creme);
+  --akzent: var(--koralle);
+  position: absolute;
+  container-type: size;
+  border-radius: 50%;
+  color: var(--creme);
+  background-color: var(--f);
+  background-image:
+    radial-gradient(circle at 34% 27%, rgba(255,255,255,.24), rgba(255,255,255,0) 52%),
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 60%, rgba(0,0,0,.2) 100%),
+    var(--flor), var(--flor-dunkel);
+  box-shadow: 0 0 0 .6px color-mix(in srgb, var(--f) 80%, #000), 0 1px 1px rgba(0,0,0,.18), 0 3px 6px rgba(20,40,40,.26);
+}
+.filz svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.filz .naht, .filz .naht2 { fill: none; stroke: rgba(255,255,255,.93); stroke-width: 2.5; stroke-dasharray: 4.6 3.5; stroke-linecap: round; }
+.filz .naht2 { stroke-width: 1.6; stroke-dasharray: .1 3.4; stroke: var(--senf); stroke-width: 2.6; }
+.filz .mot { fill: currentColor; }
+.filz .strich { fill: none; stroke: currentColor; stroke-linecap: round; }
+.filz .beere { fill: var(--akzent); stroke: var(--creme); stroke-width: 1; }
+.filz .ader { fill: none; stroke: var(--f); stroke-width: .9; stroke-linecap: round; }
+.filz .zahl {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-family: var(--schrift-zahl);
+  font-weight: 700;
+  font-size: 47cqw;
+  line-height: 1;
+  color: var(--zf);
+  transform: translate(var(--zx, 0%), var(--zy, 3%)) rotate(-7deg);
+  text-shadow: 0 .02em 0 rgba(0,0,0,.2);
+  letter-spacing: -.03em;
+}
+.filz.zwei .zahl { font-size: 41cqw; }
+.f-P { --f: var(--petrol); }
+.f-K { --f: var(--koralle); --akzent: var(--senf); }
+.f-S { --f: var(--senf); --zf: var(--schiefer); }
+.f-T { --f: var(--tanne); }
+.f-G { --f: var(--schiefer); --akzent: var(--koralle); }
+.m-sterne, .m-herzen, .m-gross { --zy: 10%; }
+.m-tanne { --zy: 11%; }
+.m-stern { --zx: 7%; --zy: 6%; }
+.m-herz, .m-stechpalme { --zy: -6%; }
+.m-flocken { --zy: 5%; }
+.ohne .zahl { --zx: 0%; --zy: 3%; }
+
+/* ---------- Türchen ---------- */
+.tuer {
+  --zarge: 7cqmin;
+  --d: 60cqmin;
+  --dicke: 2.4cqmin;
+  --offen: 98deg;
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0;
+  background: none;
+  font: inherit; color: inherit;
+  cursor: pointer;
+  overflow: visible;
+  container-type: size;
+  border-radius: 2.6cqmin;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  outline: none;
+}
+/* Treffer nur über die Kachel selbst – die 3D-Innereien (90°-Kanten) würden sonst fehlerhaft „treffen“ */
+.tuer * { pointer-events: none; }
+.tuer.gross { --zarge: 5cqmin; --d: 48cqmin; --dicke: 1.3cqmin; --offen: 94deg; }
+.tuer[data-z="offen"] { z-index: 2; }
+.tuer[data-z="heute"], .tuer.schwingt { z-index: 3; }
+.tuer:focus-visible .koerper { outline: 3px solid var(--schiefer); outline-offset: 3px; }
+
+.koerper {
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background-color: var(--karton);
+  background-image: linear-gradient(155deg, rgba(255,255,255,.7), rgba(255,255,255,0) 45%, rgba(150,110,50,.06)), var(--korn);
+  box-shadow:
+    0 1.7cqmin 0 -.1cqmin color-mix(in srgb, var(--kraft) 85%, #fff),
+    0 1.9cqmin .4cqmin -.1cqmin rgba(60,50,30,.25),
+    0 4cqmin 7cqmin -1cqmin rgba(22,74,68,.32);
+  transition: box-shadow .5s;
+}
+.koerper::before {
+  content: ""; position: absolute;
+  inset: calc(var(--zarge) - 1.1cqmin);
+  border-radius: 1.8cqmin;
+  box-shadow: inset 0 0 0 1px rgba(120,92,48,.22), inset 0 .5cqmin 0 rgba(255,255,255,.7);
+}
+.tuer[data-z="heute"] .koerper {
+  box-shadow:
+    0 0 0 1.4cqmin var(--senf),
+    0 0 0 2.8cqmin rgba(255,251,236,.75),
+    0 0 9cqmin 3cqmin rgba(255,224,140,.95),
+    0 3cqmin 8cqmin rgba(22,74,68,.3);
+}
+
+.raum { position: absolute; inset: var(--zarge); perspective: 400cqmin; }
+.nische {
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden;
+  border-radius: 1.3cqmin;
+  background: #22302f;
+}
+.nische::before {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(90deg, rgba(10,20,20,.5), rgba(10,20,20,0) 17%, rgba(10,20,20,0) 83%, rgba(10,20,20,.5));
+  opacity: 0; transition: opacity .8s .2s;
+}
+.nische::after {
+  content: ""; position: absolute; inset: 0; z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 .9cqmin color-mix(in srgb, var(--kraft) 85%, transparent),
+    inset 0 3cqmin 3.5cqmin -1.2cqmin rgba(0,0,0,.5),
+    inset 0 -1.2cqmin 2cqmin -1cqmin rgba(0,0,0,.25);
+}
+.vorschau {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .5s .15s;
+}
+.licht {
+  position: absolute; inset: 0; z-index: 2;
+  background:
+    radial-gradient(ellipse 26% 62% at 50% 48%, #fffef7 0%, #fff3cf 40%, rgba(255,236,180,0) 100%),
+    radial-gradient(circle at 50% 48%, #ffe7a6 0%, var(--senf) 60%, color-mix(in srgb, var(--senf) 60%, var(--koralle)) 100%);
+  opacity: 0;
+  transition: opacity 1s .25s;
+}
+.tuer[data-z="heute"] .licht { opacity: 1; }
+.tuer[data-z="nachholen"] .licht { opacity: .7; }
+.tuer[data-z="offen"] .nische:not(.laedt) .vorschau { opacity: 1; }
+.tuer[data-z="offen"] .nische::before { opacity: 1; }
+/* Vorschau lädt noch übers Netz: Durchschnittsfarbe des Fotos (--lqip) mit sanftem Lichtschimmer statt dunkler Nische */
+.tuer[data-z="offen"] .nische { background-color: var(--lqip, #22302f); }
+.tuer[data-z="offen"] .nische.laedt {
+  background-image: linear-gradient(105deg, rgba(255,255,255,0) 36%, rgba(255,255,255,.3) 50%, rgba(255,255,255,0) 64%);
+  background-size: 250% 100%;
+  animation: schimmer 1.5s ease-in-out infinite;
+}
+@keyframes schimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+.fluegel {
+  position: absolute; top: 0; bottom: 0; width: 50%;
+  transform-style: preserve-3d;
+  transition: transform .9s cubic-bezier(.3,1.35,.5,1);
+}
+.fluegel.l { left: 0; transform-origin: 0 50%; }
+.fluegel.r { right: 0; transform-origin: 100% 50%; }
+.seite {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.vorne {
+  background-color: var(--karton);
+  background-image: var(--korn);
+}
+.l .vorne {
+  border-radius: 1.3cqmin .3cqmin .3cqmin 1.3cqmin;
+  background-image: linear-gradient(90deg, rgba(255,255,255,.55), rgba(255,255,255,0) 35%, rgba(140,100,40,.07)), var(--korn);
+}
+.r .vorne {
+  border-radius: .3cqmin 1.3cqmin 1.3cqmin .3cqmin;
+  background-image: linear-gradient(270deg, rgba(255,255,255,.4), rgba(255,255,255,0) 35%, rgba(140,100,40,.05)), var(--korn);
+}
+.vorne::before {
+  content: ""; position: absolute;
+  top: 6cqmin; bottom: 6cqmin;
+  border: max(1px, .55cqmin) solid rgba(52,73,75,.13);
+  border-radius: 2.2cqmin;
+  box-shadow: .3cqmin .4cqmin 0 rgba(255,255,255,.75);
+}
+.l .vorne::before { left: 5cqmin; right: 3.5cqmin; }
+.r .vorne::before { left: 3.5cqmin; right: 5cqmin; }
+.vorne::after { content: ""; position: absolute; top: 0; bottom: 0; width: 1px; z-index: 2; }
+.l .vorne::after { right: 0; background: rgba(80,60,28,.4); }
+.r .vorne::after { left: 0; background: rgba(255,255,255,.85); }
+.hinten {
+  background-color: var(--kraft);
+  background-image: linear-gradient(90deg, rgba(0,0,0,.12), rgba(255,255,255,.1)), var(--korn);
+  transform: translateZ(calc(-1 * var(--dicke))) rotateY(180deg);
+}
+.r .hinten { background-image: linear-gradient(270deg, rgba(0,0,0,.12), rgba(255,255,255,.1)), var(--korn); }
+.kante {
+  position: absolute; top: 0; bottom: 0; width: var(--dicke);
+  background: var(--kraft-kante);
+  background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.12) 0 1px, transparent 1px 3px);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.l .kante { right: 0; transform-origin: 100% 50%; transform: rotateY(-90deg); }
+.r .kante { left: 0; transform-origin: 0 50%; transform: rotateY(90deg); }
+
+.vorne .filz { width: var(--d); height: var(--d); top: calc(45% - var(--d) / 2); }
+.r .vorne { overflow: visible; }
+.r .vorne .filz { left: calc(var(--d) / -2); z-index: 3; }
+
+.knauf {
+  position: absolute; top: 85%;
+  width: 6.4cqmin; height: 6.4cqmin; margin-top: -3.2cqmin;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff8e4 0 14%, var(--senf) 45%, color-mix(in srgb, var(--senf) 55%, #5a3a10) 100%);
+  box-shadow: 0 .7cqmin .9cqmin rgba(70,45,10,.45);
+}
+.l .knauf { right: 4.2cqmin; }
+.r .knauf { left: 4.2cqmin; }
+
+/* Zustände der Flügel */
+.tuer[data-z="offen"] .l { transform: rotateY(calc(-1 * var(--offen))); }
+.tuer[data-z="offen"] .r { transform: rotateY(var(--offen)); }
+.tuer[data-z="nachholen"] .l { transform: rotateY(-5deg); }
+.tuer[data-z="nachholen"] .r { transform: rotateY(5deg); }
+.tuer[data-z="heute"] .l { transform: rotateY(-16deg); animation: atmen-l 3.6s 1s ease-in-out infinite; }
+.tuer[data-z="heute"] .r { transform: rotateY(16deg); animation: atmen-r 3.6s 1s ease-in-out infinite; }
+@keyframes atmen-l { 0%, 100% { transform: rotateY(-16deg); } 50% { transform: rotateY(-23deg); } }
+@keyframes atmen-r { 0%, 100% { transform: rotateY(16deg); } 50% { transform: rotateY(23deg); } }
+@media (hover: hover) {
+  .tuer[data-z="nachholen"]:hover .l { transform: rotateY(-14deg); }
+  .tuer[data-z="nachholen"]:hover .r { transform: rotateY(14deg); }
+  .tuer[data-z="offen"]:hover .koerper { box-shadow: 0 0 0 1cqmin rgba(255,255,255,.8), 0 4cqmin 8cqmin rgba(22,74,68,.35); }
+}
+
+/* Mini-Plakette auf offenen Türchen */
+.mini {
+  position: absolute; z-index: 5;
+  left: -3cqmin; top: -3cqmin;
+  width: 34cqmin; height: 34cqmin;
+  opacity: 0;
+  transform: rotate(-12deg) scale(.3);
+  transition: opacity .3s, transform .5s cubic-bezier(.3,1.6,.5,1);
+  pointer-events: none;
+}
+.tuer.gross .mini { width: 21cqmin; height: 21cqmin; left: -2cqmin; top: -2cqmin; }
+.mini .filz { inset: 0; width: 100%; height: 100%; }
+.mini .filz.zwei .zahl { font-size: 45cqw; }
+.mini .naht { stroke-width: 3.2; stroke-dasharray: 5.5 4.5; }
+.tuer[data-z="offen"] .mini { opacity: 1; transform: rotate(-12deg) scale(1); transition-delay: .55s, .55s; }
+
+/* Fähnchen „Heute“ / „Nachholen“ */
+.fahne {
+  position: absolute; z-index: 6;
+  top: -2.6cqmin; right: -3.2cqmin;
+  padding: .14em .95em .2em .6em;
+  font-family: var(--schrift-zahl);
+  font-weight: 700;
+  font-size: clamp(14px, 13cqmin, 20px);
+  line-height: 1.15;
+  color: #fff;
+  background-color: var(--koralle-tief);
+  background-image: var(--flor);
+    clip-path: polygon(0 0, 100% 0, calc(100% - .5em) 50%, 100% 100%, 0 100%);
+  transform: rotate(5deg);
+  filter: drop-shadow(0 2px 2px rgba(30,30,20,.3));
+  pointer-events: none;
+  display: none;
+  white-space: nowrap;
+}
+.fahne::before {
+  content: ""; position: absolute; inset: .17em .55em .17em .17em;
+  border: 1.4px dashed rgba(255,255,255,.75);
+  border-right: 0;
+}
+.tuer[data-z="heute"] .fahne,
+.tuer[data-z="nachholen"] .fahne { display: block; }
+.tuer[data-z="nachholen"] .fahne { background-color: var(--senf); color: var(--schiefer); font-size: clamp(14px, 12cqmin, 18px); padding-left: .45em; padding-right: .85em; }
+.tuer[data-z="nachholen"] .fahne::before { border-color: rgba(52,73,75,.45); }
+
+/* Hinweis-Puls */
+.tuer.puls { animation: puls 1.15s cubic-bezier(.3,.7,.4,1); z-index: 4; }
+@keyframes puls {
+  0% { transform: scale(1); } 22% { transform: scale(1.1); } 46% { transform: scale(.97); }
+  68% { transform: scale(1.045); } 100% { transform: scale(1); }
+}
+.tuer .koerper::after {
+  content: ""; position: absolute; inset: -1.5cqmin;
+  border-radius: 4cqmin;
+  border: max(3px, 1.6cqmin) solid var(--koralle);
+  opacity: 0;
+  pointer-events: none;
+}
+.tuer.puls .koerper::after { animation: ring 1.1s ease-out 2; }
+@keyframes ring { from { opacity: .95; transform: scale(.98); } to { opacity: 0; transform: scale(1.3); } }
+
+/* ---------- Anhänger (gesperrt) ---------- */
+.anhaenger {
+  --ax: 50%;
+  position: absolute; z-index: 20; left: 0; top: 0;
+  max-width: min(280px, calc(100% - 8px));
+  padding: .5em 1.05em .58em;
+  font-family: var(--schrift-zahl);
+  font-weight: 700;
+  font-size: clamp(17px, 1.3vw + 12px, 21px);
+  line-height: 1.15;
+  text-align: center;
+  color: #fff;
+  background-color: var(--koralle-tief);
+  background-image: var(--flor);
+  border-radius: 20px;
+  box-shadow: 0 2px 0 rgba(120,30,10,.25), 0 10px 22px rgba(30,40,30,.3);
+  pointer-events: none;
+  transform-origin: var(--ax) calc(100% + 10px);
+}
+.anhaenger.unten { transform-origin: var(--ax) -10px; }
+.anhaenger::before {
+  content: ""; position: absolute; inset: 4px;
+  border: 1.6px dashed rgba(255,255,255,.82);
+  border-radius: 16px;
+}
+.anhaenger::after {
+  content: ""; position: absolute;
+  left: var(--ax); bottom: -7px;
+  width: 16px; height: 16px; margin-left: -8px;
+  background: inherit;
+  border-radius: 0 0 4px 0;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+.anhaenger.unten::after { bottom: auto; top: -7px; border-radius: 4px 0 0 0; }
+.anhaenger.zeigen { animation: aufploppen .55s cubic-bezier(.3,1.55,.5,1); }
+.anhaenger.weg { opacity: 0; transform: scale(.85); transition: opacity .25s, transform .25s; }
+@keyframes aufploppen {
+  0% { opacity: 0; transform: scale(.35) rotate(-10deg); }
+  60% { opacity: 1; transform: scale(1.04) rotate(3deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ---------- Heute-Leiste ---------- */
+.leiste {
+  position: fixed; z-index: 30;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  width: min(430px, calc(100% - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  min-height: 60px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 7px 9px 7px 8px;
+  border: 0; border-radius: 999px;
+  font: inherit; text-align: left;
+  color: var(--creme);
+  background-color: var(--schiefer);
+  background-image: var(--flor);
+    box-shadow: 0 2px 0 rgba(0,0,0,.2), 0 10px 26px rgba(16,52,50,.38);
+  cursor: pointer;
+  transform: translateX(-50%);
+  animation: leiste-rein .7s .4s cubic-bezier(.3,1.4,.5,1) backwards;
+  -webkit-tap-highlight-color: transparent;
+}
+@keyframes leiste-rein { from { transform: translate(-50%, 140%); } }
+.leiste::before {
+  content: ""; position: absolute; inset: 4px;
+  border: 1.6px dashed rgba(255,255,255,.4);
+  border-radius: 999px;
+  pointer-events: none;
+}
+.leiste:focus-visible { outline: 3px solid var(--koralle); outline-offset: 3px; }
+.leiste-filz { position: relative; display: block; flex: none; width: 46px; height: 46px; }
+.leiste-filz .filz { inset: 0; width: 100%; height: 100%; }
+.leiste-text { flex: 1; min-width: 0; }
+.leiste-text b { display: block; font-family: var(--schrift-zahl); font-weight: 700; font-size: 20px; line-height: 1.1; }
+.leiste-text small { display: block; font-size: 14px; font-weight: 700; line-height: 1.25; color: var(--mint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.leiste .los {
+  flex: none;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  background-color: var(--koralle);
+  background-image: var(--flor);
+  box-shadow: inset 0 0 0 3px var(--koralle), inset 0 0 0 4.6px rgba(255,255,255,.6);
+}
+.leiste .los svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+html.gesperrt .leiste { visibility: hidden; }
+/* Menü-Knopf #kalender-reset (runder 40-px-Knopf aus kalender.js) sitzt in allen Ansichten fest unten links.
+   Die Heute-Leiste hält dessen Ecke (--menue-knopf-zone, 64 px ab dem Rand) frei: Sie bleibt mittig, solange
+   links daneben genug Platz ist, sonst beginnt sie rechts neben dem Knopf (Mitte per left, translateX(-50%) bleibt).
+   Am Seitenende liegen beide über dem freien Polster der .huelle unter der Fußzeile. */
+:root {
+  --leiste-b: min(430px, calc(100% - var(--menue-knopf-zone, 64px) - 12px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+}
+.leiste {
+  width: var(--leiste-b);
+  left: max(50%, calc(var(--menue-knopf-zone, 64px) + env(safe-area-inset-left) + var(--leiste-b) / 2));
+}
+@media (max-width: 400px) {
+  /* schmale Handys: Leiste teilt sich das Band mit dem Menü-Knopf → etwas kompakter */
+  .leiste { gap: 8px; padding: 7px 7px 7px 7px; }
+  .leiste-filz { width: 42px; height: 42px; }
+  .leiste .los { width: 42px; height: 42px; }
+  .leiste-text b { font-size: 18px; }
+  .leiste-text small { font-size: 13.5px; }
+}
+html.gesperrt #kalender-reset { display: none; }
+
+.fusszeile {
+  margin: 30px 0 0;
+  text-align: center;
+  font-family: var(--schrift-zahl);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--schiefer);
+}
+
+/* ---------- Bildansicht ---------- */
+.ansicht {
+  position: fixed; inset: 0; z-index: 50;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  color: var(--creme);
+  overscroll-behavior: contain;
+}
+.ansicht[hidden] { display: none; }
+.a-grund {
+  position: absolute; inset: 0; z-index: -1;
+  background-color: var(--schiefer);
+  background-image:
+    radial-gradient(75% 55% at 50% 44%, color-mix(in srgb, var(--petrol) 42%, transparent), transparent 72%),
+    var(--flor), var(--flor-dunkel);
+  background-size: auto, 90px 90px, 70px 70px;
+}
+.a-grund::after {
+  content: ""; position: absolute;
+  inset: max(7px, env(safe-area-inset-top)) max(7px, env(safe-area-inset-right)) max(7px, env(safe-area-inset-bottom)) max(7px, env(safe-area-inset-left));
+  border: 2px dashed rgba(255,255,255,.16);
+  border-radius: 20px;
+  pointer-events: none;
+}
+.a-kopf {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 4px calc(20px + env(safe-area-inset-left));
+}
+.a-zaehler { margin: 0; font-family: var(--schrift-zahl); font-weight: 700; font-size: 18px; color: var(--mint); line-height: 1.2; }
+.a-zaehler small { display: block; font-family: var(--schrift-text); font-size: 14px; font-weight: 700; color: rgba(255,250,240,.78); }
+.filzknopf {
+  --f: var(--petrol);
+  position: relative;
+  flex: none;
+  width: 50px; height: 50px;
+  display: grid; place-items: center;
+  border: 0; border-radius: 50%;
+  padding: 0;
+  color: #fff;
+  background-color: var(--f);
+  background-image: radial-gradient(circle at 34% 27%, rgba(255,255,255,.22), rgba(255,255,255,0) 55%), var(--flor);
+    box-shadow: 0 2px 0 rgba(0,0,0,.25), 0 6px 14px rgba(0,0,0,.3);
+  cursor: pointer;
+  transition: transform .15s, opacity .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.filzknopf::before { content: ""; position: absolute; inset: 4.5px; border-radius: 50%; border: 1.6px dashed rgba(255,255,255,.8); }
+.filzknopf svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
+.filzknopf:active { transform: scale(.93); }
+.filzknopf:disabled { opacity: .28; cursor: default; }
+.filzknopf:focus-visible { outline: 3px solid var(--senf); outline-offset: 3px; }
+.filzknopf.zu { --f: var(--koralle); }
+.a-buehne {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.a-buehne.zieht { cursor: grabbing; }
+.a-spur { display: flex; height: 100%; will-change: transform; }
+.a-blatt {
+  flex: 0 0 100%;
+  height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  min-width: 0;
+}
+.a-rahmen {
+  margin: 0;
+  padding: var(--matte, 6px);
+  background-color: var(--karton);
+  background-image: var(--korn);
+  border-radius: 4px;
+  box-shadow: 0 2px 0 var(--kraft), 0 18px 40px rgba(0,0,0,.45);
+}
+.a-blatt.leer .a-rahmen { visibility: hidden; }
+.a-rahmen { position: relative; }
+.a-rahmen img {
+  display: block;
+  /* bis das Foto da ist: Durchschnittsfarbe bzw. die schon geladene Vorschau (per Skript gesetzt) */
+  background-color: #d9cfb8;
+  background-size: cover;
+  background-position: center;
+  object-fit: cover;
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+/* Ladeanzeige: gestrichelte Filz-Naht, die sich dreht – erscheint erst nach kurzer Zeit (schnelle Bilder flackern nicht) */
+.a-rahmen::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 48px; height: 48px; margin: -24px 0 0 -24px;
+  border-radius: 50%;
+  border: 3px dashed rgba(255,250,240,.92);
+  background: rgba(36,52,54,.42);
+  box-shadow: 0 0 0 6px rgba(36,52,54,.42);
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+.a-rahmen.laedt::after { opacity: 1; transition: opacity .3s .35s; animation: drehen 2.6s linear infinite; }
+@keyframes drehen { to { transform: rotate(1turn); } }
+.a-fuss {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 78px;
+  padding: 6px calc(14px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));
+}
+.a-text { display: flex; align-items: center; justify-content: center; gap: 12px; min-width: 0; }
+.a-plakette { position: relative; flex: none; width: 54px; height: 54px; transform: rotate(-8deg); }
+.a-plakette .filz { inset: 0; width: 100%; height: 100%; }
+.a-worte { min-width: 0; }
+.a-titel {
+  margin: 0;
+  font-family: var(--schrift-titel);
+  font-weight: 400;
+  font-size: clamp(17px, 1.2vw + 13px, 25px);
+  line-height: 1.12;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.a-datum { margin: 3px 0 0; font-size: 14px; font-weight: 700; color: var(--mint); }
+@media (min-width: 900px), (max-height: 500px) and (min-width: 560px) {
+  .a-fuss { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  #a-zurueck, #a-weiter { position: absolute; top: 50%; width: 62px; height: 62px; margin-top: -31px; }
+  #a-zurueck { left: calc(30px + env(safe-area-inset-left)); }
+  #a-weiter { right: calc(30px + env(safe-area-inset-right)); }
+  .filzknopf svg { width: 26px; height: 26px; }
+}
+@media (max-height: 500px) and (min-width: 560px) {
+  .ansicht { display: block; }
+  .a-buehne { position: absolute; inset: 0; }
+  .a-kopf { position: absolute; z-index: 2; top: 0; left: 0; right: 0; padding-top: calc(6px + env(safe-area-inset-top)); pointer-events: none; }
+  .a-kopf > * { pointer-events: auto; }
+  .a-fuss {
+    position: absolute; z-index: 2; left: 0; right: 0; bottom: 0;
+    min-height: 0; padding-top: 22px; padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    background: linear-gradient(rgba(36,52,54,0), rgba(36,52,54,.88) 45%);
+    pointer-events: none;
+  }
+  .a-fuss > * { pointer-events: auto; }
+  .a-titel { font-size: 18px; -webkit-line-clamp: 1; }
+  .a-datum { font-size: 13px; }
+  #a-zurueck, #a-weiter { width: 52px; height: 52px; margin-top: -26px; }
+}
+@media (min-width: 700px) {
+  .a-plakette { width: 66px; height: 66px; }
+  .a-fuss { gap: 24px; padding-left: 28px; padding-right: 28px; }
+  .a-text { gap: 16px; }
+}
+
+@media (max-height: 500px) and (min-width: 560px) {
+  .a-plakette { width: 44px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tuer[data-z="heute"] .l, .tuer[data-z="heute"] .r { animation: none; }
+  .leiste { animation: none; }
+  .fluegel { transition-duration: .01s; }
+  .tuer[data-z="offen"] .nische.laedt { animation: none; background-image: none; }
+  .a-rahmen.laedt::after { animation: none; }
+}
+</style>
+<style id="titel-stil">
+.titel .z1 { font-size: calc(var(--g1) * clamp(.5, 9 / {{TITEL_A_LAENGE}}, 1.3)); }
+.titel .z2.titel-bunt { color: inherit; font-size: calc(var(--g2) * clamp(.5, 15 / {{TITEL_B_LAENGE}}, 1)); }
+.titel .z2.titel-bunt > span { -webkit-text-stroke: .028em color-mix(in srgb, currentColor 52%, var(--schiefer)); }
+</style>
+</head>
+<body>
+<canvas id="schnee" aria-hidden="true"></canvas>
+
+<button type="button" class="leiste" id="leiste">
+  <span class="leiste-filz" id="leiste-filz" aria-hidden="true"></span>
+  <span class="leiste-text"><b id="leiste-titel"></b><small id="leiste-sub"></small></span>
+  <span class="los" aria-hidden="true"><svg viewBox="0 0 24 24"><path id="leiste-pfeil" d="M12 5v13M6 12.5l6 6 6-6"/></svg></span>
+</button>
+
+<main class="huelle" id="haupt">
+  <div class="wand" id="wand">
+    <header class="titel">
+      <div class="girlande" aria-hidden="true" id="girlande"></div>
+      <h1>
+        <span class="nur-sr">{{TITEL}}</span>
+        <span class="zeile z1" aria-hidden="true">{{TITEL_A_BUNT}}</span>
+        <span class="zeile z2 titel-bunt" aria-hidden="true">{{TITEL_B_BUNT}}</span>
+      </h1>
+      <p class="unterzeile" id="unterzeile"></p>
+    </header>
+  </div>
+  <div class="anhaenger" id="anhaenger" hidden aria-hidden="true"></div>
+  <p class="fusszeile">Jeden Tag ein Türchen, jeden Tag ein Stück von unserem Jahr.</p>
+</main>
+
+
+<p class="nur-sr" id="ansage" aria-live="polite"></p>
+
+<div class="ansicht" id="ansicht" role="dialog" aria-modal="true" aria-label="Bildansicht" aria-describedby="a-titel" hidden>
+  <div class="a-grund"></div>
+  <div class="a-kopf">
+    <p class="a-zaehler" id="a-zaehler"></p>
+    <button type="button" class="filzknopf zu" id="a-zu" aria-label="Bildansicht schließen">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>
+    </button>
+  </div>
+  <div class="a-buehne" id="a-buehne">
+    <div class="a-spur" id="a-spur">
+      <div class="a-blatt" aria-hidden="true"><figure class="a-rahmen"><img alt="" draggable="false" decoding="async"></figure></div>
+      <div class="a-blatt"><figure class="a-rahmen"><img alt="" draggable="false" decoding="async"></figure></div>
+      <div class="a-blatt" aria-hidden="true"><figure class="a-rahmen"><img alt="" draggable="false" decoding="async"></figure></div>
+    </div>
+  </div>
+  <div class="a-fuss">
+    <button type="button" class="filzknopf" id="a-zurueck" aria-label="Vorheriges Bild">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5L8 12l6.5 6.5"/></svg>
+    </button>
+    <div class="a-text">
+      <span class="a-plakette" id="a-plakette" aria-hidden="true"></span>
+      <div class="a-worte"><h2 class="a-titel" id="a-titel"></h2><p class="a-datum" id="a-datum"></p></div>
+    </div>
+    <button type="button" class="filzknopf" id="a-weiter" aria-label="Nächstes Bild">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5L16 12l-6.5 6.5"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="../shared/kalender.js"></script>
+<script src="../shared/fotos.js"></script>
+<script>
+(function () {
+  'use strict';
+  var K = window.Kalender.init('tueren');
+  var F = window.Fotos;
+  var reduziert = !!K.bewegungReduziert;
+  var html = document.documentElement;
+  function $(id) { return document.getElementById(id); }
+
+  /* ======================= Filz-Plaketten ======================= */
+  function r1(n) { return Math.round(n * 10) / 10; }
+  function stern(cx, cy, r, dreh) {
+    var p = [];
+    for (var i = 0; i < 10; i++) {
+      var w = (dreh || 0) * Math.PI / 180 - Math.PI / 2 + i * Math.PI / 5;
+      var rr = i % 2 ? r * 0.46 : r;
+      p.push(r1(cx + Math.cos(w) * rr) + ',' + r1(cy + Math.sin(w) * rr));
+    }
+    return '<polygon class="mot" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" points="' + p.join(' ') + '"/>';
+  }
+  function herz(cx, cy, s, dreh) {
+    return '<path class="mot" transform="translate(' + cx + ' ' + cy + ') rotate(' + (dreh || 0) + ') scale(' + s + ')" ' +
+      'd="M0 4.6C-3 2.6-6.6 .2-6.6-2.8-6.6-5.2-4.8-6.8-2.9-6.8-1.6-6.8-.5-6-0-5 .5-6 1.6-6.8 2.9-6.8 4.8-6.8 6.6-5.2 6.6-2.8 6.6 .2 3 2.6 0 4.6Z"/>';
+  }
+  function punkt(cx, cy, r) { return '<circle class="mot" cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>'; }
+  function flocke(cx, cy, r) {
+    var d = '';
+    for (var i = 0; i < 6; i++) {
+      var w = i * Math.PI / 3 - Math.PI / 2;
+      d += 'M' + cx + ' ' + cy + 'L' + r1(cx + Math.cos(w) * r) + ' ' + r1(cy + Math.sin(w) * r);
+      var bx = cx + Math.cos(w) * r * 0.58, by = cy + Math.sin(w) * r * 0.58;
+      for (var s = -1; s <= 1; s += 2) {
+        var w2 = w + s * 0.8;
+        d += 'M' + r1(bx) + ' ' + r1(by) + 'L' + r1(bx + Math.cos(w2) * r * 0.36) + ' ' + r1(by + Math.sin(w2) * r * 0.36);
+      }
+    }
+    return '<path class="strich" stroke-width="' + r1(Math.max(1.3, r / 4.2)) + '" d="' + d + '"/>';
+  }
+  var BLATT = 'M0 0C1.5-2.6 3.2-4.2 4.6-3.2 5.4-5.4 7.6-5.6 8.6-3.6 10-5.2 12.4-4.6 12.6-2.4 14-2.2 15.4-1 16.4 0 15.4 1 14 2.2 12.6 2.4 12.4 4.6 10 5.2 8.6 3.6 7.6 5.6 5.4 5.4 4.6 3.2 3.2 4.2 1.5 2.6 0 0Z';
+  function stechpalme(cx, cy) {
+    return '<g transform="translate(' + cx + ' ' + cy + ') scale(1.15)">' +
+      '<g transform="rotate(205)"><path class="mot" d="' + BLATT + '"/><path class="ader" d="M2 0H14"/></g>' +
+      '<g transform="rotate(-25)"><path class="mot" d="' + BLATT + '"/><path class="ader" d="M2 0H14"/></g>' +
+      '<circle class="beere" cx="0" cy="-2.6" r="2.4"/><circle class="beere" cx="-2.5" cy="1" r="2.1"/><circle class="beere" cx="2.5" cy="1" r="2.1"/></g>';
+  }
+  function tanne(cx, cy) {
+    var p = [[0, -15], [6, -7], [3.4, -7], [8.6, 0.5], [4.6, 0.5], [10, 8], [-10, 8], [-4.6, 0.5], [-8.6, 0.5], [-3.4, -7], [-6, -7]];
+    return '<polygon class="mot" points="' + p.map(function (q) { return (cx + q[0]) + ',' + (cy + q[1]); }).join(' ') + '"/>' +
+      '<rect class="mot" x="' + (cx - 1.8) + '" y="' + (cy + 8) + '" width="3.6" height="3.6"/>';
+  }
+  function punkteRing() {
+    var s = '', rad = [2.8, 1.8, 2.3, 1.6, 2.8, 1.8, 2.3, 1.6, 2.1, 1.7];
+    for (var i = 0; i < 10; i++) {
+      var w = -Math.PI / 2 + i * Math.PI / 5 + 0.2;
+      s += punkt(r1(50 + Math.cos(w) * 33), r1(50 + Math.sin(w) * 33), rad[i]);
+    }
+    return s;
+  }
+  var MOTIV = {
+    sterne: stern(35.5, 25, 5.2, -14) + stern(50, 18.5, 7.8, 0) + stern(64.5, 25, 5.2, 14),
+    stern: stern(27, 30, 10.5, -12) + stern(74, 72, 4.2, 12) + punkt(71, 29, 1.8) + punkt(29, 72, 1.5),
+    herz: herz(50, 80, 1.05, 0) + punkt(36.5, 78.5, 1.8) + punkt(63.5, 78.5, 1.8),
+    herzen: herz(39, 23.5, .78, -16) + herz(61, 23.5, .78, 16),
+    flocken: flocke(28, 30, 8) + flocke(72.5, 28, 5.8) + flocke(72, 72, 4.4),
+    stechpalme: stechpalme(50, 80),
+    tanne: tanne(50, 25),
+    punkte: punkteRing(),
+    gross: stern(50, 17.5, 8.5, 0) + stern(34, 23.5, 4, -16) + stern(66, 23.5, 4, 16) + '<circle class="naht2" cx="50" cy="50" r="46.2"/>'
+  };
+  var PLAKETTE = [null,
+    ['T', 'sterne'], ['K', 'flocken'], ['P', 'herz'], ['S', 'tanne'], ['G', 'punkte'], ['K', 'stechpalme'],
+    ['P', 'stern'], ['T', 'herzen'], ['S', 'flocken'], ['G', 'sterne'], ['K', 'tanne'], ['P', 'stechpalme'],
+    ['T', 'punkte'], ['S', 'herz'], ['G', 'stern'], ['T', 'flocken'], ['K', 'herzen'], ['P', 'sterne'],
+    ['S', 'stechpalme'], ['G', 'flocken'], ['P', 'punkte'], ['T', 'stern'], ['G', 'tanne'], ['K', 'gross']];
+
+  function filz(t, ohneMotiv) {
+    var p = PLAKETTE[t];
+    return '<span class="filz f-' + p[0] + (ohneMotiv ? ' ohne' : ' m-' + p[1]) + (t > 9 ? ' zwei' : '') + '">' +
+      '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><circle class="naht" cx="50" cy="50" r="41.5"/>' +
+      (ohneMotiv ? '' : MOTIV[p[1]]) + '</svg><span class="zahl">' + t + '</span></span>';
+  }
+  function filzMotiv(farbe, motiv) {
+    return '<span class="filz f-' + farbe + '"><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">' +
+      '<circle class="naht" cx="50" cy="50" r="41.5"/><g transform="translate(50 50) scale(1.5) translate(-50 -50)">' + motiv + '</g></svg></span>';
+  }
+
+  /* ======================= Türchenwand ======================= */
+  var wand = $('wand');
+  var tueren = [];
+  var huelle = $('haupt');
+
+  function tuerHTML(t) {
+    var plak = filz(t);
+    return '<span class="koerper" aria-hidden="true"></span>' +
+      '<span class="raum" aria-hidden="true">' +
+        '<span class="nische"><span class="licht"></span></span>' +
+        '<span class="fluegel l"><span class="seite vorne"><span class="knauf"></span></span><span class="seite hinten"></span><span class="kante"></span></span>' +
+        '<span class="fluegel r"><span class="seite vorne">' + plak + '<span class="knauf"></span></span><span class="seite hinten"></span><span class="kante"></span></span>' +
+      '</span>' +
+      '<span class="mini" aria-hidden="true">' + filz(t, true) + '</span>' +
+      '<span class="fahne" aria-hidden="true"></span>';
+  }
+
+  for (var t = 1; t <= 24; t++) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tuer' + (t === 24 ? ' gross' : '');
+    b.style.gridArea = 'd' + t;
+    b.dataset.tag = t;
+    b.innerHTML = tuerHTML(t);
+    b.addEventListener('click', klickTuer);
+    wand.appendChild(b);
+    tueren[t] = b;
+  }
+
+  // Handy (3 Spalten) und Tablet (5 Spalten): Tage in der festen 2025er-Reihenfolge zeilenweise,
+  // Titelblock oben links, Türchen 24 als 2×2 unten rechts (beim Handy bleibt so die Lesefolge 19 · 24 · 21).
+  function flaeche(sp, tw, th) {
+    var ordnung = (K.reihenfolge ? K.reihenfolge() : []).filter(function (x) { return x !== 24; });
+    if (ordnung.length !== 23) { ordnung = []; for (var i = 1; i <= 23; i++) ordnung.push(i); }
+    var zeilen = Math.ceil((tw * th + 23 + 4) / sp), g = [], r, c;
+    for (r = 0; r < zeilen; r++) { g.push([]); for (c = 0; c < sp; c++) g[r].push(null); }
+    for (r = 0; r < th; r++) for (c = 0; c < tw; c++) g[r][c] = 't';
+    for (r = zeilen - 2; r < zeilen; r++) for (c = sp - 2; c < sp; c++) g[r][c] = 'd24';
+    var k = 0;
+    for (r = 0; r < zeilen; r++) for (c = 0; c < sp; c++) if (!g[r][c]) g[r][c] = k < ordnung.length ? 'd' + ordnung[k++] : '.';
+    return g.map(function (z) { return '"' + z.join(' ') + '"'; }).join(' ');
+  }
+  wand.style.setProperty('--fl-3', flaeche(3, 3, 2));
+  wand.style.setProperty('--fl-5', flaeche(5, 4, 2));
+
+  // Girlande im Titelblock (nur Desktop sichtbar)
+  (function () {
+    var g = $('girlande');
+    var teile = [['K', stern(50, 50, 16, 0)], ['P', herz(50, 52, 2.1, 0)], ['S', flocke(50, 50, 15)], ['T', tanne(50, 52)], ['G', stern(50, 50, 16, 8)]];
+    var xs = [10, 30, 50, 70, 89];
+    var s = '<svg class="schnur" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M0 1Q50 17 100 1"/></svg>';
+    teile.forEach(function (tl, i) {
+      var tt = xs[i] / 100, y = (1 - tt) * (1 - tt) * 1 + 2 * (1 - tt) * tt * 17 + tt * tt * 1; // Kurve in viewBox-Einheiten (Höhe 10)
+      s += '<span class="anh" style="left:' + xs[i] + '%;top:calc(' + (y / 10) + ' * 10cqi + 2.2cqi);transform:rotate(' + [-6, 4, -3, 5, -5][i] + 'deg)">' + filzMotiv(tl[0], tl[1]) + '</span>';
+    });
+    g.innerHTML = s;
+  })();
+
+  function zustand(t) {
+    if (K.istGeoeffnet(t)) return 'offen';
+    if (!K.darfOeffnen(t)) return 'zu';
+    var h = K.heute();
+    if (h >= 1 && h <= 24 && t === h) return 'heute';
+    return 'nachholen';
+  }
+  var STATUS = { offen: 'geöffnet', heute: 'heute dran, noch zu', nachholen: 'noch zu, darf nachgeholt werden', zu: 'noch gesperrt' };
+
+  /* ---------- Bilder kommen übers Netz: Laden abwarten, Fehler abfangen ---------- */
+  // fertig(ok) genau einmal, sobald das Bild in img dargestellt werden kann. Scheitert eine Server-URL, tauscht
+  // fotos.js (Produktion) die Quelle selbst gegen einen gemalten Platzhalter – dann wird auf diesen gewartet.
+  // Wird img inzwischen neu belegt (src neu gesetzt bzw. beobachte erneut aufgerufen), verfällt der Aufruf.
+  function beobachte(img, fertig) {
+    var nr = img._ladeNr = (img._ladeNr || 0) + 1, quelle = img.src, erledigt = false;
+    function ende(ok) {
+      if (erledigt) return;
+      erledigt = true;
+      img.removeEventListener('load', geladen);
+      img.removeEventListener('error', fehler);
+      if (img._ladeNr === nr) fertig(ok);
+    }
+    function geladen() { ende(img.naturalWidth > 0); }
+    function fehler() {
+      if (img.src && img.src !== quelle) { // Ersatzquelle läuft schon
+        quelle = img.src;
+        if (img.complete && img.naturalWidth > 0) ende(true);
+        return;
+      }
+      ende(false);
+    }
+    if (!quelle) { ende(false); return; }
+    img.addEventListener('load', geladen);
+    img.addEventListener('error', fehler);
+    if (img.complete && img.naturalWidth > 0) ende(true);
+  }
+  function platzhalterFuer(t, px) { // gemalter Ersatz, falls auch fotos.js keinen liefert (nur Produktion)
+    return (F.platzhalter && t) ? F.platzhalter(t, px) : '';
+  }
+  function farbeVon(t) {
+    var f = F.farbe ? F.farbe(t) : '';
+    return /^#[0-9a-f]{6}$/i.test(f || '') ? f : '';
+  }
+  // Bildunterschrift kann leer sein (nicht jeder Tag hat einen Text)
+  function titelVon(t) { var s = F.titel ? F.titel(t) : ''; return typeof s === 'string' ? s.trim() : ''; }
+
+  function sichereVorschau(t) {
+    var n = tueren[t].querySelector('.nische');
+    if (n.querySelector('.vorschau')) return;
+    var img = document.createElement('img');
+    img.className = 'vorschau';
+    img.alt = '';
+    img.decoding = 'async';
+    img.loading = 'lazy';
+    var farbe = farbeVon(t);
+    if (farbe) n.style.setProperty('--lqip', farbe);
+    n.classList.add('laedt');
+    img.src = F.vorschau(t, t === 24 ? 480 : 320);
+    n.insertBefore(img, n.firstChild);
+    beobachte(img, function (ok) {
+      if (!ok) { // ohne jeden Ersatz: lieber gar kein Bild als ein kaputtes Symbol
+        var ersatz = platzhalterFuer(t, t === 24 ? 480 : 320);
+        if (ersatz) img.src = ersatz; else img.removeAttribute('src');
+      }
+      n.classList.remove('laedt');
+    });
+  }
+
+  function aktualisiere() {
+    var h = K.heute();
+    for (var t = 1; t <= 24; t++) {
+      var b = tueren[t], z = zustand(t);
+      if (b.dataset.z !== z) b.dataset.z = z;
+      if (z === 'offen') sichereVorschau(t);
+      b.setAttribute('aria-label', 'Tag ' + t + ', ' + K.datumText(t) + ' – ' + STATUS[z]);
+      b.querySelector('.fahne').textContent = z === 'heute' ? 'Heute' : (z === 'nachholen' ? (h >= 25 ? 'Noch zu' : 'Nachholen') : '');
+    }
+    document.body.dataset.phase = h === 0 ? 'november' : (h >= 25 ? 'weihnachten' : 'advent');
+    var u = $('unterzeile');
+    if (h === 0) u.textContent = 'Noch ist November – bald geht’s los!';
+    else if (h >= 25) u.textContent = ungeoeffnet().length ? 'Frohe Weihnachten! Jetzt dürfen alle Türchen auf.' : 'Frohe Weihnachten! Alle Türchen sind offen.';
+    else if (h === 24) u.textContent = 'Heute ist Heiligabend!';
+    else u.textContent = 'Heute ist ' + K.datumText(h) + (K.istSonntag(h) ? ' – ' + K.adventsSonntag(h) + '. Advent' : '');
+    leisteAktualisieren();
+  }
+
+  /* ---------- Öffnen ---------- */
+  var ansichtOffen = false;
+
+  function klickTuer(ev) {
+    var t = +ev.currentTarget.dataset.tag;
+    var z = tueren[t].dataset.z;
+    versteckeAnhaenger();
+    if (z === 'zu') { ruettle(t); return; }
+    if (z === 'offen') { if (!tueren[t].classList.contains('schwingt')) zeigeAnsicht(t); return; }
+    aufschwingen(t, true);
+  }
+
+  function rot(w) { return 'rotateY(' + w + 'deg)'; }
+  function schwung(s, start, offen) {
+    return [
+      { transform: rot(s * start), easing: 'cubic-bezier(.4,0,.6,1)' },
+      { offset: .07, transform: rot(s * (start + 9)), easing: 'ease-in-out' },
+      { offset: .15, transform: rot(s * (start + 3)), easing: 'cubic-bezier(.35,.1,.45,1)' },
+      { offset: .55, transform: rot(s * (offen + 22)), easing: 'cubic-bezier(.45,0,.55,1)' },
+      { offset: .76, transform: rot(s * (offen - 9)), easing: 'cubic-bezier(.45,0,.55,1)' },
+      { offset: .9, transform: rot(s * (offen + 3)), easing: 'ease-in-out' },
+      { transform: rot(s * offen) }
+    ];
+  }
+
+  function aufschwingen(t, mitAnsicht) {
+    var b = tueren[t];
+    if (b.classList.contains('schwingt')) return;
+    var vorher = b.dataset.z;
+    if (!K.oeffne(t)) return;
+    sichereVorschau(t);
+    b.classList.add('schwingt');
+    var offen = parseFloat(getComputedStyle(b).getPropertyValue('--offen')) || 103;
+    if (!reduziert) {
+      var start = vorher === 'heute' ? 16 : (vorher === 'nachholen' ? 5 : 0);
+      var dauer = 1350;
+      b.querySelector('.r').animate(schwung(1, start, offen), { duration: dauer });
+      b.querySelector('.l').animate(schwung(-1, start, offen), { duration: dauer, delay: 90, fill: 'backwards' });
+      var img = b.querySelector('.vorschau');
+      if (img && img.animate) img.animate([{ transform: 'scale(1.18)', filter: 'brightness(1.5) saturate(.7)' }, { transform: 'scale(1)', filter: 'none' }], { duration: 1300, delay: 150, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'backwards' });
+    }
+    aktualisiere();
+    ansage('Türchen ' + t + ' ist offen' + (titelVon(t) ? ': ' + titelVon(t) : '.'));
+    if (mitAnsicht) setTimeout(function () { F.bild(t); }, 60); // Collage während des Schwungs vorbereiten
+    setTimeout(function () {
+      b.classList.remove('schwingt');
+      if (mitAnsicht && !ansichtOffen && K.istGeoeffnet(t)) zeigeAnsicht(t);
+    }, reduziert ? 250 : 1250);
+  }
+
+  function ruettle(t) {
+    var b = tueren[t];
+    if (!reduziert && !b.classList.contains('schwingt')) {
+      var opt = { duration: 520, easing: 'ease-out' };
+      b.querySelector('.r').animate([{ transform: rot(0) }, { transform: rot(8) }, { transform: rot(1) }, { transform: rot(6) }, { transform: rot(0) }, { transform: rot(2) }, { transform: rot(0) }], opt);
+      b.querySelector('.l').animate([{ transform: rot(0) }, { transform: rot(-7) }, { transform: rot(0) }, { transform: rot(-5) }, { transform: rot(-1) }, { transform: rot(-2) }, { transform: rot(0) }], { duration: 520, delay: 35, easing: 'ease-out' });
+      var kn = b.querySelectorAll('.knauf');
+      for (var i = 0; i < kn.length; i++) kn[i].animate([{ transform: 'none' }, { transform: 'translateY(-1.5px) rotate(-14deg)' }, { transform: 'translateY(1px) rotate(10deg)' }, { transform: 'rotate(-6deg)' }, { transform: 'none' }], { duration: 420 });
+    }
+    var text = K.sperrText(t) || 'Noch ein bisschen Geduld!';
+    zeigeAnhaenger(t, text);
+    ansage('Tag ' + t + ': ' + text);
+  }
+
+  /* ---------- Anhänger (Sprechblase) ---------- */
+  var anh = $('anhaenger');
+  var anhTimer = 0;
+  function zeigeAnhaenger(t, text) {
+    clearTimeout(anhTimer);
+    anh.hidden = false;
+    anh.classList.remove('weg', 'zeigen', 'unten');
+    anh.textContent = text;
+    var hr = huelle.getBoundingClientRect(), tr = tueren[t].getBoundingClientRect();
+    var bw = anh.offsetWidth, bh = anh.offsetHeight;
+    var mitte = tr.left + tr.width / 2 - hr.left;
+    var x = Math.max(6, Math.min(hr.width - bw - 6, mitte - bw / 2));
+    var oben = tr.top - bh - 12 > 8;
+    var y = oben ? (tr.top - hr.top - bh - 10) : (tr.bottom - hr.top + 12);
+    if (!oben) anh.classList.add('unten');
+    anh.style.left = x + 'px';
+    anh.style.top = y + 'px';
+    anh.style.setProperty('--ax', Math.max(18, Math.min(bw - 18, mitte - x)) + 'px');
+    void anh.offsetWidth;
+    anh.classList.add('zeigen');
+    anhTimer = setTimeout(versteckeAnhaenger, 2600);
+  }
+  function versteckeAnhaenger() {
+    if (anh.hidden) return;
+    clearTimeout(anhTimer);
+    anh.classList.add('weg');
+    anhTimer = setTimeout(function () { anh.hidden = true; anh.classList.remove('weg', 'zeigen'); }, 260);
+  }
+  document.addEventListener('pointerdown', function (e) {
+    if (!anh.hidden && !(e.target.closest && e.target.closest('.tuer'))) versteckeAnhaenger();
+  });
+
+  var ansageEl = $('ansage');
+  function ansage(text) { ansageEl.textContent = ''; setTimeout(function () { ansageEl.textContent = text; }, 30); }
+
+  /* ======================= Heute-Leiste ======================= */
+  var leiste = $('leiste');
+  var leisteAktion = null;
+  var STERN_FILZ = filzMotiv('K', stern(50, 50, 17, 0));
+
+  function ungeoeffnet() {
+    var r = [];
+    for (var t = 1; t <= 24; t++) if (K.darfOeffnen(t) && !K.istGeoeffnet(t)) r.push(t);
+    return r;
+  }
+  var leisteZiel = 0, leisteModus = 'los';
+  var PFEIL = {
+    unten: 'M12 5v13M6 12.5l6 6 6-6',
+    oben: 'M12 19V6M6 11.5l6-6 6 6',
+    los: 'M5 12h14M13 6l6 6-6 6'
+  };
+  function leisteAktualisieren() {
+    var h = K.heute(), titel, sub, filzHTML;
+    // Unterzeile in Stufen von lang nach kurz – die längste, die in die (schmale) Leiste passt, wird gezeigt
+    var subs;
+    leisteModus = 'los';
+    if (h === 0) {
+      titel = 'Noch ist November';
+      subs = ['Am 1. Dezember geht’s los', 'Ab 1. Dezember geht’s los', 'Ab 1. Dezember'];
+      filzHTML = STERN_FILZ;
+      leisteZiel = 1;
+      leisteAktion = function () { springeZu(1, function () { pulse(1); }); };
+    } else if (h >= 25) {
+      var rest = ungeoeffnet();
+      titel = 'Frohe Weihnachten!';
+      filzHTML = STERN_FILZ;
+      leisteZiel = 0;
+      if (rest.length) {
+        subs = rest.length === 1 ? ['Das letzte Türchen öffnen', 'Letztes Türchen öffnen']
+          : ['Alle ' + rest.length + ' restlichen Türchen öffnen', 'Alle ' + rest.length + ' Türchen öffnen', rest.length + ' Türchen öffnen'];
+        leisteAktion = alleOeffnen;
+      } else {
+        subs = ['Alle 24 Bilder ansehen', 'Alle Bilder ansehen'];
+        leisteAktion = function () { zeigeAnsicht(1); };
+      }
+    } else {
+      var verpasst = ungeoeffnet().filter(function (x) { return x !== h; }).length;
+      var offen = K.istGeoeffnet(h);
+      titel = 'Heute: Türchen ' + h;
+      filzHTML = filz(h, true);
+      leisteZiel = h;
+      subs = verpasst ? [
+        (offen ? 'Bild ansehen' : 'Jetzt öffnen') + ' · ' + verpasst + ' zum Nachholen',
+        (offen ? 'Bild ansehen' : 'Jetzt öffnen') + ' · ' + verpasst + ' nachholen',
+        (offen ? 'Ansehen' : 'Öffnen') + ' · ' + verpasst + ' nachholen'
+      ] : [offen ? 'Bild ansehen' : 'Jetzt öffnen'];
+      leisteAktion = function () { heuteOeffnen(h); };
+    }
+    sub = subs[0];
+    $('leiste-titel').textContent = titel;
+    leisteSubs = subs;
+    leisteEinpassen();
+    var lf = $('leiste-filz');
+    if (lf.dataset.k !== filzHTML) { lf.innerHTML = filzHTML; lf.dataset.k = filzHTML; }
+    leiste.setAttribute('aria-label', titel + ' – ' + sub);
+    leistePfeil();
+  }
+  var leisteSubs = [];
+  function leisteEinpassen() {
+    var el = $('leiste-sub');
+    for (var i = 0; i < leisteSubs.length; i++) {
+      el.textContent = leisteSubs[i];
+      if (el.scrollWidth <= el.clientWidth + 1) return;
+    }
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(leisteEinpassen);
+  function leistePfeil() {
+    var art = leisteModus;
+    if (leisteZiel) {
+      var r = tueren[leisteZiel].getBoundingClientRect();
+      art = r.bottom > window.innerHeight - 92 ? 'unten' : (r.top < 8 ? 'oben' : 'los');
+    }
+    var pf = $('leiste-pfeil');
+    if (pf.getAttribute('d') !== PFEIL[art]) pf.setAttribute('d', PFEIL[art]);
+  }
+  var pfeilRaf = 0;
+  window.addEventListener('scroll', function () {
+    if (pfeilRaf) return;
+    pfeilRaf = requestAnimationFrame(function () { pfeilRaf = 0; leistePfeil(); });
+  }, { passive: true });
+  leiste.addEventListener('click', function () { if (leisteAktion) leisteAktion(); });
+
+  // Leiste „Heute“: hinscrollen und gleich aufschwingen lassen (bzw. das Bild zeigen)
+  function heuteOeffnen(t) {
+    springeZu(t, function () {
+      var z = tueren[t].dataset.z;
+      if (z === 'heute' || z === 'nachholen') aufschwingen(t, true);
+      else if (z === 'offen') zeigeAnsicht(t);
+      else pulse(t);
+    });
+  }
+
+  function sichtbarkeit(b) {
+    var r = b.getBoundingClientRect();
+    return { r: r, ganz: r.top >= 8 && r.bottom <= window.innerHeight - 92 };
+  }
+  function springeZu(t, danach) {
+    var b = tueren[t], s = sichtbarkeit(b), r = s.r;
+    if (!s.ganz) {
+      var frei = window.innerHeight - 92;
+      var ziel = window.scrollY + r.top - Math.max(16, (frei - r.height) / 2);
+      window.scrollTo({ top: Math.max(0, ziel), behavior: reduziert ? 'auto' : 'smooth' });
+    }
+    b.focus({ preventScroll: true });
+    setTimeout(function () { if (danach) danach(); }, s.ganz || reduziert ? 0 : 600);
+  }
+  function pulse(t) {
+    var b = tueren[t];
+    b.classList.remove('puls');
+    void b.offsetWidth;
+    if (!reduziert) b.classList.add('puls');
+  }
+
+  // Beim Laden bzw. neuem Datum: die Heute-Tür „klopft an“ und wird bei Bedarf sanft sichtbar gescrollt
+  function klopfen(t) {
+    if (reduziert) return;
+    var b = tueren[t];
+    if (b.dataset.z !== 'heute' || b.classList.contains('schwingt')) return;
+    var o = { duration: 700, easing: 'ease-in-out' };
+    b.querySelector('.r').animate([{ transform: rot(16) }, { transform: rot(27) }, { transform: rot(15) }, { transform: rot(25) }, { transform: rot(16) }], o);
+    b.querySelector('.l').animate([{ transform: rot(-16) }, { transform: rot(-24) }, { transform: rot(-15) }, { transform: rot(-22) }, { transform: rot(-16) }], o);
+  }
+  function anklopfen(nurOhneScroll) {
+    var h = K.heute();
+    if (h < 1 || h > 24 || ansichtOffen) return;
+    var b = tueren[h];
+    if (b.dataset.z !== 'heute') return;
+    var s = sichtbarkeit(b);
+    var warte = 0;
+    if (!s.ganz && !(nurOhneScroll && window.scrollY > 0)) {
+      var frei = window.innerHeight - 92;
+      var ziel = s.r.top < 8 ? window.scrollY + s.r.top - 24 : window.scrollY + s.r.bottom - frei + 24;
+      window.scrollTo({ top: Math.max(0, ziel), behavior: reduziert ? 'auto' : 'smooth' });
+      warte = 700;
+    }
+    setTimeout(function () { klopfen(h); }, warte);
+  }
+  wand.addEventListener('animationend', function (e) {
+    if (e.animationName === 'puls') e.target.classList.remove('puls');
+  });
+
+  function alleOeffnen() {
+    var rest = ungeoeffnet();
+    rest.forEach(function (t, i) {
+      setTimeout(function () { aufschwingen(t, false); }, reduziert ? 0 : i * 120);
+    });
+  }
+
+  /* ======================= Bildansicht ======================= */
+  var ansicht = $('ansicht'), buehne = $('a-buehne'), spur = $('a-spur');
+  var knopfZu = $('a-zu'), knopfZurueck = $('a-zurueck'), knopfWeiter = $('a-weiter');
+  var liste = [], pos = 0, breite = 0, blaettertGerade = false, nachbarTimer = 0;
+  var istTouch = window.matchMedia && window.matchMedia('(hover: none)').matches;
+
+  function blaetter() { return spur.children; }
+
+  // Seitenverhältnis (Breite/Höhe): tatsächlich geladenes Bild > Abmessungen vom Server > Format aus dem Prototyp
+  function verhaeltnis(t, img) {
+    if (img && img.dataset.tag === String(t) && +img.dataset.verh > 0) return +img.dataset.verh;
+    var m = F.masse ? F.masse(t) : null;
+    if (m && m.w > 0 && m.h > 0) return Math.max(0.3, Math.min(3.5, m.w / m.h));
+    return F.format(t) === 'hoch' ? 2 / 3 : 1;
+  }
+  function altText(t) { var s = titelVon(t); return 'Fotocollage vom ' + t + '. Dezember' + (s ? ': ' + s : ''); }
+  // Solange das Foto lädt: Durchschnittsfarbe; bei quadratischen Collagen zusätzlich die Türchen-Vorschau –
+  // aber nur, wenn sie in der Nische schon fertig geladen ist (liegt im Browser-Cache, keine Zusatzanfrage).
+  // Das Foto wird dann nur noch „scharf“.
+  function geladeneVorschau(t) {
+    var v = tueren[t] && tueren[t].querySelector('.vorschau');
+    return (v && v.complete && v.naturalWidth > 0 && !/^data:/.test(v.getAttribute('src') || '')) ? v.src : '';
+  }
+  function grundSetzen(img, t) {
+    img.style.backgroundColor = t ? farbeVon(t) : '';
+    var lqip = (t && F.hatBild && F.hatBild(t) && Math.abs(verhaeltnis(t) - 1) < 0.02) ? geladeneVorschau(t) : '';
+    img.style.backgroundImage = lqip ? 'url("' + lqip + '")' : '';
+  }
+  function bildLeeren(fig, img, t) {
+    img._ladeNr = (img._ladeNr || 0) + 1; // laufende Beobachtung verwerfen
+    img.removeAttribute('src');
+    img.dataset.tag = '';
+    delete img.dataset.verh;
+    grundSetzen(img, t);
+    fig.classList.toggle('laedt', !!t);
+  }
+  function bildLaden(fig, img, t) {
+    delete img.dataset.verh;
+    grundSetzen(img, t);
+    fig.classList.add('laedt');
+    img.fetchPriority = fig.parentNode === blaetter()[1] ? 'high' : 'low';
+    img.src = F.bild(t);
+    img.dataset.tag = t;
+    beobachte(img, function (ok) {
+      var ersatz = ok ? '' : platzhalterFuer(t);
+      if (ersatz && img.src !== ersatz) {
+        img.src = ersatz;
+        beobachte(img, function () { bildDa(fig, img, t); });
+        return;
+      }
+      if (!ok && !ersatz) { img.removeAttribute('src'); img.alt = ''; }
+      bildDa(fig, img, t);
+    });
+  }
+  function bildDa(fig, img, t) {
+    fig.classList.remove('laedt');
+    img.style.backgroundImage = '';
+    // weicht das geladene Bild (z. B. Platzhalter statt Foto) vom erwarteten Format ab → Rahmen anpassen
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+      var v = img.naturalWidth / img.naturalHeight;
+      if (Math.abs(v - verhaeltnis(t)) > 0.03) { img.dataset.verh = v; if (ansichtOffen) groessen(); }
+    }
+  }
+  function setzeBlatt(el, t, mitBild) {
+    var fig = el.firstElementChild, img = fig.firstElementChild;
+    el.dataset.tag = t || '';
+    if (!t) { el.classList.add('leer'); bildLeeren(fig, img, 0); img.alt = ''; return; }
+    el.classList.remove('leer');
+    if (img.dataset.tag !== String(t)) {
+      if (mitBild) bildLaden(fig, img, t); else bildLeeren(fig, img, t);
+    }
+    img.alt = img.getAttribute('src') ? altText(t) : '';
+  }
+  function ladeNachbarn() {
+    var bl = blaetter();
+    for (var i = 0; i < 3; i++) {
+      var t = +bl[i].dataset.tag;
+      if (t) setzeBlatt(bl[i], t, true);
+    }
+  }
+  // Nachbarbilder erst holen, wenn das sichtbare Bild da ist (am Handy zählt jede Leitung), spätestens nach 3,5 s
+  var nachbarNr = 0;
+  function nachbarnSpaeter(ms) {
+    clearTimeout(nachbarTimer);
+    var nr = ++nachbarNr;
+    nachbarTimer = setTimeout(function () {
+      if (nr !== nachbarNr || !ansichtOffen) return;
+      var fig = blaetter()[1].firstElementChild, img = fig.firstElementChild;
+      if (!fig.classList.contains('laedt')) { ladeNachbarn(); return; }
+      var los = function () {
+        img.removeEventListener('load', los);
+        img.removeEventListener('error', los);
+        clearTimeout(nachbarTimer);
+        if (nr === nachbarNr && ansichtOffen) ladeNachbarn();
+      };
+      img.addEventListener('load', los);
+      img.addEventListener('error', los);
+      nachbarTimer = setTimeout(los, 3500);
+    }, ms);
+  }
+  function fuelle() {
+    var bl = blaetter();
+    setzeBlatt(bl[0], liste[pos - 1], false);
+    setzeBlatt(bl[1], liste[pos], true);
+    setzeBlatt(bl[2], liste[pos + 1], false);
+    for (var i = 0; i < 3; i++) {
+      if (i === 1) bl[i].removeAttribute('aria-hidden'); else bl[i].setAttribute('aria-hidden', 'true');
+    }
+    nachbarnSpaeter(380);
+    beschrifte();
+    passeAn();
+  }
+  function beschrifte() {
+    var t = liste[pos], titel = titelVon(t), datum = $('a-datum');
+    $('a-zaehler').innerHTML = 'Bild ' + (pos + 1) + ' von ' + liste.length + (istTouch && liste.length > 1 ? '<small>Wischen zum Blättern</small>' : '');
+    $('a-plakette').innerHTML = filz(t);
+    // ohne Bildunterschrift wird das Datum zur Überschrift (statt einer leeren Zeile)
+    $('a-titel').textContent = titel || K.datumText(t);
+    datum.textContent = titel ? K.datumText(t) : '';
+    datum.hidden = !titel;
+    knopfZurueck.disabled = pos <= 0;
+    knopfWeiter.disabled = pos >= liste.length - 1;
+  }
+  function groessen() {
+    var r = buehne.getBoundingClientRect();
+    breite = r.width;
+    var kompakt = r.height < 500 && r.width >= 560; // Handy quer: Kopf und Fuß liegen über dem Bild
+    var schmal = r.width < 600 || kompakt;
+    var rand = kompakt ? 76 : (schmal ? 10 : (window.innerWidth >= 900 ? 110 : 28)), matte = schmal ? 5 : 9;
+    var bl = blaetter();
+    for (var i = 0; i < 3; i++) {
+      var t = +bl[i].dataset.tag;
+      var fig = bl[i].firstElementChild, img = fig.firstElementChild;
+      fig.style.setProperty('--matte', matte + 'px');
+      if (!t) continue;
+      var verh = verhaeltnis(t, img);
+      var aw = r.width - 2 * rand - 2 * matte, ah = r.height - (kompakt ? 12 : (schmal ? 16 : 36)) - 2 * matte;
+      var w = Math.max(60, Math.min(aw, ah * verh));
+      img.style.width = Math.floor(w) + 'px';
+      img.style.height = Math.floor(w / verh) + 'px';
+    }
+  }
+  function passeAn() {
+    groessen();
+    setzeSpur(0, false);
+  }
+  function setzeSpur(dx, weich, fertig) {
+    spur.style.transition = weich ? 'transform .34s cubic-bezier(.25,.8,.3,1)' : 'none';
+    spur.style.transform = 'translate3d(' + (-breite + dx) + 'px,0,0)';
+    if (fertig) {
+      var erledigt = false;
+      var ende = function () { if (erledigt) return; erledigt = true; spur.removeEventListener('transitionend', ende); fertig(); };
+      spur.addEventListener('transitionend', ende);
+      setTimeout(ende, 420);
+    }
+  }
+  function blaettern(richtung) {
+    if (blaettertGerade) return;
+    var neu = pos + richtung;
+    if (neu < 0 || neu >= liste.length) { setzeSpur(0, true); return; }
+    ladeNachbarn();
+    blaettertGerade = true;
+    var los = function () {
+      pos = neu;
+      var bl = blaetter();
+      if (richtung > 0) spur.appendChild(bl[0]); else spur.insertBefore(bl[2], bl[0]);
+      bl = blaetter();
+      setzeBlatt(bl[richtung > 0 ? 2 : 0], liste[pos + richtung], false);
+      for (var i = 0; i < 3; i++) {
+        if (i === 1) bl[i].removeAttribute('aria-hidden'); else bl[i].setAttribute('aria-hidden', 'true');
+      }
+      beschrifte();
+      passeAn();
+      blaettertGerade = false;
+      nachbarnSpaeter(200);
+    };
+    if (reduziert) los();
+    else setzeSpur(-richtung * breite, true, los);
+  }
+
+  // Wischen mit Pointer Events
+  var zug = null;
+  buehne.addEventListener('pointerdown', function (e) {
+    if (e.button > 0 || blaettertGerade) return;
+    zug = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), aktiv: false, dx: 0 };
+  });
+  buehne.addEventListener('pointermove', function (e) {
+    if (!zug || e.pointerId !== zug.id) return;
+    var dx = e.clientX - zug.x, dy = e.clientY - zug.y;
+    if (!zug.aktiv) {
+      if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.1) {
+        zug.aktiv = true;
+        ladeNachbarn();
+        try { buehne.setPointerCapture(e.pointerId); } catch (err) { /* egal */ }
+        buehne.classList.add('zieht');
+      } else if (Math.abs(dy) > 14) { zug = null; return; }
+      else return;
+    }
+    var amRand = (dx > 0 && pos <= 0) || (dx < 0 && pos >= liste.length - 1);
+    zug.dx = amRand ? dx * 0.32 : dx;
+    setzeSpur(zug.dx, false);
+  });
+  var zugGerade = false;
+  function zugEnde(e) {
+    if (!zug || e.pointerId !== zug.id) return;
+    var z = zug; zug = null;
+    if (z.aktiv) { zugGerade = true; setTimeout(function () { zugGerade = false; }, 80); }
+    buehne.classList.remove('zieht');
+    if (!z.aktiv) return;
+    var dt = Math.max(1, performance.now() - z.t), v = z.dx / dt;
+    if ((z.dx < -breite * 0.18 || v < -0.5) && pos < liste.length - 1) blaettern(1);
+    else if ((z.dx > breite * 0.18 || v > 0.5) && pos > 0) blaettern(-1);
+    else setzeSpur(0, true);
+  }
+  buehne.addEventListener('pointerup', zugEnde);
+  buehne.addEventListener('click', function (e) {
+    // Tippen neben das Bild (nicht nach einem Wischer) schließt die Ansicht
+    if (!e.target.closest('.a-rahmen') && !blaettertGerade && !zugGerade) schliesseAnsicht();
+  });
+  buehne.addEventListener('pointercancel', function (e) { if (zug && e.pointerId === zug.id) { zug = null; buehne.classList.remove('zieht'); setzeSpur(0, true); } });
+
+  knopfZurueck.addEventListener('click', function () { blaettern(-1); });
+  knopfWeiter.addEventListener('click', function () { blaettern(1); });
+  knopfZu.addEventListener('click', schliesseAnsicht);
+
+  function sperreSeite(an) {
+    if (an) {
+      var sb = window.innerWidth - html.clientWidth;
+      html.classList.add('gesperrt');
+      if (sb > 0) document.body.style.paddingRight = sb + 'px';
+    } else {
+      html.classList.remove('gesperrt');
+      document.body.style.paddingRight = '';
+    }
+  }
+  function mittelRahmen() { return blaetter()[1].firstElementChild; }
+
+  function zeigeAnsicht(t) {
+    liste = K.geoeffnet();
+    pos = liste.indexOf(t);
+    if (pos < 0) return;
+    versteckeAnhaenger();
+    ansichtOffen = true;
+    ansicht.hidden = false;
+    sperreSeite(true);
+    $('haupt').inert = true;
+    leiste.inert = true;
+    schnee.pause(true);
+    fuelle();
+    knopfZu.focus({ preventScroll: true });
+    var rahmenEl = mittelRahmen(), bildEl = rahmenEl.firstElementChild;
+    if (!reduziert) {
+      rahmenEl.style.opacity = '0';
+      ansicht.querySelector('.a-grund').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: 'ease-out' });
+      ansicht.querySelector('.a-kopf').animate([{ opacity: 0, transform: 'translateY(-10px)' }, { opacity: 1, transform: 'none' }], { duration: 380, delay: 120, easing: 'ease-out', fill: 'backwards' });
+      ansicht.querySelector('.a-fuss').animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 380, delay: 160, easing: 'ease-out', fill: 'backwards' });
+      // Ist das Foto schon da (Vorladen während des Aufschwingens), fliegt es fertig dekodiert herein;
+      // sonst nach höchstens 220 ms mit Vorschau/Ladeanzeige – nie ein leerer Bildschirm.
+      var geflogen = false;
+      var flug = function () { if (geflogen) return; geflogen = true; rahmenEl.style.opacity = ''; fliegeRein(t); };
+      if (bildEl.decode && bildEl.getAttribute('src')) bildEl.decode().then(flug, flug);
+      setTimeout(flug, 220);
+    }
+  }
+  function fliegeRein(t) {
+    if (!ansichtOffen) return;
+    var quelle = tueren[t].querySelector('.nische').getBoundingClientRect();
+    var rahmen = mittelRahmen(), ziel = rahmen.getBoundingClientRect();
+    if (!ziel.width || !ziel.height) return;
+    var s = Math.min(quelle.width / ziel.width, quelle.height / ziel.height);
+    var dx = (quelle.left + quelle.width / 2) - (ziel.left + ziel.width / 2);
+    var dy = (quelle.top + quelle.height / 2) - (ziel.top + ziel.height / 2);
+    rahmen.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')', opacity: .4 }, { transform: 'none', opacity: 1 }], { duration: 480, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  }
+
+  function schliesseAnsicht() {
+    if (!ansichtOffen) return;
+    var t = liste[pos];
+    var b = tueren[t];
+    ansichtOffen = false;
+    var fertig = function () {
+      ansicht.hidden = true;
+      sperreSeite(false);
+      $('haupt').inert = false;
+      leiste.inert = false;
+      schnee.pause(false);
+      if (b) b.focus({ preventScroll: true });
+    };
+    if (b) {
+      var r = b.getBoundingClientRect();
+      if (r.top < 8 || r.bottom > window.innerHeight - 92) {
+        window.scrollTo(0, Math.max(0, window.scrollY + r.top - Math.max(16, (window.innerHeight - 92 - r.height) / 2)));
+      }
+    }
+    if (reduziert || !b) { fertig(); return; }
+    var quelle = b.querySelector('.nische').getBoundingClientRect();
+    var rahmen = mittelRahmen(), ziel = rahmen.getBoundingClientRect();
+    var s = Math.min(quelle.width / ziel.width, quelle.height / ziel.height);
+    var dx = (quelle.left + quelle.width / 2) - (ziel.left + ziel.width / 2);
+    var dy = (quelle.top + quelle.height / 2) - (ziel.top + ziel.height / 2);
+    rahmen.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')', opacity: .2 }], { duration: 360, easing: 'cubic-bezier(.4,0,.6,1)' });
+    ansicht.querySelector('.a-grund').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 360, easing: 'ease-in' });
+    ansicht.querySelector('.a-kopf').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' });
+    ansicht.querySelector('.a-fuss').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' });
+    setTimeout(function () {
+      ansicht.querySelector('.a-kopf').getAnimations().forEach(function (a) { a.cancel(); });
+      ansicht.querySelector('.a-fuss').getAnimations().forEach(function (a) { a.cancel(); });
+      fertig();
+    }, 340);
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (!ansichtOffen) {
+      if (e.key === 'Escape') versteckeAnhaenger();
+      return;
+    }
+    if (e.key === 'Escape') { e.preventDefault(); schliesseAnsicht(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); blaettern(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); blaettern(-1); }
+  });
+
+  /* ======================= Schnee ======================= */
+  var schnee = (function () {
+    var c = $('schnee'), g = c.getContext('2d');
+    var w = 0, h = 0, flocken = [], laeuft = false, angehalten = false, letzte = 0, raf = 0;
+    function neu(f, oben) {
+      f.x = Math.random() * w;
+      f.y = oben ? -6 - Math.random() * 30 : Math.random() * h;
+      f.r = 0.8 + Math.pow(Math.random(), 2) * 2.6;
+      f.v = 16 + f.r * 13 + Math.random() * 10;
+      f.a = 0.45 + Math.random() * 0.5;
+      f.p = Math.random() * 6.283;
+      f.s = 0.5 + Math.random() * 0.9;
+      f.amp = 6 + Math.random() * 14;
+      return f;
+    }
+    function groesse() {
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      w = window.innerWidth; h = window.innerHeight;
+      c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var faktor = K.heute() >= 25 ? 1.35 : 1;
+      var n = Math.round(Math.max(26, Math.min(120, (w * h) / (w < 600 ? 10500 : 8000))) * faktor);
+      while (flocken.length < n) flocken.push(neu({}, false));
+      flocken.length = n;
+      if (reduziert) zeichne(0);
+    }
+    function zeichne(dt) {
+      g.clearRect(0, 0, w, h);
+      g.fillStyle = '#fff';
+      for (var i = 0; i < flocken.length; i++) {
+        var f = flocken[i];
+        if (dt) {
+          f.y += f.v * dt;
+          f.p += f.s * dt;
+          if (f.y > h + 8) neu(f, true);
+        }
+        g.globalAlpha = f.a;
+        g.beginPath();
+        g.arc(f.x + Math.sin(f.p) * f.amp, f.y, f.r, 0, 6.283);
+        g.fill();
+      }
+      g.globalAlpha = 1;
+    }
+    function schritt(zeit) {
+      if (!laeuft) return;
+      var dt = letzte ? Math.min(0.05, (zeit - letzte) / 1000) : 0;
+      letzte = zeit;
+      zeichne(dt);
+      raf = requestAnimationFrame(schritt);
+    }
+    function start() {
+      if (reduziert || laeuft || angehalten || document.hidden) return;
+      laeuft = true; letzte = 0;
+      raf = requestAnimationFrame(schritt);
+    }
+    function stopp() { laeuft = false; cancelAnimationFrame(raf); }
+    groesse();
+    start();
+    var rt = 0;
+    window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(groesse, 120); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) stopp(); else start(); });
+    return {
+      pause: function (an) { angehalten = an; if (an) stopp(); else start(); },
+      neu: groesse
+    };
+  })();
+
+  /* ======================= Start & Live-Updates ======================= */
+  window.addEventListener('resize', function () {
+    if (ansichtOffen) passeAn();
+    versteckeAnhaenger();
+    leisteEinpassen();
+  });
+
+  var letzterTag = K.heute();
+  K.onChange(function (h) {
+    versteckeAnhaenger();
+    aktualisiere();
+    if (h !== letzterTag) { letzterTag = h; setTimeout(function () { anklopfen(false); }, 250); }
+    schnee.neu();
+    if (ansichtOffen) {
+      var t = liste[pos];
+      var neueListe = K.geoeffnet();
+      if (neueListe.indexOf(t) < 0) { schliesseAnsicht(); }
+      else { liste = neueListe; pos = liste.indexOf(t); fuelle(); }
+    }
+  });
+
+  html.classList.add('still');
+  aktualisiere();
+  requestAnimationFrame(function () { requestAnimationFrame(function () { html.classList.remove('still'); }); });
+  setTimeout(function () { anklopfen(true); }, 1100);
+  // heutige Collage im Leerlauf vorbereiten, damit die Bildansicht ohne Ruckler aufgeht
+  var leerlauf = window.requestIdleCallback || function (f) { return setTimeout(f, 1500); };
+  leerlauf(function () { var h = K.heute(); if (h >= 1 && h <= 24) F.bild(h); });
+})();
+</script>
+</body>
+</html>

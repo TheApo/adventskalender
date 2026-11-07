@@ -1,0 +1,13 @@
+# Abhängigkeiten und gebauter Kalender
+node_modules/
+ausgabe/
+
+# Eigene Fotos nie ins Repo – nur die Anleitung bleibt drin
+bilder/*
+!bilder/LIES-MICH.md
+!bilder/.gitkeep
+
+# Systemdateien
+.DS_Store
+Thumbs.db
+desktop.ini

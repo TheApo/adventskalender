@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kugel-Girlanden – {{TITEL}}</title>
+<link rel="stylesheet" href="../fonts/girlande.css">
+<style>
+:root {
+  /* Farb-Tokens */
+  --nacht: #08170f;      /* Tannennacht, fast schwarz */
+  --tanne: #1b3d2c;      /* Nadelgrün für Flächen */
+  --matt: #46705a;       /* mattgrüne Kugel */
+  --rot: #c9302b;        /* Kugelrot */
+  --gold: #d9ad55;       /* Kappen, Fäden, Schrift-Akzent */
+  --creme: #f3e6c8;      /* Ziffern, Text */
+  /* Schrift-Tokens */
+  --schrift-display: 'Fraunces', 'Georgia', 'Times New Roman', serif;
+  --schrift-fein: 'Cormorant Garamond', 'Georgia', serif;
+  --cw: calc(100vw - 28px);
+  --d: 84px;
+  --sw: 120px;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--nacht); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  color: var(--creme);
+  font-family: var(--schrift-display);
+}
+.seite { overflow-x: hidden; overflow-x: clip; }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    var(--muster1, none),
+    var(--muster2, none),
+    radial-gradient(110% 70% at 50% 30%, #13301f 0%, #0c2016 42%, #06120c 100%);
+  background-size: 230px 230px, 370px 370px, auto;
+  pointer-events: none;
+}
+button { font: inherit; color: inherit; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Lichterkette oben ---------- */
+.lichter { display: block; width: 100%; height: 34px; overflow: hidden; }
+.birne { transform-box: fill-box; }
+.fest .birne.funkel { animation: funkeln 2.6s ease-in-out infinite; }
+@keyframes funkeln { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+
+/* ---------- Kopf ---------- */
+.kopf {
+  width: var(--cw);
+  margin: 2px auto 0;
+  display: grid;
+  gap: 14px 40px;
+}
+.titel {
+  margin: 0;
+  font-family: var(--schrift-display);
+  font-weight: 800;
+  font-size: clamp(31px, 9.4vw, 62px);
+  line-height: 1;
+  letter-spacing: -0.012em;
+  font-variation-settings: 'opsz' 144, 'SOFT' 35, 'WONK' 1;
+  color: var(--creme);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .35), 0 8px 22px rgba(0, 0, 0, .5);
+}
+.titel .z1, .titel .z2 { display: block; }
+.initial { position: relative; color: #d8392f; }
+.ilex {
+  position: absolute;
+  width: .8em;
+  height: auto;
+  left: -.28em;
+  top: -.36em;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45));
+  pointer-events: none;
+}
+.unterzeile {
+  margin: 12px 0 0;
+  font-family: var(--schrift-fein);
+  font-weight: 600;
+  font-size: clamp(14.5px, 3.9vw, 19px);
+  letter-spacing: .06em;
+  color: var(--gold);
+}
+.trenn {
+  display: inline-block;
+  width: .3em;
+  height: .3em;
+  margin: 0 .4em;
+  background: var(--gold);
+  transform: translateY(-.18em) rotate(45deg);
+  opacity: .75;
+}
+.statusblock { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.aktionen { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.aktionen[hidden], .jahr[hidden] { display: none; }
+.sprungliste { display: contents; }
+.sprung {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 16px 0 10px;
+  border: 1.5px solid rgba(217, 173, 85, .6);
+  border-radius: 22px;
+  background: rgba(8, 23, 15, .6);
+  color: var(--creme);
+  font-weight: 600;
+  font-size: 15.5px;
+  font-variation-settings: 'opsz' 14;
+  cursor: pointer;
+}
+.sprung:hover { background: rgba(217, 173, 85, .14); }
+.sprung:focus-visible { outline: 3px solid var(--creme); outline-offset: 3px; }
+.sprung .mini { width: 18px; height: 18px; }
+.status {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 14, 'SOFT' 50;
+  color: rgba(243, 230, 200, .84);
+  max-width: 34em;
+}
+.status strong { font-weight: 650; color: var(--creme); }
+.status .gold { color: #e9c477; }
+.jahr {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1.5px solid rgba(217, 173, 85, .75);
+  border-radius: 22px;
+  background: rgba(8, 23, 15, .6);
+  color: var(--creme);
+  font-weight: 600;
+  font-size: 16px;
+  font-variation-settings: 'opsz' 14;
+  cursor: pointer;
+}
+.jahr:hover { background: rgba(217, 173, 85, .14); }
+.jahr:focus-visible, .zu-heute:focus-visible, .a-knopf:focus-visible { outline: 3px solid var(--creme); outline-offset: 3px; }
+
+@media (min-width: 1000px) {
+  .kopf { grid-template-columns: 1fr 400px; align-items: end; }
+  .titel { white-space: nowrap; font-size: min(60px, 4.1vw, calc((var(--cw) - 440px) / 11.8)); }
+  .titel .z1, .titel .z2 { display: inline; }
+  .unterzeile { letter-spacing: .1em; }
+  .trenn { margin: 0 .55em; }
+  .statusblock { padding-bottom: 4px; }
+  .status { font-size: 15.5px; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) and (min-width: 600px) {
+  .kopf { grid-template-columns: 1fr minmax(240px, 320px); align-items: end; gap: 10px 32px; }
+  .titel { white-space: nowrap; font-size: min(clamp(26px, 8vh, 40px), calc((var(--cw) - 300px) / 11.8)); }
+  .titel .z1, .titel .z2 { display: inline; }
+  .unterzeile { margin-top: 8px; font-size: 15px; }
+  .status { font-size: 15px; }
+}
+
+/* ---------- Baum / Girlanden ---------- */
+.baum {
+  position: relative;
+  width: var(--cw);
+  margin: 10px auto 0;
+  touch-action: pan-y pinch-zoom;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.reihe { position: relative; }
+.girlande {
+  position: absolute;
+  left: -10px;
+  top: 0;
+  pointer-events: none;
+}
+.haenger {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 0;
+  height: 0;
+}
+.pendel {
+  position: absolute;
+  top: 0;
+  left: calc(var(--d) * -.5);
+  width: var(--d);
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+.schwung { transform-origin: 50% 0; }
+.faden {
+  display: block;
+  width: 1px;
+  height: var(--l);
+  margin: 0 auto;
+  background: linear-gradient(rgba(233, 205, 140, .25), rgba(233, 205, 140, .85));
+}
+.kugel {
+  position: relative;
+  display: block;
+  width: var(--d);
+  height: calc(var(--d) * 1.17);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y pinch-zoom;
+}
+.kugel:focus { outline: none; }
+.kugel::after {
+  content: '';
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  bottom: 0;
+  width: var(--d);
+  height: var(--d);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px #f1cf86, 0 0 18px 4px rgba(241, 207, 134, .55);
+  opacity: 0;
+  pointer-events: none;
+}
+.ruft .kugel::after { animation: rufen 1s ease-out 3; }
+@keyframes rufen { 0% { opacity: .95; transform: scale(1); } 100% { opacity: 0; transform: scale(1.7); } }
+.kugel:focus-visible .koerper { outline: 3px solid var(--creme); outline-offset: 5px; }
+.oese {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: calc(var(--d) * .09);
+  height: calc(var(--d) * .09);
+  margin-left: calc(var(--d) * -.045);
+  border: 1.5px solid #caa14c;
+  border-radius: 50%;
+}
+.kappe {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--d) * .075);
+  left: 50%;
+  width: calc(var(--d) * .25);
+  height: calc(var(--d) * .13);
+  margin-left: calc(var(--d) * -.125);
+  border-radius: 2px 2px 35% 35% / 2px 2px 55% 55%;
+  background:
+    repeating-linear-gradient(90deg, rgba(60, 35, 5, .28) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, #7d5819 0%, #f6dc93 32%, #d3a346 58%, #8a621d 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .55);
+}
+.koerper {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--d);
+  height: var(--d);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.koerper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.koerper::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: calc(var(--d) * -.5);
+  border-radius: 50%;
+  display: none;
+  pointer-events: none;
+}
+.ziffer {
+  position: relative;
+  z-index: 1;
+  font-family: var(--schrift-display);
+  font-weight: 800;
+  font-size: calc(var(--d) * .5);
+  line-height: 1;
+  font-variant-numeric: lining-nums;
+  font-variation-settings: 'opsz' 72, 'SOFT' 100, 'WONK' 0;
+  color: var(--creme);
+  transform: translateY(1%);
+  text-shadow: 0 calc(var(--d) * .022) 0 rgba(0, 0, 0, .38), 0 calc(var(--d) * .05) calc(var(--d) * .1) rgba(0, 0, 0, .45);
+  pointer-events: none;
+}
+.plakette {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  right: calc(var(--d) * -.07);
+  bottom: calc(var(--d) * -.04);
+  min-width: max(30px, calc(var(--d) * .4));
+  height: max(30px, calc(var(--d) * .4));
+  padding: 0 .28em;
+  border-radius: 999px;
+  place-items: center;
+  background: radial-gradient(circle at 36% 30%, #fffaf0 0%, #f3e6c8 55%, #d9c497 100%);
+  box-shadow: 0 0 0 calc(var(--d) * .02) #c99b45, 0 2px 5px rgba(0, 0, 0, .55);
+  color: #a92621;
+  font-weight: 800;
+  font-size: max(16px, calc(var(--d) * .23));
+  line-height: 1;
+  font-variant-numeric: lining-nums;
+  font-variation-settings: 'opsz' 24, 'SOFT' 100;
+  pointer-events: none;
+}
+.glas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: none;
+}
+.glas.neu { animation: glas-auf .45s ease-out; }
+@keyframes glas-auf { from { opacity: 0; } to { opacity: 1; } }
+/* Ladezustand: Das Foto der geöffneten Kugel kommt übers Netz. Bis es da ist, schimmert die Kugel
+   in der Leitfarbe des Tages (statt leer/dunkel zu bleiben). */
+.lader {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: none;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, rgba(255, 250, 230, 0) 30%, rgba(255, 250, 230, .34) 50%, rgba(255, 250, 230, 0) 70%) 120% 0 / 260% 100% no-repeat,
+    radial-gradient(circle at 40% 35%, var(--ladefarbe, #6f8a78) 0%, rgba(15, 35, 27, .92) 78%);
+  animation: lader 1.5s ease-in-out infinite;
+}
+.ist-offen.glas-laedt .lader { display: block; }
+@keyframes lader { 0% { background-position: 120% 0, 0 0; } 70%, 100% { background-position: -30% 0, 0 0; } }
+.etikett {
+  position: absolute;
+  top: calc(var(--l) + var(--d) * 1.21 + 4px);
+  left: calc(var(--sw) * -.5);
+  width: var(--sw);
+  text-align: center;
+  font-family: var(--schrift-fein);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(17px, calc(var(--d) * .2), 23px);
+  line-height: 1;
+  color: #e3bd6c;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Gesperrt: matt-grüner Samt */
+.ist-zu .koerper {
+  background: radial-gradient(circle at 42% 38%, #5b866a 0%, #47725a 34%, #2f5641 66%, #1a3727 100%);
+  box-shadow:
+    inset calc(var(--d) * -.07) calc(var(--d) * -.1) calc(var(--d) * .18) rgba(0, 0, 0, .4),
+    0 calc(var(--d) * .07) calc(var(--d) * .16) rgba(0, 0, 0, .55);
+}
+.ist-zu .koerper::after {
+  background:
+    radial-gradient(ellipse 48% 36% at 35% 27%, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 72%),
+    var(--rauschen, none);
+  background-size: auto, 56px 56px;
+}
+
+/* Heute: rot, Goldrand, leuchtet, pendelt */
+.ist-heute .koerper {
+  background: radial-gradient(circle at 37% 31%, #ff8d72 0%, #e5453b 20%, #bd2324 52%, #74101a 92%);
+  box-shadow:
+    0 0 0 1px rgba(70, 12, 10, .7),
+    0 0 0 calc(var(--d) * .045) #dfb45c,
+    0 0 0 calc(var(--d) * .055) rgba(90, 55, 10, .7),
+    inset calc(var(--d) * -.06) calc(var(--d) * -.1) calc(var(--d) * .18) rgba(60, 0, 10, .45),
+    0 calc(var(--d) * .07) calc(var(--d) * .16) rgba(0, 0, 0, .5);
+}
+.ist-heute .koerper::after {
+  background:
+    radial-gradient(ellipse 26% 17% at 34% 24%, rgba(255, 255, 255, .92), rgba(255, 255, 255, .32) 45%, rgba(255, 255, 255, 0) 75%),
+    radial-gradient(ellipse 36% 14% at 58% 86%, rgba(255, 190, 150, .28), rgba(255, 190, 150, 0) 75%);
+}
+.ist-heute .koerper::before, .ist-tag.ist-offen .koerper::before {
+  background: radial-gradient(circle, rgba(255, 110, 70, .55) 0%, rgba(255, 90, 50, .22) 30%, rgba(255, 170, 80, 0) 64%);
+  display: block;
+  animation: gluehen 2.8s ease-in-out infinite;
+}
+.ist-tag.ist-offen .koerper::before {
+  background: radial-gradient(circle, rgba(255, 210, 120, .35) 0%, rgba(255, 190, 90, .12) 32%, rgba(255, 190, 90, 0) 62%);
+}
+.ist-heute .schwung { animation: pendeln 3.4s ease-in-out infinite; }
+@keyframes pendeln { 0%, 100% { transform: rotate(-3.2deg); } 50% { transform: rotate(3.2deg); } }
+@keyframes gluehen { 0%, 100% { opacity: .75; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.04); } }
+.ist-heute .etikett, .ist-tag .etikett { color: #f6d692; font-weight: 700; font-size: clamp(18px, calc(var(--d) * .22), 25px); }
+.ist-verpasst .etikett { font-weight: 700; }
+
+/* Verpasst: Gold mit Schimmer */
+.ist-verpasst .koerper {
+  background: radial-gradient(circle at 37% 31%, #fff3c9 0%, #efcd78 17%, #c9963d 50%, #845b1b 82%, #5c3d10 100%);
+  box-shadow:
+    inset calc(var(--d) * -.06) calc(var(--d) * -.1) calc(var(--d) * .18) rgba(60, 30, 0, .4),
+    0 0 calc(var(--d) * .3) rgba(240, 190, 90, .22),
+    0 calc(var(--d) * .07) calc(var(--d) * .16) rgba(0, 0, 0, .5);
+}
+.ist-verpasst .ziffer {
+  color: #1d3b29;
+  text-shadow: 0 calc(var(--d) * .015) 0 rgba(255, 244, 205, .55), 0 calc(var(--d) * -.01) 0 rgba(60, 35, 5, .35);
+}
+.ist-verpasst .koerper::after {
+  background:
+    linear-gradient(112deg, rgba(255, 250, 225, 0) 38%, rgba(255, 250, 225, .7) 48%, rgba(255, 250, 225, 0) 58%),
+    radial-gradient(ellipse 26% 17% at 34% 24%, rgba(255, 255, 255, .85), rgba(255, 255, 255, 0) 75%);
+  background-size: 300% 100%, auto;
+  background-position: 120% 0, 0 0;
+  background-repeat: no-repeat;
+  animation: schimmer 4.2s ease-in-out infinite;
+}
+@keyframes schimmer { 0% { background-position: 120% 0, 0 0; } 55%, 100% { background-position: -30% 0, 0 0; } }
+
+/* Geöffnet: Glaskugel mit Foto */
+.ist-offen .koerper {
+  background: radial-gradient(circle at 40% 35%, #2d5a49, #0f231b);
+  box-shadow: 0 calc(var(--d) * .07) calc(var(--d) * .18) rgba(0, 0, 0, .6);
+}
+.ist-offen .glas { display: block; }
+.ist-offen .ziffer { display: none; }
+.ist-offen .plakette { display: grid; }
+.ist-offen .koerper::after {
+  background:
+    radial-gradient(ellipse 25% 15% at 33% 22%, rgba(255, 255, 255, .85), rgba(255, 255, 255, .25) 45%, rgba(255, 255, 255, 0) 75%),
+    radial-gradient(circle at 26% 30%, rgba(255, 255, 255, .9) 0, rgba(255, 255, 255, 0) 2.5%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, .13) 67%, rgba(255, 255, 255, 0) 72%),
+    radial-gradient(ellipse 40% 16% at 56% 87%, rgba(255, 255, 255, .26), rgba(255, 255, 255, 0) 75%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .32),
+    inset calc(var(--d) * -.04) calc(var(--d) * -.06) calc(var(--d) * .12) rgba(0, 0, 0, .28);
+}
+
+/* Bewegung reduzieren */
+@media (prefers-reduced-motion: reduce) {
+  .ist-heute .schwung, .ist-verpasst .koerper::after, .ist-heute .koerper::before,
+  .ist-tag.ist-offen .koerper::before, .fest .birne.funkel, .glas.neu { animation: none; }
+  .lader { animation: none; }
+  .ruft .kugel::after { animation: none; opacity: .9; }
+}
+
+/* ---------- Fuß ---------- */
+.fuss {
+  width: var(--cw);
+  margin: 0 auto;
+  /* Platz für die Pille und den Menü-Knopf unten links (mindestens --menue-knopf-zone) */
+  padding: 6px 0 calc(max(86px, var(--menue-knopf-zone, 64px)) + env(safe-area-inset-bottom));
+}
+.hinweis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 0;
+  font-family: var(--schrift-fein);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(18px, 4.8vw, 22px);
+  line-height: 1.3;
+  color: var(--gold);
+  text-align: center;
+}
+.hinweis::before, .hinweis::after {
+  content: '';
+  flex: 0 1 64px;
+  min-width: 18px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(217, 173, 85, 0), rgba(217, 173, 85, .75));
+}
+.hinweis::after { background: linear-gradient(90deg, rgba(217, 173, 85, .75), rgba(217, 173, 85, 0)); }
+
+/* ---------- Zur heutigen Kugel ---------- */
+/* Mittig unten, aber nie in der Ecke des Menü-Knopfs: Die Pille steht zwischen den beiden
+   --menue-knopf-zone-Rändern (margin auto zentriert); ist sie breiter, beginnt sie rechts neben der Zone. */
+.zu-heute {
+  position: fixed;
+  z-index: 20;
+  left: calc(var(--menue-knopf-zone, 64px) + env(safe-area-inset-left));
+  right: calc(var(--menue-knopf-zone, 64px) + env(safe-area-inset-right));
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  width: -webkit-max-content;
+  width: max-content;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px 0 12px;
+  border: 1.5px solid rgba(223, 180, 92, .85);
+  border-radius: 24px;
+  background: rgba(10, 28, 19, .92);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .55);
+  font-weight: 600;
+  font-size: 16px;
+  font-variation-settings: 'opsz' 14;
+  cursor: pointer;
+  white-space: nowrap;
+  animation: pille-auf .35s ease-out;
+}
+.zu-heute[hidden] { display: none; }
+.mini {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 37% 31%, #ff8d72 0%, #e5453b 22%, #bd2324 55%, #74101a 95%);
+  box-shadow: 0 0 0 2px #dfb45c, 0 0 12px rgba(255, 90, 60, .6);
+}
+.zu-heute svg { width: 16px; height: 16px; transition: transform .2s; }
+.mini.gold, .zu-heute.nachholen .mini {
+  background: radial-gradient(circle at 37% 31%, #fff3c9 0%, #efcd78 20%, #c9963d 55%, #845b1b 95%);
+  box-shadow: 0 0 0 1.5px rgba(255, 240, 200, .5), 0 0 10px rgba(240, 190, 90, .45);
+}
+.zu-heute.oben svg { transform: rotate(180deg); }
+/* Menü-Knopf (#kalender-reset aus shared/kalender.js, rund, 40 px): sitzt fest unten links (Lage setzt
+   kalender.js). Die Seite hält die Ecke frei: Heute-Pille rechts neben der Zone, Fuß mit genug Abstand
+   nach unten. In der Bildansicht ist er ausgeblendet. */
+.ansicht-offen #kalender-reset { display: none; }
+@keyframes pille-auf { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Sprechblase ---------- */
+.blase {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  top: 0;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 24px));
+  padding: 11px 16px 12px;
+  border-radius: 16px;
+  background: var(--creme);
+  color: #163424;
+  box-shadow: 0 0 0 1.5px var(--gold), 0 12px 28px rgba(0, 0, 0, .55);
+  font-weight: 650;
+  font-size: 17px;
+  line-height: 1.25;
+  font-variation-settings: 'opsz' 14, 'SOFT' 100;
+  pointer-events: none;
+}
+.blase[hidden] { display: none; }
+.blase::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: calc(var(--pfeil, 50%) - 7px);
+  width: 14px;
+  height: 14px;
+  background: var(--creme);
+  transform: rotate(45deg);
+  box-shadow: -1.5px -1.5px 0 0 var(--gold);
+  border-radius: 2px 0 0 0;
+}
+.blase.oben::before { top: auto; bottom: -7px; box-shadow: 1.5px 1.5px 0 0 var(--gold); border-radius: 0 0 2px 0; }
+.blase.auf { animation: blase-auf .32s cubic-bezier(.3, 1.4, .5, 1); transform-origin: var(--pfeil, 50%) 0; }
+.blase.oben.auf { transform-origin: var(--pfeil, 50%) 100%; }
+@keyframes blase-auf { from { opacity: 0; transform: translateY(-6px) scale(.85); } to { opacity: 1; transform: none; } }
+
+/* ---------- Bildansicht ---------- */
+.ansicht {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background:
+    var(--muster1, none),
+    radial-gradient(120% 80% at 50% 45%, #10291c 0%, #08170f 55%, #040c08 100%);
+  background-size: 230px 230px, auto;
+  color: var(--creme);
+  overscroll-behavior: contain;
+  touch-action: pinch-zoom;
+}
+.ansicht[hidden] { display: none; }
+.ansicht.gezoomt, .ansicht.gezoomt .buehne { touch-action: auto; }
+.a-glut {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(closest-side at 50% 50%, var(--tagfarbe, #f4c35a), rgba(0, 0, 0, 0));
+  opacity: .16;
+  pointer-events: none;
+  transition: background .4s;
+}
+.a-kopf {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 14px 4px 20px;
+}
+.a-text { flex: 1; min-width: 0; padding-top: 2px; }
+.a-datum {
+  margin: 0;
+  font-family: var(--schrift-fein);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: .08em;
+  color: var(--gold);
+}
+.a-titel {
+  margin: 3px 0 0;
+  font-weight: 750;
+  font-size: clamp(21px, 5.6vw, 32px);
+  line-height: 1.12;
+  font-variation-settings: 'opsz' 72, 'SOFT' 40, 'WONK' 1;
+}
+.a-knopf {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1.5px solid rgba(217, 173, 85, .7);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, rgba(255, 255, 255, .12), rgba(255, 255, 255, 0) 60%), rgba(8, 23, 15, .75);
+  color: var(--creme);
+  cursor: pointer;
+}
+.a-knopf svg { width: 20px; height: 20px; }
+.a-knopf:disabled { opacity: .28; cursor: default; }
+.a-knopf:not(:disabled):hover { border-color: var(--gold); background-color: rgba(217, 173, 85, .14); }
+.buehne {
+  position: relative;
+  overflow: hidden;
+  touch-action: pinch-zoom;
+  cursor: grab;
+}
+.buehne:active { cursor: grabbing; }
+.spur { position: absolute; inset: 0; }
+.tafel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+}
+.tafel img {
+  display: block;
+  flex: none;
+  /* Breite/Höhe setzt das Skript passend zum Seitenverhältnis des Bildes (schon bevor es geladen ist) */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background-color: var(--bildfarbe, #2d5a49);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(243, 230, 200, .22),
+    0 0 0 6px rgba(6, 18, 12, .7),
+    0 0 0 7px rgba(217, 173, 85, .55),
+    0 26px 60px rgba(0, 0, 0, .65);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+.tafel img[hidden] { display: none; }
+/* Bild lädt noch: Fläche in der Leitfarbe des Tages mit wanderndem Glanz und kleinem Glas-Kreisel */
+.tafel.laedt img {
+  background-image:
+    linear-gradient(110deg, rgba(255, 250, 230, 0) 35%, rgba(255, 250, 230, .14) 50%, rgba(255, 250, 230, 0) 65%),
+    radial-gradient(circle at 50% 45%, rgba(8, 23, 15, .2), rgba(8, 23, 15, .62));
+  background-size: 260% 100%, auto;
+  background-repeat: no-repeat;
+  animation: tafel-laedt 1.6s ease-in-out infinite;
+}
+@keyframes tafel-laedt { 0% { background-position: 120% 0, 0 0; } 70%, 100% { background-position: -30% 0, 0 0; } }
+.tafel.laedt::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  border: 3px solid rgba(243, 230, 200, .25);
+  border-top-color: var(--gold);
+  animation: kreisel .9s linear infinite;
+  pointer-events: none;
+}
+@keyframes kreisel { to { transform: rotate(360deg); } }
+.tafel img.neu { animation: bild-auf .35s ease-out; }
+@keyframes bild-auf { from { opacity: .25; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .tafel.laedt img, .tafel.laedt::after, .tafel img.neu { animation: none; }
+}
+.a-fuss {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 6px 16px 14px;
+}
+.a-zaehler {
+  font-family: var(--schrift-fein);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 18px;
+  color: rgba(243, 230, 200, .8);
+  text-align: center;
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .ansicht {
+    grid-template-columns: minmax(190px, 30%) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas: "kopf buehne" "fuss buehne";
+  }
+  .a-kopf { grid-area: kopf; max-width: none; padding: 12px 6px 4px 16px; }
+  .a-titel { font-size: 20px; }
+  .a-datum { font-size: 15px; }
+  .buehne { grid-area: buehne; }
+  .tafel { padding: 8px 14px 8px 6px; }
+  .a-fuss { grid-area: fuss; max-width: none; padding: 6px 6px 12px 12px; gap: 6px; }
+  .a-zaehler { font-size: 15px; }
+}
+@media (min-width: 1000px) {
+  .tafel { padding: 14px 24px; }
+  .a-kopf { padding-top: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="seite">
+<svg class="lichter" id="lichter" aria-hidden="true" focusable="false"></svg>
+
+<header class="kopf" id="kopf">
+  <div class="titelblock">
+    <h1 class="titel" aria-label="{{TITEL}}"><span class="z1" aria-hidden="true"><span class="initial">{{TITEL_A_ERSTES}}<svg class="ilex" viewBox="0 0 64 48" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id="beere" cx="35%" cy="32%" r="70%"><stop offset="0" stop-color="#ff8a7a"/><stop offset=".45" stop-color="#d42b2b"/><stop offset="1" stop-color="#7a0d14"/></radialGradient>
+        <linearGradient id="blatt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3f8a55"/><stop offset="1" stop-color="#1c4d2f"/></linearGradient>
+      </defs>
+      <g transform="translate(31 30) rotate(-152)"><path d="M0,0 Q4,-6 7,-6 Q8,-3 12,-8 Q14,-4 18,-8 Q19,-4 24,-6 Q26,-3 31,0 Q26,3 24,6 Q19,4 18,8 Q14,4 12,8 Q8,3 7,6 Q4,6 0,0Z" fill="url(#blatt)"/><path d="M2,0 L27,0" stroke="#7fbf86" stroke-width=".9" opacity=".7"/></g>
+      <g transform="translate(33 30) rotate(-28)"><path d="M0,0 Q4,-6 7,-6 Q8,-3 12,-8 Q14,-4 18,-8 Q19,-4 24,-6 Q26,-3 31,0 Q26,3 24,6 Q19,4 18,8 Q14,4 12,8 Q8,3 7,6 Q4,6 0,0Z" fill="url(#blatt)"/><path d="M2,0 L27,0" stroke="#7fbf86" stroke-width=".9" opacity=".7"/></g>
+      <circle cx="28" cy="31" r="5" fill="url(#beere)"/><circle cx="37" cy="32" r="5" fill="url(#beere)"/><circle cx="32.5" cy="38" r="5" fill="url(#beere)"/>
+    </svg></span>{{TITEL_A_REST}}</span> <span class="z2" aria-hidden="true">{{TITEL_B}}</span></h1>
+    <p class="unterzeile">24 Kugeln <span class="trenn" aria-hidden="true"></span> 24 Momente <span class="trenn" aria-hidden="true"></span> ein ganzes Jahr</p>
+  </div>
+  <div class="statusblock">
+    <p class="status" id="status"></p>
+    <div class="aktionen" id="aktionen" hidden>
+      <button class="jahr" id="jahr" type="button" hidden>Das ganze Jahr ansehen</button>
+      <span class="sprungliste" id="sprung"></span>
+    </div>
+  </div>
+</header>
+
+<main class="baum" id="baum" aria-label="24 Christbaumkugeln, eine für jeden Tag bis Heiligabend"></main>
+
+<footer class="fuss" id="fuss"><p class="hinweis" id="hinweis"></p></footer>
+</div>
+
+<button class="zu-heute" id="zuHeute" type="button" hidden>
+  <span class="mini" aria-hidden="true"></span><span id="zuHeuteText">Heute: Kugel 1</span>
+  <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<div class="blase" id="blase" role="status" aria-live="polite" hidden></div>
+
+<div class="ansicht" id="ansicht" role="dialog" aria-modal="true" aria-labelledby="aTitel" hidden>
+  <div class="a-glut" id="aGlut"></div>
+  <div class="a-kopf" id="aKopf">
+    <div class="a-text">
+      <p class="a-datum" id="aDatum"></p>
+      <h2 class="a-titel" id="aTitel"></h2>
+    </div>
+    <button class="a-knopf" id="aZu" type="button" aria-label="Bildansicht schließen">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.5 4.5l11 11M15.5 4.5l-11 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="buehne" id="buehne">
+    <div class="spur" id="spur">
+      <div class="tafel"><img alt="" draggable="false"></div>
+      <div class="tafel"><img alt="" draggable="false"></div>
+      <div class="tafel"><img alt="" draggable="false"></div>
+    </div>
+  </div>
+  <div class="a-fuss" id="aFuss">
+    <button class="a-knopf" id="aZurueck" type="button" aria-label="Vorheriges Bild">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M12.5 4l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <span class="a-zaehler" id="aZaehler"></span>
+    <button class="a-knopf" id="aWeiter" type="button" aria-label="Nächstes Bild">
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <p class="sr" id="aAnsage" aria-live="polite"></p>
+</div>
+
+<script src="../shared/kalender.js"></script>
+<script src="../shared/fotos.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var K = window.Kalender.init('girlande');
+  var F = window.Fotos;
+  var ruhig = !!K.bewegungReduziert;
+  var root = document.documentElement;
+
+  var el = function (id) { return document.getElementById(id); };
+  var baum = el('baum'), kopf = el('kopf'), fuss = el('fuss'), lichter = el('lichter');
+  var statusEl = el('status'), hinweisEl = el('hinweis'), jahrBtn = el('jahr');
+  var sprungEl = el('sprung'), aktionenEl = el('aktionen');
+  var zuHeute = el('zuHeute'), zuHeuteText = el('zuHeuteText'), blase = el('blase');
+  var ansicht = el('ansicht'), aKopf = el('aKopf'), aFuss = el('aFuss'), buehne = el('buehne'), spur = el('spur');
+  var aDatum = el('aDatum'), aTitel = el('aTitel'), aZaehler = el('aZaehler'), aAnsage = el('aAnsage');
+  var aZu = el('aZu'), aZurueck = el('aZurueck'), aWeiter = el('aWeiter'), aGlut = el('aGlut');
+
+  function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+  function rng(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ---------- Hintergrund-Muster (Sterne, Schneeflocken) ---------- */
+  function muster(groesse, seed, punkte, flocken, sterne) {
+    var r = rng(seed), s = '<svg xmlns="http://www.w3.org/2000/svg" width="' + groesse + '" height="' + groesse + '">';
+    var i, x, y;
+    for (i = 0; i < punkte; i++) {
+      s += '<circle cx="' + (r() * groesse).toFixed(1) + '" cy="' + (r() * groesse).toFixed(1) + '" r="' +
+        (0.45 + r() * 0.7).toFixed(2) + '" fill="#f3e6c8" opacity="' + (0.12 + r() * 0.32).toFixed(2) + '"/>';
+    }
+    for (i = 0; i < flocken; i++) {
+      x = r() * groesse; y = r() * groesse;
+      var g = 3.5 + r() * 4, d = '';
+      for (var k = 0; k < 3; k++) {
+        var a = k * Math.PI / 3, c = Math.cos(a) * g, sn = Math.sin(a) * g;
+        d += 'M' + (x - c).toFixed(1) + ',' + (y - sn).toFixed(1) + 'L' + (x + c).toFixed(1) + ',' + (y + sn).toFixed(1);
+      }
+      s += '<path d="' + d + '" stroke="#f3e6c8" stroke-width=".7" stroke-linecap="round" opacity="' + (0.1 + r() * 0.1).toFixed(2) + '"/>';
+    }
+    for (i = 0; i < sterne; i++) {
+      x = r() * groesse; y = r() * groesse;
+      var q = 2.2 + r() * 2.2, w = q * 0.22;
+      s += '<path d="M' + x.toFixed(1) + ',' + (y - q).toFixed(1) + 'L' + (x + w).toFixed(1) + ',' + (y - w).toFixed(1) +
+        'L' + (x + q).toFixed(1) + ',' + y.toFixed(1) + 'L' + (x + w).toFixed(1) + ',' + (y + w).toFixed(1) +
+        'L' + x.toFixed(1) + ',' + (y + q).toFixed(1) + 'L' + (x - w).toFixed(1) + ',' + (y + w).toFixed(1) +
+        'L' + (x - q).toFixed(1) + ',' + y.toFixed(1) + 'L' + (x - w).toFixed(1) + ',' + (y - w).toFixed(1) + 'Z" fill="#f6e2b0" opacity="' +
+        (0.25 + r() * 0.25).toFixed(2) + '"/>';
+    }
+    return 'url("data:image/svg+xml,' + encodeURIComponent(s + '</svg>') + '")';
+  }
+  function rauschen() {
+    var c = document.createElement('canvas'); c.width = c.height = 56;
+    var g = c.getContext('2d'), d = g.createImageData(56, 56), r = rng(11);
+    for (var i = 0; i < 56 * 56; i++) {
+      var v = r() < 0.5 ? 0 : 255;
+      d.data[i * 4] = d.data[i * 4 + 1] = d.data[i * 4 + 2] = v;
+      d.data[i * 4 + 3] = Math.floor(r() * 30);
+    }
+    g.putImageData(d, 0, 0);
+    return 'url(' + c.toDataURL() + ')';
+  }
+  root.style.setProperty('--muster1', muster(230, 3, 26, 2, 2));
+  root.style.setProperty('--muster2', muster(370, 9, 30, 3, 2));
+  root.style.setProperty('--rauschen', rauschen());
+
+  /* ---------- Klang: zartes Glas-Klirren (nur nach Antippen) ---------- */
+  var ac = null;
+  function klang(art) {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    try {
+      ac = ac || new AC();
+      if (ac.state === 'suspended') ac.resume();
+      var t0 = ac.currentTime + 0.01;
+      var toene = art === 'klirr' ? [[2794, 0], [3322, 0.075]] : (art === 'auf' ? [[1568, 0], [2093, 0.07], [2637, 0.14]] : [[2349, 0]]);
+      toene.forEach(function (p) {
+        [1, 2.76, 5.4].forEach(function (m, j) {
+          var o = ac.createOscillator(), g = ac.createGain();
+          o.type = 'sine'; o.frequency.value = p[0] * m;
+          var t = t0 + p[1], lautst = 0.035 / (j * 2 + 1);
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.exponentialRampToValueAtTime(lautst, t + 0.004);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5 / (j + 1) + 0.15);
+          o.connect(g); g.connect(ac.destination);
+          o.start(t); o.stop(t + 0.8);
+        });
+      });
+    } catch (e) { /* kein Ton – egal */ }
+  }
+
+  /* ---------- Kugeln bauen ---------- */
+  var H = [];
+  // Feste, gemischte Anzeige-Reihenfolge wie bei einem echten Adventskalender (Platz → Tag)
+  var ORD = (typeof K.reihenfolge === 'function' && K.reihenfolge()) || [];
+  if (ORD.length !== 24) { ORD = []; for (var o = 1; o <= 24; o++) ORD.push(o); }
+  function anPlatz(i) { return H[ORD[i] - 1]; }
+  var MUSTER_L = [0.18, 0.62, 0.32, 0.86, 0.12, 0.5, 0.74, 0.26];
+  function baueHaenger(tag) {
+    var d = document.createElement('div');
+    d.className = 'haenger';
+    d.innerHTML = '<div class="pendel"><div class="schwung"><span class="faden"></span>' +
+      '<button class="kugel" type="button" data-tag="' + tag + '"><span class="oese"></span><span class="kappe"></span>' +
+      '<span class="koerper"><span class="lader" aria-hidden="true"></span><span class="ziffer" aria-hidden="true">' + tag + '</span>' +
+      '<span class="plakette" aria-hidden="true">' + tag + '</span></span></button></div></div>' +
+      '<span class="etikett" aria-hidden="true"></span>';
+    var h = {
+      tag: tag, el: d, pendel: d.firstChild, knopf: d.querySelector('.kugel'),
+      koerper: d.querySelector('.koerper'), etikett: d.querySelector('.etikett'), lader: d.querySelector('.lader'),
+      theta: 0, omega: 0, jig: 0, bewegt: false, w0: 5.5, x: 0, py: 0, L: 20, glas: null, platz: 0,
+      sinn: (((tag * 7919) % 13) / 13 > 0.5 ? 1 : -1) * (0.6 + ((tag * 31) % 7) / 17)
+    };
+    h.knopf.addEventListener('click', function () {
+      if (klickSperre) return;
+      tippe(h);
+    });
+    return h;
+  }
+  for (var t = 1; t <= 24; t++) H.push(baueHaenger(t));
+
+  /* ---------- Layout ---------- */
+  var spalten = 0, D = 84, slotW = 120, contW = 360, reihen = [], girlandenSchluessel = '';
+  var G_TOP = 15, ETIKETT = 22;
+
+  function layout() {
+    var vw = root.clientWidth, vh = window.innerHeight;
+    var pad = Math.round(clamp(vw * 0.045, 14, 52));
+    // Handy: 4 Kugeln je Girlande, solange sie mindestens 64 px groß bleiben, sonst 3
+    var quer = vh < 520 && vw >= 600 && vw > vh * 1.3;
+    var sp = (vw >= 1000 || quer) ? 6 : (vw >= 600 ? 4 : ((vw - 2 * pad) / 4 * 0.76 >= 64 ? 4 : 3));
+    var frei = vw - 2 * pad;
+    var lmax = sp === 6 ? 10 : (vw >= 600 ? 26 : 24);
+    var lmin = sp === 6 ? 3 : 5;
+    var cw, d, sag;
+    if (sp === 6 && !quer) {
+      // Desktop: Kopf + 4 Girlanden sollen in den Bildschirm passen.
+      // Kopfhöhe hängt (über die Titelgröße) von der Breite ab, deshalb zweimal messen.
+      sag = 8;
+      cw = Math.floor(Math.min(frei, 1120));
+      for (var durchgang = 0; durchgang < 2; durchgang++) {
+        root.style.setProperty('--cw', cw + 'px');
+        var kh = kopf.offsetHeight + lichter.getBoundingClientRect().height + 16;
+        var pro = (vh - kh - 6) / 4;
+        var dh = (pro - (G_TOP + sag + 2 + lmax + 27)) / 1.17;
+        d = Math.floor(clamp(Math.min(dh, frei / 6 * 0.62), 72, 124));
+        cw = Math.floor(Math.min(frei, 1120, Math.max(1000, 6 * d * 2)));
+      }
+    } else {
+      cw = Math.floor(Math.min(frei, quer ? 900 : (vw >= 600 ? 780 : 520)));
+      d = Math.min(cw / sp * (vw >= 600 ? 0.6 : (sp === 4 ? 0.76 : 0.7)), 122);
+      sag = clamp(cw * 0.02, 6, 14);
+    }
+    var sw = cw / sp;
+    root.style.setProperty('--cw', cw + 'px');
+    D = Math.round(d); slotW = sw; contW = cw;
+    ETIKETT = Math.round(clamp(D * 0.22, 18, 25) + 8 + D * 0.04);
+    root.style.setProperty('--d', D + 'px');
+    root.style.setProperty('--sw', Math.round(sw) + 'px');
+
+    if (sp !== spalten) {
+      var fokus = document.activeElement;
+      spalten = sp;
+      baum.textContent = '';
+      reihen = [];
+      for (var r = 0; r < 24 / sp; r++) {
+        var re = document.createElement('div');
+        re.className = 'reihe';
+        var cv = document.createElement('canvas');
+        cv.className = 'girlande';
+        cv.setAttribute('aria-hidden', 'true');
+        re.appendChild(cv);
+        for (var i = 0; i < sp; i++) re.appendChild(anPlatz(r * sp + i).el);
+        baum.appendChild(re);
+        reihen.push({ el: re, canvas: cv, r: r, seed: 4000 + r * 977 });
+      }
+      if (fokus && fokus.classList && fokus.classList.contains('kugel')) fokus.focus({ preventScroll: true });
+      girlandenSchluessel = '';
+    }
+
+    var rowH = Math.round(G_TOP + sag + 2 + lmax + D * 1.17 + ETIKETT);
+    reihen.forEach(function (re) {
+      re.W = cw;
+      re.sag = sag;
+      var phase = re.r * 1.7 + 0.4;
+      re.yFn = function (x) {
+        var u = x / cw;
+        return G_TOP + sag * Math.sin(Math.PI * clamp(u, 0, 1)) + 1.6 * Math.sin(u * Math.PI * 3 + phase);
+      };
+      re.el.style.height = rowH + 'px';
+      for (var i = 0; i < sp; i++) {
+        var h = anPlatz(re.r * sp + i);
+        h.platz = re.r * sp + i;
+        var x = sw * (i + 0.5);
+        var L = Math.round(lmin + (lmax - lmin) * MUSTER_L[(i + re.r * 3) % MUSTER_L.length]);
+        h.x = x; h.py = re.yFn(x) + 2; h.L = L;
+        h.w0 = 2 * Math.PI / (0.95 + (L + 0.6 * D) / 260);
+        h.el.style.setProperty('--x', x.toFixed(1) + 'px');
+        h.el.style.setProperty('--y', h.py.toFixed(1) + 'px');
+        h.el.style.setProperty('--l', L + 'px');
+      }
+    });
+    girlandenZeichnen();
+    lichterZeichnen();
+    // Nach jedem Neu-Layout (Größenwechsel, Schriften geladen, Kopf umgebrochen) die Pille neu bewerten –
+    // sonst bleibt sie nach einem Datumswechsel stehen, obwohl ihre Kugel längst im Bild ist.
+    pilleAktualisieren();
+    if (A.offen) tafelnMessen();
+  }
+
+  /* ---------- Tannengirlande (Canvas, fein gestrichelte Nadeln) ---------- */
+  function girlandenZeichnen() {
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var fest = K.heute() >= 25;
+    var key = [contW, D, spalten, fest, dpr].join('|');
+    if (key === girlandenSchluessel) return;
+    girlandenSchluessel = key;
+    reihen.forEach(function (re) { zeichneGirlande(re, dpr, fest); });
+  }
+
+  function zeichneGirlande(re, dpr, fest) {
+    var UE = 10, W = re.W + 2 * UE, Hh = Math.round(G_TOP + re.sag + 24);
+    var c = re.canvas;
+    c.width = Math.round(W * dpr); c.height = Math.round(Hh * dpr);
+    c.style.width = W + 'px'; c.style.height = Hh + 'px';
+    var g = c.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, W, Hh);
+    var r = rng(re.seed);
+    var y = function (x) { return re.yFn(x - UE); };
+    var s = clamp(D / 92, 0.72, 1.12);
+
+    // Zweig
+    g.strokeStyle = '#2a1c10'; g.lineWidth = 2.4 * s; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(6, y(6));
+    for (var x0 = 6; x0 <= W - 6; x0 += 6) g.lineTo(x0, y(x0));
+    g.stroke();
+
+    var lagen = [
+      { f: ['#0b2217', '#0f2b1d'], n: 2, l: [8, 14], w: 1.6, sp: 4.5 },
+      { f: ['#173f2b', '#1d4a34', '#1a4430'], n: 3, l: [6.5, 12.5], w: 1.25, sp: 4 },
+      { f: ['#2b6345', '#336f4e', '#28593f'], n: 2, l: [5, 10], w: 1.1, sp: 3.4 },
+      { f: ['#5c976a', '#4a865b', '#78aa7a', '#3f7a52'], n: 1, l: [3, 7], w: 0.95, sp: 2.4, oben: true }
+    ];
+    lagen.forEach(function (la) {
+      var pfade = la.f.map(function () { return new Path2D(); });
+      for (var x = 3; x < W - 3; x += 1.7) {
+        var rand = Math.min(x, W - x);
+        var taper = clamp(rand / 42, 0, 1); taper = taper * taper * (3 - 2 * taper);
+        if (taper < 0.06) continue;
+        var yy = y(x), a = Math.atan2(y(x + 1) - y(x - 1), 2);
+        for (var k = 0; k < la.n; k++) {
+          var side = la.oben ? (r() < 0.8 ? -1 : 1) : (r() < 0.5 ? -1 : 1);
+          var px = x + (r() - 0.5) * 2;
+          var py = yy + side * r() * la.sp * taper * s;
+          var len = (la.l[0] + r() * (la.l[1] - la.l[0])) * (0.4 + 0.6 * taper) * s;
+          var th = 0.42 + r() * 0.8;
+          var dir = r() < 0.5 ? a + side * th : a + Math.PI - side * th;
+          var p = pfade[(r() * pfade.length) | 0];
+          p.moveTo(px, py);
+          p.lineTo(px + Math.cos(dir) * len, py + Math.sin(dir) * len);
+        }
+      }
+      g.lineWidth = la.w; g.lineCap = 'round';
+      pfade.forEach(function (p, i) { g.strokeStyle = la.f[i]; g.stroke(p); });
+    });
+
+    // Beeren und Goldperlen
+    var bx = 34 + r() * 50;
+    while (bx < W - 30) {
+      var by = y(bx) + (r() - 0.5) * 7 * s;
+      var n = 2 + ((r() * 2) | 0);
+      for (var b = 0; b < n; b++) {
+        var ex = bx + (b - (n - 1) / 2) * 4.2 * s + (r() - 0.5) * 2, ey = by + (r() - 0.5) * 4;
+        var rr = (2.2 + r() * 0.8) * s;
+        var gr = g.createRadialGradient(ex - rr * 0.35, ey - rr * 0.4, 0, ex, ey, rr);
+        gr.addColorStop(0, '#ff8a7a'); gr.addColorStop(0.45, '#cf2a2a'); gr.addColorStop(1, '#6e0b12');
+        g.fillStyle = gr; g.beginPath(); g.arc(ex, ey, rr, 0, 6.2832); g.fill();
+      }
+      if (r() < 0.5) {
+        var gx = bx + 26 + r() * 20, gy = y(gx) + (r() - 0.5) * 6;
+        var gg = g.createRadialGradient(gx - 1, gy - 1, 0, gx, gy, 2.6 * s);
+        gg.addColorStop(0, '#fff1c0'); gg.addColorStop(0.5, '#d9ad55'); gg.addColorStop(1, '#7a5418');
+        g.fillStyle = gg; g.beginPath(); g.arc(gx, gy, 2.4 * s, 0, 6.2832); g.fill();
+      }
+      bx += 78 + r() * 96;
+    }
+
+    // Weihnachten: warme Lichter in der Girlande
+    if (fest) {
+      for (var lx = 22 + r() * 10; lx < W - 16; lx += 34 + r() * 16) {
+        var ly = y(lx) + (r() - 0.5) * 8;
+        var lg = g.createRadialGradient(lx, ly, 0, lx, ly, 13);
+        lg.addColorStop(0, 'rgba(255,228,160,.95)'); lg.addColorStop(0.18, 'rgba(255,200,110,.55)'); lg.addColorStop(1, 'rgba(255,170,80,0)');
+        g.fillStyle = lg; g.beginPath(); g.arc(lx, ly, 13, 0, 6.2832); g.fill();
+        g.fillStyle = '#fff6da'; g.beginPath(); g.arc(lx, ly, 1.8, 0, 6.2832); g.fill();
+      }
+    }
+  }
+
+  /* ---------- Lichterkette oben ---------- */
+  var lichterBreite = 0;
+  function lichterZeichnen() {
+    var w = root.clientWidth;
+    if (w === lichterBreite) return;
+    lichterBreite = w;
+    var hgt = 34, y0 = 2, durch = w < 600 ? 7 : 9;
+    var n = Math.max(2, Math.round(w / (w < 600 ? 120 : 170))), sw = w / n;
+    var d = 'M0,' + y0;
+    var bir = '';
+    var idx = 0;
+    for (var i = 0; i < n; i++) {
+      d += ' Q' + (i * sw + sw / 2).toFixed(1) + ',' + (y0 + durch * 2) + ' ' + ((i + 1) * sw).toFixed(1) + ',' + y0;
+      var k = Math.max(3, Math.round(sw / 23));
+      for (var j = 0; j < k; j++) {
+        var tt = (j + 0.5) / k, x = i * sw + tt * sw, y = y0 + 2 * tt * (1 - tt) * durch * 2;
+        var rot = (idx % 5 === 0 || idx % 5 === 3);
+        var rad = 2.6 + ((idx * 37) % 5) * 0.28;
+        bir += '<g class="birne' + (idx % 3 === 1 ? ' funkel' : '') + '" style="animation-delay:' + ((idx * 0.37) % 2.6).toFixed(2) + 's" transform="translate(' + x.toFixed(1) + ' ' + (y + 3.4).toFixed(1) + ')">' +
+          '<circle r="' + (rad * 3.4).toFixed(1) + '" fill="url(#' + (rot ? 'gl-r' : 'gl-g') + ')"/>' +
+          '<rect x="-1.1" y="' + (-rad - 1.6).toFixed(1) + '" width="2.2" height="2" fill="#b38a3a"/>' +
+          '<circle cy="0.4" r="' + rad.toFixed(1) + '" fill="url(#' + (rot ? 'k-r' : 'k-g') + ')"/></g>';
+        idx++;
+      }
+    }
+    lichter.setAttribute('viewBox', '0 0 ' + w + ' ' + hgt);
+    lichter.innerHTML = '<defs>' +
+      '<radialGradient id="gl-r"><stop offset="0" stop-color="#ff6a50" stop-opacity=".55"/><stop offset="1" stop-color="#ff6a50" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="gl-g"><stop offset="0" stop-color="#ffd27a" stop-opacity=".5"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="k-r" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffb3a0"/><stop offset=".4" stop-color="#e2392f"/><stop offset="1" stop-color="#7a1014"/></radialGradient>' +
+      '<radialGradient id="k-g" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff4cf"/><stop offset=".45" stop-color="#e3b65c"/><stop offset="1" stop-color="#7d5718"/></radialGradient>' +
+      '</defs><path d="' + d + '" fill="none" stroke="#3a2c1c" stroke-width="1.1"/>' + bir;
+  }
+
+  /* ---------- Glaskugel-Vorschau (Kugel-Linse per Pixel-Abbildung) ---------- */
+  // Die Vorschauen kommen (in der echten Version) asynchron übers Netz: höchstens drei gleichzeitig laden,
+  // erst nach onload + decode auf das Canvas zeichnen bzw. Pixel lesen. Bis dahin schimmert die Kugel
+  // („glas-laedt“). Scheitert ein Bild (404/403/Netz), kommt der gemalte Platzhalter aus fotos.js hinein.
+  var glasCache = {}, glasWarte = [], glasImFlug = 0, GLAS_PARALLEL = 3;
+  var TINT = [22, 50, 40];
+  function glasAnfordern(tag, vorne) {
+    var h = H[tag - 1];
+    if (h.glas) return;
+    if (glasCache[tag]) { glasEinsetzen(tag); return; }
+    if (h.glasLaedt) return;
+    var i = glasWarte.indexOf(tag);
+    if (i >= 0) { if (!vorne) return; glasWarte.splice(i, 1); }
+    if (vorne) glasWarte.unshift(tag); else glasWarte.push(tag);
+    naechstesGlas();
+  }
+  // Bild laden und dekodieren; Ergebnis ist ein fertiges <img> oder null
+  function bildLaden(url) {
+    return new Promise(function (fertig) {
+      if (!url) { fertig(null); return; }
+      var img = new Image();
+      img.decoding = 'async';
+      img.onload = function () {
+        if (img.decode) img.decode().then(function () { fertig(img); }, function () { fertig(img.naturalWidth ? img : null); });
+        else fertig(img);
+      };
+      img.onerror = function () { fertig(null); };
+      img.src = url;
+    });
+  }
+  function istDatenUrl(u) { return typeof u === 'string' && u.indexOf('data:') === 0; }
+  function ersatzVorschau(tag) {
+    return typeof F.platzhalter === 'function' ? F.platzhalter(tag, 256) : '';
+  }
+  function naechstesGlas() {
+    while (glasImFlug < GLAS_PARALLEL && glasWarte.length) glasHolen(glasWarte.shift());
+  }
+  function glasHolen(tag) {
+    var h = H[tag - 1];
+    if (h.glas || glasCache[tag] || !K.darfOeffnen(tag)) return;   // gesperrte Tage: nie ein Bild anfordern
+    h.glasLaedt = true;
+    glasImFlug++;
+    var url = F.vorschau(tag, 256);
+    bildLaden(url).then(function (img) {
+      // Ladefehler → gemalter Platzhalter (nur einmal versuchen, nicht für data:-URLs)
+      if (!img && !istDatenUrl(url)) return bildLaden(ersatzVorschau(tag));
+      return img;
+    }).then(function (img) {
+      if (img) {
+        try { glasCache[tag] = glasRendern(img); } catch (e) { if (window.console) console.warn(e); }
+      }
+      h.glasLaedt = false;
+      glasImFlug--;
+      if (glasCache[tag]) glasEinsetzen(tag, true);
+      else glasLaederAus(h);
+      setTimeout(naechstesGlas, 8);
+    });
+  }
+  function glasEinsetzen(tag, neu) {
+    var h = H[tag - 1];
+    if (h.glas || !glasCache[tag]) return;
+    h.glas = glasCache[tag];
+    h.glas.classList.toggle('neu', !!neu && !ruhig);
+    h.koerper.insertBefore(h.glas, h.koerper.firstChild);
+    glasLaederAus(h);
+  }
+  function glasLaederAus(h) { h.el.classList.remove('glas-laedt'); }
+  function glasRendern(img) {
+    var Q = 256, S = 240;
+    var qc = document.createElement('canvas'); qc.width = qc.height = Q;
+    var qg = qc.getContext('2d');
+    // Nicht-quadratische Quellen mittig quadratisch beschneiden (Vorschauen sind normalerweise schon quadratisch)
+    var iw = img.naturalWidth || img.width || Q, ih = img.naturalHeight || img.height || Q, m = Math.min(iw, ih);
+    qg.drawImage(img, (iw - m) / 2, (ih - m) / 2, m, m, 0, 0, Q, Q);
+    var oc = document.createElement('canvas'); oc.width = oc.height = S; oc.className = 'glas';
+    oc.setAttribute('aria-hidden', 'true');
+    var og = oc.getContext('2d');
+    var src;
+    try { src = qg.getImageData(0, 0, Q, Q).data; } catch (e) {
+      // Pixel nicht lesbar (z. B. fremde Herkunft ohne CORS): einfache runde Glaskugel ohne Linsen-Effekt
+      return glasEinfach(oc, og, qc, S);
+    }
+    var out = og.createImageData(S, S), o = out.data;
+    var LX = -0.42, LY = -0.58, LZ = 0.7;
+    for (var py = 0; py < S; py++) {
+      var ny = (py + 0.5) / S * 2 - 1;
+      for (var px = 0; px < S; px++) {
+        var nx = (px + 0.5) / S * 2 - 1, r2 = nx * nx + ny * ny, i = (py * S + px) * 4;
+        if (r2 >= 1) { o[i + 3] = 0; continue; }
+        var r = Math.sqrt(r2), z = Math.sqrt(1 - r2);
+        var k = r > 1e-4 ? Math.asin(r) / (r * 1.5707963) : 0.63662;
+        var f = (0.26 + 0.74 * k) * 0.985;
+        var sx = (nx * f * 0.5 + 0.5) * (Q - 1), sy = (ny * f * 0.5 + 0.5) * (Q - 1);
+        var x0 = sx | 0, y0 = sy | 0, fx = sx - x0, fy = sy - y0;
+        var x1 = x0 < Q - 1 ? x0 + 1 : x0, y1 = y0 < Q - 1 ? y0 + 1 : y0;
+        var a = (y0 * Q + x0) * 4, b = (y0 * Q + x1) * 4, c = (y1 * Q + x0) * 4, d = (y1 * Q + x1) * 4;
+        var w00 = (1 - fx) * (1 - fy), w10 = fx * (1 - fy), w01 = (1 - fx) * fy, w11 = fx * fy;
+        var lam = nx * LX + ny * LY + z * LZ; if (lam < 0) lam = 0;
+        var sh = 0.52 + 0.3 * Math.sqrt(z) + 0.26 * lam;
+        var tt = r > 0.76 ? (r - 0.76) / 0.24 : 0; tt = tt * tt * (3 - 2 * tt) * 0.55;
+        for (var ch = 0; ch < 3; ch++) {
+          var v = src[a + ch] * w00 + src[b + ch] * w10 + src[c + ch] * w01 + src[d + ch] * w11;
+          o[i + ch] = v * sh * (1 - tt) + TINT[ch] * tt;
+        }
+        var kante = (1 - r) * S * 0.5;
+        o[i + 3] = kante >= 1 ? 255 : (kante > 0 ? kante * 255 : 0);
+      }
+    }
+    og.putImageData(out, 0, 0);
+    return oc;
+  }
+  function glasEinfach(oc, og, qc, S) {
+    og.save();
+    og.beginPath(); og.arc(S / 2, S / 2, S / 2 - 0.5, 0, 6.2832); og.clip();
+    og.drawImage(qc, -S * 0.04, -S * 0.04, S * 1.08, S * 1.08);
+    var v = og.createRadialGradient(S * 0.4, S * 0.35, S * 0.1, S / 2, S / 2, S / 2);
+    v.addColorStop(0, 'rgba(255,255,255,0.06)'); v.addColorStop(0.75, 'rgba(0,0,0,0.08)'); v.addColorStop(1, 'rgba(22,50,40,0.55)');
+    og.fillStyle = v; og.fillRect(0, 0, S, S);
+    og.restore();
+    return oc;
+  }
+
+  /* ---------- Pendel-Physik ---------- */
+  var laeuft = false, letzteZeit = 0, rafId = 0;
+  var DAEMPF = 1.05;
+  function anstossen(h, dw) {
+    if (ruhig) return;
+    h.omega = clamp(h.omega + dw, -3.2, 3.2);
+    h.bewegt = true;
+    starte();
+  }
+  function starte() {
+    if (laeuft || document.hidden) return;
+    laeuft = true;
+    letzteZeit = performance.now();
+    rafId = requestAnimationFrame(schritt);
+  }
+  function schritt(now) {
+    var dt = Math.min(0.034, Math.max(0, (now - letzteZeit) / 1000));
+    letzteZeit = now;
+    var aktiv = false;
+    for (var n = 0; n < 24; n++) {
+      var h = H[n];
+      if (!h.bewegt) continue;
+      for (var k = 0; k < 2; k++) {
+        var st = dt / 2;
+        h.omega += (-h.w0 * h.w0 * Math.sin(h.theta) - DAEMPF * h.omega) * st;
+        h.theta = clamp(h.theta + h.omega * st, -0.95, 0.95);
+      }
+      var j = 0;
+      if (h.jig) {
+        var tj = (now - h.jig) / 1000;
+        if (tj < 0.8) j = 0.075 * Math.sin(tj * 2 * Math.PI * 9) * Math.exp(-tj / 0.16);
+        else h.jig = 0;
+      }
+      if (!h.jig && Math.abs(h.theta) < 0.0007 && Math.abs(h.omega) < 0.004) {
+        h.theta = 0; h.omega = 0; h.bewegt = false; h.pendel.style.transform = '';
+        continue;
+      }
+      aktiv = true;
+      h.pendel.style.transform = 'rotate(' + (-(h.theta + j)).toFixed(4) + 'rad)';
+    }
+    if (aktiv) rafId = requestAnimationFrame(schritt);
+    else laeuft = false;
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { cancelAnimationFrame(rafId); laeuft = false; }
+    else if (H.some(function (h) { return h.bewegt; })) starte();
+  });
+
+  // Überstreichen (Maus) und Wischen über die Girlande (Touch) bringt Kugeln zum Schwingen
+  var zeiger = {}, klickSperre = false, druck = null;
+  function trefferBei(x, y) {
+    for (var r = 0; r < reihen.length; r++) {
+      var rr = reihen[r].el.getBoundingClientRect();
+      if (y < rr.top || y > rr.bottom) continue;
+      var i = Math.floor((x - rr.left) / slotW);
+      if (i < 0 || i >= spalten) return -1;
+      var h = anPlatz(r * spalten + i);
+      if (Math.abs(x - (rr.left + h.x)) > D * 0.6) return -1;
+      var oben = rr.top + h.py - 16, unten = rr.top + h.py + h.L + D * 1.17;
+      return (y >= oben && y <= unten) ? h.tag - 1 : -1;
+    }
+    return -1;
+  }
+  baum.addEventListener('pointerdown', function (e) {
+    druck = { x: e.clientX, y: e.clientY };
+    zeiger[e.pointerId] = { x: e.clientX, y: e.clientY, t: e.timeStamp, vx: 0, drin: trefferBei(e.clientX, e.clientY) };
+  });
+  baum.addEventListener('pointermove', function (e) {
+    var z = zeiger[e.pointerId];
+    if (!z) { zeiger[e.pointerId] = { x: e.clientX, y: e.clientY, t: e.timeStamp, vx: 0, drin: trefferBei(e.clientX, e.clientY) }; return; }
+    var dt = Math.max(4, e.timeStamp - z.t);
+    var vx = (e.clientX - z.x) / dt;
+    z.vx = z.vx * 0.4 + vx * 0.6;
+    z.x = e.clientX; z.y = e.clientY; z.t = e.timeStamp;
+    var hit = trefferBei(e.clientX, e.clientY);
+    if (hit !== z.drin) {
+      if (hit >= 0 && Math.abs(z.vx) > 0.04) anstossen(H[hit], clamp(z.vx * 0.6, -1.5, 1.5));
+      z.drin = hit;
+    }
+  }, { passive: true });
+  function zeigerWeg(e) {
+    delete zeiger[e.pointerId];
+    if (druck && e.type === 'pointerup') {
+      var weit = Math.abs(e.clientX - druck.x) + Math.abs(e.clientY - druck.y) > 14;
+      if (weit) { klickSperre = true; setTimeout(function () { klickSperre = false; }, 0); }
+    }
+    druck = null;
+  }
+  baum.addEventListener('pointerup', zeigerWeg);
+  baum.addEventListener('pointercancel', zeigerWeg);
+  baum.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') delete zeiger[e.pointerId]; });
+
+  // Scrollen schaukelt leicht
+  var letztesY = window.scrollY;
+  window.addEventListener('scroll', function () {
+    var dy = window.scrollY - letztesY;
+    letztesY = window.scrollY;
+    if (!dy || ruhig || A.offen) return;
+    var vh = window.innerHeight;
+    for (var r = 0; r < reihen.length; r++) {
+      var rr = reihen[r].el.getBoundingClientRect();
+      if (rr.bottom < -40 || rr.top > vh + 40) continue;
+      for (var i = 0; i < spalten; i++) {
+        var h = anPlatz(r * spalten + i);
+        var add = clamp(dy * 0.0042, -0.22, 0.22) * h.sinn;
+        if (Math.abs(h.omega + add) < 0.55) anstossen(h, add);
+      }
+    }
+  }, { passive: true });
+
+  /* ---------- Zustände darstellen ---------- */
+  var ZAHL = ['null', 'eine', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn', 'elf', 'zwölf'];
+  function zustandVon(tag) {
+    if (K.istGeoeffnet(tag)) return 'offen';
+    if (!K.darfOeffnen(tag)) return 'zu';
+    return tag === K.heute() ? 'heute' : 'verpasst';
+  }
+  function verpassteTage() {
+    var r = [];
+    for (var t = 24; t >= 1; t--) if (zustandVon(t) === 'verpasst') r.push(t);
+    return r;  // neueste zuerst
+  }
+
+  function darstellen() {
+    var heute = K.heute();
+    document.body.classList.toggle('november', heute === 0);
+    document.body.classList.toggle('fest', heute >= 25);
+    H.forEach(function (h) {
+      var t = h.tag, st = zustandVon(t), istTag = t === heute;
+      var laedt = st === 'offen' && !h.glas;
+      h.el.className = 'haenger ist-' + st + (istTag ? ' ist-tag' : '') + (laedt ? ' glas-laedt' : '');
+      if (laedt) h.lader.style.setProperty('--ladefarbe', F.farbe(t));
+      var et = '';
+      if (t === 24) et = 'Heiligabend';
+      else if (st === 'heute' || (istTag && st === 'offen')) et = 'heute';
+      else if (st === 'verpasst') et = 'nachholen';   // vor dem Advents-Etikett: alle goldenen Kugeln gleich beschriftet
+      else if (K.istSonntag(t)) et = K.adventsSonntag(t) + '. Advent';
+      h.etikett.textContent = et;
+      var lab = 'Tag ' + t + ', ' + K.datumText(t) + ' – ';
+      if (st === 'offen') lab += 'geöffnet, Bild ansehen';
+      else if (st === 'heute') lab += 'heute, noch nicht geöffnet';
+      else if (st === 'verpasst') lab += 'verpasst, jetzt nachholen';
+      else lab += 'gesperrt. ' + K.sperrText(t);
+      h.knopf.setAttribute('aria-label', lab);
+    });
+    ORD.forEach(function (t) { if (K.istGeoeffnet(t)) glasAnfordern(t); });
+
+    // Statuszeile
+    var verp = verpassteTage(), n = verp.length;
+    var wort = n < ZAHL.length ? ZAHL[n] : String(n);
+    var s;
+    if (heute === 0) {
+      s = 'Noch ist November. Ab dem <strong>1. Dezember</strong> füllt sich jeden Tag eine Kugel mit einem Bild aus unserem Jahr.';
+    } else if (heute >= 25) {
+      s = '<strong>Frohe Weihnachten!</strong> ' + (n === 0
+        ? 'Alle Kugeln hängen voller Erinnerungen – schaut sie euch noch einmal an.'
+        : '<span class="gold">' + (n === 1 ? 'Eine goldene Kugel wartet' : 'Noch ' + wort + ' goldene Kugeln warten') +
+          ' darauf, geöffnet zu werden.</span>');
+    } else {
+      var offenHeute = K.istGeoeffnet(heute);
+      s = '<strong>' + K.datumText(heute) + '.</strong> ' +
+        (heute === 24 ? (offenHeute ? 'Die letzte Kugel ist offen – frohe Weihnachten!' : 'Heiligabend! Die letzte rote Kugel ist dran.')
+          : (offenHeute ? 'Die Kugel von heute ist offen. Morgen kommt die nächste.' : 'Die rote Kugel ist heute dran – tipp sie an.'));
+      if (n) {
+        var w = wort.charAt(0).toUpperCase() + wort.slice(1);
+        s += ' <span class="gold">' + (n === 1 ? 'Eine goldene Kugel wartet' : w + ' goldene Kugeln warten') + ' aufs Nachholen.</span>';
+      }
+    }
+    statusEl.innerHTML = s;
+    jahrBtn.hidden = !(heute >= 25 && K.geoeffnet().length > 0);
+
+    // Sprungknöpfe zu den goldenen Kugeln (neueste zuerst, höchstens drei)
+    sprungEl.textContent = '';
+    verp.slice(0, 3).forEach(function (t) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'sprung';
+      b.innerHTML = '<span class="mini gold" aria-hidden="true"></span>Zu Kugel ' + t;
+      b.setAttribute('aria-label', 'Zur goldenen Kugel ' + t + ' springen');
+      b.addEventListener('click', function () { zeigeKugel(H[t - 1]); });
+      sprungEl.appendChild(b);
+    });
+    aktionenEl.hidden = jahrBtn.hidden && !sprungEl.firstChild;
+
+    var hw;
+    if (heute === 0) hw = 'Öffnet am 1. Dezember';
+    else if (heute >= 25) hw = 'Frohe Weihnachten und ein gutes neues Jahr';
+    else if (heute === 24) hw = 'Frohe Weihnachten, ihr Lieben';
+    else hw = 'Grüne Kugeln verraten, wie oft ihr noch schlafen müsst';
+    hinweisEl.textContent = hw;
+
+    girlandenZeichnen();
+    pilleAktualisieren();
+  }
+
+  // Pille: zeigt zur heutigen Kugel (sonst zur neuesten goldenen), wenn sie nicht im eigenen Fenster liegt
+  var pillZiel = null;
+  function pilleAktualisieren() {
+    var heute = K.heute();
+    var ziel = null, art = '';
+    if (heute >= 1 && heute <= 24 && !K.istGeoeffnet(heute)) { ziel = H[heute - 1]; art = 'heute'; }
+    else { var v = verpassteTage(); if (v.length) { ziel = H[v[0] - 1]; art = 'nachholen'; } }
+    var zeigen = false, oben = false;
+    if (ziel && !A.offen) {
+      var r = ziel.koerper.getBoundingClientRect(), vh = window.innerHeight;
+      var sichtbar = Math.min(r.bottom, vh) - Math.max(r.top, 0) >= r.height * 0.6;
+      zeigen = !sichtbar;
+      oben = r.bottom < 0;
+    }
+    pillZiel = ziel;
+    if (ziel) {
+      zuHeuteText.textContent = (art === 'heute' ? 'Heute: Kugel ' : 'Nachholen: Kugel ') + ziel.tag;
+      zuHeute.classList.toggle('nachholen', art !== 'heute');
+    }
+    zuHeute.classList.toggle('oben', oben);
+    if (zuHeute.hidden === zeigen) zuHeute.hidden = !zeigen;
+    document.body.classList.toggle('pille-an', zeigen);
+  }
+  var pillePlan = false;
+  window.addEventListener('scroll', function () {
+    if (pillePlan) return;
+    pillePlan = true;
+    requestAnimationFrame(function () { pillePlan = false; pilleAktualisieren(); });
+  }, { passive: true });
+
+  // Nur das eigene Dokument scrollen (scrollIntoView würde im iframe die Übersichtsseite mitziehen)
+  function scrolleZu(h, sanft) {
+    var r = h.koerper.getBoundingClientRect();
+    var ziel = window.scrollY + r.top + r.height / 2 - window.innerHeight / 2;
+    window.scrollTo({ top: Math.max(0, ziel), behavior: sanft && !ruhig ? 'smooth' : 'auto' });
+  }
+  function zeigeKugel(h) {
+    if (!h) return;
+    scrolleZu(h, true);
+    setTimeout(function () {
+      anstossen(h, 1.1 * h.sinn);
+      h.knopf.focus({ preventScroll: true });
+      rufen(h);
+    }, ruhig ? 0 : 650);
+  }
+  zuHeute.addEventListener('click', function () { zeigeKugel(pillZiel); });
+  var rufTimer = 0;
+  function rufen(h) {
+    H.forEach(function (x) { x.el.classList.remove('ruft'); });
+    void h.el.offsetWidth;
+    h.el.classList.add('ruft');
+    clearTimeout(rufTimer);
+    rufTimer = setTimeout(function () { h.el.classList.remove('ruft'); }, 3200);
+  }
+  jahrBtn.addEventListener('click', function () {
+    var l = K.geoeffnet();
+    if (l.length) oeffneAnsicht(l[0], H[l[0] - 1], jahrBtn);
+  });
+
+  /* ---------- Antippen ---------- */
+  var blaseTimer = 0;
+  function tippe(h) {
+    if (A.offen || A.animiert) return;
+    var tag = h.tag;
+    if (!K.darfOeffnen(tag)) { gesperrt(h); return; }
+    var neu = !K.istGeoeffnet(tag);
+    klang(neu ? 'auf' : 'glas');
+    anstossen(h, (h.omega >= 0 ? 1 : -1) * (neu ? 1.5 : 0.9));
+    // Das große Bild schon jetzt anfordern (es kommt übers Netz) – die Pendel-Zeit bis zur Ansicht nutzen
+    vorbereiten(tag);
+    if (neu) { K.oeffne(tag); glasAnfordern(tag, true); }
+    A.animiert = true;
+    setTimeout(function () {
+      A.animiert = false;
+      oeffneAnsicht(tag, h);
+      if (neu) darstellen();
+    }, ruhig ? 0 : (neu ? 300 : 180));
+  }
+
+  function gesperrt(h) {
+    klang('klirr');
+    if (!ruhig) {
+      var richtung = h.theta > 0.02 ? 1 : (h.theta < -0.02 ? -1 : h.sinn > 0 ? 1 : -1);
+      anstossen(h, richtung * 1.25);
+      h.jig = performance.now();
+      var sp = spalten, pos = h.platz % sp;
+      [-1, 1].forEach(function (s) {
+        if ((pos + s) < 0 || (pos + s) >= sp) return;
+        var nb = anPlatz(h.platz + s);
+        if (!nb) return;
+        setTimeout(function () { anstossen(nb, s * 0.32); }, 110);
+      });
+    }
+    zeigeBlase(h, K.sperrText(h.tag));
+  }
+
+  function zeigeBlase(h, text) {
+    clearTimeout(blaseTimer);
+    blase.hidden = false;
+    blase.classList.remove('auf');
+    blase.textContent = text;
+    var r = h.koerper.getBoundingClientRect(), vw = root.clientWidth;
+    var bw = blase.offsetWidth, bh = blase.offsetHeight, cx = r.left + r.width / 2;
+    var left = clamp(cx - bw / 2, 10, vw - 10 - bw);
+    var oben = r.bottom + 14 + bh > window.innerHeight - 12 && r.top - 14 - bh > 12;
+    blase.classList.toggle('oben', oben);
+    blase.style.left = (left + window.scrollX) + 'px';
+    blase.style.top = ((oben ? r.top - 14 - bh : r.bottom + 14) + window.scrollY) + 'px';
+    blase.style.setProperty('--pfeil', clamp(cx - left, 18, bw - 18) + 'px');
+    void blase.offsetWidth;
+    blase.classList.add('auf');
+    blaseTimer = setTimeout(versteckeBlase, 2600);
+  }
+  function versteckeBlase() { clearTimeout(blaseTimer); blase.hidden = true; blase.classList.remove('auf'); }
+  document.addEventListener('pointerdown', function (e) {
+    if (!blase.hidden && !(e.target.closest && e.target.closest('.ist-zu'))) versteckeBlase();
+  });
+
+  /* ---------- Bildansicht ---------- */
+  var A = { offen: false, animiert: false, liste: [], idx: 0, rolle: [0, 1, 2], tafeln: [] };
+  Array.prototype.forEach.call(spur.children, function (t) {
+    A.tafeln.push({ el: t, img: t.querySelector('img'), tag: 0, w: 0, h: 0 });
+  });
+  // Für jedes neue Bild ein frisches <img>: Ein wiederverwendetes würde beim Wechsel der Quelle bis zum
+  // Laden noch das alte Foto (eines anderen Tages) zeigen – mit Netz-Bildern sichtbar.
+  function frischesBild(tf) {
+    var alt = tf.img, img = document.createElement('img');
+    img.alt = '';
+    img.setAttribute('draggable', 'false');
+    img.decoding = 'async';
+    img.addEventListener('load', function () { if (tf.img === img) tafelGeladen(tf); });
+    img.addEventListener('error', function () { if (tf.img === img) tafelFehler(tf); });
+    if (alt && alt.parentNode) alt.parentNode.replaceChild(img, alt); else tf.el.appendChild(img);
+    tf.img = img;
+    return img;
+  }
+  function tafel(pos) { return A.tafeln[A.rolle[pos + 1]]; }
+  function bildText(tag) {
+    var ti = F.titel(tag);
+    return ti ? ti + ' – ' + K.datumText(tag) : 'Bild von Kugel ' + tag + ' – ' + K.datumText(tag);
+  }
+  // Seitenverhältnis des Tagesbildes, bevor es geladen ist: echte Maße vom Server (masse), sonst aus format()
+  function erwarteteMasse(tag) {
+    if (typeof F.masse === 'function') {
+      var m = F.masse(tag);
+      if (m && m.w > 0 && m.h > 0) return { w: +m.w, h: +m.h };
+    }
+    return F.format(tag) === 'hoch' ? { w: 800, h: 1200 } : { w: 1200, h: 1200 };
+  }
+  // Große Bilder vorbereiten: im Prototyp wird die Collage gemalt, in der echten Version startet das Laden
+  function vorbereiten(tag) { if (tag >= 1 && tag <= 24 && K.darfOeffnen(tag)) F.bild(tag); }
+  function tafelSetzen(pos, tag) {
+    var tf = tafel(pos);
+    if (tf.tag === tag) return;
+    tf.tag = tag || 0;
+    if (!tag) {
+      tf.img.hidden = true; tf.img.removeAttribute('src'); tf.img.alt = '';
+      tf.el.classList.remove('laedt');
+      return;
+    }
+    var img = frischesBild(tf);
+    var m = erwarteteMasse(tag);
+    tf.w = m.w; tf.h = m.h;
+    img.style.setProperty('--bildfarbe', F.farbe(tag));
+    tf.el.classList.add('laedt');
+    img.alt = bildText(tag);
+    tafelMessen(tf);
+    img.src = F.bild(tag);
+    if (img.complete && img.naturalWidth) tafelGeladen(tf, true);
+  }
+  function tafelGeladen(tf, sofort) {
+    if (!tf.tag || !tf.img.naturalWidth) return;
+    var warLadend = tf.el.classList.contains('laedt');
+    tf.el.classList.remove('laedt');
+    tf.w = tf.img.naturalWidth; tf.h = tf.img.naturalHeight;
+    tafelMessen(tf);
+    if (warLadend && !sofort && !ruhig) {
+      tf.img.classList.remove('neu'); void tf.img.offsetWidth; tf.img.classList.add('neu');
+    }
+  }
+  function tafelFehler(tf) {
+    if (!tf.tag) return;
+    var img = tf.img, u = img.getAttribute('src') || '';
+    img.fehler = (img.fehler || 0) + 1;
+    // fotos.js (echte Version) hat die Quelle meist schon gegen den gemalten Platzhalter getauscht → abwarten
+    if (istDatenUrl(u)) { if (img.fehler === 1) return; }
+    else if (img.fehler === 1 && typeof F.platzhalter === 'function') {
+      img.setAttribute('data-platzhalter', '1'); img.src = F.platzhalter(tf.tag); return;
+    }
+    tf.el.classList.remove('laedt');
+  }
+  // Bildgröße passend in die Tafel einpassen (auch vor dem Laden, damit Kreis-Übergang und Wischen stimmen)
+  function tafelMessen(tf) {
+    if (!tf.tag || !tf.w || !tf.h) return;
+    var cs = window.getComputedStyle(tf.el);
+    var bw = tf.el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var bh = tf.el.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    if (!(bw > 0 && bh > 0)) return;
+    var s = Math.min(bw / tf.w, bh / tf.h);
+    tf.img.style.width = Math.max(1, Math.floor(tf.w * s)) + 'px';
+    tf.img.style.height = Math.max(1, Math.floor(tf.h * s)) + 'px';
+  }
+  function tafelnMessen() { A.tafeln.forEach(tafelMessen); }
+  function tafelnPositionieren() {
+    for (var k = 0; k < 3; k++) {
+      var tf = A.tafeln[A.rolle[k]];
+      tf.el.style.transform = k === 1 ? 'none' : 'translateX(calc(' + (k - 1) + ' * (100% + 28px)))';
+      tf.el.setAttribute('aria-hidden', k === 1 ? 'false' : 'true');
+    }
+  }
+  function nachbarnLaden() {
+    if (!A.offen) return;
+    tafelSetzen(-1, A.liste[A.idx - 1] || 0);
+    setTimeout(function () { if (A.offen) tafelSetzen(1, A.liste[A.idx + 1] || 0); }, 40);
+  }
+  function ansichtKopf(ansagen, i) {
+    if (i === undefined) i = A.idx;
+    var tag = A.liste[i], ti = F.titel(tag);
+    // Ohne Bildunterschrift: Datum groß als Überschrift, darüber dezent die Kugel-Nummer (nie eine leere Zeile)
+    aDatum.textContent = ti ? K.datumText(tag) : 'Kugel ' + tag;
+    aTitel.textContent = ti || K.datumText(tag);
+    aZaehler.textContent = (i + 1) + ' von ' + A.liste.length + ' geöffnet';
+    aZurueck.disabled = i <= 0;
+    aWeiter.disabled = i >= A.liste.length - 1;
+    ansicht.style.setProperty('--tagfarbe', F.farbe(tag));
+    if (ansagen) aAnsage.textContent = K.datumText(tag) + (ti ? ': ' + ti : '');
+  }
+  function seiteInert(an) {
+    document.body.classList.toggle('ansicht-offen', an);
+    [lichter, kopf, baum, fuss, zuHeute].forEach(function (x) {
+      x.inert = an;
+      if (an) x.setAttribute('aria-hidden', 'true'); else x.removeAttribute('aria-hidden');
+    });
+  }
+  function kreis(r, x, y) { return 'circle(' + r.toFixed(1) + 'px at ' + x.toFixed(1) + 'px ' + y.toFixed(1) + 'px)'; }
+
+  function oeffneAnsicht(tag, h, quelle) {
+    if (A.offen || A.animiert) return;
+    A.liste = K.geoeffnet();
+    A.idx = A.liste.indexOf(tag);
+    if (A.idx < 0) return;
+    A.offen = true; A.animiert = true;
+    versteckeBlase();
+    A.rolle = [0, 1, 2];
+    A.tafeln.forEach(function (tf) { tf.tag = -1; });
+    tafelnPositionieren();
+    tafelSetzen(0, tag); tafelSetzen(-1, 0); tafelSetzen(1, 0);
+    spur.style.transform = '';
+    ansichtKopf(false);
+    var r = h.koerper.getBoundingClientRect();
+    if (quelle && (r.bottom < 0 || r.top > window.innerHeight)) r = quelle.getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2, r0 = Math.min(r.width, r.height) / 2;
+    ansicht.style.clipPath = kreis(0, cx, cy);
+    ansicht.hidden = false;
+    tafelnMessen();   // erst jetzt hat die Bühne Maße → Bildgröße aus dem Seitenverhältnis (auch wenn es noch lädt)
+    seiteInert(true);
+    zuHeute.hidden = true;
+    var img = tafel(0).img;
+    var gestartet = false;
+    var los = function () {
+      if (gestartet) return;
+      gestartet = true;
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var R1 = Math.hypot(Math.max(cx, vw - cx), Math.max(cy, vh - cy)) + 4;
+      ansicht.style.clipPath = '';
+      if (ruhig) {
+        ansicht.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160 });
+        fertigAuf();
+        return;
+      }
+      var ir = img.getBoundingClientRect();
+      var s = (2 * r0) / Math.max(1, Math.min(ir.width, ir.height));
+      var dx = cx - (ir.left + ir.width / 2), dy = cy - (ir.top + ir.height / 2);
+      var dauer = 780, ez = 'cubic-bezier(.62,0,.22,1)';
+      ansicht.animate([{ clipPath: kreis(r0, cx, cy) }, { clipPath: kreis(R1, cx, cy) }], { duration: dauer, easing: ez });
+      img.animate([
+        { transform: 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')', borderRadius: '50%' },
+        { transform: 'none', borderRadius: '4px' }
+      ], { duration: dauer, easing: ez });
+      [aKopf, aFuss].forEach(function (x) {
+        x.animate([{ opacity: 0, transform: 'translateY(' + (x === aKopf ? -8 : 8) + 'px)' }, { opacity: 1, transform: 'none' }],
+          { duration: 360, delay: dauer * 0.55, easing: 'ease-out', fill: 'backwards' });
+      });
+      setTimeout(fertigAuf, dauer);
+    };
+    // Kurz auf das (übers Netz kommende) Bild warten; dauert es länger, startet der Übergang trotzdem –
+    // die Tafel zeigt dann den Ladezustand in der richtigen Größe, das Foto blendet sich danach ein.
+    if (img.decode) img.decode().then(los, los); else los();
+    setTimeout(los, 450);
+  }
+  function fertigAuf() {
+    A.animiert = false;
+    aZu.focus({ preventScroll: true });
+    setTimeout(nachbarnLaden, 60);
+  }
+
+  function schliesseAnsicht(sofort) {
+    if (!A.offen) return;
+    if (lauf) { var alt = lauf; lauf = null; alt.an.onfinish = null; alt.fertig(); }
+    if (A.animiert && !sofort) return;
+    var tag = A.liste[A.idx];
+    var h = H[tag - 1];
+    var fertig = function () {
+      ansicht.hidden = true;
+      ansicht.getAnimations({ subtree: true }).forEach(function (an) { an.cancel(); });
+      ansicht.style.clipPath = '';
+      A.offen = false; A.animiert = false;
+      seiteInert(false);
+      if (h) {
+        h.knopf.focus({ preventScroll: true });
+        anstossen(h, 0.85 * h.sinn);
+      }
+      pilleAktualisieren();
+    };
+    if (sofort || ruhig || !h) {
+      if (ruhig && !sofort) {
+        A.animiert = true;
+        var an0 = ansicht.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' });
+        an0.onfinish = fertig;
+      } else fertig();
+      return;
+    }
+    A.animiert = true;
+    var r = h.koerper.getBoundingClientRect();
+    if (r.bottom < 30 || r.top > window.innerHeight - 30) {
+      scrolleZu(h, false);
+      letztesY = window.scrollY;
+      r = h.koerper.getBoundingClientRect();
+    }
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2, r0 = r.width / 2;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var R1 = Math.hypot(Math.max(cx, vw - cx), Math.max(cy, vh - cy)) + 4;
+    var img = tafel(0).img;
+    var ir = img.getBoundingClientRect();
+    var s = (2 * r0) / Math.max(1, Math.min(ir.width, ir.height));
+    var dx = cx - (ir.left + ir.width / 2), dy = cy - (ir.top + ir.height / 2);
+    var dauer = 560, ez = 'cubic-bezier(.55,0,.35,1)';
+    [aKopf, aFuss].forEach(function (x) { x.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' }); });
+    img.animate([
+      { transform: 'none', borderRadius: '4px' },
+      { transform: 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')', borderRadius: '50%' }
+    ], { duration: dauer, easing: ez, fill: 'forwards' });
+    var an = ansicht.animate([{ clipPath: kreis(R1, cx, cy) }, { clipPath: kreis(r0, cx, cy) }], { duration: dauer, easing: ez, fill: 'forwards' });
+    an.onfinish = fertig;
+  }
+
+  var lauf = null;   // laufender Bildwechsel {an, fertig}
+  function wechsel(dir, vonDx) {
+    if (!A.offen) return;
+    if (lauf) { var alt = lauf; lauf = null; alt.an.onfinish = null; alt.fertig(); }
+    if (A.animiert) return;
+    var ziel = A.idx + dir;
+    if (ziel < 0 || ziel >= A.liste.length) { zurueckSchnappen(vonDx || 0); return; }
+    if (!tafel(dir).tag || tafel(dir).tag !== A.liste[ziel]) tafelSetzen(dir, A.liste[ziel]);
+    A.animiert = true;
+    ansichtKopf(false, ziel);
+    if (!ruhig) [aDatum, aTitel].forEach(function (x) { x.animate([{ opacity: 0.15 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' }); });
+    var W = buehne.clientWidth + 28, nach = -dir * W;
+    var fertig = function () {
+      A.idx = ziel;
+      A.rolle = dir > 0 ? [A.rolle[1], A.rolle[2], A.rolle[0]] : [A.rolle[2], A.rolle[0], A.rolle[1]];
+      tafelnPositionieren();
+      spur.style.transform = '';
+      if (an) an.cancel();
+      ansichtKopf(true);
+      A.animiert = false;
+      setTimeout(nachbarnLaden, 30);
+    };
+    var an = null;
+    if (ruhig) { fertig(); return; }
+    an = spur.animate([{ transform: 'translateX(' + (vonDx || 0) + 'px)' }, { transform: 'translateX(' + nach + 'px)' }],
+      { duration: 320, easing: 'cubic-bezier(.22,.7,.2,1)', fill: 'forwards' });
+    lauf = { an: an, fertig: fertig };
+    an.onfinish = function () { lauf = null; fertig(); };
+  }
+  function zurueckSchnappen(vonDx) {
+    if (!vonDx) { spur.style.transform = ''; return; }
+    spur.style.transform = '';
+    if (ruhig) return;
+    spur.animate([{ transform: 'translateX(' + vonDx + 'px)' }, { transform: 'none' }], { duration: 240, easing: 'cubic-bezier(.3,1.3,.5,1)' });
+  }
+
+  var zug = null, finger = 0;
+  function gezoomt() { return !!(window.visualViewport && window.visualViewport.scale > 1.02); }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function () { ansicht.classList.toggle('gezoomt', gezoomt()); });
+  }
+  buehne.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'touch') finger++;
+    if (zug && e.pointerId !== zug.id) { var z0 = zug; zug = null; zurueckSchnappen(z0.dx); return; }
+    if (!A.offen || A.animiert || finger > 1 || gezoomt()) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.pointerType === 'mouse') e.preventDefault();
+    zug = { id: e.pointerId, x: e.clientX, y: e.clientY, lx: e.clientX, lt: e.timeStamp, v: 0, dx: 0 };
+    try { buehne.setPointerCapture(e.pointerId); } catch (err) { /* egal */ }
+  });
+  buehne.addEventListener('pointermove', function (e) {
+    if (!zug || e.pointerId !== zug.id) return;
+    var dx = e.clientX - zug.x, dt = e.timeStamp - zug.lt;
+    if (dt > 0) zug.v = zug.v * 0.3 + ((e.clientX - zug.lx) / dt) * 0.7;
+    zug.lx = e.clientX; zug.lt = e.timeStamp;
+    if ((dx > 0 && A.idx === 0) || (dx < 0 && A.idx === A.liste.length - 1)) dx *= 0.3;
+    zug.dx = dx;
+    spur.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+  });
+  function zugEnde(e) {
+    if (e.pointerType === 'touch') finger = Math.max(0, finger - 1);
+    if (!zug || e.pointerId !== zug.id) return;
+    var z = zug; zug = null;
+    var W = buehne.clientWidth;
+    if (e.type !== 'pointercancel' && (z.dx < -W * 0.16 || (z.v < -0.4 && z.dx < -24)) && A.idx < A.liste.length - 1) wechsel(1, z.dx);
+    else if (e.type !== 'pointercancel' && (z.dx > W * 0.16 || (z.v > 0.4 && z.dx > 24)) && A.idx > 0) wechsel(-1, z.dx);
+    else zurueckSchnappen(z.dx);
+  }
+  buehne.addEventListener('pointerup', zugEnde);
+  buehne.addEventListener('pointercancel', zugEnde);
+  // Mausrad soll die Seite dahinter nicht scrollen (Strg+Rad zum Zoomen bleibt erlaubt)
+  ansicht.addEventListener('wheel', function (e) { if (!e.ctrlKey) e.preventDefault(); }, { passive: false });
+
+  aZu.addEventListener('click', function () { schliesseAnsicht(false); });
+  aZurueck.addEventListener('click', function () { wechsel(-1, 0); });
+  aWeiter.addEventListener('click', function () { wechsel(1, 0); });
+
+  document.addEventListener('keydown', function (e) {
+    if (!A.offen) {
+      if (e.key === 'Escape') versteckeBlase();
+      return;
+    }
+    if (e.key === 'Escape') { e.preventDefault(); schliesseAnsicht(false); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); wechsel(1, 0); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); wechsel(-1, 0); }
+    else if (e.key === 'Tab') {
+      var f = [aZu, aZurueck, aWeiter].filter(function (b) { return !b.disabled; });
+      var i = f.indexOf(document.activeElement);
+      e.preventDefault();
+      var n = e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i < 0 || i >= f.length - 1 ? 0 : i + 1);
+      f[n].focus();
+    }
+  });
+
+  /* ---------- Start und Live-Änderungen ---------- */
+  K.onChange(function () {
+    if (A.offen) {
+      var tag = A.liste[A.idx];
+      if (!K.istGeoeffnet(tag)) schliesseAnsicht(true);
+      else {
+        A.liste = K.geoeffnet(); A.idx = A.liste.indexOf(tag);
+        tafelSetzen(-1, 0); tafelSetzen(1, 0);
+        ansichtKopf(false); nachbarnLaden();
+      }
+    }
+    versteckeBlase();
+    darstellen();
+  });
+
+  var layoutGeplant = false;
+  function layoutPlanen() {
+    if (layoutGeplant) return;
+    layoutGeplant = true;
+    requestAnimationFrame(function () { layoutGeplant = false; layout(); });
+  }
+  window.addEventListener('resize', layoutPlanen);
+  if ('ResizeObserver' in window) new ResizeObserver(layoutPlanen).observe(kopf);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutPlanen);
+
+  layout();
+  darstellen();
+})();
+</script>
+</body>
+</html>

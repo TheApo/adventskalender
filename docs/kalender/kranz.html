@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Der Lichterkranz – Dein Adventskalender</title>
+<link rel="stylesheet" href="../fonts/kranz.css">
+<style>
+:root {
+  /* Farben: Raum, Wachs, Flamme, Kerzenrot, Tanne, Messing */
+  --nacht: #120b07;
+  --wachs: #f5ead6;
+  --glut: #ffb65f;
+  --kerzenrot: #b8262f;
+  --tanne: #2f4c30;
+  --messing: #c99f55;
+  /* Schriften: Fraunces (weich wie Wachs, SOFT-Achse) + Alegreya Sans */
+  --schrift-titel: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --schrift-text: 'Alegreya Sans', 'Gill Sans', 'Trebuchet MS', sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--nacht); color: var(--wachs); }
+html { overflow-x: hidden; }
+body {
+  font: 400 17px/1.4 var(--schrift-text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+button { font: inherit; color: inherit; }
+#szene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+
+.app {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100vh; height: 100dvh; min-height: 520px;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  overflow-x: clip;
+}
+
+/* ---------- Kopf ---------- */
+.kopf { padding: 14px 20px 0; text-align: center; text-shadow: 0 1px 14px rgba(0,0,0,.7); }
+h1 {
+  margin: 0;
+  font: 560 clamp(27px, 7.6vw, 48px)/1.02 var(--schrift-titel);
+  font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 96;
+  letter-spacing: -.012em;
+}
+.h1-klein {
+  display: block; margin-bottom: 3px;
+  font-style: italic; font-weight: 400; font-size: .5em; letter-spacing: .01em;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 40;
+  color: var(--glut);
+}
+.status { margin: 6px 0 0; font-size: 15.5px; color: rgba(245,234,214,.78); }
+.status.fest {
+  font: italic 500 clamp(16px, 4.5vw, 20px)/1.2 var(--schrift-titel);
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 30;
+  color: var(--glut);
+}
+
+/* ---------- Bühne mit dem Kranz ---------- */
+.buehne {
+  position: relative; min-height: 0;
+  touch-action: pan-y;
+  user-select: none; -webkit-user-select: none;
+  cursor: grab;
+}
+.buehne.zieht { cursor: grabbing; }
+.kerzen { position: absolute; inset: 0; }
+.kerze {
+  position: absolute; left: 0; top: 0;
+  margin: 0; padding: 0; border: 0; border-radius: 16px;
+  background: transparent;
+  pointer-events: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.kerze:focus { outline: none; }
+.kerze:focus-visible { outline: 2px solid var(--glut); outline-offset: 2px; box-shadow: 0 0 0 6px rgba(255,182,95,.18); }
+
+.schild {
+  position: absolute; left: 0; top: 0; z-index: 60;
+  min-width: 44px; height: 28px; padding: 0 11px;
+  display: grid; place-items: center;
+  border-radius: 14px;
+  font: 600 16px/1 var(--schrift-titel);
+  font-variation-settings: "SOFT" 100, "opsz" 20;
+  color: #2b1606;
+  background: linear-gradient(#f4d896, #c99b4f);
+  box-shadow: 0 0 0 1px rgba(255,236,190,.6) inset, 0 4px 14px rgba(0,0,0,.55);
+  pointer-events: none; white-space: nowrap;
+  transition: opacity .25s;
+}
+.schild.aus { opacity: 0; }
+.schild { display: none; }
+.hinweis {
+  position: absolute; left: 0; top: 0; z-index: 55; pointer-events: none; white-space: nowrap;
+  font: italic 400 14px/1 var(--schrift-text); color: rgba(245,234,214,.55);
+  transition: opacity .6s;
+}
+.hinweis.weg { opacity: 0; }
+
+.blase {
+  --bx: 0px; --by: 0px; --tx: 50%;
+  position: absolute; left: 0; top: 0; z-index: 70;
+  max-width: min(320px, calc(100vw - 24px)); padding: 10px 15px 11px;
+  border-radius: 16px;
+  background: var(--wachs); color: #2a1708;
+  font: italic 500 17.5px/1.22 var(--schrift-titel);
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 24;
+  box-shadow: 0 12px 30px -8px rgba(0,0,0,.7), 0 0 0 1px rgba(201,159,85,.7), 0 0 30px rgba(255,170,80,.25);
+  /* lange Hinweise („Noch ist November – Geduld!“) umbrechen statt über den Rand zu laufen */
+  pointer-events: none; white-space: normal; text-wrap: balance; text-align: center;
+  opacity: 0;
+  transform: translate(var(--bx), var(--by)) scale(.85);
+  transform-origin: var(--tx) 100%;
+  transition: opacity .18s ease, transform .3s cubic-bezier(.3,1.5,.5,1);
+}
+.blase::after {
+  content: ''; position: absolute; left: var(--tx); bottom: -6px;
+  width: 13px; height: 13px; margin-left: -6.5px;
+  background: inherit; border-radius: 2px; transform: rotate(45deg);
+  box-shadow: 1px 1px 0 rgba(201,159,85,.7);
+}
+.blase.zeigen { opacity: 1; transform: translate(var(--bx), var(--by)) scale(1); }
+
+/* ---------- Seite: Panel + Bildansicht ---------- */
+.seite { position: relative; padding: 0 max(16px, env(safe-area-inset-left)) 12px; }
+.seite::before {
+  content: ''; position: absolute; left: 0; right: 0; top: -26px; bottom: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(12,7,4,0), rgba(12,7,4,.72) 34%, rgba(12,7,4,.88));
+}
+.panel { max-width: 540px; margin: 0 auto; padding: 4px 0 2px; transition: opacity .3s; }
+.panel-kopf { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; gap: 8px; }
+.pfeil {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: grid; place-items: center; padding: 0; cursor: pointer;
+  border: 1px solid rgba(201,159,85,.55);
+  background: rgba(18,11,7,.55); color: var(--wachs);
+  transition: background .2s, transform .15s;
+}
+.pfeil:active { transform: scale(.94); }
+.pfeil svg { width: 20px; height: 20px; }
+.panel-mitte { text-align: center; min-width: 0; }
+.panel-eyebrow { margin: 0; font-size: 14.5px; color: var(--glut); letter-spacing: .015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.panel-titel {
+  margin: 1px 0 0;
+  font: 500 clamp(17px, 4.8vw, 21px)/1.18 var(--schrift-titel);
+  font-variation-settings: "SOFT" 100, "opsz" 30;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.panel-inhalt { display: flex; align-items: center; justify-content: center; gap: 12px; height: 60px; margin: 6px 0 8px; }
+/* Vorschau im Panel: runder Rahmen; solange das Bild lädt, glimmt er in der Farbe des Fotos */
+.panel-bild {
+  --laden-farbe: rgba(150,96,52,.6);
+  position: relative; flex: none; width: 54px; height: 54px; border-radius: 50%; overflow: hidden;
+  background: radial-gradient(circle at 50% 64%, var(--laden-farbe), rgba(26,16,10,.95) 74%);
+  box-shadow: 0 0 0 2px rgba(201,159,85,.8), 0 0 22px rgba(255,160,70,.5);
+}
+.panel-bild[hidden] { display: none; }
+.panel-bild img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transition: opacity .35s ease; }
+.panel-bild.laedt img { opacity: 0; }
+.panel-bild::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 10px; height: 15px; margin: -9px 0 0 -5px;
+  border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 50% 70%, #fff6dc, #ffc36e 45%, rgba(255,128,40,0) 75%);
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+.panel-bild.laedt::after { opacity: .9; animation: glimmen 1.1s ease-in-out infinite alternate; }
+@keyframes glimmen { from { transform: scale(.82); filter: brightness(.85); } to { transform: scale(1.08); filter: brightness(1.15); } }
+.panel-text {
+  margin: 0; max-width: 36ch; text-align: center;
+  font-size: 16.5px; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  text-wrap: balance;
+}
+.panel-text.titel {
+  font: italic 450 18px/1.25 var(--schrift-titel);
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 24;
+  text-align: left;
+}
+.panel-knoepfe { display: flex; gap: 10px; justify-content: center; min-height: 52px; }
+.aktion {
+  flex: 1 1 auto; max-width: 330px; min-height: 52px; padding: 0 22px;
+  border: 0; border-radius: 26px; cursor: pointer;
+  font: 600 18.5px/1 var(--schrift-titel);
+  font-variation-settings: "SOFT" 100, "opsz" 24;
+  color: #2b1606;
+  background: linear-gradient(180deg, #f8dc98, #dca852 58%, #b9802f);
+  box-shadow: 0 0 0 1px rgba(255,236,190,.55) inset, 0 -2px 0 rgba(120,70,20,.35) inset, 0 10px 26px -8px rgba(255,150,50,.6);
+  transition: transform .15s, filter .2s;
+}
+.aktion:active { transform: scale(.97); }
+.aktion.still {
+  background: rgba(18,11,7,.5); color: var(--wachs);
+  box-shadow: 0 0 0 1px rgba(201,159,85,.65) inset;
+  font-weight: 500;
+}
+.aktion[hidden], .neben[hidden] { display: none; }
+.neben {
+  flex: none; min-height: 52px; padding: 0 18px; border-radius: 26px; cursor: pointer;
+  background: rgba(18,11,7,.5); border: 1px solid rgba(201,159,85,.55);
+  font: 500 16.5px/1 var(--schrift-text);
+}
+.platzhalter { visibility: hidden; }
+.wichern {
+  margin: 10px auto 0; max-width: 44ch; text-align: center;
+  font-size: 13.5px; line-height: 1.35; font-style: italic;
+  color: rgba(245,234,214,.58);
+}
+button:focus { outline: none; }
+button:focus-visible { outline: 2px solid var(--glut); outline-offset: 3px; }
+
+/* ---------- Bildansicht ---------- */
+.ansicht {
+  position: fixed; inset: 0; z-index: 100;
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 10px;
+  padding: calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 12px) calc(env(safe-area-inset-bottom) + 10px) calc(env(safe-area-inset-left) + 12px);
+  background:
+    radial-gradient(110% 60% at 50% 104%, rgba(170,80,20,.38), rgba(0,0,0,0) 62%),
+    rgba(12,7,4,.94);
+  opacity: 0; transition: opacity .4s ease;
+}
+.ansicht.offen { opacity: 1; }
+.ansicht:focus { outline: none; }
+.ansicht[hidden] { display: none; }
+.a-kopf { display: flex; align-items: flex-start; gap: 12px; padding: 0 2px; }
+.a-texte { flex: 1 1 auto; min-width: 0; padding-top: 2px; }
+.a-datum { margin: 0; font-size: 14.5px; color: var(--glut); }
+.a-titel {
+  margin: 2px 0 0;
+  font: italic 480 23px/1.15 var(--schrift-titel);
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 36;
+}
+.a-zu {
+  flex: none; width: 48px; height: 48px; border-radius: 50%; padding: 0; cursor: pointer;
+  display: grid; place-items: center;
+  border: 1px solid rgba(201,159,85,.6); background: rgba(18,11,7,.6); color: var(--wachs);
+}
+.a-zu svg { width: 18px; height: 18px; }
+.a-buehne { position: relative; min-height: 0; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; }
+.a-glut {
+  position: absolute; left: 0; top: 0; width: 10px; height: 10px; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255,166,74,.62), rgba(255,124,42,.22) 55%, rgba(255,100,30,0));
+  opacity: .8;
+}
+.app.modal-offen .kopf, .app.modal-offen .buehne, .app.modal-offen .panel { opacity: 0; transition: opacity .3s; }
+.a-rahmen {
+  position: absolute; left: 0; top: 0; margin: 0;
+  padding: 5px; border-radius: 4px;
+  background: linear-gradient(#efe1c3, #e2cfa9);
+  box-shadow: 0 30px 60px -22px rgba(0,0,0,.9), 0 0 0 1px rgba(255,230,180,.25);
+  will-change: transform;
+}
+.a-rahmen img { display: block; width: 100%; height: 100%; object-fit: contain; background: #1a120c; border-radius: 2px; -webkit-user-drag: none; user-select: none; transition: opacity .4s ease; }
+/* Ladezustand: die echten Fotos kommen übers Netz – bis dahin glimmt der Rahmen (mit verschwommener
+   Vorschau, falls die schon da ist) und eine kleine Flamme sagt „Foto wird geholt …“ */
+.a-rahmen.laedt img { opacity: 0; }
+.a-laden {
+  --laden-farbe: rgba(150,96,52,.6);
+  position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px; border-radius: 2px; overflow: hidden;
+  display: grid; place-items: center; pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 72%, var(--laden-farbe), #1a120c 78%);
+  opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s;
+}
+.a-rahmen.laedt .a-laden { opacity: 1; visibility: visible; transition: opacity .2s ease, visibility 0s; }
+.a-laden-bild { position: absolute; left: -28px; top: -28px; right: -28px; bottom: -28px; background: center / cover no-repeat; filter: blur(18px) saturate(1.1) brightness(.8); opacity: .8; }
+.a-laden-text {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px;
+  font: italic 450 17px/1.2 var(--schrift-titel); font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 24;
+  color: rgba(245,234,214,.9); text-shadow: 0 1px 10px rgba(0,0,0,.7);
+  opacity: 0;
+}
+.a-rahmen.laedt .a-laden-text { animation: auftauchen .4s ease .3s forwards; }
+.a-laden-text::before {
+  content: ''; width: 16px; height: 26px;
+  border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 50% 72%, #fffbe8, #ffd082 38%, rgba(255,128,40,.55) 62%, rgba(255,110,30,0) 78%);
+  box-shadow: 0 0 26px 8px rgba(255,160,70,.35);
+  animation: glimmen 1.1s ease-in-out infinite alternate;
+}
+@keyframes auftauchen { to { opacity: 1; } }
+.a-licht {
+  position: absolute; inset: 0; border-radius: 4px; pointer-events: none;
+  background:
+    radial-gradient(130% 85% at 50% 118%, rgba(255,176,90,.8), rgba(255,140,60,.2) 52%, rgba(30,14,6,.45) 100%);
+  box-shadow: inset 0 -26px 46px -18px rgba(255,170,80,.9), inset 0 0 0 1px rgba(255,214,150,.5), inset 0 0 38px rgba(255,150,60,.35);
+  mix-blend-mode: soft-light;
+  opacity: .7;
+}
+.a-fuss { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.a-nav {
+  min-height: 48px; padding: 0 16px; border-radius: 24px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid rgba(201,159,85,.55); background: rgba(18,11,7,.55);
+  font: 500 16px/1 var(--schrift-text); color: var(--wachs);
+}
+.a-nav svg { width: 16px; height: 16px; flex: none; }
+#a-zurueck { justify-self: start; }
+#a-weiter { justify-self: end; }
+.a-nav.weg { visibility: hidden; }
+.a-kerze { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.a-kerze canvas { width: 40px; height: 54px; display: block; }
+.a-kerze span { font: 500 14px/1 var(--schrift-text); color: rgba(245,234,214,.75); margin-top: 2px; }
+
+/* Runder Menü-Knopf aus shared/kalender.js (#kalender-reset, 40 px) sitzt in allen Ansichten fest unten links.
+   Hochkant endet das Panel über seiner Ecke (--menue-knopf-zone, 64 px); quer und am Desktop steht das Panel
+   rechts, links unten ist nur Raum unter dem Kranz. In der Bildansicht ausgeblendet. */
+.seite { padding-bottom: var(--menue-knopf-zone, 64px); }
+.foto-offen #kalender-reset { display: none; }
+.sr { position: absolute; top: 0; left: 0; margin: 0; padding: 0; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+/* ---------- Kleine Bildschirme ---------- */
+@media (max-height: 700px) {
+  .kopf { padding-top: 10px; }
+  h1 { font-size: clamp(25px, 7vw, 40px); }
+  .status { margin-top: 4px; font-size: 14.5px; }
+  .panel-inhalt { margin: 4px 0 6px; }
+  .wichern { margin-top: 8px; font-size: 12.5px; }
+}
+@media (max-height: 600px) { .wichern { display: none; } }
+
+/* Querformat auf dem Handy: Kranz links, Panel rechts */
+@media (orientation: landscape) and (max-height: 599px) and (min-width: 560px) {
+  .app { grid-template-columns: minmax(0, 1fr) minmax(300px, 42%); grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+  .kopf { grid-column: 2; grid-row: 1; padding-top: 12px; }
+  h1 { font-size: 26px; }
+  .buehne { grid-column: 1; grid-row: 1 / 3; }
+  .seite { grid-column: 2; grid-row: 2; display: flex; align-items: center; padding-bottom: 12px; }
+  .seite::before { display: none; }
+  .panel { width: 100%; }
+  .panel-titel { font-size: 18px; }
+  .hinweis { display: none; }
+}
+
+/* ---------- Desktop: Kranz groß, Bildbereich daneben ---------- */
+@media (min-width: 1000px) and (min-height: 600px) and (orientation: landscape) {
+  .app { grid-template-columns: minmax(0, 1fr) clamp(400px, 41vw, 620px); grid-template-rows: auto minmax(0, 1fr); }
+  .kopf { grid-column: 1; grid-row: 1; text-align: left; padding: 30px 44px 0; }
+  h1 { font-size: clamp(36px, 3.4vw, 52px); }
+  .status { font-size: 17px; }
+  .buehne { grid-column: 1; grid-row: 2; }
+  .seite { grid-column: 2; grid-row: 1 / 3; display: flex; align-items: center; justify-content: center; padding: 36px 44px 36px 8px; }
+  .seite.seite { padding-bottom: 36px; }
+  .seite::before { display: none; }
+  .panel { width: 100%; max-width: 460px; }
+  .panel-titel { font-size: 27px; }
+  .panel-eyebrow { font-size: 16px; }
+  .panel-inhalt { height: 84px; justify-content: flex-start; }
+  .panel-bild { width: 76px; height: 76px; }
+  .panel-text { text-align: left; font-size: 18px; }
+  .panel-text.titel { font-size: 21px; }
+  .wichern { text-align: left; margin-left: 0; font-size: 14.5px; margin-top: 22px; }
+  .seite.foto .panel { opacity: 0; visibility: hidden; }
+  .ansicht { position: absolute; inset: 0; z-index: 5; background: none; padding: 30px 44px 30px 8px; gap: 14px; }
+  .a-titel { font-size: 27px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blase, .ansicht, .panel, .schild { transition: none; }
+  .panel-bild.laedt::after, .a-laden-text::before { animation: none; }
+  .a-rahmen.laedt .a-laden-text { animation: none; opacity: 1; }
+}
+</style>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+</head>
+<body>
+<canvas id="szene" aria-hidden="true"></canvas>
+
+<div class="app" id="app">
+  <header class="kopf" id="kopf">
+    <h1><span class="h1-klein">Dein</span> Adventskalender</h1>
+    <p class="status" id="status"></p>
+  </header>
+
+  <main class="buehne" id="buehne" aria-label="Adventskranz mit 24 Kerzen. Zum Drehen seitlich wischen.">
+    <div class="kerzen" id="kerzen" role="group" aria-label="Kerzen vom 1. bis 24. Dezember"></div>
+    <div class="schild aus" id="schild" aria-hidden="true"></div>
+    <div class="hinweis" id="hinweis" aria-hidden="true">Zum Drehen seitlich wischen</div>
+    <div class="blase" id="blase" role="status" aria-live="polite"></div>
+  </main>
+
+  <aside class="seite" id="seite">
+    <section class="panel" id="panel" aria-label="Ausgewählte Kerze">
+      <div class="panel-kopf">
+        <button class="pfeil" id="p-zurueck" type="button" aria-label="Vorherige Kerze">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="panel-mitte">
+          <p class="panel-eyebrow" id="p-eyebrow"></p>
+          <h2 class="panel-titel" id="p-titel"></h2>
+        </div>
+        <button class="pfeil" id="p-weiter" type="button" aria-label="Nächste Kerze">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="panel-inhalt">
+        <span class="panel-bild" id="p-bildrahmen" hidden><img id="p-bild" alt="" width="54" height="54" decoding="async" draggable="false"></span>
+        <p class="panel-text" id="p-text"></p>
+      </div>
+      <div class="panel-knoepfe">
+        <button class="aktion" id="p-aktion" type="button">Kerze anzünden</button>
+        <button class="neben" id="p-neben" type="button" hidden>Zu heute</button>
+      </div>
+      <p class="wichern" id="wichern">Wie bei Wicherns erstem Adventskranz (Hamburg, 1839): kleine rote Kerzen für die Werktage, große weiße für die Sonntage.</p>
+    </section>
+
+    <div class="ansicht" id="ansicht" role="dialog" aria-modal="true" aria-labelledby="a-titel" tabindex="-1" hidden>
+      <div class="a-kopf">
+        <div class="a-texte">
+          <p class="a-datum" id="a-datum"></p>
+          <h2 class="a-titel" id="a-titel"></h2>
+        </div>
+        <button class="a-zu" id="a-zu" type="button" aria-label="Bildansicht schließen">
+          <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3 3 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="a-buehne" id="a-buehne">
+        <div class="a-glut" id="a-glut"></div>
+        <figure class="a-rahmen" id="a-rahmen">
+          <img id="a-bild" alt="" draggable="false" decoding="async">
+          <span class="a-laden" id="a-laden" aria-hidden="true"><span class="a-laden-bild" id="a-laden-bild"></span><span class="a-laden-text">Foto wird geholt …</span></span>
+          <span class="a-licht" id="a-licht"></span>
+        </figure>
+      </div>
+      <div class="a-fuss">
+        <button class="a-nav" id="a-zurueck" type="button">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="a-zurueck-t">Tag 1</span>
+        </button>
+        <div class="a-kerze" aria-hidden="true"><canvas id="a-flamme" width="80" height="108"></canvas><span id="a-tag"></span></div>
+        <button class="a-nav" id="a-weiter" type="button">
+          <span id="a-weiter-t">Tag 2</span>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+</div>
+<p class="sr" id="ansage" aria-live="polite"></p>
+
+<script src="../shared/start.js" data-ansicht="kranz"></script>
+<script src="../shared/kalender.js"></script>
+<script src="../shared/fotos.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var K = window.Kalender.init('kranz');
+  var F = window.Fotos;
+  var RM = !!K.bewegungReduziert;
+  var TAU = Math.PI * 2, N = 23, STEP = TAU / N, SETZ = 1400;
+  var GROB = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+  var DOCK = window.matchMedia('(min-width: 1000px) and (min-height: 600px) and (orientation: landscape)');
+
+  function $(id) { return document.getElementById(id); }
+  function mk(w, h) { var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; }
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function eoc(t) { t = clamp(t, 0, 1); return 1 - (1 - t) * (1 - t) * (1 - t); }
+  function eio(t) { t = clamp(t, 0, 1); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function rng(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function jetzt() { return performance.now(); }
+
+  // ------------------------------------------------------------------
+  // DOM
+  var cv = $('szene'), ctx = cv.getContext('2d');
+  var app = $('app'), kopf = $('kopf'), buehne = $('buehne'), kerzenBox = $('kerzen');
+  var schild = $('schild'), blase = $('blase'), seite = $('seite'), panel = $('panel'), hinweis = $('hinweis');
+  function hinweisWeg() { hinweis.classList.add('weg'); }
+  if (!GROB) hinweis.textContent = 'Zum Drehen den Kranz ziehen';
+  setTimeout(hinweisWeg, 12000);
+  var pEyebrow = $('p-eyebrow'), pTitel = $('p-titel'), pText = $('p-text'), pBild = $('p-bild'), pBildRahmen = $('p-bildrahmen');
+  var pAktion = $('p-aktion'), pNeben = $('p-neben'), pZurueck = $('p-zurueck'), pWeiter = $('p-weiter');
+  var statusEl = $('status'), ansage = $('ansage');
+  var ansicht = $('ansicht'), aBuehne = $('a-buehne'), aRahmen = $('a-rahmen'), aBild = $('a-bild');
+  var aLicht = $('a-licht'), aGlut = $('a-glut'), aDatum = $('a-datum'), aTitel = $('a-titel');
+  var aZu = $('a-zu'), aZurueck = $('a-zurueck'), aWeiter = $('a-weiter');
+  var aZurueckT = $('a-zurueck-t'), aWeiterT = $('a-weiter-t'), aTag = $('a-tag');
+  var aFlamme = $('a-flamme'), aCtx = aFlamme.getContext('2d');
+  var aLaden = $('a-laden'), aLadenBild = $('a-laden-bild');
+
+  // ------------------------------------------------------------------
+  // Fotos: kommen im echten Kalender als URLs übers Netz (im Prototyp als data:-URLs).
+  // Neuere Zusatzfunktionen von fotos.js (masse, platzhalter) nur nutzen, wenn vorhanden.
+  function fotoTitel(t) { var s = ''; try { s = F.titel(t); } catch (e) { } return typeof s === 'string' ? s.replace(/^\s+|\s+$/g, '') : ''; }
+  function ersatzBild(t, px) {
+    if (typeof F.platzhalter !== 'function') return '';
+    try { return px ? F.platzhalter(t, px) : F.platzhalter(t); } catch (e) { return ''; }
+  }
+  // Seitenverhältnis (Breite/Höhe) eines Tagesfotos: echte Maße, sonst Format (1:1 bzw. 2:3)
+  function verhaeltnis(t) {
+    var q = 0;
+    if (typeof F.masse === 'function') { try { var m = F.masse(t); if (m && m.w > 0 && m.h > 0) q = m.w / m.h; } catch (e) { } }
+    if (!q) q = F.format(t) === 'hoch' ? 2 / 3 : 1;
+    return clamp(q, 0.4, 2.5);
+  }
+  // warme Ladefarbe aus der Leitfarbe des Fotos (halb Foto, halb Kerzenschein)
+  function ladeFarbe(t) {
+    var hex = '', m;
+    try { hex = F.farbe(t); } catch (e) { }
+    m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex || '');
+    var r = m ? parseInt(m[1], 16) : 150, g = m ? parseInt(m[2], 16) : 96, b = m ? parseInt(m[3], 16) : 52;
+    return 'rgba(' + Math.round(r * 0.45 + 140) + ',' + Math.round(g * 0.45 + 80) + ',' + Math.round(b * 0.45 + 28) + ',0.62)';
+  }
+  var vorschauFertig = {}; // Tag → schon geladene Vorschau-URL (dient als verschwommener Ladegrund)
+
+  // ------------------------------------------------------------------
+  // Kerzen: 20 kleine rote (Werktage), große weiße (Sonntage 6., 13., 20.), Tag 24 in der Mitte
+  var TYP = {
+    rot: { w: 0.074, h: 0.31, fl: 0.118, schale: 0.07, licht: 0.62, lr: 1.05, brand: 0.028,
+      dunkel: [70, 9, 14], mitte: [172, 32, 42], hell: [226, 96, 98], tropf: [196, 52, 60], glut: '255,92,58' },
+    weiss: { w: 0.104, h: 0.42, fl: 0.138, schale: 0.088, licht: 0.78, lr: 1.2, brand: 0.024,
+      dunkel: [128, 112, 92], mitte: [232, 222, 202], hell: [255, 251, 242], tropf: [246, 240, 226], glut: '255,186,118' },
+    gross: { w: 0.17, h: 0.5, fl: 0.165, schale: 0.112, licht: 0.95, lr: 1.45, brand: 0.02,
+      dunkel: [138, 112, 74], mitte: [236, 220, 186], hell: [255, 248, 228], tropf: [248, 238, 210], glut: '255,190,120' }
+  };
+  var H = K.heute();
+  var kerzen = [null];
+  for (var ti = 1; ti <= 24; ti++) {
+    var typ = ti === 24 ? 'gross' : (K.istSonntag(ti) ? 'weiss' : 'rot');
+    kerzen.push({
+      tag: ti, typ: typ, T: TYP[typ], zustand: 'leer',
+      anteil: 0, kaskadeT: 0, zuendT: -1, setzT: -1, wackelT: -1,
+      x: 0, y: 0, ys: 0, s: 1, tiefe: 0, hPx: 0, wPx: 0, yTop: 0,
+      fx: 0, fy: 0, fGr: 0, f: 1, sw: 0, hoehe: 1, tropfen: [], licht: [0, 0, 0], btn: null
+    });
+  }
+
+  var auswahl = 1, mitteGewaehlt = false;
+  var rot = 0, rotZiel = 0;
+  var L = { W: 0, H: 0, dpr: 1, cx: 0, cy: 0, R: 100, k: 0.65, v: 0.86, dick: 10, wandY: 0, stL: 0, stT: 0, stW: 0, stH: 0, ok: false };
+  var BG = null, TEX = null, TEX_D = null, TEX_S = 0, LM = null, LMc = null, VIG = null;
+  var funken = [], rauch = [], staeubchen = [], ablauf = null;
+  var amb = [0, 0, 0], bounceA = 0, lichtQ = 0, mondB = 0;
+  var domDirty = true;
+
+  // ------------------------------------------------------------------
+  // Flackern: deterministisch pro Kerze, wiederverwendetes Objekt
+  var FL = { f: 1, s: 0 };
+  function flk(i, t) {
+    if (RM) { FL.f = 1; FL.s = 0; return FL; }
+    var p = i * 1.713;
+    var f = 1 + 0.055 * Math.sin(t * 6.1 + p) + 0.035 * Math.sin(t * 13.7 + p * 2.3) + 0.025 * Math.sin(t * 23.3 + p * 0.7);
+    var g = Math.sin(t * 0.47 + p * 3.1);
+    if (g > 0.93) f -= (g - 0.93) * 2.2 * (0.5 + 0.5 * Math.sin(t * 31 + p));
+    FL.f = f;
+    FL.s = 0.5 * Math.sin(t * 1.9 + p) + 0.3 * Math.sin(t * 4.3 + p * 1.9) + 0.2 * Math.sin(t * 9.1 + p * 0.5);
+    return FL;
+  }
+
+  // ------------------------------------------------------------------
+  // Sprites
+  function falloff(d) { if (d >= 1) return 0; var a = 1 - d; return a * a / (1 + 9 * d * d); }
+  function sprite(px, farbe, fn) {
+    var c = mk(px, px), g = c.getContext('2d'), r = px / 2;
+    var gr = g.createRadialGradient(r, r, 0, r, r, r);
+    for (var i = 0; i <= 18; i++) { var d = i / 18; gr.addColorStop(d, 'rgba(' + farbe + ',' + clamp(fn(d), 0, 1).toFixed(4) + ')'); }
+    g.fillStyle = gr; g.fillRect(0, 0, px, px);
+    return c;
+  }
+  var SP_LICHT = sprite(128, '255,206,150', falloff);
+  var SP_BOUNCE = sprite(128, '255,172,108', function (d) { return Math.pow(1 - d, 1.7); });
+  var SP_MOND = sprite(128, '110,132,186', function (d) { return Math.pow(1 - d, 1.4); });
+  var SP_HALO = sprite(128, '255,176,96', function (d) { return Math.pow(1 - d, 2.6) * 0.95; });
+  var SP_GLUT = sprite(64, '255,120,44', function (d) { return Math.pow(1 - d, 2); });
+  var SP_GOLD = sprite(32, '255,222,160', function (d) { return Math.pow(1 - d, 2.2); });
+  var RAUSCHEN = (function () {
+    var c = mk(120, 120), g = c.getContext('2d'), r = rng(7);
+    for (var i = 0; i < 1100; i++) {
+      g.fillStyle = r() < 0.5 ? 'rgba(255,238,215,' + (r() * 0.06).toFixed(3) + ')' : 'rgba(0,0,0,' + (r() * 0.1).toFixed(3) + ')';
+      g.fillRect(r() * 120, r() * 120, 1 + r() * 1.6, 1 + r() * 1.6);
+    }
+    return c;
+  })();
+
+  // Flammen-Verläufe im Einheitsraum (Flammenhöhe = 100)
+  function flammenVerlaeufe(g) {
+    var a = g.createRadialGradient(0, -34, 2, 0, -30, 76);
+    a.addColorStop(0, 'rgba(255,246,220,1)');
+    a.addColorStop(0.32, 'rgba(255,206,112,.95)');
+    a.addColorStop(0.66, 'rgba(255,128,38,.72)');
+    a.addColorStop(1, 'rgba(170,40,0,0)');
+    var k = g.createRadialGradient(0, -16, 1, 0, -18, 40);
+    k.addColorStop(0, 'rgba(255,255,248,1)');
+    k.addColorStop(0.55, 'rgba(255,242,205,.92)');
+    k.addColorStop(1, 'rgba(255,214,140,0)');
+    var b = g.createRadialGradient(0, 2, 0, 0, 2, 11);
+    b.addColorStop(0, 'rgba(80,110,255,.75)');
+    b.addColorStop(1, 'rgba(60,80,255,0)');
+    return { aussen: a, kern: k, blau: b };
+  }
+  var GV = flammenVerlaeufe(ctx);
+  var GVa = flammenVerlaeufe(aCtx);
+
+  function flammeMalen(g, V, x, y, gr, f, sw, an, flare) {
+    if (an <= 0.01 || gr <= 0) return;
+    var sc = gr / 100 * (0.3 + 0.7 * an) * (1 + (flare || 0));
+    var h = 100 * f, tip = sw * 15;
+    g.save();
+    g.translate(x, y); g.scale(sc, sc);
+    g.globalCompositeOperation = 'lighter';
+    g.globalAlpha = clamp(an, 0, 1);
+    g.beginPath();
+    g.moveTo(tip, -h);
+    g.bezierCurveTo(tip * 0.35 + 18, -h * 0.52, 18, -5, 0, 7);
+    g.bezierCurveTo(-18, -5, tip * 0.35 - 18, -h * 0.52, tip, -h);
+    g.fillStyle = V.aussen; g.fill();
+    var h2 = h * 0.56;
+    g.beginPath();
+    g.moveTo(tip * 0.5, -h2 - 6);
+    g.bezierCurveTo(tip * 0.2 + 9.5, -h2 * 0.5, 9.5, -2, 0, 3.5);
+    g.bezierCurveTo(-9.5, -2, tip * 0.2 - 9.5, -h2 * 0.5, tip * 0.5, -h2 - 6);
+    g.fillStyle = V.kern; g.fill();
+    g.fillStyle = V.blau;
+    g.beginPath(); g.ellipse(0, 1, 9, 7, 0, 0, TAU); g.fill();
+    g.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // Zustände
+  function zustandVon(t) {
+    if (H === 0) return 'leer';
+    if (H >= 25) return K.istGeoeffnet(t) ? 'brennt' : 'verpasst';
+    if (t > H) return 'leer';
+    if (K.istGeoeffnet(t)) return 'brennt';
+    return t === H ? 'heute' : 'verpasst';
+  }
+  function tropfenBerechnen(c) {
+    var alter = c.zustand === 'brennt' ? Math.max(0, Math.min(H, 25) - c.tag) : 0;
+    c.hoehe = c.zustand === 'brennt' ? Math.max(0.36, 1 - c.T.brand * alter) : 1;
+    c.alter = alter;
+    var r = rng(c.tag * 977 + 13), n = alter === 0 ? 0 : Math.min(4, 1 + Math.floor(alter / 4));
+    c.tropfen = [];
+    for (var i = 0; i < n; i++) {
+      c.tropfen.push({ u: (r() * 2 - 1) * 0.72, len: (0.1 + r() * 0.28) * Math.min(1, alter / 7), b: 0.15 + r() * 0.1 });
+    }
+  }
+  function zustaendeSetzen(eingang) {
+    var now = jetzt(), n = 0;
+    for (var t = 1; t <= 24; t++) {
+      var c = kerzen[t];
+      c.zustand = zustandVon(t);
+      tropfenBerechnen(c);
+      var brennt = c.zustand === 'brennt';
+      c.zuendT = -1; c.setzT = -1; c.wackelT = -1; c.gelandet = false;
+      if (brennt && eingang && !RM) { c.anteil = 0; c.kaskadeT = now + 260 + n * 36; n++; }
+      else { c.anteil = brennt ? 1 : 0; c.kaskadeT = 0; }
+    }
+    if (H >= 1 && H <= 24 && kerzen[H].zustand === 'heute' && !RM) kerzen[H].setzT = now + (eingang ? 300 + n * 36 : 150);
+    domDirty = true;
+  }
+  function brennende() { var n = 0; for (var t = 1; t <= 24; t++) if (kerzen[t].zustand === 'brennt') n++; return n; }
+  function offeneTage() { return K.geoeffnet(); }
+
+  // ------------------------------------------------------------------
+  // Layout
+  function layout() {
+    var W = window.innerWidth, Hh = window.innerHeight;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (W * Hh * dpr * dpr > 3.2e6) dpr = Math.max(1, Math.sqrt(3.2e6 / (W * Hh)));
+    var r = buehne.getBoundingClientRect();
+    var sw = Math.max(200, r.width), sh = Math.max(220, r.height);
+    var unten = 40, hoch = sh > sw * 0.9;
+    var fW = DOCK.matches ? 0.36 : (hoch ? 0.43 : 0.38);
+    // seitlich müssen die Tages-Plaketten außen neben den Kranz passen
+    var lrMax = clamp(sw * 0.4 * 0.19, 27, 34) / 2 * 1.02;
+    var R = Math.min(sw * fW, (sw / 2 - 2 * lrMax - 8) / 1.08, (sh - unten - 6) / (2.22 * 0.6 + 0.6));
+    var k = clamp(((sh - unten - 6) / R - 0.6) / 2.22, 0.5, hoch ? 0.8 : 0.68);
+    var oben = k * R + 0.5 * R, runter = 1.22 * k * R + 0.1 * R + unten;
+    var frei = Math.max(0, sh - (oben + runter));
+    var groesseAlt = L.W + 'x' + L.H + 'x' + L.dpr + 'x' + Math.round(L.R) + 'x' + L.k.toFixed(3) + 'x' + Math.round(L.cy);
+    L.W = W; L.H = Hh; L.dpr = dpr; L.R = R; L.k = k; L.v = 0.86; L.dick = 0.1 * R;
+    L.cx = r.left + sw / 2;
+    L.cy = r.top + frei * (hoch ? 0.6 : 0.5) + oben;
+    L.stL = r.left; L.stT = r.top; L.stW = sw; L.stH = sh;
+    L.wandY = Math.max(40, L.cy - k * R - 0.36 * R);
+    var neu = L.W + 'x' + L.H + 'x' + L.dpr + 'x' + Math.round(L.R) + 'x' + L.k.toFixed(3) + 'x' + Math.round(L.cy);
+    if (neu !== groesseAlt || !BG) {
+      cv.width = Math.round(W * dpr); cv.height = Math.round(Hh * dpr);
+      hintergrundMalen();
+      kranzTextur();
+      LM = mk(Math.ceil(W / 8) + 1, Math.ceil(Hh / 8) + 1); LMc = LM.getContext('2d');
+      VIG = LMc.createRadialGradient(L.cx / 8, (L.cy - 0.2 * R) / 8, R * 1.05 / 8, L.cx / 8, L.cy / 8, Math.max(W, Hh) * 0.95 / 8);
+      VIG.addColorStop(0, 'rgba(0,0,0,0)'); VIG.addColorStop(1, 'rgba(0,0,0,0.62)');
+    }
+    L.ok = true;
+    domDirty = true;
+  }
+
+  // Raum: Wand (Biedermeier-Streifen) + Holztisch, voll beleuchtet – Licht kommt später per Multiplikation
+  function hintergrundMalen() {
+    var W = L.W, Hh = L.H, d = L.dpr, wy = L.wandY, R = L.R;
+    BG = mk(W * d, Hh * d);
+    var g = BG.getContext('2d');
+    g.scale(d, d);
+    var r = rng(42);
+    // Wand
+    var gw = g.createLinearGradient(0, 0, 0, wy);
+    gw.addColorStop(0, '#5e4231'); gw.addColorStop(1, '#93704f');
+    g.fillStyle = gw; g.fillRect(0, 0, W, wy + 1);
+    var sb = Math.max(16, R * 0.15), x0 = (L.cx % (sb * 2)) - sb * 2;
+    for (var x = x0; x < W + sb; x += sb * 2) {
+      g.fillStyle = 'rgba(255,226,186,0.07)'; g.fillRect(x, 0, sb, wy);
+      g.fillStyle = 'rgba(40,20,10,0.16)'; g.fillRect(x + sb - 0.6, 0, 1.2, wy); g.fillRect(x - 0.6, 0, 1.2, wy);
+      g.fillStyle = 'rgba(255,226,186,0.06)';
+      for (var y = (sb * 0.6) % (sb * 1.6); y < wy; y += sb * 1.6) {
+        var mx = x + sb / 2;
+        g.beginPath(); g.moveTo(mx, y - sb * 0.22); g.lineTo(mx + sb * 0.14, y); g.lineTo(mx, y + sb * 0.22); g.lineTo(mx - sb * 0.14, y); g.closePath(); g.fill();
+      }
+    }
+    g.save(); g.globalAlpha = 0.8; g.fillStyle = g.createPattern(RAUSCHEN, 'repeat'); g.fillRect(0, 0, W, wy); g.restore();
+    // Schatten an der Wand über der Tischkante
+    var gs = g.createLinearGradient(0, wy - R * 0.18, 0, wy);
+    gs.addColorStop(0, 'rgba(0,0,0,0)'); gs.addColorStop(1, 'rgba(0,0,0,0.42)');
+    g.fillStyle = gs; g.fillRect(0, wy - R * 0.18, W, R * 0.18);
+    // Tisch
+    var gt = g.createLinearGradient(0, wy, 0, Hh);
+    gt.addColorStop(0, '#55331f'); gt.addColorStop(0.5, '#74452a'); gt.addColorStop(1, '#855232');
+    g.fillStyle = gt; g.fillRect(0, wy, W, Hh - wy);
+    // Bretter laufen zum Betrachter, Fluchtpunkt weit oben
+    var vpY = wy - (Hh - wy) * 2.6, pw = Math.max(70, R * 0.62);
+    var fak = (wy - vpY) / (Hh - vpY);
+    g.lineWidth = 1;
+    for (var bx = L.cx - pw * 0.5 - pw * Math.ceil(W / pw + 2); bx < W + pw * 4; bx += pw) {
+      var xt = L.cx + (bx - L.cx) * fak;
+      g.strokeStyle = 'rgba(22,10,4,0.6)'; g.lineWidth = 1.4;
+      g.beginPath(); g.moveTo(xt, wy); g.lineTo(bx, Hh); g.stroke();
+      g.strokeStyle = 'rgba(255,214,170,0.05)'; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(xt + 1.5 * fak, wy); g.lineTo(bx + 1.5, Hh); g.stroke();
+      // Maserung
+      for (var m = 0; m < 6; m++) {
+        var u = 0.12 + r() * 0.76, ph = r() * 6, amp = pw * (0.02 + r() * 0.04);
+        g.strokeStyle = 'rgba(35,16,6,' + (0.08 + r() * 0.1).toFixed(3) + ')';
+        g.lineWidth = 0.8 + r() * 0.8;
+        g.beginPath();
+        for (var s = 0; s <= 24; s++) {
+          var v = s / 24, yy = lerp(wy, Hh, v);
+          var f = lerp(fak, 1, v);
+          var xx = L.cx + (bx + u * pw - L.cx) * f + Math.sin(v * 7 + ph) * amp * f;
+          if (s === 0) g.moveTo(xx, yy); else g.lineTo(xx, yy);
+        }
+        g.stroke();
+      }
+    }
+    g.save(); g.globalAlpha = 0.9; g.fillStyle = g.createPattern(RAUSCHEN, 'repeat'); g.fillRect(0, wy, W, Hh - wy); g.restore();
+    // Tischkante
+    g.fillStyle = 'rgba(255,214,170,0.14)'; g.fillRect(0, wy, W, 1);
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(0, wy + 1, W, 2);
+    // Schatten des Kranzes
+    g.save(); g.translate(L.cx, L.cy + L.dick * 1.4); g.scale(1, L.k);
+    var rr = R * 1.5, sg = g.createRadialGradient(0, 0, 0, 0, 0, rr);
+    sg.addColorStop(0, 'rgba(0,0,0,0.25)'); sg.addColorStop(0.2, 'rgba(0,0,0,0.1)'); sg.addColorStop(0.44, 'rgba(0,0,0,0.12)');
+    sg.addColorStop(0.56, 'rgba(0,0,0,0.55)'); sg.addColorStop(0.7, 'rgba(0,0,0,0.7)'); sg.addColorStop(0.85, 'rgba(0,0,0,0.42)'); sg.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = sg; g.beginPath(); g.arc(0, 0, rr, 0, TAU); g.fill();
+    g.restore();
+  }
+
+  // Tannengrün als Draufsicht-Ring (wird gedreht und gestaucht gezeichnet)
+  function kranzTextur() {
+    var R = L.R, d = L.dpr, S = Math.ceil(R * 2.76 * d);
+    var c = mk(S, S), g = c.getContext('2d'), r = rng(1839);
+    g.translate(S / 2, S / 2); g.scale(d, d);
+    g.lineCap = 'round';
+    g.strokeStyle = '#0a160c'; g.lineWidth = R * 0.34;
+    g.beginPath(); g.arc(0, 0, R, 0, TAU); g.stroke();
+    var dichte = clamp(R / 160, 0.85, 1.75);
+    var lagen = [
+      { n: 170, f: ['#11231a', '#16291b', '#1b3220'], br: 0.22, l0: 0.13, l1: 0.23 },
+      { n: 220, f: ['#22402a', '#2a4e30', '#2e5734', '#335d38'], br: 0.18, l0: 0.11, l1: 0.19 },
+      { n: 150, f: ['#3b6a3f', '#467647', '#52824d', '#628f56'], br: 0.11, l0: 0.08, l1: 0.15 }
+    ];
+    for (var li = 0; li < lagen.length; li++) {
+      var la = lagen[li], n = Math.round(la.n * dichte);
+      for (var i = 0; i < n; i++) zweig(g, r, R, la);
+    }
+    // ein paar helle Spitzen
+    g.strokeStyle = 'rgba(150,190,120,0.55)'; g.lineWidth = Math.max(0.8, R * 0.007);
+    g.beginPath();
+    for (var j = 0; j < 160 * dichte; j++) {
+      var a = r() * TAU, rr = R + (r() * 2 - 1) * R * 0.15, px = Math.cos(a) * rr, py = Math.sin(a) * rr, an = r() * TAU, l = R * 0.025;
+      g.moveTo(px, py); g.lineTo(px + Math.cos(an) * l, py + Math.sin(an) * l);
+    }
+    g.stroke();
+    // Zapfen und ein paar Beeren zwischen den Kerzen
+    var zapfenBei = [2, 8, 12, 17, 21], beerenBei = [5, 10, 15, 19, 23];
+    for (var z = 0; z < zapfenBei.length; z++) {
+      var phi = -(zapfenBei[z] - 0.5) * STEP, ro = R * (r() < 0.5 ? 1.1 : 0.9);
+      zapfen(g, Math.cos(phi) * ro, Math.sin(phi) * ro, phi + Math.PI / 2 + (r() - 0.5) * 0.8, R * 0.058);
+    }
+    for (var b = 0; b < beerenBei.length; b++) {
+      var ph = -(beerenBei[b] - 0.5) * STEP, rb = R * (0.88 + r() * 0.24);
+      for (var q = 0; q < 4; q++) {
+        var bx = Math.cos(ph) * rb + (r() - 0.5) * R * 0.05, by = Math.sin(ph) * rb + (r() - 0.5) * R * 0.05, br = R * 0.017;
+        g.fillStyle = '#8e1019'; g.beginPath(); g.arc(bx, by, br, 0, TAU); g.fill();
+        g.fillStyle = 'rgba(255,200,190,0.55)'; g.beginPath(); g.arc(bx - br * 0.35, by - br * 0.35, br * 0.3, 0, TAU); g.fill();
+      }
+    }
+    var c2 = mk(S, S), g2 = c2.getContext('2d');
+    g2.drawImage(c, 0, 0);
+    g2.globalCompositeOperation = 'source-atop';
+    g2.fillStyle = 'rgba(3,7,4,0.74)'; g2.fillRect(0, 0, S, S);
+    TEX = c; TEX_D = c2; TEX_S = S / d;
+  }
+  function zweig(g, r, R, la) {
+    var a = r() * TAU, rr = R + (r() * 2 - 1) * R * la.br;
+    var px = Math.cos(a) * rr, py = Math.sin(a) * rr;
+    var dir = a + (r() < 0.5 ? 1 : -1) * Math.PI / 2 + (r() - 0.5) * 1.3;
+    var len = R * (la.l0 + r() * (la.l1 - la.l0));
+    var ux = Math.cos(dir), uy = Math.sin(dir), nx = -uy, ny = ux;
+    g.strokeStyle = la.f[(r() * la.f.length) | 0];
+    g.lineWidth = Math.max(0.8, R * 0.0075);
+    g.beginPath();
+    g.moveTo(px, py); g.lineTo(px + ux * len, py + uy * len);
+    var nn = 9 + ((r() * 5) | 0), nl = R * (0.034 + r() * 0.016);
+    for (var j = 1; j <= nn; j++) {
+      var u = j / (nn + 1), sx = px + ux * len * u, sy = py + uy * len * u, l = nl * (1 - u * 0.45);
+      g.moveTo(sx, sy); g.lineTo(sx + (ux * 0.55 + nx * 0.83) * l, sy + (uy * 0.55 + ny * 0.83) * l);
+      g.moveTo(sx, sy); g.lineTo(sx + (ux * 0.55 - nx * 0.83) * l, sy + (uy * 0.55 - ny * 0.83) * l);
+    }
+    g.stroke();
+  }
+  function zapfen(g, x, y, ang, gr) {
+    g.save(); g.translate(x, y); g.rotate(ang);
+    g.fillStyle = '#3a2212'; g.beginPath(); g.ellipse(0, 0, gr, gr * 0.62, 0, 0, TAU); g.fill();
+    for (var i = -3; i <= 3; i++) {
+      for (var j = -1; j <= 1; j++) {
+        g.fillStyle = (i + j) % 2 ? '#6a4223' : '#82552e';
+        g.beginPath(); g.ellipse(i * gr * 0.25, j * gr * 0.32 + (i % 2) * gr * 0.1, gr * 0.15, gr * 0.12, 0, 0, TAU); g.fill();
+      }
+    }
+    g.fillStyle = 'rgba(255,220,170,0.18)'; g.beginPath(); g.ellipse(-gr * 0.2, -gr * 0.22, gr * 0.5, gr * 0.16, 0, 0, TAU); g.fill();
+    g.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // Drehung
+  function rotFuer(t) {
+    var w = Math.PI / 2 + (t - 1) * STEP;
+    return w + TAU * Math.round((rotZiel - w) / TAU);
+  }
+  function tagBeiRot(r) {
+    var i = Math.round((r - Math.PI / 2) / STEP);
+    return ((i % N) + N) % N + 1;
+  }
+  function dreheZu(t, sofort) {
+    if (t > 23) return;
+    rotZiel = rotFuer(t);
+    if (RM || sofort) rot = rotZiel;
+    anfordern();
+  }
+
+  function positionen(now) {
+    var R = L.R, k = L.k;
+    for (var t = 1; t <= 23; t++) {
+      var c = kerzen[t], a = rot - (t - 1) * STEP, sa = Math.sin(a);
+      c.tiefe = sa; c.s = 1 + 0.1 * sa;
+      c.x = L.cx + R * Math.cos(a); c.y = L.cy + k * R * sa; c.ys = c.y;
+    }
+    var z = kerzen[24];
+    z.tiefe = 0.1; z.s = 1.02; z.x = L.cx; z.y = L.cy + L.dick - 0.075 * R; z.ys = L.cy + L.dick;
+    for (var u = 1; u <= 24; u++) {
+      var c2 = kerzen[u], T = c2.T;
+      c2.wPx = T.w * R * c2.s;
+      c2.hPx = T.h * R * L.v * c2.s * c2.hoehe;
+      var dy = 0;
+      if (c2.setzT >= 0) { var e = (now - c2.setzT) / SETZ; dy = e < 0 ? -R * 0.42 : -R * 0.42 * (1 - eio(Math.min(1, e * 0.85 + 0.15 * eoc(e)))); }
+      c2.dy = dy;
+      c2.yTop = c2.y - c2.wPx * 0.5 * k * 0.3 - c2.hPx + dy;
+      c2.fx = c2.x + c2.wPx * 0.05;
+      c2.fy = c2.yTop - R * 0.03 * c2.s;
+      c2.fGr = T.fl * R * c2.s;
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Licht
+  var REIHE = [];
+  function lichtVorbereiten(now) {
+    var t = now / 1000, summe = 0;
+    for (var i = 1; i <= 24; i++) {
+      var c = kerzen[i];
+      var o = flk(i, t); c.f = o.f; c.sw = o.s;
+      summe += c.anteil * (i === 24 ? 1.4 : c.typ === 'weiss' ? 1.15 : 1);
+    }
+    lichtQ = Math.pow(clamp(summe / 25.2, 0, 1), 0.8);
+    // Mondlicht als Mindesthelligkeit (November-Niveau), es weicht dem warmen Kerzenlicht
+    var q = lichtQ; mondB = 2.1 * (1 - q) * (1 - q); var mond = mondB;
+    amb[0] = 0.05 + 0.32 * q + 0.07 * mond;
+    amb[1] = 0.04 + 0.215 * q + 0.085 * mond;
+    amb[2] = 0.04 + 0.12 * q + 0.13 * mond;
+    bounceA = 0.8 * q + (H >= 25 ? 0.12 : 0);
+  }
+  function lichtkarte(now) {
+    var g = LMc, R = L.R, s = 1 / 8;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+    g.fillStyle = 'rgb(' + (amb[0] * 255 | 0) + ',' + (amb[1] * 255 | 0) + ',' + (amb[2] * 255 | 0) + ')';
+    g.fillRect(0, 0, LM.width, LM.height);
+    g.setTransform(s, 0, 0, s, 0, 0);
+    g.globalCompositeOperation = 'lighter';
+    var ma = 0.85 * clamp(mondB / 2.1, 0, 1);
+    if (ma > 0.01) { var mr = Math.max(L.W, L.H) * 1.15; g.globalAlpha = ma; g.drawImage(SP_MOND, L.cx - L.R * 1.2 - mr, L.cy - L.R * 1.6 - mr, mr * 2, mr * 2); }
+    if (bounceA > 0.005) {
+      var br = R * 3.4; g.globalAlpha = clamp(bounceA, 0, 1);
+      g.drawImage(SP_BOUNCE, L.cx - br, L.cy - R * 0.5 - br, br * 2, br * 2);
+    }
+    for (var i = 1; i <= 24; i++) {
+      var c = kerzen[i];
+      if (c.anteil <= 0.01) continue;
+      var rl = c.T.lr * R, a = c.anteil * c.T.licht * (0.9 + (c.f - 1) * 1.6);
+      g.globalAlpha = clamp(a, 0, 1);
+      g.drawImage(SP_LICHT, c.fx - rl, c.fy - c.fGr * 0.35 - rl, rl * 2, rl * 2);
+    }
+    if (H >= 1 && H <= 24 && kerzen[H].zustand === 'heute' && !ablauf) {
+      var hk = kerzen[H], hp = RM ? 0.6 : 0.55 + 0.35 * Math.sin(now / 1000 * 2.6);
+      if (hk.setzT >= 0) hp *= clamp((now - hk.setzT - SETZ) / 500, 0, 1);
+      var hr = R * 0.62; g.globalAlpha = 0.34 * hp;
+      g.drawImage(SP_LICHT, hk.fx - hr, hk.fy - hr, hr * 2, hr * 2);
+    }
+    if (ablauf && ablauf.zl > 0.01) {
+      var rz = R * 0.8; g.globalAlpha = ablauf.zl * 0.55;
+      g.drawImage(SP_LICHT, ablauf.zx - rz, ablauf.zy - rz, rz * 2, rz * 2);
+    }
+    g.globalCompositeOperation = 'source-over';
+    g.globalAlpha = 1 - 0.45 * lichtQ;
+    g.fillStyle = VIG; g.fillRect(0, 0, L.W, L.H);
+    g.globalAlpha = 1;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  // analytisches Licht für Kerzenkörper (sie werden nach der Licht-Multiplikation gezeichnet)
+  function kerzenLicht(c) {
+    var R = L.R, x = c.x, y = c.yTop + c.hPx * 0.5;
+    var lr = amb[0], lg = amb[1], lb = amb[2];
+    if (bounceA > 0) {
+      var dbx = x - L.cx, dby = y - (L.cy - R * 0.5), db = Math.sqrt(dbx * dbx + dby * dby) / (R * 3.4);
+      var bv = db < 1 ? bounceA * Math.pow(1 - db, 1.7) : 0;
+      lr += bv; lg += bv * 0.675; lb += bv * 0.42;
+    }
+    for (var i = 1; i <= 24; i++) {
+      var o = kerzen[i];
+      if (o.anteil <= 0.01) continue;
+      var dx = x - o.fx, dy = y - (o.fy - o.fGr * 0.35), d = Math.sqrt(dx * dx + dy * dy) / (o.T.lr * R);
+      if (d >= 1) continue;
+      var a = o.anteil * o.T.licht * (0.9 + (o.f - 1) * 1.6) * falloff(d) * (o === c ? 0.55 : 1);
+      lr += a; lg += a * 0.81; lb += a * 0.59;
+    }
+    if (c.zustand === 'heute') { lr = Math.max(lr, 0.74); lg = Math.max(lg, 0.62); lb = Math.max(lb, 0.48); }
+    c.licht[0] = Math.min(1.12, lr); c.licht[1] = Math.min(1.08, lg); c.licht[2] = Math.min(1.05, lb);
+  }
+  function farbe(base, l, m, a) {
+    m = m || 1;
+    var r = Math.min(255, base[0] * l[0] * m) | 0, g = Math.min(255, base[1] * l[1] * m) | 0, b = Math.min(255, base[2] * l[2] * m) | 0;
+    return a === undefined ? 'rgb(' + r + ',' + g + ',' + b + ')' : 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+
+  // ------------------------------------------------------------------
+  // Zeichnen
+  function ringMalen() {
+    var S = TEX_S;
+    ctx.imageSmoothingEnabled = true;
+    for (var l = 0; l < 3; l++) {
+      var off = L.dick * (2 - l) / 2;
+      ctx.save();
+      ctx.translate(L.cx, L.cy + off); ctx.scale(1, L.k); ctx.rotate(rot);
+      ctx.drawImage(l < 2 ? TEX_D : TEX, -S / 2, -S / 2, S, S);
+      ctx.restore();
+    }
+  }
+  function messing(g, rx, ry) {
+    var gr = g.createRadialGradient(-rx * 0.3, -ry * 0.45, rx * 0.04, 0, 0, rx);
+    gr.addColorStop(0, '#f8e2a6'); gr.addColorStop(0.5, '#c99a4a'); gr.addColorStop(1, '#6e4a1a');
+    return gr;
+  }
+  function schaleMalen(c, now) {
+    var R = L.R, s = c.s, rx = c.T.schale * R * s, ry = rx * L.k, wa = 0;
+    if (c.wackelT >= 0) {
+      var e = (now - c.wackelT) / 750;
+      if (e < 1) wa = Math.sin(e * 30) * 0.3 * (1 - e) * (1 - e); else c.wackelT = -1;
+    }
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    if (wa) ctx.rotate(wa);
+    ctx.fillStyle = '#3e2a10';
+    ctx.beginPath(); ctx.ellipse(0, ry * 0.5, rx, ry, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = messing(ctx, rx, ry);
+    ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,236,190,0.6)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.ellipse(0, 0, rx * 0.97, ry * 0.95, 0, Math.PI * 1.05, Math.PI * 1.95); ctx.stroke();
+    ctx.strokeStyle = 'rgba(70,40,10,0.5)';
+    ctx.beginPath(); ctx.ellipse(0, ry * 0.05, rx * 0.6, ry * 0.6, 0, 0, TAU); ctx.stroke();
+    var leer = c.zustand === 'leer' || (c.setzT >= 0 && now < c.setzT + SETZ * 0.85);
+    if (leer) {
+      var dh = Math.max(rx * 0.95, R * 0.05);
+      ctx.fillStyle = '#ecd497';
+      ctx.beginPath(); ctx.moveTo(-rx * 0.1, 0); ctx.lineTo(0, -dh); ctx.lineTo(rx * 0.1, 0); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#8a6326';
+      ctx.beginPath(); ctx.moveTo(0, -dh); ctx.lineTo(rx * 0.1, 0); ctx.lineTo(0, ry * 0.08); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
+  function staenderMalen(c, now) {
+    var R = L.R, x = L.cx, yb = L.cy + L.dick, k = L.k;
+    var bx = R * 0.135, by = bx * k;
+    ctx.fillStyle = '#3a270e';
+    ctx.beginPath(); ctx.ellipse(x, yb + by * 0.35, bx, by, 0, 0, TAU); ctx.fill();
+    ctx.save(); ctx.translate(x, yb);
+    ctx.fillStyle = messing(ctx, bx, by);
+    ctx.beginPath(); ctx.ellipse(0, 0, bx, by, 0, 0, TAU); ctx.fill();
+    ctx.restore();
+    var sw = R * 0.035, gs = ctx.createLinearGradient(x - sw, 0, x + sw, 0);
+    gs.addColorStop(0, '#5a3c14'); gs.addColorStop(0.45, '#e8c77e'); gs.addColorStop(1, '#5a3c14');
+    ctx.fillStyle = gs;
+    ctx.fillRect(x - sw, c.y, sw * 2, yb - c.y);
+    ctx.fillStyle = '#d8b56a';
+    ctx.beginPath(); ctx.ellipse(x, (yb + c.y) / 2, sw * 1.5, sw * 1.5 * k, 0, 0, TAU); ctx.fill();
+    schaleMalen(c, now);
+  }
+
+  function kerzeMalen(c, now) {
+    var z = c.zustand;
+    if (z === 'leer') return;
+    if (c.setzT >= 0 && now < c.setzT) return;
+    var T = c.T, R = L.R, w = c.wPx, rx = w / 2, ry = rx * L.k * 0.9, h = c.hPx;
+    var x = c.x, yTop = c.yTop, yb = yTop + h;
+    var lit = c.anteil > 0.01;
+    var al = 1;
+    if (c.setzT >= 0) al = clamp((now - c.setzT) / (SETZ * 0.45), 0, 1);
+    kerzenLicht(c);
+    var l = c.licht;
+    // die neue Kerze kommt in einem warmen Schimmer dazu
+    if (c.setzT >= 0 && now < c.setzT + SETZ + 600) {
+      var se = (now - c.setzT) / SETZ, sa = se < 1 ? Math.sin(Math.min(1, se * 1.4) * Math.PI * 0.5) * 0.55 : 0.55 * (1 - (se - 1) * SETZ / 600);
+      var sg = R * 0.55;
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = clamp(sa, 0, 1);
+      ctx.drawImage(SP_HALO, x - sg / 2, yTop + h * 0.4 - sg / 2, sg, sg);
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.globalAlpha = al;
+    var seite = clamp((L.cx - x) / L.R, -1, 1) * 0.16;
+    var gr = ctx.createLinearGradient(x - rx, 0, x + rx, 0);
+    gr.addColorStop(0, farbe(T.dunkel, l, 0.6));
+    gr.addColorStop(clamp(0.22 + seite, 0.05, 0.9), farbe(T.mitte, l, 0.85));
+    gr.addColorStop(clamp(0.52 + seite, 0.1, 0.93), farbe(T.hell, l, 0.98));
+    gr.addColorStop(clamp(0.8 + seite, 0.2, 0.97), farbe(T.mitte, l, 0.72));
+    gr.addColorStop(1, farbe(T.dunkel, l, 0.5));
+    ctx.fillStyle = gr;
+    ctx.beginPath();
+    ctx.moveTo(x - rx, yTop);
+    ctx.lineTo(x - rx, yb);
+    ctx.ellipse(x, yb, rx, ry, 0, Math.PI, 0, true);
+    ctx.lineTo(x + rx, yTop);
+    ctx.ellipse(x, yTop, rx, ry, 0, 0, Math.PI, true);
+    ctx.closePath();
+    ctx.fill();
+    // Glühen des Wachses unter der Flamme
+    if (lit) {
+      ctx.globalCompositeOperation = 'lighter';
+      var gl = ctx.createLinearGradient(0, yTop - ry, 0, yTop + Math.min(h, w * (c.typ === 'gross' ? 1.1 : 2.2)));
+      gl.addColorStop(0, 'rgba(' + T.glut + ',' + (0.55 * c.anteil * al).toFixed(3) + ')');
+      gl.addColorStop(1, 'rgba(' + T.glut + ',0)');
+      ctx.fillStyle = gl; ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    // goldene Ringe und Stern auf der großen Kerze
+    if (c.typ === 'gross') {
+      ctx.strokeStyle = farbe([214, 168, 76], l, 1); ctx.lineWidth = Math.max(1, w * 0.035);
+      for (var gb = 0; gb < 2; gb++) {
+        var gy = yb - c.T.h * R * L.v * c.s * (0.1 + gb * 0.05);
+        if (gy > yTop + ry) { ctx.beginPath(); ctx.ellipse(x, gy, rx, ry, 0, 0, Math.PI); ctx.stroke(); }
+      }
+      var sy0 = yb - c.T.h * R * L.v * c.s * 0.32, sr = w * 0.17;
+      if (sy0 - sr > yTop + ry) {
+        ctx.fillStyle = farbe([226, 182, 90], l, 1.05);
+        ctx.beginPath();
+        for (var sp = 0; sp < 10; sp++) {
+          var sa = -Math.PI / 2 + sp * Math.PI / 5, srr = sp % 2 ? sr * 0.42 : sr;
+          ctx.lineTo(x + Math.cos(sa) * srr, sy0 + Math.sin(sa) * srr);
+        }
+        ctx.closePath(); ctx.fill();
+      }
+    }
+    // Wachstropfen: laufen über den Rand, unten mit kleinem Tropfenkopf
+    for (var i = 0; i < c.tropfen.length; i++) {
+      var tr = c.tropfen[i], tx = x + tr.u * rx * 0.8, tw = w * tr.b, tl = h * tr.len + ry;
+      ctx.fillStyle = farbe(T.tropf, l, 0.95);
+      ctx.beginPath();
+      ctx.moveTo(tx - tw * 0.75, yTop + ry * 0.5);
+      ctx.quadraticCurveTo(tx - tw * 0.35, yTop + ry * 1.2, tx - tw * 0.32, yTop + tl * 0.6);
+      ctx.lineTo(tx - tw * 0.4, yTop + tl);
+      ctx.arc(tx, yTop + tl, tw * 0.42, Math.PI, 0, true);
+      ctx.lineTo(tx + tw * 0.32, yTop + tl * 0.6);
+      ctx.quadraticCurveTo(tx + tw * 0.35, yTop + ry * 1.2, tx + tw * 0.75, yTop + ry * 0.5);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,240,225,' + (0.16 * l[0]).toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(tx - tw * 0.14, yTop + tl - tw * 0.1, tw * 0.14, 0, TAU); ctx.fill();
+    }
+    // Oberseite
+    ctx.fillStyle = farbe(T.hell, l, lit ? 0.92 : 0.86);
+    ctx.beginPath(); ctx.ellipse(x, yTop, rx, ry, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = farbe(T.mitte, l, 0.8);
+    ctx.beginPath(); ctx.ellipse(x, yTop + ry * 0.08, rx * 0.8, ry * 0.72, 0, 0, TAU); ctx.fill();
+    if (lit) {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = 'rgba(' + T.glut + ',' + (0.5 * c.anteil * al).toFixed(3) + ')';
+      ctx.beginPath(); ctx.ellipse(x, yTop + ry * 0.08, rx * 0.8, ry * 0.72, 0, 0, TAU); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    // Docht: neu = hell, gebrannt = schwarz
+    var dh = R * 0.032 * c.s, neu = z !== 'brennt' || (ablauf && ablauf.tag === c.tag && c.anteil < 0.01);
+    ctx.strokeStyle = neu ? farbe([236, 226, 205], l, 1) : '#1c120a';
+    ctx.lineWidth = Math.max(1.1, w * 0.075); ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x, yTop + ry * 0.05);
+    ctx.quadraticCurveTo(x, yTop - dh * 0.7, c.fx + (neu ? 0 : w * 0.05), yTop - dh);
+    ctx.stroke();
+    ctx.restore();
+
+    // Flamme
+    if (lit) {
+      var flare = 0;
+      if (c.zuendT >= 0) { var e = (now - c.zuendT) / 700; if (e < 1) flare = Math.sin(e * Math.PI) * 0.55 * (1 - e * 0.5); }
+      var hr = c.fGr * (4.4 + flare * 3);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = clamp(c.anteil * (0.5 + (c.f - 1) * 2) * al, 0, 1);
+      ctx.drawImage(SP_HALO, c.fx - hr / 2, c.fy - c.fGr * 0.45 - hr / 2, hr, hr);
+      ctx.restore();
+      flammeMalen(ctx, GV, c.fx, c.fy, c.fGr, c.f, c.sw, c.anteil * al, flare);
+      // Docht im Flammenfuß
+      ctx.strokeStyle = 'rgba(30,16,8,0.85)'; ctx.lineWidth = Math.max(1, w * 0.07);
+      ctx.beginPath(); ctx.moveTo(x, yTop); ctx.quadraticCurveTo(x, yTop - dh * 0.7, c.fx + w * 0.05, yTop - dh); ctx.stroke();
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = 'rgba(255,150,70,0.9)';
+      ctx.beginPath(); ctx.arc(c.fx + w * 0.05, yTop - dh, Math.max(1, w * 0.05), 0, TAU); ctx.fill();
+      ctx.restore();
+    } else if (z === 'heute') {
+      // Docht glimmt einladend
+      var p = RM ? 0.6 : 0.55 + 0.35 * Math.sin(now / 1000 * 2.6);
+      if (c.setzT >= 0) p *= clamp((now - c.setzT - SETZ) / 500, 0, 1);
+      var gx = c.fx, gy = yTop - dh, gg = R * 0.21 * c.s;
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = p * 0.8;
+      ctx.drawImage(SP_GLUT, gx - gg / 2, gy - gg / 2, gg, gg);
+      ctx.globalAlpha = p;
+      ctx.fillStyle = 'rgb(255,140,60)';
+      ctx.beginPath(); ctx.arc(gx, gy, Math.max(1.2, w * 0.07), 0, TAU); ctx.fill();
+      ctx.restore();
+    } else if (z === 'verpasst') {
+      // kleines Funkeln: „hier wartet noch etwas“
+      var tw2 = RM ? 0.5 : Math.max(0, Math.sin(now / 1000 * 1.5 + c.tag * 1.3));
+      if (tw2 > 0.02) {
+        var sx = x + rx + R * 0.035, sy = yTop - R * 0.06, sg = R * 0.032 * (0.6 + 0.4 * tw2);
+        ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.65 * tw2;
+        ctx.fillStyle = 'rgb(255,226,170)';
+        ctx.beginPath();
+        ctx.moveTo(sx, sy - sg); ctx.quadraticCurveTo(sx, sy, sx + sg * 0.7, sy); ctx.quadraticCurveTo(sx, sy, sx, sy + sg);
+        ctx.quadraticCurveTo(sx, sy, sx - sg * 0.7, sy); ctx.quadraticCurveTo(sx, sy, sx, sy - sg); ctx.fill();
+        ctx.drawImage(SP_GOLD, sx - sg * 1.5, sy - sg * 1.5, sg * 3, sg * 3);
+        ctx.restore();
+      }
+    }
+  }
+
+  function auswahlMalen(now) {
+    if (H === 0 && !L.ok) return;
+    var c = kerzen[auswahl], R = L.R;
+    var rx = (c.tag === 24 ? 0.2 : 0.13) * R * c.s, ry = rx * L.k;
+    var y = c.tag === 24 ? L.cy + L.dick : c.y;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = 0.32;
+    ctx.translate(c.x, y); ctx.scale(1, L.k);
+    ctx.drawImage(SP_HALO, -rx * 1.6, -rx * 1.6, rx * 3.2, rx * 3.2);
+    ctx.restore();
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = 'rgba(255,210,140,0.55)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.ellipse(c.x, y, rx, ry, 0, 0, TAU); ctx.stroke();
+    if (c.zustand === 'heute' && !RM && (c.setzT < 0 || now > c.setzT + SETZ)) {
+      var p = ((now / 1000) % 2.4) / 2.4, pr = lerp(0.07, 0.26, eoc(p)) * R * c.s;
+      ctx.strokeStyle = 'rgba(255,196,120,' + (0.6 * Math.pow(1 - p, 1.6)).toFixed(3) + ')'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(c.x, y, pr, pr * L.k, 0, 0, TAU); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Streichholz, Funken, Rauch
+  function streichholzMalen(now) {
+    var a = ablauf; if (!a) return;
+    var c = kerzen[a.tag], R = L.R, e = now - a.t0;
+    if (e < 0) return;
+    var zx = c.fx + R * 0.045, zy = c.fy - R * 0.012;
+    var sx = zx + R * 0.95, sy = zy - R * 0.6, px, py;
+    if (e < 420) { var u = eoc(e / 420); px = lerp(sx, zx, u); py = lerp(sy, zy, u) - Math.sin(u * Math.PI) * R * 0.08; }
+    else if (e < 900) { px = zx + Math.sin(e * 0.045) * 0.6; py = zy + Math.cos(e * 0.06) * 0.4; }
+    else { var u2 = eio((e - 900) / 650); px = lerp(zx, zx + R * 0.85, u2); py = lerp(zy, zy - R * 0.75, u2); }
+    var alpha = e > 1350 ? clamp(1 - (e - 1350) / 250, 0, 1) : 1;
+    if (alpha <= 0) return;
+    var brenn = e >= 420 && e < 1060;
+    a.zx = px; a.zy = py; a.zl = brenn ? (e < 470 ? (e - 420) / 50 : 1) * (e > 960 ? clamp((1060 - e) / 100, 0, 1) : 1) : 0;
+    var th = 0.62, len = R * 0.62, wid = Math.max(2, R * 0.024);
+    var ex = px + Math.cos(th) * len, ey = py + Math.sin(th) * len;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var hl = 0.35 + 0.65 * a.zl;
+    ctx.strokeStyle = 'rgb(' + (190 * hl + 40 | 0) + ',' + (140 * hl + 28 | 0) + ',' + (88 * hl + 18 | 0) + ')';
+    ctx.lineWidth = wid; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ex, ey); ctx.stroke();
+    ctx.fillStyle = e < 420 ? '#8a2216' : '#2a140a';
+    ctx.beginPath(); ctx.ellipse(px, py, wid * 1.35, wid * 1.05, th, 0, TAU); ctx.fill();
+    ctx.restore();
+    if (a.zl > 0.01) {
+      var o = flk(31, now / 1000);
+      flammeMalen(ctx, GV, px - wid * 0.2, py + wid * 0.3, R * 0.13, o.f, o.s * 0.6 - 0.3, a.zl, e < 520 ? (520 - e) / 100 * 0.6 : 0);
+    }
+  }
+  function funkenStoss(x, y, n, kraft) {
+    var r = Math.random;
+    for (var i = 0; i < n; i++) {
+      var an = -Math.PI / 2 + (r() - 0.5) * 2.6, v = (0.35 + r() * 0.8) * L.R * kraft;
+      funken.push({ x: x, y: y, vx: Math.cos(an) * v, vy: Math.sin(an) * v, t: 0, max: 0.3 + r() * 0.45 });
+    }
+  }
+  function funkenMalen(dt) {
+    if (!funken.length) return;
+    var g = L.R * 2.2, s = dt / 1000;
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+    for (var i = funken.length - 1; i >= 0; i--) {
+      var p = funken[i];
+      p.t += s; if (p.t > p.max) { funken.splice(i, 1); continue; }
+      p.vy += g * s; p.x += p.vx * s; p.y += p.vy * s;
+      var a = 1 - p.t / p.max;
+      ctx.strokeStyle = 'rgba(255,' + (190 + 50 * a | 0) + ',' + (110 + 60 * a | 0) + ',' + a.toFixed(3) + ')';
+      ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx * 0.025, p.y - p.vy * 0.025); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function rauchStart(quelle, dauer, staerke) { rauch.push({ q: quelle, t0: jetzt(), dauer: dauer, st: staerke, seed: Math.random() * 10 }); }
+  function rauchMalen(now) {
+    if (!rauch.length) return;
+    var R = L.R;
+    ctx.save(); ctx.lineCap = 'round';
+    for (var i = rauch.length - 1; i >= 0; i--) {
+      var r = rauch[i], a = (now - r.t0) / 1000;
+      if (a > r.dauer) { rauch.splice(i, 1); continue; }
+      var x, y;
+      if (typeof r.q === 'number') { var c = kerzen[r.q]; x = c.fx; y = c.fy - c.fGr * c.f * 0.95; }
+      else { x = r.q[0]; y = r.q[1]; }
+      var wachs = Math.min(1, a / 0.7), fade = Math.pow(1 - a / r.dauer, 1.3), len = R * 0.62 * wachs;
+      for (var s = 0; s < 2; s++) {
+        var gr = ctx.createLinearGradient(0, y, 0, y - len);
+        gr.addColorStop(0, 'rgba(220,208,196,' + (r.st * fade * (s ? 0.12 : 0.22)).toFixed(3) + ')');
+        gr.addColorStop(1, 'rgba(220,208,196,0)');
+        ctx.strokeStyle = gr; ctx.lineWidth = s ? 1 : 1.8;
+        ctx.beginPath();
+        for (var j = 0; j <= 16; j++) {
+          var u = j / 16, yy = y - u * len;
+          var xx = x + Math.sin(u * 5.5 + a * 2.6 + r.seed + s * 1.4) * u * R * 0.06 + Math.sin(u * 12 - a * 4.2 + s) * u * R * 0.016;
+          if (j === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+        }
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+  function staeubchenMalen(dt) {
+    if (H < 25 || RM || lichtQ < 0.8) { staeubchen.length = 0; return; }
+    var R = L.R, ziel = GROB ? 14 : 26, s = dt / 1000;
+    while (staeubchen.length < ziel) {
+      staeubchen.push({ x: L.cx + (Math.random() * 2 - 1) * R * 1.1, y: L.cy + (Math.random() - 0.3) * R * 0.6, t: -Math.random() * 6, max: 6 + Math.random() * 5, v: 0.05 + Math.random() * 0.08, ph: Math.random() * 6 });
+    }
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (var i = staeubchen.length - 1; i >= 0; i--) {
+      var p = staeubchen[i];
+      p.t += s;
+      if (p.t > p.max) { staeubchen.splice(i, 1); continue; }
+      if (p.t < 0) continue;
+      var u = p.t / p.max, a = Math.sin(u * Math.PI) * 0.7;
+      var x = p.x + Math.sin(p.t * 0.9 + p.ph) * R * 0.05, y = p.y - p.t * p.v * R;
+      var gs = R * (0.03 + 0.02 * Math.sin(p.t * 3 + p.ph));
+      ctx.globalAlpha = a;
+      ctx.drawImage(SP_GOLD, x - gs, y - gs, gs * 2, gs * 2);
+    }
+    ctx.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // Tageszahlen: runde Plaketten, mit einem kurzen Messingsteg fest am eigenen Halter.
+  // Vordere Hälfte und Flanken: radial außen (dort ist immer frei). Hintere Hälfte: radial innen
+  // (außen stünde die eigene Kerze davor). Der Wechsel liegt zwischen den Ruhestellungen
+  // (sin a −0,07 bzw. −0,34), im Stillstand gibt es also nie zwei Plaketten für einen Tag.
+  function etikettPositionen() {
+    var R = L.R, k = L.k, basis = clamp(R * 0.19, 27, 34);
+    var z = kerzen[24], zSteht = z.zustand !== 'leer' && !(z.setzT >= 0 && jetzt() < z.setzT);
+    var zTop = z.yTop - z.fGr * 1.15, zHalb = z.wPx / 2 + 2;
+    for (var t = 1; t <= 24; t++) {
+      var c = kerzen[t];
+      var gr = basis * (t === 24 ? 1.1 : 1) * (0.9 + 0.1 * (c.tiefe + 1) / 2);
+      if (t === auswahl) gr = Math.max(gr * 1.2, basis * 1.2);
+      var lr = gr / 2; c.lr = lr; c.lw2 = 0;
+      if (t === 24) {
+        // neben dem Ständer, damit sie nicht über der vorderen Kerze schwebt
+        c.lx = L.cx + R * 0.135 + lr * 1.45 + 4; c.ly = L.cy + L.dick - lr * 0.2;
+        c.ax = L.cx + R * 0.135; c.ay = c.ly; c.lw = 1;
+        continue;
+      }
+      var rx = c.T.schale * R * c.s, ry = rx * k;
+      var a = rot - (t - 1) * STEP, sa = Math.sin(a);
+      var vx = Math.cos(a), vy = k * sa, vl = Math.sqrt(vx * vx + vy * vy) || 1;
+      vx /= vl; vy /= vl;
+      var tb = 1 / Math.sqrt((vx / rx) * (vx / rx) + (vy / ry) * (vy / ry)), d = tb + lr + 4;
+      var w = clamp((sa + 0.24) / 0.08, 0, 1);
+      // außen
+      c.lx = clamp(c.x + vx * d, lr + 2, L.W - lr - 2); c.ly = c.y + vy * d;
+      c.ax = c.x + vx * tb; c.ay = c.y + vy * tb;
+      // innen: leicht zum Betrachter geneigt, damit die Plaketten auf dem engeren Innenkreis nicht aneinanderstoßen
+      var wx = -vx, wy = -vy + 0.35, wl = Math.sqrt(wx * wx + wy * wy); wx /= wl; wy /= wl;
+      var tbi = 1 / Math.sqrt((wx / rx) * (wx / rx) + (wy / ry) * (wy / ry)), di = tbi + lr + 2;
+      var ix = c.x + wx * di, iy = c.y + wy * di;
+      if (zSteht && iy + lr > zTop && iy - lr < z.y && Math.abs(ix - L.cx) < zHalb + lr) {
+        // nicht auf der großen Mittelkerze: erst dichter an den eigenen Halter (über die Flammenspitze) …
+        var dNeu = (zTop - lr - 3 - c.y) / wy;
+        if (wy > 0.3 && dNeu >= tbi * 0.2) { dNeu = Math.min(di, dNeu); ix = c.x + wx * dNeu; iy = c.y + wy * dNeu; }
+        // … sonst zur Seite ausweichen
+        else ix += (c.x >= L.cx ? 1 : -1) * (zHalb + lr - Math.abs(ix - L.cx));
+      }
+      c.lx2 = ix; c.ly2 = iy; c.ax2 = c.x + wx * tbi; c.ay2 = c.y + wy * tbi;
+      c.lw = w; c.lw2 = 1 - w;
+      if (w < 0.5) { var tx = c.lx, ty = c.ly, sx = c.ax, sy = c.ay; c.lx = ix; c.ly = iy; c.ax = c.ax2; c.ay = c.ay2; c.lx2 = tx; c.ly2 = ty; c.ax2 = sx; c.ay2 = sy; c.lw = 1 - w; c.lw2 = w; }
+    }
+  }
+  function etikettMalen(c, now) {
+    if (c.lw2 > 0.02) etikett(c, c.lx2, c.ly2, c.ax2, c.ay2, c.lw2, now);
+    if (c.lw > 0.02) etikett(c, c.lx, c.ly, c.ax, c.ay, c.lw, now);
+  }
+  function etikett(c, x, y, ax, ay, al, now) {
+    // kurzer Messingsteg vom Halter zur Plakette
+    var z0 = c.zustand === 'leer' || (c.setzT >= 0 && now < c.setzT);
+    ctx.save(); ctx.globalAlpha = al;
+    ctx.strokeStyle = z0 ? 'rgba(150,112,52,0.8)' : 'rgb(205,160,82)'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(x + (ax - x) * 0.35, y + (ay - y) * 0.35); ctx.stroke();
+    ctx.restore();
+    var r = c.lr, z = c.zustand, t = c.tag, sel = t === auswahl;
+    if (c.setzT >= 0 && now < c.setzT) z = 'leer';
+    var hell = z !== 'leer';
+    ctx.save();
+    ctx.globalAlpha = al;
+    if (z === 'heute') {
+      var p = RM ? 0.7 : 0.55 + 0.35 * Math.sin(now / 1000 * 2.6), hg = r * 4.2;
+      ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = al * p * 0.7;
+      ctx.drawImage(SP_HALO, x - hg / 2, y - hg / 2, hg, hg);
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = al;
+    }
+    ctx.fillStyle = 'rgba(0,0,0,0.42)';
+    ctx.beginPath(); ctx.ellipse(x, y + r * 0.28, r * 1.02, r * 0.86, 0, 0, TAU); ctx.fill();
+    if (t === 24) {
+      ctx.fillStyle = hell ? '#e7b75a' : 'rgba(150,118,64,0.75)';
+      ctx.beginPath();
+      for (var sp = 0; sp < 16; sp++) {
+        var sw = -Math.PI / 2 + sp * Math.PI / 8, sr = sp % 2 ? r * 1.08 : r * 1.42;
+        ctx.lineTo(x + Math.cos(sw) * sr, y + Math.sin(sw) * sr);
+      }
+      ctx.closePath(); ctx.fill();
+    }
+    var g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r);
+    var zahl, rand, rb = 1;
+    if (z === 'heute') { g.addColorStop(0, '#fff0bf'); g.addColorStop(1, '#e4a143'); zahl = '#3a1a04'; rand = '#fff4d2'; rb = 1.4; }
+    else if (z === 'brennt') { g.addColorStop(0, '#fff8ea'); g.addColorStop(1, '#e2cfab'); zahl = '#4a2814'; rand = '#c9a055'; rb = 1.8; }
+    else if (z === 'verpasst') { g.addColorStop(0, '#f6ecd8'); g.addColorStop(1, '#cfbb95'); zahl = '#4a2814'; rand = '#ffb65f'; rb = 1.8; }
+    else { g.addColorStop(0, 'rgba(46,32,22,0.92)'); g.addColorStop(1, 'rgba(22,14,9,0.92)'); zahl = 'rgba(245,234,214,0.86)'; rand = 'rgba(201,159,85,0.6)'; rb = 1.6; }
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+    ctx.strokeStyle = rand; ctx.lineWidth = rb;
+    ctx.beginPath(); ctx.arc(x, y, r - rb / 2, 0, TAU); ctx.stroke();
+    if (c.typ !== 'rot') {
+      ctx.strokeStyle = hell ? 'rgba(150,104,40,0.55)' : 'rgba(245,234,214,0.25)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(x, y, r * 0.8, 0, TAU); ctx.stroke();
+    }
+    if (sel) {
+      ctx.strokeStyle = 'rgba(255,210,140,0.9)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(x, y, r + 3, 0, TAU); ctx.stroke();
+    }
+    var fs = r * (t > 9 ? (c.typ === 'rot' ? 1.1 : 1.0) : 1.2);
+    ctx.font = '600 ' + fs.toFixed(1) + 'px Fraunces, Georgia, serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = zahl;
+    ctx.fillText(String(t), x, y + fs * 0.05);
+    ctx.restore();
+  }
+
+  var SORT = [];
+  function malen(now, dt) {
+    if (!L.ok || !TEX) return;
+    positionen(now);
+    etikettPositionen();
+    lichtVorbereiten(now);
+    var d = L.dpr;
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+    // Durchgang A: Raum, Kranz, Halter (werden mit der Lichtkarte multipliziert)
+    ctx.drawImage(BG, 0, 0, L.W, L.H);
+    ringMalen();
+    SORT.length = 0;
+    for (var t = 1; t <= 24; t++) SORT.push(kerzen[t]);
+    SORT.sort(function (a, b) { return a.ys - b.ys; });
+    for (var i = 0; i < SORT.length; i++) {
+      if (SORT[i].tag === 24) staenderMalen(SORT[i], now); else schaleMalen(SORT[i], now);
+    }
+    lichtkarte(now);
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.drawImage(LM, 0, 0, LM.width * 8, LM.height * 8);
+    ctx.globalCompositeOperation = 'source-over';
+    // Durchgang B: Kerzen und Flammen (selbstleuchtend)
+    auswahlMalen(now);
+    for (var j = 0; j < SORT.length; j++) { kerzeMalen(SORT[j], now); etikettMalen(SORT[j], now); }
+    streichholzMalen(now);
+    funkenMalen(dt);
+    rauchMalen(now);
+    if (lichtQ > 0.02) {
+      var br = L.R * 3.3;
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.17 * lichtQ;
+      ctx.drawImage(SP_HALO, L.cx - br, L.cy - L.R * 0.35 - br, br * 2, br * 2);
+      ctx.restore();
+    }
+    staeubchenMalen(dt);
+    domAktualisieren(now);
+  }
+
+  // ------------------------------------------------------------------
+  // Zeitschritt
+  function schritt(now, dt) {
+    // Drehung
+    if (!zeiger || !zeiger.ziehen) {
+      var diff = rotZiel - rot;
+      if (Math.abs(diff) < 0.0004) rot = rotZiel; else rot += diff * (1 - Math.exp(-dt / 105));
+    }
+    // Kaskade, Zünden, Setzen
+    for (var t = 1; t <= 24; t++) {
+      var c = kerzen[t];
+      if (c.kaskadeT > 0) {
+        var e = (now - c.kaskadeT) / 480;
+        if (e >= 1) { c.anteil = 1; c.kaskadeT = 0; } else c.anteil = e <= 0 ? 0 : eoc(e);
+      }
+      if (c.zuendT >= 0) {
+        var e2 = (now - c.zuendT) / 520;
+        c.anteil = e2 <= 0 ? 0 : (e2 >= 1 ? 1 : eoc(e2));
+        if (now - c.zuendT > 1400) c.zuendT = -1;
+      }
+      if (c.setzT >= 0 && now > c.setzT + SETZ + 1100) { c.setzT = -1; domDirty = true; }
+      if (c.setzT >= 0 && !c.gelandet && now > c.setzT + SETZ - 40) {
+        c.gelandet = true;
+        funkenStoss(c.x, c.y - L.R * 0.02, GROB ? 5 : 8, 0.35);
+      }
+    }
+    if (ablauf) ablaufSchritt(now);
+  }
+  function istAktiv(now) {
+    if (zeiger && zeiger.ziehen) return true;
+    if (Math.abs(rotZiel - rot) > 0.0004) return true;
+    if (ablauf || funken.length || rauch.length) return true;
+    for (var t = 1; t <= 24; t++) { var c = kerzen[t]; if (c.kaskadeT > 0 || c.zuendT >= 0 || c.setzT >= 0 || c.wackelT >= 0) return true; }
+    return false;
+  }
+
+  // ------------------------------------------------------------------
+  // Schleife
+  var raf = 0, letzte = 0, halb = false, laeuft = false;
+  function schleife(now) {
+    raf = requestAnimationFrame(schleife);
+    var aktiv = istAktiv(now);
+    if (!aktiv) { halb = !halb; if (halb) return; }
+    var dt = letzte ? Math.min(64, now - letzte) : 16;
+    letzte = now;
+    schritt(now, dt);
+    var verdeckt = AN.offen && AN.modal && !AN.anim;
+    if (!verdeckt) malen(now, dt);
+    if (AN.offen) ansichtTick(now);
+  }
+  function starten() {
+    if (laeuft || document.hidden || sichtbar === false) return;
+    laeuft = true; letzte = 0;
+    if (RM) { anfordern(); return; }
+    raf = requestAnimationFrame(schleife);
+  }
+  function stoppen() { laeuft = false; if (raf) cancelAnimationFrame(raf); raf = 0; }
+  var einmalRaf = 0;
+  function anfordern() {
+    if (!RM) return;
+    if (einmalRaf) return;
+    einmalRaf = requestAnimationFrame(function (now) {
+      einmalRaf = 0;
+      schritt(now, 16);
+      if (Math.abs(rotZiel - rot) > 0) rot = rotZiel;
+      malen(now, 16);
+      if (AN.offen) ansichtTick(now);
+      if (ablauf || funken.length) anfordern();
+    });
+  }
+  var sichtbar = true;
+  document.addEventListener('visibilitychange', function () { if (document.hidden) stoppen(); else if (sichtbar) starten(); });
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) {
+    sichtbar = es[es.length - 1].isIntersecting;
+    if (sichtbar) starten(); else stoppen();
+  }).observe(buehne);
+
+  // ------------------------------------------------------------------
+  // DOM: Knöpfe über den Kerzen
+  var buttons = [null];
+  for (var b = 1; b <= 24; b++) {
+    var bt = document.createElement('button');
+    bt.type = 'button'; bt.className = 'kerze kerze-' + b; bt.dataset.tag = String(b);
+    kerzenBox.appendChild(bt);
+    buttons.push(bt);
+    kerzen[b].btn = bt;
+  }
+  function kerzeLabel(t) {
+    var z = kerzen[t].zustand, d = 'Tag ' + t + ', ' + K.datumText(t);
+    if (t === 24) d += ', große Kerze in der Mitte';
+    else if (K.istSonntag(t)) d += ', ' + K.adventsSonntag(t) + '. Advent';
+    var m = { brennt: 'geöffnet, die Kerze brennt', heute: 'heute, Kerze noch nicht angezündet', verpasst: 'verpasst, kann nachgeholt werden', leer: 'noch gesperrt' };
+    return d + ' – ' + m[z];
+  }
+  function labelsSetzen() { for (var t = 1; t <= 24; t++) buttons[t].setAttribute('aria-label', kerzeLabel(t)); }
+
+  var letzteDom = '';
+  var blaseTag = 0, blaseTimer = 0;
+  function domAktualisieren(now) {
+    var key = rot.toFixed(4) + '|' + auswahl + '|' + L.cx + '|' + L.cy + '|' + L.R;
+    var bew = false;
+    for (var t = 1; t <= 24; t++) if (kerzen[t].setzT >= 0) { bew = true; break; }
+    if (key === letzteDom && !domDirty && !bew && !blaseTag) return;
+    letzteDom = key; domDirty = false;
+    var R = L.R;
+    for (var u = 1; u <= 24; u++) {
+      var c = kerzen[u], btn = buttons[u];
+      var w = Math.max(44, c.wPx * 2.4), top, bot = c.y + R * 0.06;
+      if (c.zustand === 'leer') top = c.y - R * 0.16;
+      else top = c.yTop - c.fGr * 1.1;
+      if (u === auswahl) w = Math.max(w, 60);
+      var hh = Math.max(44, bot - top);
+      if (bot - top < 44) top = bot - 44;
+      var x = c.x - L.stL - w / 2, y = top - L.stT;
+      btn.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+      btn.style.width = w.toFixed(1) + 'px'; btn.style.height = hh.toFixed(1) + 'px';
+      btn.style.zIndex = String(10 + Math.round((c.ys - L.cy) / R * 20 + 25) + (u === auswahl ? 30 : 0));
+    }
+    // Schild mit der Tageszahl vorn am Kranz
+    var s = kerzen[auswahl];
+    var sx = clamp(s.x - L.stL, 30, L.stW - 30), sy = L.cy + 1.24 * L.k * R + L.dick + 6 - L.stT;
+    if (auswahl === 24) sx = L.cx - L.stL;
+    schild.style.transform = 'translate(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px) translateX(-50%)';
+    hinweis.style.transform = 'translate(' + (L.cx - L.stL).toFixed(1) + 'px,' + (sy + 8).toFixed(1) + 'px) translateX(-50%)';
+    hinweis.style.visibility = sy + 26 > L.stH ? 'hidden' : '';
+    // Sprechblase folgt dem Halter
+    if (blaseTag) {
+      var c2 = kerzen[blaseTag], bw = blase.offsetWidth || 160, bh = blase.offsetHeight || 44;
+      var ax = c2.x - L.stL, ay = (c2.zustand === 'leer' ? c2.y - R * 0.12 : c2.yTop - c2.fGr * 1.2) - L.stT - 12;
+      var bx = clamp(ax - bw / 2, 8, L.stW - bw - 8), by = Math.max(4, ay - bh);
+      blase.style.setProperty('--bx', bx.toFixed(1) + 'px');
+      blase.style.setProperty('--by', by.toFixed(1) + 'px');
+      blase.style.setProperty('--tx', clamp(ax - bx, 16, bw - 16).toFixed(1) + 'px');
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Vorschau im Panel: lädt asynchron (kleine Vorschau-Größe), alte Bilder verschwinden sofort,
+  // beim Drehen erst laden, wenn die Auswahl kurz stehen bleibt. t = 0 → ausblenden.
+  var pBildNr = 0, pBildTimer = 0;
+  function panelBildSetzen(t) {
+    if (!t) {
+      clearTimeout(pBildTimer); pBildNr++;
+      pBildRahmen.hidden = true;
+      pBild.onload = pBild.onerror = null;
+      pBild.removeAttribute('src'); pBild.removeAttribute('data-tag');
+      return;
+    }
+    pBildRahmen.hidden = false;
+    if (pBild.getAttribute('data-tag') === String(t)) return; // schon gesetzt (lädt oder ist fertig)
+    clearTimeout(pBildTimer);
+    var nr = ++pBildNr;
+    pBild.onload = pBild.onerror = null;
+    pBild.removeAttribute('src'); pBild.removeAttribute('data-platzhalter'); pBild.removeAttribute('data-tag');
+    pBildRahmen.classList.add('laedt');
+    pBildRahmen.style.setProperty('--laden-farbe', ladeFarbe(t));
+    pBildTimer = setTimeout(function () {
+      if (nr !== pBildNr) return;
+      var fehler = 0;
+      pBild.onload = function () {
+        if (nr !== pBildNr) return;
+        pBildRahmen.classList.remove('laedt');
+        vorschauFertig[t] = pBild.currentSrc || pBild.src;
+      };
+      pBild.onerror = function () {
+        if (nr !== pBildNr) return;
+        // fotos.js tauscht Fehlschläge (404/403) selbst gegen den Platzhalter – sonst hier
+        if (++fehler === 1 && !pBild.hasAttribute('data-platzhalter')) {
+          var ersatz = ersatzBild(t, 160);
+          if (ersatz) { pBild.setAttribute('data-platzhalter', '1'); pBild.src = ersatz; return; }
+        }
+        if (fehler > 1 || !pBild.hasAttribute('data-platzhalter')) pBildRahmen.classList.remove('laedt');
+      };
+      pBild.setAttribute('data-tag', String(t));
+      pBild.src = F.vorschau(t, 160);
+    }, zeiger && zeiger.ziehen ? 160 : 0);
+  }
+  // Große Ansicht des gewählten (brennenden) Tages schon vorladen, wenn die Auswahl kurz steht –
+  // immer nur dieses eine Bild, nie alle auf einmal.
+  var vorTimer = 0;
+  function fotoVorbereiten(t) {
+    clearTimeout(vorTimer);
+    if (!t) return;
+    vorTimer = setTimeout(function () {
+      if (auswahl !== t || (zeiger && zeiger.ziehen) || AN.offen || !K.istGeoeffnet(t)) return;
+      try { F.bild(t); } catch (e) { }
+    }, 900);
+  }
+
+  // ------------------------------------------------------------------
+  // Panel & Status
+  function panelAktualisieren() {
+    var t = auswahl, c = kerzen[t], z = c.zustand;
+    var zusatz = t === 24 ? ' · Heiligabend' : (K.istSonntag(t) ? ' · ' + K.adventsSonntag(t) + '. Advent' : '');
+    var eyebrow, text, titelText = false, aktion = null, still = false, neben = false;
+    if (H === 0) {
+      eyebrow = 'Tag ' + t + zusatz + ' · noch leer';
+      text = 'Ab dem 1. Dezember kommt jeden Tag eine Kerze dazu, bis an Heiligabend alle 24 brennen.';
+    } else if (z === 'heute') {
+      eyebrow = 'Heute' + zusatz;
+      text = t === 24 ? 'Die große Kerze in der Mitte ist da. Zünde die Kerze von heute an!' : 'Eine neue Kerze ist dazugekommen. Zünde die Kerze von heute an!';
+      aktion = 'Kerze anzünden';
+    } else if (z === 'verpasst') {
+      eyebrow = 'Nachholen · Tag ' + t + zusatz;
+      text = 'Diese Kerze wartet noch darauf, angezündet zu werden.';
+      aktion = 'Kerze anzünden';
+      neben = true;
+    } else if (z === 'brennt') {
+      eyebrow = (t === H ? 'Heute' : 'Tag ' + t) + zusatz;
+      // ohne Bildunterschrift ein kurzer, freundlicher Satz statt einer leeren Zeile
+      text = fotoTitel(t) || 'Die Kerze brennt – schau dir das Foto an!'; titelText = true;
+      aktion = 'Foto ansehen';
+      neben = H <= 24 && t !== H;
+    } else {
+      eyebrow = 'Tag ' + t + zusatz + ' · noch leer';
+      text = K.sperrText(t) + ' Dann kommt hier eine Kerze dazu.';
+      aktion = 'Zur Kerze von heute'; still = true;
+    }
+    pEyebrow.textContent = eyebrow;
+    pTitel.textContent = K.datumText(t);
+    pText.textContent = text;
+    pText.classList.toggle('titel', titelText);
+    panelBildSetzen(z === 'brennt' ? t : 0);
+    fotoVorbereiten(z === 'brennt' ? t : 0);
+    if (aktion) {
+      pAktion.hidden = false; pAktion.classList.remove('platzhalter');
+      pAktion.textContent = aktion; pAktion.classList.toggle('still', still);
+    } else {
+      pAktion.hidden = false; pAktion.classList.add('platzhalter'); pAktion.textContent = ' ';
+      pAktion.tabIndex = -1;
+    }
+    if (aktion) pAktion.tabIndex = 0;
+    pNeben.hidden = !(neben && H >= 1 && H <= 24);
+    schild.textContent = t + '.';
+    schild.classList.toggle('aus', false);
+  }
+  function statusAktualisieren() {
+    var n = brennende();
+    statusEl.classList.toggle('fest', H >= 25);
+    if (H === 0) statusEl.textContent = 'Noch ist November. Der Kranz wartet auf seine Kerzen.';
+    else if (H >= 25) statusEl.textContent = n >= 24 ? 'Frohe Weihnachten! Alle Kerzen brennen.' : 'Frohe Weihnachten! ' + (n === 0 ? 'Zünde die Kerzen an.' : n === 1 ? '1 Kerze brennt.' : n + ' von 24 Kerzen brennen.');
+    else statusEl.textContent = K.datumText(H) + ' · ' + (n === 0 ? 'noch brennt keine Kerze' : n === 1 ? '1 Kerze brennt' : n + ' von 24 Kerzen brennen');
+  }
+
+  function waehle(t, drehen, ansagen, ausAnsicht) {
+    t = ((t - 1 + 24) % 24) + 1;
+    auswahl = t; mitteGewaehlt = t === 24;
+    if (drehen && t <= 23) dreheZu(t);
+    panelAktualisieren();
+    // nur die ausgewählte Kerze liegt in der Tab-Reihenfolge, die Pfeiltasten wandern weiter
+    for (var b = 1; b <= 24; b++) buttons[b].tabIndex = b === t ? 0 : -1;
+    domDirty = true;
+    if (ansagen) ansage.textContent = kerzeLabel(t);
+    if (AN.offen && !AN.modal && !ausAnsicht && !ablauf && !(zeiger && zeiger.ziehen)) {
+      if (kerzen[t].zustand === 'brennt') ansichtFolgt(t); else fotoSchliessen(true);
+    }
+    anfordern();
+  }
+
+  // ------------------------------------------------------------------
+  // Aktionen
+  function aktion(t) {
+    var c = kerzen[t];
+    if (!K.darfOeffnen(t)) return gesperrt(t);
+    if (ablauf) return;
+    if (c.zustand === 'brennt') { if (H >= 25) K.oeffne(t); return fotoZeigen(t, true); }
+    zuenden(t);
+  }
+  function gesperrt(t) {
+    var c = kerzen[t];
+    c.wackelT = jetzt();
+    blase.textContent = K.sperrText(t);
+    blaseTag = t;
+    blase.classList.remove('zeigen');
+    void blase.offsetWidth;
+    domDirty = true; domAktualisieren(jetzt());
+    blase.classList.add('zeigen');
+    clearTimeout(blaseTimer);
+    blaseTimer = setTimeout(function () { blase.classList.remove('zeigen'); setTimeout(function () { if (!blase.classList.contains('zeigen')) blaseTag = 0; }, 300); }, 2300);
+    anfordern();
+  }
+  function zuenden(t) {
+    var c = kerzen[t];
+    if (!K.oeffne(t)) return gesperrt(t);
+    c.zustand = 'brennt'; tropfenBerechnen(c);
+    c.setzT = -1;
+    labelsSetzen();
+    if (RM) {
+      c.anteil = 1; panelAktualisieren(); statusAktualisieren(); anfordern();
+      setTimeout(function () { fotoZeigen(t, true); }, 250);
+      return;
+    }
+    c.anteil = 0;
+    var warte = Math.abs(rotZiel - rot) > 0.01 ? 380 : 60;
+    ablauf = { tag: t, t0: jetzt() + warte, phase: 0, zl: 0, zx: 0, zy: 0 };
+    pText.classList.remove('titel'); pText.textContent = 'Die Kerze wird angezündet …';
+    pAktion.classList.add('platzhalter'); pAktion.tabIndex = -1; pNeben.hidden = true; panelBildSetzen(0);
+    // das Foto schon während des Anzündens holen (es steigt danach aus der Flamme auf)
+    setTimeout(function () { try { F.bild(t); } catch (e) { } }, 0);
+  }
+  function ablaufSchritt(now) {
+    var a = ablauf, c = kerzen[a.tag], e = now - a.t0;
+    if (e < 0) return;
+    if (a.phase === 0 && e >= 420) { a.phase = 1; funkenStoss(a.zx || c.fx, a.zy || c.fy, GROB ? 12 : 18, 0.9); }
+    if (a.phase === 1 && e >= 640) {
+      a.phase = 2; c.zuendT = now; funkenStoss(c.fx, c.fy - c.fGr * 0.3, GROB ? 5 : 8, 0.45);
+      rauchStart(a.tag, 2.6, 0.7);
+      statusAktualisieren();
+    }
+    if (a.phase === 2 && e >= 1060) { a.phase = 3; rauchStart([a.zx, a.zy], 1.9, 1); }
+    if (a.phase === 3 && e >= 1320) { a.phase = 4; panelAktualisieren(); fotoZeigen(a.tag, true); }
+    if (e >= 1650) { ablauf = null; }
+  }
+
+  // ------------------------------------------------------------------
+  // Bildansicht
+  var AN = { offen: false, tag: 0, modal: true, anim: false, zurueck: null, q: 0 };
+  function fotoGroesse() {
+    var b = aBuehne.getBoundingClientRect(), pad = 5;
+    // echtes Seitenverhältnis: nach dem Laden aus dem Bild selbst, vorher aus den Metadaten
+    var ratio = AN.q || verhaeltnis(AN.tag);
+    var maxW = Math.max(60, b.width - pad * 2), maxH = Math.max(60, b.height - pad * 2);
+    var iw = Math.min(maxW, maxH * ratio), ih = iw / ratio;
+    var fw = iw + pad * 2, fh = ih + pad * 2;
+    var l = (b.width - fw) / 2, tp = (b.height - fh) / 2;
+    aRahmen.style.width = fw + 'px'; aRahmen.style.height = fh + 'px';
+    aRahmen.style.left = l + 'px'; aRahmen.style.top = tp + 'px';
+    var gw = fw * 1.55, gh = fh * 1.45;
+    aGlut.style.width = gw + 'px'; aGlut.style.height = gh + 'px';
+    aGlut.style.left = (l + fw / 2 - gw / 2) + 'px'; aGlut.style.top = (tp + fh / 2 - gh / 2 + fh * 0.08) + 'px';
+  }
+  // Großes Foto setzen: bis es geladen und dekodiert ist, zeigt der Rahmen den Ladezustand (nie ein
+  // leeres/schwarzes Feld und nie kurz das Foto des vorigen Tages). Fehler → Platzhalter.
+  var aBildNr = 0;
+  function ladenFertig(nr) {
+    if (nr !== aBildNr) return;
+    aRahmen.classList.remove('laedt'); aRahmen.removeAttribute('aria-busy');
+  }
+  function ansichtBild(t) {
+    var url = F.bild(t);
+    var nr = ++aBildNr, fehler = 0;
+    if (aBild.getAttribute('src') === url && aBild.complete && aBild.naturalWidth > 0 && !aBild.hasAttribute('data-platzhalter')) {
+      // dasselbe Bild ist schon fertig da (z. B. neu dargestellt nach einem Datumswechsel)
+      aBild.onload = aBild.onerror = null;
+      AN.q = clamp(aBild.naturalWidth / aBild.naturalHeight, 0.4, 2.5);
+      ladenFertig(nr);
+      return;
+    }
+    AN.q = 0;
+    aRahmen.classList.add('laedt'); aRahmen.setAttribute('aria-busy', 'true');
+    aLaden.style.setProperty('--laden-farbe', ladeFarbe(t));
+    aLadenBild.style.backgroundImage = vorschauFertig[t] ? 'url("' + String(vorschauFertig[t]).replace(/["\\\n\r]/g, '') + '")' : 'none';
+    aBild.onload = function () {
+      if (nr !== aBildNr) return;
+      var q = aBild.naturalWidth && aBild.naturalHeight ? clamp(aBild.naturalWidth / aBild.naturalHeight, 0.4, 2.5) : 0;
+      var zeigen = function () {
+        if (nr !== aBildNr) return;
+        if (q && Math.abs(q - (AN.q || verhaeltnis(t))) > 0.01) { AN.q = q; if (AN.offen) fotoGroesse(); }
+        else AN.q = q;
+        ladenFertig(nr);
+      };
+      // erst dekodieren, dann einblenden (kein Ruckeln bei großen Bildern)
+      if (aBild.decode) aBild.decode().then(zeigen, zeigen); else zeigen();
+    };
+    aBild.onerror = function () {
+      if (nr !== aBildNr) return;
+      // fotos.js tauscht Fehlschläge (404/403/Netz) selbst gegen den Platzhalter – sonst hier
+      if (++fehler === 1 && !aBild.hasAttribute('data-platzhalter')) {
+        var ersatz = ersatzBild(t);
+        if (ersatz) { aBild.setAttribute('data-platzhalter', '1'); aBild.src = ersatz; return; }
+      }
+      if (fehler > 1 || !aBild.hasAttribute('data-platzhalter')) ladenFertig(nr);
+    };
+    aBild.removeAttribute('data-platzhalter');
+    aBild.src = url;
+  }
+  function ansichtInhalt(t) {
+    AN.tag = t;
+    var zus = t === 24 ? ' · Heiligabend' : (K.istSonntag(t) ? ' · ' + K.adventsSonntag(t) + '. Advent' : '');
+    var titel = fotoTitel(t);
+    if (titel) { aDatum.textContent = K.datumText(t) + zus; aTitel.textContent = titel; }
+    else {
+      // ohne Bildunterschrift wird das Datum zur Überschrift – nichts bleibt leer
+      aDatum.textContent = (t === H ? 'Heute' : 'Tag ' + t) + zus;
+      aTitel.textContent = K.datumText(t);
+    }
+    aBild.alt = 'Foto vom ' + t + '. Dezember' + (titel ? ': ' + titel : '');
+    ansichtBild(t);
+    aTag.textContent = 'Tag ' + t;
+    var liste = offeneTage(), i = liste.indexOf(t);
+    var vor = i > 0 ? liste[i - 1] : 0, nach = i >= 0 && i < liste.length - 1 ? liste[i + 1] : 0;
+    aZurueck.classList.toggle('weg', !vor); aZurueck.disabled = !vor;
+    aWeiter.classList.toggle('weg', !nach); aWeiter.disabled = !nach;
+    aZurueckT.textContent = vor ? 'Tag ' + vor : '';
+    if ((document.activeElement === aWeiter && !nach) || (document.activeElement === aZurueck && !vor)) (nach ? aWeiter : vor ? aZurueck : ansicht).focus({ preventScroll: true });
+    aWeiterT.textContent = nach ? 'Tag ' + nach : '';
+    aZurueck.setAttribute('aria-label', vor ? 'Vorheriges Foto, Tag ' + vor : 'Kein vorheriges Foto');
+    aWeiter.setAttribute('aria-label', nach ? 'Nächstes Foto, Tag ' + nach : 'Kein nächstes Foto');
+    fotoGroesse();
+    var nb = [vor, nach];
+    setTimeout(function () { for (var j = 0; j < nb.length; j++) if (nb[j]) { try { F.bild(nb[j]); } catch (e) { } } }, 450);
+  }
+  function modalSetzen(an) {
+    kopf.inert = an; buehne.inert = an; panel.inert = an;
+    app.classList.toggle('modal-offen', an);
+  }
+  function fotoZeigen(t, aufsteigen) {
+    if (!K.darfOeffnen(t)) return;
+    if (AN.schliessAnim) { AN.schliessAnim.onfinish = null; AN.schliessAnim.cancel(); AN.schliessAnim = null; AN.anim = false; }
+    var schonOffen = AN.offen;
+    if (!schonOffen) AN.zurueck = document.activeElement && document.activeElement !== document.body ? document.activeElement : null;
+    AN.modal = !DOCK.matches;
+    ansicht.setAttribute('aria-modal', AN.modal ? 'true' : 'false');
+    ansicht.hidden = false;
+    seite.classList.add('foto');
+    if (auswahl !== t) waehle(t, true, false, true);
+    ansichtInhalt(t);
+    AN.offen = true;
+    document.documentElement.classList.add('foto-offen');
+    if (AN.modal) modalSetzen(true);
+    requestAnimationFrame(function () { ansicht.classList.add('offen'); });
+    if (!RM && aufsteigen && aRahmen.animate) {
+      var c = kerzen[t], fr = aRahmen.getBoundingClientRect();
+      var dx = c.fx - (fr.left + fr.width / 2), dy = (c.fy - c.fGr * 0.5) - (fr.top + fr.height / 2);
+      AN.anim = true;
+      var an = aRahmen.animate([
+        { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0.04)', opacity: 0 },
+        { offset: 0.3, opacity: 1 },
+        { transform: 'translate(0px,0px) scale(1)', opacity: 1 }
+      ], { duration: schonOffen ? 700 : 950, easing: 'cubic-bezier(.2,.78,.24,1)' });
+      aGlut.animate([{ opacity: 0 }, { opacity: 0.8 }], { duration: 1100, easing: 'ease-out' });
+      an.onfinish = function () { AN.anim = false; };
+      setTimeout(function () { AN.anim = false; }, 1100);
+    }
+    if (!schonOffen || !ansicht.contains(document.activeElement)) ansicht.focus({ preventScroll: true });
+    anfordern();
+  }
+  function fotoSchliessen(fokusLassen) {
+    if (!AN.offen) return;
+    AN.offen = false;
+    document.documentElement.classList.remove('foto-offen');
+    var fokusDrin = ansicht.contains(document.activeElement) || document.activeElement === document.body;
+    var fertig = function () {
+      AN.schliessAnim = null;
+      ansicht.hidden = true; ansicht.classList.remove('offen');
+      aRahmen.style.transform = '';
+    };
+    modalSetzen(false);
+    ansicht.classList.remove('offen');
+    // Panel sofort wieder fokussierbar machen (angedockte Ansicht verdeckt es sonst noch)
+    seite.classList.remove('foto');
+    if (!RM && aRahmen.animate) {
+      var c = kerzen[AN.tag], fr = aRahmen.getBoundingClientRect();
+      var dx = c.fx - (fr.left + fr.width / 2), dy = (c.fy - c.fGr * 0.5) - (fr.top + fr.height / 2);
+      AN.anim = true;
+      var an = aRahmen.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0.05)', opacity: 0 }], { duration: 420, easing: 'cubic-bezier(.5,0,.75,.4)', fill: 'forwards' });
+      AN.schliessAnim = an;
+      an.onfinish = function () { an.cancel(); AN.anim = false; fertig(); };
+    } else fertig();
+    var z = AN.zurueck;
+    AN.zurueck = null;
+    if (fokusLassen && !fokusDrin) return;
+    // war es ein Kerzen-Knopf, gilt die aktuelle Auswahl (der Kranz kann inzwischen gedreht sein)
+    if (z && z.classList && z.classList.contains("kerze")) z = buttons[auswahl];
+    fokusIntern = true;
+    if (z && document.contains(z) && !z.disabled && z.offsetParent !== null) z.focus({ preventScroll: true });
+    else buttons[auswahl].focus({ preventScroll: true });
+    fokusIntern = false;
+  }
+  // angedockte Ansicht folgt dem Kranz: anderes brennendes Licht → anderes Foto
+  function ansichtFolgt(t) {
+    if (AN.tag === t) return;
+    if (RM || !aRahmen.animate) { ansichtInhalt(t); return; }
+    var weg = aRahmen.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: 'ease-in', fill: 'forwards' });
+    weg.onfinish = function () {
+      ansichtInhalt(t); weg.cancel();
+      aRahmen.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
+    };
+  }
+  function blaettern(dir) {
+    if (!AN.offen) return;
+    var liste = offeneTage(), i = liste.indexOf(AN.tag), j = i + dir;
+    if (j < 0 || j >= liste.length) {
+      if (!RM && aRahmen.animate) aRahmen.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-dir * 18) + 'px)' }, { transform: 'translateX(0)' }], { duration: 260, easing: 'ease-out' });
+      return;
+    }
+    var neu = liste[j];
+    waehle(neu, true, false, true);
+    if (RM || !aRahmen.animate) { ansichtInhalt(neu); return; }
+    var weg = aRahmen.animate([{ transform: aRahmen.style.transform || 'none', opacity: 1 }, { transform: 'translateX(' + (-dir * 34) + '%)', opacity: 0 }], { duration: 170, easing: 'ease-in', fill: 'forwards' });
+    weg.onfinish = function () {
+      aRahmen.style.transform = '';
+      ansichtInhalt(neu);
+      weg.cancel();
+      aRahmen.animate([{ transform: 'translateX(' + (dir * 30) + '%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 280, easing: 'cubic-bezier(.2,.8,.3,1)' });
+    };
+  }
+  function ansichtTick(now) {
+    var o = flk(AN.tag, now / 1000), f = o.f;
+    aLicht.style.opacity = clamp(0.66 + (f - 1) * 3.6, 0.3, 1).toFixed(3);
+    aGlut.style.opacity = AN.anim ? '' : clamp(0.8 + (f - 1) * 3.2, 0.4, 1).toFixed(3);
+    // kleine Kerze mit Flamme im Fuß der Ansicht
+    var g = aCtx, W = aFlamme.width, Hh = aFlamme.height, c = kerzen[AN.tag], T = c.T;
+    g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+    g.clearRect(0, 0, W, Hh);
+    var x = W / 2, top = Hh * 0.62, kw = T === TYP.gross ? 26 : T === TYP.weiss ? 20 : 15;
+    g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.55 + (f - 1) * 2;
+    g.drawImage(SP_HALO, x - 40, top - 52, 80, 80);
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+    var gr = g.createLinearGradient(x - kw / 2, 0, x + kw / 2, 0), l1 = [1, 0.82, 0.62];
+    gr.addColorStop(0, farbe(T.dunkel, l1, 0.7)); gr.addColorStop(0.5, farbe(T.hell, l1, 1)); gr.addColorStop(1, farbe(T.dunkel, l1, 0.6));
+    g.fillStyle = gr; g.fillRect(x - kw / 2, top, kw, Hh - top);
+    g.fillStyle = farbe(T.hell, l1, 1); g.beginPath(); g.ellipse(x, top, kw / 2, 3, 0, 0, TAU); g.fill();
+    var gl = g.createLinearGradient(0, top, 0, Hh);
+    gl.addColorStop(0, 'rgba(' + T.glut + ',.6)'); gl.addColorStop(1, 'rgba(' + T.glut + ',0)');
+    g.globalCompositeOperation = 'lighter'; g.fillStyle = gl; g.fillRect(x - kw / 2, top - 3, kw, Hh - top + 3);
+    g.globalCompositeOperation = 'source-over';
+    g.strokeStyle = '#1c120a'; g.lineWidth = 2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(x, top); g.lineTo(x + 1, top - 6); g.stroke();
+    flammeMalen(g, GVa, x + 1, top - 5, 46, f, o.s, 1, 0);
+  }
+
+  // ------------------------------------------------------------------
+  // Eingaben auf der Bühne: Ziehen dreht den Kranz
+  var zeiger = null, klickSperre = 0, zeigerZeit = 0, zeigerTyp = 'mouse', fokusIntern = false;
+  buehne.addEventListener('pointerdown', function (e) {
+    if (e.button > 0) return;
+    zeigerZeit = jetzt(); zeigerTyp = e.pointerType || 'mouse';
+    zeiger = { id: e.pointerId, x0: e.clientX, y0: e.clientY, rot0: rot, ziehen: false, p: [[e.timeStamp, e.clientX]] };
+  });
+  buehne.addEventListener('pointermove', function (e) {
+    if (!zeiger && e.pointerType === 'mouse') {
+      var ht = trefferBei(e.clientX, e.clientY, 'mouse');
+      buehne.style.cursor = ht ? 'pointer' : '';
+      return;
+    }
+    if (!zeiger || e.pointerId !== zeiger.id) return;
+    var dx = e.clientX - zeiger.x0, dy = e.clientY - zeiger.y0;
+    if (!zeiger.ziehen) {
+      if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.1) {
+        zeiger.ziehen = true; zeiger.x0 = e.clientX; zeiger.rot0 = rot;
+        try { buehne.setPointerCapture(e.pointerId); } catch (er) { }
+        buehne.classList.add('zieht');
+        blase.classList.remove('zeigen');
+      } else return;
+    }
+    rot = zeiger.rot0 - (e.clientX - zeiger.x0) / (L.R * 0.95);
+    rotZiel = rot;
+    zeiger.p.push([e.timeStamp, e.clientX]); if (zeiger.p.length > 6) zeiger.p.shift();
+    var t = tagBeiRot(rot);
+    if (t !== auswahl || mitteGewaehlt) waehle(t, false);
+    anfordern();
+    e.preventDefault();
+  });
+  function zeigerEnde(e) {
+    if (!zeiger || e.pointerId !== zeiger.id) return;
+    if (zeiger.ziehen) {
+      var p = zeiger.p, a = p[0], b2 = p[p.length - 1], dt = b2[0] - a[0];
+      var v = dt > 0 ? -(b2[1] - a[1]) / (L.R * 0.95) / dt : 0;
+      if (e.timeStamp - b2[0] > 90) v = 0;
+      var proj = rot + clamp(v * 140, -STEP * 3, STEP * 3);
+      var t = tagBeiRot(proj);
+      rotZiel = rot;
+      dreheZu(t);
+      zeiger.ziehen = false; // damit waehle() die angedockte Bildansicht nachziehen darf
+      waehle(t, false, true);
+      klickSperre = jetzt() + 380;
+      hinweisWeg();
+      buehne.classList.remove('zieht');
+    } else if (e.type === 'pointerup') {
+      var th = trefferBei(e.clientX, e.clientY, zeigerTyp);
+      if (th) tippen(th, zeigerTyp === 'mouse');
+    }
+    zeiger = null;
+  }
+  buehne.addEventListener('pointerup', zeigerEnde);
+  buehne.addEventListener('pointercancel', zeigerEnde);
+  // nur das Ende der eigenen Capture zählt: die implizite Touch-Capture auf .kerzen meldet beim
+  // Umhängen auf die Bühne ebenfalls lostpointercapture und bubbelt hierher
+  buehne.addEventListener('lostpointercapture', function (e) { if (e.target === buehne && zeiger && zeiger.ziehen) zeigerEnde(e); });
+
+  // Treffertest nach der gezeichneten Form (vorderste Kerze gewinnt, sonst die nächste in Fingerreichweite)
+  var NACH_VORN = [];
+  function trefferBei(px, py, typ) {
+    if (!L.ok) return 0;
+    var R = L.R, best = 0, bestD = 1e9, tol = typ === 'mouse' ? 8 : 24;
+    NACH_VORN.length = 0;
+    for (var t = 1; t <= 24; t++) NACH_VORN.push(kerzen[t]);
+    NACH_VORN.sort(function (a, b) { return b.ys - a.ys; });
+    // 1. sichtbare Kerzenkörper samt Flamme bzw. leere Halter, vorderste zuerst
+    for (var i = 0; i < NACH_VORN.length; i++) {
+      var c = NACH_VORN[i], sr = c.T.schale * R * c.s;
+      var leer = c.zustand === 'leer' || (c.setzT >= 0 && jetzt() < c.setzT);
+      var unten = c.y + sr * L.k + 2;
+      if (leer) {
+        if (px >= c.x - sr - 1 && px <= c.x + sr + 1 && py >= c.y - R * 0.11 && py <= unten) return c.tag;
+        continue;
+      }
+      // Körper in gezeichneter Breite …
+      if (px >= c.x - c.wPx / 2 && px <= c.x + c.wPx / 2 && py >= c.yTop - c.wPx * 0.3 && py <= unten) return c.tag;
+      // … und darüber nur die schmale Flamme
+      var fh = Math.max(2.5, c.fGr * 0.12);
+      if (px >= c.fx - fh && px <= c.fx + fh && py >= c.yTop - c.fGr * 1.1 && py < c.yTop) return c.tag;
+    }
+    // 2. die Tages-Plaketten selbst (Fingerreichweite ≥ 44 px ergibt sich in Schritt 3)
+    for (var e = 0; e < NACH_VORN.length; e++) {
+      var ce = NACH_VORN[e], pr = ce.lr + (typ === 'mouse' ? 2 : 4);
+      if (ce.lx !== undefined && (px - ce.lx) * (px - ce.lx) + (py - ce.ly) * (py - ce.ly) <= pr * pr) return ce.tag;
+    }
+    // 3. sonst die nächste Kerze/Plakette in Fingerreichweite
+    for (var j = 0; j < NACH_VORN.length; j++) {
+      var cj = NACH_VORN[j], sj = cj.T.schale * R * cj.s;
+      var lj = cj.zustand === 'leer', hj = lj ? sj : Math.max(cj.wPx / 2, sj);
+      var oj = lj ? cj.y - R * 0.11 : cj.yTop - cj.fGr, uj = cj.y + sj * L.k;
+      var dx = Math.max(cj.x - hj - px, 0, px - (cj.x + hj)), dy = Math.max(oj - py, 0, py - uj);
+      var d = Math.min(Math.sqrt(dx * dx + dy * dy), Math.max(0, Math.sqrt((px - cj.lx) * (px - cj.lx) + (py - cj.ly) * (py - cj.ly)) - cj.lr));
+      if (d < bestD - 0.5) { bestD = d; best = cj.tag; }
+    }
+    return bestD <= tol ? best : 0;
+  }
+  function tippen(t, maus) {
+    // gesperrte Plätze nur wackeln lassen, ohne den Kranz von „heute“ wegzudrehen
+    if (!K.darfOeffnen(t)) { gesperrt(t); return; }
+    if (t !== auswahl) waehle(t, true, true, true);
+    aktion(t);
+  }
+  // Klicks auf die (für Zeiger durchlässigen) Knöpfe kommen nur von Tastatur oder Screenreader
+  kerzenBox.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('.kerze');
+    if (!btn) return;
+    var t = parseInt(btn.dataset.tag, 10);
+    if (t !== auswahl) waehle(t, true, false, true);
+    aktion(t);
+  });
+  kerzenBox.addEventListener('focusin', function (e) {
+    var btn = e.target.closest && e.target.closest('.kerze');
+    if (!btn) return;
+    if (fokusIntern || jetzt() - zeigerZeit < 700) return;
+    var t = parseInt(btn.dataset.tag, 10);
+    if (t !== auswahl) waehle(t, true);
+  });
+  kerzenBox.addEventListener('keydown', function (e) {
+    var btn = e.target.closest && e.target.closest('.kerze');
+    if (!btn) return;
+    var t = parseInt(btn.dataset.tag, 10), n = 0;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = t % 24 + 1;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = (t + 22) % 24 + 1;
+    else if (e.key === 'Home') n = 1; else if (e.key === 'End') n = 24;
+    if (n) { e.preventDefault(); e.stopPropagation(); waehle(n, true); buttons[n].focus({ preventScroll: true }); }
+  });
+
+  pZurueck.addEventListener('click', function () { hinweisWeg(); waehle(auswahl - 1, true, true); });
+  pWeiter.addEventListener('click', function () { hinweisWeg(); waehle(auswahl + 1, true, true); });
+  pAktion.addEventListener('click', function () {
+    if (pAktion.classList.contains('platzhalter')) return;
+    var c = kerzen[auswahl];
+    if (c.zustand === 'leer') {
+      if (H >= 1 && H <= 24) { waehle(H, true, true); } else gesperrt(auswahl);
+      return;
+    }
+    aktion(auswahl);
+  });
+  pNeben.addEventListener('click', function () { if (H >= 1 && H <= 24) waehle(H, true, true); });
+
+  aZu.addEventListener('click', fotoSchliessen);
+  aZurueck.addEventListener('click', function () { blaettern(-1); });
+  aWeiter.addEventListener('click', function () { blaettern(1); });
+
+  // Wischen in der Bildansicht
+  var wisch = null;
+  aBuehne.addEventListener('pointerdown', function (e) {
+    if (!AN.offen || e.button > 0) return;
+    wisch = { id: e.pointerId, x0: e.clientX, y0: e.clientY, t0: e.timeStamp, aktiv: false, dx: 0 };
+  });
+  aBuehne.addEventListener('pointermove', function (e) {
+    if (!wisch || e.pointerId !== wisch.id) return;
+    var dx = e.clientX - wisch.x0, dy = e.clientY - wisch.y0;
+    if (!wisch.aktiv) {
+      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) { wisch.aktiv = true; try { aBuehne.setPointerCapture(e.pointerId); } catch (er) { } }
+      else return;
+    }
+    var liste = offeneTage(), i = liste.indexOf(AN.tag);
+    var rand = (dx > 0 && i <= 0) || (dx < 0 && i >= liste.length - 1);
+    wisch.dx = rand ? dx * 0.3 : dx;
+    aRahmen.style.transform = 'translateX(' + wisch.dx.toFixed(1) + 'px) rotate(' + (wisch.dx * 0.012).toFixed(2) + 'deg)';
+  });
+  function wischEnde(e) {
+    if (!wisch || e.pointerId !== wisch.id) return;
+    var w = wisch; wisch = null;
+    if (!w.aktiv) {
+      if (e.type === 'pointerup' && e.target === aBuehne && AN.modal) fotoSchliessen();
+      return;
+    }
+    var schnell = Math.abs(w.dx) / Math.max(1, e.timeStamp - w.t0) > 0.5;
+    var breite = aRahmen.offsetWidth || 300;
+    if (Math.abs(w.dx) > Math.min(90, breite * 0.2) || (schnell && Math.abs(w.dx) > 30)) blaettern(w.dx < 0 ? 1 : -1);
+    else {
+      var von = aRahmen.style.transform; aRahmen.style.transform = '';
+      if (aRahmen.animate && !RM) aRahmen.animate([{ transform: von }, { transform: 'none' }], { duration: 220, easing: 'ease-out' });
+    }
+  }
+  aBuehne.addEventListener('pointerup', wischEnde);
+  aBuehne.addEventListener('pointercancel', wischEnde);
+
+  document.addEventListener('keydown', function (e) {
+    if (AN.offen) {
+      if (e.key === 'Escape') { e.preventDefault(); fotoSchliessen(); return; }
+      if (e.key === 'ArrowRight') { e.preventDefault(); blaettern(1); return; }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); blaettern(-1); return; }
+      if (e.key === 'Tab' && AN.modal) {
+        var f = [aZu, aZurueck, aWeiter].filter(function (b) { return !b.disabled; });
+        var i = f.indexOf(document.activeElement);
+        e.preventDefault();
+        var n = e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i + 1) % f.length;
+        f[n].focus({ preventScroll: true });
+      }
+      return;
+    }
+    var el = document.activeElement;
+    if (el === document.body || el === null) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); waehle(auswahl + 1, true, true); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); waehle(auswahl - 1, true, true); }
+    }
+    if (e.key === 'Escape') blase.classList.remove('zeigen');
+  });
+
+  // ------------------------------------------------------------------
+  // Größe, Datum
+  var rzTimer = 0;
+  function neuLayout() {
+    layout();
+    if (AN.offen) {
+      var m = !DOCK.matches;
+      if (m !== AN.modal) { AN.modal = m; modalSetzen(m); ansicht.setAttribute('aria-modal', m ? 'true' : 'false'); }
+      fotoGroesse();
+    }
+    domDirty = true;
+    anfordern();
+  }
+  window.addEventListener('resize', function () { clearTimeout(rzTimer); rzTimer = setTimeout(neuLayout, 90); });
+  window.addEventListener('scroll', function () {
+    var r = buehne.getBoundingClientRect();
+    if (Math.abs(r.top - L.stT) > 0.5) neuLayout();
+  }, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(function () { clearTimeout(rzTimer); rzTimer = setTimeout(neuLayout, 60); }).observe(buehne);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { neuLayout(); });
+
+  function startAuswahl() { return H === 0 ? 1 : H >= 24 ? 24 : H; }
+  function neuerTag(h, eingang) {
+    H = h;
+    ablauf = null; funken.length = 0; rauch.length = 0;
+    if (AN.offen && !K.istGeoeffnet(AN.tag)) fotoSchliessen();
+    zustaendeSetzen(eingang !== false);
+    labelsSetzen();
+    var t = startAuswahl();
+    auswahl = t; mitteGewaehlt = t === 24;
+    for (var b = 1; b <= 24; b++) buttons[b].tabIndex = b === t ? 0 : -1;
+    dreheZu(t <= 23 ? t : 23, eingang === 'erst');
+    panelAktualisieren(); statusAktualisieren();
+    if (AN.offen) ansichtInhalt(AN.tag);
+    domDirty = true;
+    anfordern();
+  }
+  K.onChange(function (h) { neuerTag(h, true); });
+
+  // Start
+  layout();
+  rotZiel = rotFuer(H >= 1 && H <= 23 ? H : 23); rot = rotZiel;
+  neuerTag(H, 'erst');
+  starten();
+})();
+</script>
+</body>
+</html>

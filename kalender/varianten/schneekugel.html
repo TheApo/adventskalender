@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Die Schneekugel – {{TITEL}}</title>
+<link rel="stylesheet" href="../fonts/schneekugel.css">
+<style>
+:root{
+  --wand:#22365c;      /* Dämmerblau der Zimmerwand */
+  --nacht:#111a30;     /* tiefe Schatten, Bildansicht */
+  --frost:#e7eef6;     /* Schnee, helle Schrift */
+  --holz:#7a4528;      /* Nussholz von Sockel und Regal */
+  --messing:#c9a352;   /* Messingschild, Knöpfe */
+  --kerze:#f4d99e;     /* warmes Lampenlicht */
+  --schrift-titel:'IM Fell English','Iowan Old Style','Palatino Linotype',Georgia,serif;
+  --schrift-schild:'IM Fell English SC','IM Fell English',Georgia,serif;
+  --schrift-text:'Alegreya Sans','Gill Sans','Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--nacht)}
+html.gesperrt{overflow:hidden}
+body{margin:0;min-height:100vh;color:var(--frost);font-family:var(--schrift-text);font-size:1.0625rem;line-height:1.5;overflow-x:clip;font-variant-numeric:lining-nums}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(55% 45% at 92% 12%,rgba(244,217,158,.16),transparent 70%),
+    repeating-linear-gradient(90deg,rgba(231,238,246,.022) 0 2px,transparent 2px 44px),
+    linear-gradient(180deg,#2a426f 0%,var(--wand) 42%,#172543 100%)}
+body.fest::before{background:
+    radial-gradient(60% 50% at 90% 10%,rgba(244,200,120,.28),transparent 70%),
+    radial-gradient(40% 40% at 6% 92%,rgba(244,200,120,.10),transparent 70%),
+    repeating-linear-gradient(90deg,rgba(231,238,246,.022) 0 2px,transparent 2px 44px),
+    linear-gradient(180deg,#2d406a 0%,#26365a 42%,#1a2443 100%)}
+body.november::before{background:
+    radial-gradient(55% 45% at 92% 12%,rgba(244,217,158,.09),transparent 70%),
+    repeating-linear-gradient(90deg,rgba(231,238,246,.02) 0 2px,transparent 2px 44px),
+    linear-gradient(180deg,#22365e 0%,#1d2e50 42%,#131e38 100%)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--kerze);outline-offset:3px}
+.unsichtbar{position:absolute!important;top:0;left:0;margin:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+/* Ziffern der Fell-Schrift sind Mediävalziffern (1 wie I): Zahlen daher in Alegreya Sans mit Versalziffern */
+.ziffer{font-family:var(--schrift-text);font-style:normal;font-weight:700;font-variant-numeric:lining-nums;font-size:.9em;letter-spacing:0}
+
+/* ---------- Raum / Raster ---------- */
+.zimmer{overflow-x:clip;padding:max(14px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.raum{display:grid;grid-template-areas:"kopf" "buehne" "regal";row-gap:10px;max-width:1380px;margin:0 auto}
+.kopf{grid-area:kopf;text-align:center;padding:4px 6px 0}
+.kopf h1{margin:0;font-family:var(--schrift-titel);font-style:italic;font-weight:400;font-size:clamp(1.8rem,7.4vw,3rem);line-height:1.02;letter-spacing:.003em;text-wrap:balance;text-shadow:0 2px 20px rgba(8,14,30,.55)}
+.heute-zeile{margin:.4rem 0 0;color:var(--kerze);font-size:1.02rem}
+
+/* ---------- Bühne mit Fenster, Fensterbank, Kugel ---------- */
+.buehne{grid-area:buehne;--kw:min(calc(100vw - 32px),calc((100vh - 290px) / 1.14),470px);min-width:0}
+@supports (height:100svh){.buehne{--kw:min(calc(100vw - 32px),calc((100svh - 290px) / 1.14),470px)}}
+.kugel-platz{position:relative;display:flex;justify-content:center;padding-top:calc(var(--kw) * .04);padding-bottom:calc(var(--kw) * .0235 + 16px);margin-top:8px}
+.fenster{position:absolute;z-index:0;top:0;left:50%;translate:-50% 0;width:min(100%,calc(var(--kw) * 1.34));height:calc(var(--kw) * 1.0715);border-radius:8px 8px 0 0;overflow:hidden;
+  background:linear-gradient(180deg,#13214a 0%,#27457c 46%,#5f82b9 78%,#9fb6da 100%);
+  box-shadow:0 0 0 9px #1a2747,0 0 0 10px rgba(231,238,246,.08),0 0 70px 10px rgba(95,130,185,.22)}
+.fenster-aussen{position:absolute;inset:0;filter:blur(1.4px);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'%3E%3Cpath fill='%23182a4e' d='M0 80L12 54L20 66L31 36L42 64L50 52L58 68L70 32L82 66L92 56L100 70L114 42L126 68L136 58L146 72L160 38L172 68L182 58L194 74L208 46L220 70L230 60L242 74L256 40L268 70L278 58L290 72L304 44L316 70L326 56L338 72L352 36L364 68L374 56L386 70L400 48V120H0Z'/%3E%3Cpath fill='%23b3c4dd' d='M0 100Q100 88 200 97T400 94V120H0Z'/%3E%3C/svg%3E") 0 100%/100% 34% repeat-x,
+    radial-gradient(1.6px 1.6px at 18% 22%,rgba(255,255,255,.75),transparent),
+    radial-gradient(1.2px 1.2px at 62% 12%,rgba(255,255,255,.6),transparent),
+    radial-gradient(2px 2px at 82% 38%,rgba(255,255,255,.55),transparent),
+    radial-gradient(1.3px 1.3px at 38% 48%,rgba(255,255,255,.5),transparent),
+    radial-gradient(1.8px 1.8px at 8% 60%,rgba(255,255,255,.45),transparent);
+  background-size:100% 34%,90px 110px,120px 90px,140px 130px,70px 100px,110px 150px}
+.fenster::before{content:"";position:absolute;inset:0;z-index:2;
+  background:
+    linear-gradient(90deg,transparent calc(50% - 5px),#1a2747 calc(50% - 5px) calc(50% + 5px),transparent calc(50% + 5px)) calc(50% + var(--sprossen-x,0px)) 0/var(--sprosse,100%) 100% repeat-x,
+    linear-gradient(180deg,transparent calc(40% - 4px),#1a2747 calc(40% - 4px) calc(40% + 4px),transparent calc(40% + 4px))}
+.fenster::after{content:"";position:absolute;inset:0;z-index:3;
+  background:
+    radial-gradient(38% 30% at 0 100%,rgba(231,238,246,.32),transparent 70%),
+    radial-gradient(38% 30% at 100% 100%,rgba(231,238,246,.28),transparent 70%),
+    radial-gradient(30% 22% at 0 40%,rgba(231,238,246,.12),transparent 70%),
+    radial-gradient(30% 22% at 100% 40%,rgba(231,238,246,.12),transparent 70%)}
+body.november .fenster{background:linear-gradient(180deg,#0e1838 0%,#1d3260 50%,#3c5a8e 82%,#6c86b4 100%)}
+.lichter{position:absolute;inset:0;z-index:1;display:none;filter:blur(.6px);
+  background:
+    radial-gradient(3px 2.4px at 14% 84%,#ffd98a,transparent),
+    radial-gradient(2.6px 2px at 31% 81%,#ffcf7a,transparent),
+    radial-gradient(3px 2.4px at 57% 86%,#ffd98a,transparent),
+    radial-gradient(2.4px 2px at 74% 80%,#ffe0a0,transparent),
+    radial-gradient(3px 2.4px at 90% 85%,#ffcf7a,transparent)}
+body.fest .lichter{display:block}
+.girlande{position:absolute;z-index:4;top:-14px;left:50%;translate:-50% 0;width:min(calc(100% + 16px),calc(var(--kw) * 1.34 + 22px));height:30px;display:none;pointer-events:none;
+  background:
+    radial-gradient(circle at 12px 18px,#ffe3a6 0 2.6px,rgba(255,214,140,.55) 3.4px,transparent 7px) 0 0/44px 30px,
+    radial-gradient(ellipse 15px 10px at 50% 55%,#2f5d40 0 62%,transparent 66%) 0 2px/22px 24px,
+    radial-gradient(ellipse 13px 9px at 50% 45%,#23482f 0 62%,transparent 66%) 11px 6px/22px 24px}
+body.fest .girlande{display:block}
+.fensterbank{position:absolute;z-index:1;left:50%;translate:-50% 0;width:min(calc(100% + 8px),calc(var(--kw) * 1.42));top:calc(var(--kw) * 1.0715);height:calc(var(--kw) * .105 + 16px);border-radius:3px;
+  background:
+    linear-gradient(90deg,transparent 0 calc(100% - 2px),rgba(28,12,4,.42) calc(100% - 2px)) 0 0/236px 100% repeat-x,
+    radial-gradient(ellipse 13px 3.5px at 84px 58%,rgba(40,18,6,.4),rgba(40,18,6,.12) 60%,transparent 72%) 0 0/236px 100% repeat-x,
+    radial-gradient(ellipse 7px 2.5px at 182px 32%,rgba(40,18,6,.32),transparent 72%) 0 0/236px 100% repeat-x,
+    repeating-linear-gradient(179.4deg,rgba(40,20,8,.0) 0 5px,rgba(40,20,8,.12) 5px 6px),
+    linear-gradient(180deg,#3f2615 0,#6e4426 calc(var(--kw) * .06),#9a6a42 calc(var(--kw) * .105 - 2px),#d39d6b calc(var(--kw) * .105 - 1px),#7a4a2a calc(var(--kw) * .105 + 1px),#5b351d calc(var(--kw) * .105 + 6px),#3e2312 100%);
+  box-shadow:0 16px 26px -12px rgba(0,0,0,.75)}
+.kugel-schatten{position:absolute;z-index:2;left:50%;top:calc(var(--kw) * 1.1165);width:calc(var(--kw) * .98);height:calc(var(--kw) * .08);translate:-50% -50%;border-radius:50%;background:radial-gradient(closest-side,rgba(8,10,22,.62),rgba(8,10,22,.25) 60%,transparent);pointer-events:none}
+.kugel-huelle{position:relative;z-index:3;width:var(--kw);aspect-ratio:1/1.113;transform-origin:50% 96%;user-select:none;-webkit-user-select:none}
+.kugel-huelle canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.kugel-innen{z-index:1}
+.kugel-glas{z-index:2;pointer-events:none}
+.schild{position:absolute;z-index:3;left:50%;top:88%;transform:translate(-50%,-50%);white-space:nowrap;font-family:var(--schrift-schild);font-size:15px;letter-spacing:.035em;line-height:1.15;color:#3b2a0f;padding:.2em 1.05em .26em;border-radius:.28em;pointer-events:none;
+  background:linear-gradient(180deg,#f4e1aa 0%,#d6b267 36%,#b18b3f 64%,#e4c67f 100%);
+  box-shadow:inset 0 1px 0 rgba(255,250,230,.85),inset 0 -1px 0 rgba(90,60,20,.55),0 1px 2px rgba(0,0,0,.55);
+  text-shadow:0 1px 0 rgba(255,242,205,.65)}
+.schild::before,.schild::after{content:"";position:absolute;top:50%;width:.3em;height:.3em;margin-top:-.15em;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3cf,#8a6a2a 72%)}
+.schild::before{left:.38em}.schild::after{right:.38em}
+/* Auf der Kugel selbst wird nicht gescrollt (sonst ginge nur seitliches Schütteln): jede Richtung schüttelt,
+   Zwei-Finger-Zoom bleibt. Gescrollt wird neben, über und unter der Kugel (Rand, Sockel, Text, Knöpfe). */
+.kugel-griff{position:absolute;z-index:4;border-radius:50%;touch-action:pinch-zoom;cursor:grab}
+.kugel-griff:active{cursor:grabbing}
+/* Ladeanzeige: echte Fotos kommen übers Netz – solange zeigt die Kugel ein Leuchten in der Tagesfarbe und diesen Hinweis */
+.kugel-laden{position:absolute;z-index:3;left:50%;top:45%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 14px 9px;border-radius:14px;background:rgba(17,26,48,.42);color:var(--frost);font-size:.92rem;font-weight:500;line-height:1.2;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s}
+.kugel-laden.an{opacity:1;transition-delay:.18s}
+.dreher{display:block;width:26px;height:26px;border-radius:50%;border:3px solid rgba(231,238,246,.26);border-top-color:var(--kerze);animation:dreh .9s linear infinite}
+@keyframes dreh{to{transform:rotate(360deg)}}
+
+.kugel-text{text-align:center;max-width:34rem;margin:14px auto 0;padding:0 6px}
+.kugel-text .knoepfe{margin-bottom:16px}
+.kugel-text h2{margin:0 0 .25rem;font-family:var(--schrift-titel);font-style:italic;font-weight:400;font-size:clamp(1.55rem,5.8vw,2.05rem);line-height:1.1;text-wrap:balance}
+.kugel-text p{margin:0 auto .95rem;max-width:29rem;color:rgba(231,238,246,.84);text-wrap:pretty}
+.knoepfe{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.knopf{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:48px;padding:.65rem 1.3rem;border:0;border-radius:12px;font-weight:700;font-size:1.05rem;line-height:1.1;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.knopf svg{width:1.3em;height:1.3em;flex:none}
+.knopf-messing{color:#2b1d0a;background:linear-gradient(180deg,#f0d898 0%,var(--messing) 52%,#a37e35 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -2px 0 rgba(80,55,15,.4),0 8px 18px -8px rgba(0,0,0,.7)}
+.knopf-messing:active{transform:translateY(1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(80,55,15,.4),0 4px 10px -6px rgba(0,0,0,.7)}
+.knopf-glas{color:var(--frost);background:rgba(231,238,246,.07);box-shadow:inset 0 0 0 1.5px rgba(231,238,246,.5)}
+.knopf-glas:active{background:rgba(231,238,246,.14)}
+.knopf[aria-disabled="true"]{opacity:.55}
+.nachholen{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;margin:0 auto;padding:.35rem .95rem .4rem;border:0;border-radius:8px;cursor:pointer;color:var(--kerze);font-weight:700;font-size:.98rem;background:rgba(231,238,246,.05);box-shadow:inset 0 0 0 1px rgba(201,163,82,.65)}
+.nachholen::before{content:"";width:10px;height:10px;border-radius:50%;background:#b8433a;box-shadow:0 0 0 2px #f4ead8}
+.nachholen[hidden]{display:none}
+.knopf[hidden]{display:none}
+
+/* Hinweis „Handy schütteln erlauben“ – nur auf iPhone/iPad, die dafür eine Erlaubnis brauchen */
+.handy-hinweis{display:flex;justify-content:center;align-items:center;gap:2px;margin:0 auto .8rem;transition:opacity .4s ease}
+.handy-hinweis[hidden]{display:none}
+.handy-hinweis.weg{opacity:0}
+.handy-hinweis.frage{animation:hinweisRein .6s ease .5s backwards}
+@keyframes hinweisRein{from{opacity:0}}
+.handy-an{display:inline-flex;align-items:center;gap:.45rem;min-height:44px;padding:.3rem .95rem .35rem .8rem;border:0;border-radius:22px;cursor:pointer;color:rgba(231,238,246,.92);font-weight:500;font-size:.95rem;line-height:1.15;background:rgba(231,238,246,.06);box-shadow:inset 0 0 0 1px rgba(231,238,246,.32);-webkit-tap-highlight-color:transparent}
+.handy-an svg{width:1.25em;height:1.25em;flex:none}
+.handy-an:active{background:rgba(231,238,246,.13)}
+.handy-weg{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;color:rgba(231,238,246,.62);-webkit-tap-highlight-color:transparent}
+.handy-weg svg{width:16px;height:16px}
+.handy-hinweis.fertig .handy-an{color:var(--kerze);box-shadow:inset 0 0 0 1px rgba(201,163,82,.7);cursor:default}
+.handy-hinweis.fertig .handy-weg{display:none}
+@media (min-width:960px){.handy-hinweis{margin:.6rem auto 0}}
+
+/* ---------- Regal ---------- */
+.regal{grid-area:regal;position:relative;margin-top:26px;min-width:0}
+.regal h2{margin:0;font-family:var(--schrift-titel);font-style:italic;font-weight:400;font-size:clamp(1.5rem,5vw,1.9rem);line-height:1.1}
+.regal-hilfe{margin:.3rem 0 1rem;max-width:36rem;font-size:.97rem;color:rgba(231,238,246,.78);text-wrap:pretty}
+.bretter{--cols:4;display:grid;row-gap:clamp(12px,2.6vw,20px);max-width:620px}
+.brett{position:relative;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));padding:0 4px 13px;container-type:inline-size}
+.brett::after{content:"";position:absolute;left:-6px;right:-6px;bottom:0;height:13px;border-radius:3px;
+  background:
+    repeating-linear-gradient(178.6deg,transparent 0 3px,rgba(30,14,5,.14) 3px 4px),
+    linear-gradient(180deg,#c08655 0 3px,#8f5a34 3px 5px,#6e4024 5px,#4b2a16);
+  box-shadow:0 12px 16px -9px rgba(0,0,0,.75),0 2px 0 rgba(0,0,0,.25)}
+.brett::before{content:"";position:absolute;bottom:-9px;left:8%;right:8%;height:10px;
+  background:linear-gradient(90deg,#8a6a2a 0 6px,transparent 6px calc(100% - 6px),#8a6a2a calc(100% - 6px));clip-path:polygon(0 0,100% 0,100% 100%,calc(100% - 6px) 100%,calc(100% - 6px) 0,6px 0,6px 100%,0 100%)}
+.mini{--zelle:calc(100cqw / var(--cols));position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:44px;margin:0;padding:calc(var(--zelle) * .22) 0 0;border:0;border-radius:10px;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mini:focus-visible{outline-offset:0}
+.mini-figur{display:flex;flex-direction:column;align-items:center;width:100%;transform-origin:50% 100%}
+.mini-kugel{position:relative;z-index:1;display:block;width:74%;aspect-ratio:1;border-radius:50%;background:#2a3c60 center/cover no-repeat;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.38),inset -4px -6px 10px rgba(10,20,40,.35),0 2px 5px rgba(0,0,0,.35)}
+.mini-kugel::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.8) 0 5%,rgba(255,255,255,.2) 13%,transparent 30%),radial-gradient(circle at 74% 80%,rgba(255,226,180,.28),transparent 26%)}
+/* Mini-Foto lädt noch: Tagesfarbe, leicht pulsierend */
+.mk-laedt{animation:mkLaden 1.4s ease-in-out infinite}
+@keyframes mkLaden{0%,100%{filter:brightness(.8)}50%{filter:brightness(1.12)}}
+.mk-offen::before{content:"";position:absolute;left:10%;right:10%;bottom:5%;height:20%;border-radius:50% 50% 46% 46%/70% 70% 30% 30%;background:linear-gradient(#f8fbff,#c3d2e3)}
+.mk-schnee{background:
+  radial-gradient(circle at 30% 64%,rgba(140,165,200,.3) 0 .9px,transparent 1.5px) 0 0/7px 6px,
+  radial-gradient(circle at 70% 30%,rgba(255,255,255,.9) 0 .9px,transparent 1.5px) 0 0/5px 7px,
+  radial-gradient(circle at 50% 50%,rgba(150,175,205,.22) 0 1.1px,transparent 1.8px) 3px 2px/11px 9px,
+  radial-gradient(circle at 36% 30%,#ffffff,#e4ecf5 48%,#b3c5da 100%)}
+.mk-zu{border-radius:50% 50% 47% 47%/48% 48% 52% 52%;box-shadow:inset -5px -7px 10px rgba(0,0,0,.38),inset 3px 4px 6px rgba(255,255,255,.12),0 2px 5px rgba(0,0,0,.35)}
+.mk-zu::after{background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.22),transparent 45%)}
+.mk-papier-a{background:
+  repeating-conic-gradient(from 0deg at 50% -25%,transparent 0 4deg,rgba(0,0,0,.2) 4deg 6deg),
+  radial-gradient(circle,rgba(234,203,128,.9) 0 .9px,transparent 1.4px) 0 0/6px 6px,
+  #8b2e38}
+.mk-papier-b{background:
+  repeating-conic-gradient(from 0deg at 50% -25%,transparent 0 4deg,rgba(0,0,0,.2) 4deg 6deg),
+  repeating-linear-gradient(135deg,rgba(234,203,128,.6) 0 1.2px,transparent 1.2px 6px),
+  #2b5243}
+.mk-zu::before{content:"";position:absolute;left:33%;width:34%;top:-17%;height:28%;background:inherit;clip-path:polygon(0 0,100% 0,64% 100%,36% 100%);filter:brightness(.85)}
+.schleife{position:absolute;z-index:2;left:50%;top:-4%;width:58%;height:auto;transform:translateX(-50%);color:#e6c67e;filter:drop-shadow(0 1px 1px rgba(0,0,0,.45))}
+.mini-sockel{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:60%;height:calc(var(--zelle) * .23);margin-top:calc(var(--zelle) * -.04);border-top:3px solid var(--messing);
+  clip-path:polygon(7% 0,93% 0,100% 100%,0 100%);background:linear-gradient(90deg,#3a2010,#94592f 34%,#6b3c20 66%,#2e180b)}
+.mini-zahl{font-weight:700;font-variant-numeric:lining-nums;font-size:clamp(11px,calc(var(--zelle) * .19),16px);line-height:1;color:#f6dfa8;text-shadow:0 1px 0 rgba(0,0,0,.6)}
+.mini-heute{position:absolute;z-index:4;top:0;left:50%;transform:translateX(-50%);padding:2px 6px 3px;border-radius:4px;font-weight:700;font-size:clamp(14px,calc(var(--zelle) * .17),15px);line-height:1;color:#2b1d0a;background:linear-gradient(180deg,#f3dc9c,var(--messing));box-shadow:0 1px 3px rgba(0,0,0,.45);white-space:nowrap}
+.ist-heute .mini-kugel{box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset -4px -6px 10px rgba(10,20,40,.3),0 0 0 2px rgba(244,217,158,.9),0 0 18px 5px rgba(244,217,158,.42)}
+.ist-aktiv .mini-figur::after{content:"";position:absolute;left:50%;bottom:3px;width:26%;height:3px;border-radius:2px;transform:translateX(-50%);background:var(--kerze);box-shadow:0 0 8px 2px rgba(244,217,158,.75)}
+.ist-aktiv .mini-kugel:not(.mk-zu){outline:2px solid rgba(201,163,82,.95);outline-offset:2px}
+.mini-punkt{position:absolute;z-index:4;top:calc(var(--zelle) * .2);right:9%;width:clamp(10px,calc(var(--zelle) * .2),14px);aspect-ratio:1;border-radius:50%;background:#b8433a;box-shadow:0 0 0 2px #f4ead8,0 2px 4px rgba(0,0,0,.45)}
+@keyframes wackeln{0%{transform:rotate(0)}14%{transform:rotate(-11deg)}32%{transform:rotate(9deg)}52%{transform:rotate(-6deg)}72%{transform:rotate(3deg)}100%{transform:rotate(0)}}
+.wackelt{animation:wackeln .62s ease-out}
+/* Kamerafahrt: Bühne beschneiden, damit die ausfahrende Kugel nicht über das Regal oder den Rand läuft */
+.kugel-huelle.doppel{position:absolute;margin:0;pointer-events:none}
+.kugel-text{transition:opacity .35s ease}
+.kugel-text.wechselt{opacity:.15;transition-duration:0s}
+.kugel-huelle.blendet{transition:opacity .16s ease;opacity:0}
+.blase{position:absolute;z-index:20;width:max-content;max-width:min(270px,86%);padding:.55rem .85rem .65rem;border-radius:14px;background:#f4f7fb;color:#1c2742;font-size:.95rem;line-height:1.3;box-shadow:0 12px 28px -10px rgba(0,0,0,.7);pointer-events:none;animation:blaseRein .3s cubic-bezier(.2,.9,.3,1.25)}
+.blase strong{display:block;font-family:var(--schrift-titel);font-style:italic;font-weight:400;font-size:1.3rem;line-height:1.15;margin-bottom:.1rem}
+.blase::after{content:"";position:absolute;top:100%;left:var(--pfeil,50%);margin-left:-8px;border:8px solid transparent;border-top-color:#f4f7fb}
+.blase.unten::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#f4f7fb}
+@keyframes blaseRein{from{opacity:0;transform:translateY(6px) scale(.94)}to{opacity:1;transform:none}}
+
+/* ---------- Bildansicht ---------- */
+.ansicht{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;overflow:hidden;color:var(--frost);
+  background:radial-gradient(70% 55% at 50% 44%,#2c426d 0%,#16213d 62%,var(--nacht) 100%)}
+.ansicht::backdrop{background:#0b1222}
+.ansicht::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(34% 26% at 0 0,rgba(231,238,246,.13),transparent 70%),radial-gradient(34% 26% at 100% 0,rgba(231,238,246,.1),transparent 70%),radial-gradient(40% 24% at 0 100%,rgba(231,238,246,.12),transparent 70%),radial-gradient(40% 24% at 100% 100%,rgba(231,238,246,.12),transparent 70%)}
+.ansicht-innen{position:relative;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:6px;
+  padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.ansicht-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:50px;max-width:1100px;width:100%;margin:0 auto}
+.ansicht-zaehler{margin:0 0 0 4px;font-size:.98rem;color:var(--kerze)}
+.ansicht-buehne{position:relative;min-height:0;overflow:hidden;touch-action:pan-y pinch-zoom;cursor:grab;user-select:none;-webkit-user-select:none}
+.spur{user-select:none;-webkit-user-select:none}
+.spur{height:100%;display:flex;align-items:center;justify-content:center}
+.spur img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 16px 30px rgba(0,0,0,.55));user-select:none;-webkit-user-select:none;-webkit-user-drag:none;pointer-events:none;transition:opacity .22s ease}
+/* großes Foto lädt: altes Bild nicht stehen lassen (sonst passt es nicht zur Beschriftung), stattdessen Ladehinweis */
+.spur.laedt img{opacity:0;transition:none}
+.ansicht-laden{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;color:rgba(231,238,246,.85);font-size:.98rem;pointer-events:none;opacity:0;transition:opacity .2s}
+.ansicht-laden.an{opacity:1;transition-delay:.15s}
+.ansicht-laden .dreher{width:34px;height:34px}
+.ansicht-fuss{display:grid;grid-template-columns:52px minmax(0,1fr) 52px;align-items:center;gap:8px;max-width:780px;width:100%;margin:0 auto}
+.ansicht-text{text-align:center;min-width:0}
+.ansicht-text h2{margin:0;font-family:var(--schrift-titel);font-style:italic;font-weight:400;font-size:clamp(1.35rem,5vw,1.9rem);line-height:1.12;text-wrap:balance}
+.ansicht-text p{margin:.15rem 0 0;color:var(--kerze);font-size:.98rem}
+.knopf-rund{display:grid;place-items:center;width:52px;height:52px;padding:0;border:0;border-radius:50%;cursor:pointer;color:var(--frost);background:rgba(231,238,246,.08);box-shadow:inset 0 0 0 1.5px rgba(201,163,82,.85);-webkit-tap-highlight-color:transparent}
+.knopf-rund svg{width:24px;height:24px}
+.knopf-rund:disabled{opacity:.3;cursor:default}
+.knopf-rund:not(:disabled):active{background:rgba(231,238,246,.16)}
+
+/* ---------- Tablet & Desktop ---------- */
+@media (min-width:600px){
+  .bretter{--cols:6;max-width:680px;margin:0 auto}
+  .regal{max-width:680px;margin-left:auto;margin-right:auto;width:100%}
+}
+@media (min-width:960px){
+  .zimmer{padding-left:max(28px,env(safe-area-inset-left));padding-right:max(28px,env(safe-area-inset-right))}
+  .raum{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-areas:"kopf regal" "buehne regal";grid-template-rows:auto 1fr;column-gap:clamp(28px,4.5vw,72px);align-items:start}
+  .buehne{--kw:min(40vw,calc((100vh - 336px) / 1.14),560px)}
+  @supports (height:100svh){.buehne{--kw:min(40vw,calc((100svh - 336px) / 1.14),560px)}}
+  .zimmer{padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(14px,env(safe-area-inset-bottom))}
+  .kugel-text{margin-top:10px}
+  .kugel-text .knoepfe{margin-bottom:10px}
+  .kugel-text p{margin-bottom:0}
+  .nachholen{display:none}
+  .kopf h1{font-size:clamp(2.1rem,3.3vw,3.1rem)}
+  .regal{margin:0;max-width:600px;align-self:center;padding:18px 0 10px}
+  .bretter{--cols:6;max-width:600px;margin:0}
+}
+/* Handy quer (breit und niedrig): Kugel neben den Text statt darüber – übereinander bliebe für die Kugel kaum Höhe.
+   Größe nach der Bildschirmhöhe (Kugel samt Sockel passt ganz ins Bild), rechts bleiben mind. ca. 230 px für den Text.
+   --rand: links so viel Abstand, dass Fenster, Fensterbank und Kugel erst rechts der Menü-Knopf-Ecke (64 px) beginnen. */
+@media (orientation:landscape) and (max-height:540px) and (max-width:959px){
+  .buehne{--rand:calc(max(0px, var(--menue-knopf-zone,64px) - (100vw - 576px) / 2));padding-left:var(--rand);
+    display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:clamp(14px,3vw,28px);align-items:center;
+    --kw:min(calc((100vh - 40px) / 1.19),calc((100vw - 310px - var(--rand)) / 1.2),420px)}
+  @supports (height:100svh){.buehne{--kw:min(calc((100svh - 40px) / 1.19),calc((100vw - 310px - var(--rand)) / 1.2),420px)}}
+  @supports (height:100svh) and (width:1cqw){
+    .raum{container-type:inline-size}
+    .buehne{--kw:min(calc((100svh - 40px) / 1.19),calc((100cqw - 250px - var(--rand)) / 1.2),420px)}
+  }
+  .kugel-platz{width:calc(var(--kw) * 1.2)}
+  .kugel-text{margin-top:0}
+}
+@media (orientation:landscape) and (max-height:540px) and (max-width:599px){
+  .buehne{--rand:calc(var(--menue-knopf-zone,64px) - 12px)}
+}
+/* Menü-Knopf #kalender-reset (aus kalender.js, runder 40-px-Knopf): sitzt in allen Ansichten fest unten links
+   (Lage setzt kalender.js, hier nichts verschieben). Hier nur die Ecke freihalten (--menue-knopf-zone = 64 px
+   ab der Ecke, zzgl. Safe-Area):
+   - Handy/Tablet: unten so viel Abstand, dass am Seitenende die letzte Regalreihe über dem Knopf liegt
+     (beim Scrollen laufen Mini-Kugeln kurz darunter durch); Tablet (ab ca. 700 px Breite) zusätzlich
+     seitliche Ränder so breit wie die Zone, damit links unten nie eine Mini-Kugel liegt.
+   - Desktop (alles auf einen Blick): links unten ist nur Wand, Bühne und Knöpfe stehen mittig darüber.
+   In der Bildansicht ausgeblendet. */
+@media (max-width:959px){.zimmer{padding-bottom:calc(var(--menue-knopf-zone,64px) + 12px + env(safe-area-inset-bottom))}}
+/* Tablet: Rand so breit wie die Zone, aber nie weniger als 576 px Inhalt (so viel hatte die Bühne bei 600 px schon) */
+@media (min-width:600px) and (max-width:959px){.zimmer{padding-left:calc(clamp(12px,(100% - 576px) / 2,var(--menue-knopf-zone,64px)) + env(safe-area-inset-left));padding-right:calc(clamp(12px,(100% - 576px) / 2,var(--menue-knopf-zone,64px)) + env(safe-area-inset-right))}}
+html.gesperrt #kalender-reset{display:none}
+@media (prefers-reduced-motion:reduce){
+  .wackelt{animation-duration:.01s}
+  .handy-hinweis{transition:none;animation:none!important}
+  .blase{animation:none}
+  .dreher,.mk-laedt{animation:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="schleife" viewBox="0 0 24 16"><g fill="currentColor"><path d="M12 8C7.5 1.5 1.2 2 1.6 6.6 2 10.6 7.6 10 12 8Z"/><path d="M12 8c4.5-6.5 10.8-6 10.4-1.4C22 10.6 16.4 10 12 8Z"/><path d="M11 8.6 7.6 15.4l2.6-.9L12 9Zm2 0 3.4 6.8-2.6-.9L12 9Z"/><circle cx="12" cy="8" r="2.3"/></g></symbol>
+  <symbol id="i-schuetteln" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="11" r="5.2"/><path d="M9 20h6M4.2 6.5c-1.6 2.8-1.6 6.2 0 9M19.8 6.5c1.6 2.8 1.6 6.2 0 9"/></g></symbol>
+  <symbol id="i-handy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M11 17.5h2M4.6 8.5c-1 2.2-1 4.8 0 7M19.4 8.5c1 2.2 1 4.8 0 7"/></g></symbol>
+  <symbol id="i-gross" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></g></symbol>
+  <symbol id="i-zu" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-links" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-rechts" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="zimmer">
+  <div class="raum">
+    <header class="kopf">
+      <h1 id="titel">{{TITEL}}</h1>
+      <p class="heute-zeile" id="heuteZeile"></p>
+    </header>
+
+    <section class="buehne" aria-labelledby="kugelTitel">
+      <div class="kugel-platz" id="platz">
+        <div class="fenster" id="fenster" aria-hidden="true"><div class="fenster-aussen"></div><div class="lichter"></div></div>
+        <div class="girlande" id="girlande" aria-hidden="true"></div>
+        <div class="fensterbank" id="bank" aria-hidden="true"></div>
+        <div class="kugel-schatten" id="schatten" aria-hidden="true"></div>
+        <div class="kugel-huelle" id="huelle">
+          <canvas class="kugel-innen" id="innen" role="img" aria-label="Schneekugel"></canvas>
+          <canvas class="kugel-glas" id="glas" aria-hidden="true"></canvas>
+          <div class="schild" id="schild" aria-hidden="true">Tag 1</div>
+          <div class="kugel-laden" id="laden" aria-hidden="true"><span class="dreher"></span>Foto lädt …</div>
+          <div class="kugel-griff" id="griff" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="kugel-text" id="kugelText">
+        <div class="knoepfe">
+          <button type="button" class="knopf knopf-messing" id="schuetteln"><svg aria-hidden="true"><use href="#i-schuetteln"/></svg><span>Schütteln</span></button>
+          <button type="button" class="knopf knopf-glas" id="ansehen" aria-disabled="true"><svg aria-hidden="true"><use href="#i-gross"/></svg><span>Foto groß ansehen</span></button>
+        </div>
+        <h2 id="kugelTitel">Die Schneekugel</h2>
+        <p id="kugelInfo"></p>
+        <div class="handy-hinweis" id="handyHinweis" hidden>
+          <button type="button" class="handy-an" id="handyAn"><svg aria-hidden="true"><use href="#i-handy"/></svg><span>Handy schütteln erlauben</span></button>
+          <button type="button" class="handy-weg" id="handyWeg" aria-label="Hinweis ausblenden"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+        </div>
+        <button type="button" class="nachholen" id="nachholen" hidden></button>
+      </div>
+    </section>
+
+    <section class="regal" id="regal" aria-labelledby="regalTitel">
+      <h2 id="regalTitel">Alle <span class="ziffer">24</span> Kugeln</h2>
+      <p class="regal-hilfe" id="regalHilfe"></p>
+      <div class="bretter" id="bretter"></div>
+      <div class="blase" id="blase" hidden></div>
+    </section>
+  </div>
+</div>
+<p class="unsichtbar" id="ansage" role="status" aria-live="polite"></p>
+
+<dialog class="ansicht" id="ansicht" aria-labelledby="ansichtTitel">
+  <div class="ansicht-innen">
+    <div class="ansicht-kopf">
+      <p class="ansicht-zaehler" id="ansichtZaehler"></p>
+      <button type="button" class="knopf-rund" id="schliessen" aria-label="Bildansicht schließen"><svg aria-hidden="true"><use href="#i-zu"/></svg></button>
+    </div>
+    <div class="ansicht-buehne" id="ansichtBuehne">
+      <div class="spur" id="spur"><img id="ansichtBild" alt="" draggable="false"></div>
+      <div class="ansicht-laden" id="ansichtLaden" aria-hidden="true"><span class="dreher"></span>Foto lädt …</div>
+    </div>
+    <div class="ansicht-fuss">
+      <button type="button" class="knopf-rund" id="zurueck" aria-label="Vorheriger Tag"><svg aria-hidden="true"><use href="#i-links"/></svg></button>
+      <div class="ansicht-text"><h2 id="ansichtTitel"></h2><p id="ansichtDatum"></p></div>
+      <button type="button" class="knopf-rund" id="weiter" aria-label="Nächster Tag"><svg aria-hidden="true"><use href="#i-rechts"/></svg></button>
+    </div>
+  </div>
+</dialog>
+
+<script src="../shared/kalender.js"></script>
+<script src="../shared/fotos.js"></script>
+<script>
+(function () {
+  'use strict';
+  var K = window.Kalender.init('schneekugel');
+  var F = window.Fotos;
+  var TAU = Math.PI * 2;
+  var REDUZIERT = !!K.bewegungReduziert;
+  var GROB = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  var DPR = Math.min(2, window.devicePixelRatio || 1);
+  function $(s) { return document.getElementById(s); }
+  var el = {
+    heuteZeile: $('heuteZeile'), huelle: $('huelle'), innen: $('innen'), glas: $('glas'), schild: $('schild'),
+    griff: $('griff'), schatten: $('schatten'), platz: $('platz'), fenster: $('fenster'), girlande: $('girlande'), bank: $('bank'), kugelText: $('kugelText'), titel: $('kugelTitel'), info: $('kugelInfo'),
+    schuetteln: $('schuetteln'), ansehen: $('ansehen'), nachholen: $('nachholen'), regal: $('regal'), hilfe: $('regalHilfe'),
+    bretter: $('bretter'), blase: $('blase'), ansage: $('ansage'), handy: $('handyHinweis'), handyAn: $('handyAn'), handyWeg: $('handyWeg'),
+    dlg: $('ansicht'), aZaehler: $('ansichtZaehler'), schliessen: $('schliessen'), aBuehne: $('ansichtBuehne'),
+    spur: $('spur'), bild: $('ansichtBild'), aTitel: $('ansichtTitel'), aDatum: $('ansichtDatum'),
+    zurueck: $('zurueck'), weiter: $('weiter'), laden: $('laden'), aLaden: $('ansichtLaden'), h1: $('titel')
+  };
+
+  function leinwand(w, h) { var c = document.createElement('canvas'); c.width = Math.max(1, w); c.height = Math.max(1, h); return c; }
+  function zufall(seed) {
+    var a = seed >>> 0;
+    return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  // Zahlen in Fell-Texten in eine Ziffern-Spanne packen (Text wird vorher maskiert)
+  var MASKE = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+  function mitZiffern(text) {
+    return String(text).replace(/[&<>"]/g, function (c) { return MASKE[c]; }).replace(/\d+/g, '<span class="ziffer">$&</span>');
+  }
+  function sage(text) { el.ansage.textContent = ''; setTimeout(function () { el.ansage.textContent = text; }, 40); }
+
+  /* ================================================================
+     Echte Fotos: laden übers Netz (asynchron), Bildunterschrift oft leer
+     ================================================================ */
+  // Bildunterschrift des Tages ('' wenn keine)
+  function titelVon(t) { var x = t ? F.titel(t) : ''; return typeof x === 'string' ? x.trim() : ''; }
+  // Gibt es für den Tag (noch) kein echtes Foto? Nur der Produktions-Baustein kennt das (hatBild), der Prototyp malt immer.
+  function fotoFolgt(t) { return typeof F.hatBild === 'function' && !F.hatBild(t); }
+  // Gemalter Ersatz, wenn ein Foto nicht geladen werden kann (nur Produktions-Baustein)
+  function ersatzUrl(t, px) { try { return typeof F.platzhalter === 'function' ? F.platzhalter(t, px) : ''; } catch (e) { return ''; } }
+  function istDaten(u) { return /^data:/.test(u || ''); }
+  function cssUrl(u) { return 'url("' + String(u).replace(/["\\\n\r]/g, '') + '")'; }
+
+  // Lädt ein Bild fertig (onload + decode), bei Fehler einmal den gemalten Ersatz; Promise → <img> oder null (nie reject)
+  function bildLaden(url, tag, px) {
+    return new Promise(function (fertig) {
+      var ersatzVersucht = false;
+      function lade(u) {
+        var im = new Image();
+        im.decoding = 'async';
+        im.onload = function () {
+          im.ersatz = ersatzVersucht;
+          if (im.decode) im.decode().then(function () { fertig(im); }, function () { fertig(im); });
+          else fertig(im);
+        };
+        im.onerror = function () {
+          if (!ersatzVersucht) {
+            ersatzVersucht = true;
+            var e = ersatzUrl(tag, px);
+            if (e && e !== u) { lade(e); return; }
+          }
+          fertig(null);
+        };
+        im.src = u;
+      }
+      if (!url) fertig(null); else lade(url);
+    });
+  }
+
+  // Kleiner Vorrat der zuletzt gebrauchten Kugel-Fotos (Wechsel hin und zurück ohne neues Laden; begrenzt wegen RAM am Handy)
+  var vorrat = [];
+  function quellPx() { return Math.round(2 * (G.R || 160) * DPR) <= 480 ? 480 : 960; }
+  function holeBild(tag, px) {
+    var u = F.vorschau(tag, px), i;
+    for (i = 0; i < vorrat.length; i++) if (vorrat[i].u === u) { var e = vorrat.splice(i, 1)[0]; vorrat.push(e); return e.p; }
+    var eintrag = { u: u, p: null, fertig: false };
+    eintrag.p = bildLaden(u, tag, px).then(function (im) {
+      eintrag.fertig = true;
+      // Fehlschlag nicht merken – beim nächsten Mal erneut versuchen
+      if (!im || im.ersatz) { var j = vorrat.indexOf(eintrag); if (j >= 0) vorrat.splice(j, 1); }
+      return im;
+    });
+    vorrat.push(eintrag);
+    if (vorrat.length > 6) vorrat.shift();
+    return eintrag.p;
+  }
+  function imVorrat(u) { for (var i = 0; i < vorrat.length; i++) if (vorrat[i].u === u && vorrat[i].fertig) return true; return false; }
+  // Braucht die Kugel die große Vorschau (960 px)? Dann erst die kleine (480 px, schnell da, dieselbe wie im Regal),
+  // danach die scharfe – am Handy sieht man so schneller ein Foto.
+  function stufenweise(tag, px) {
+    if (px <= 480) return false;
+    var u = F.vorschau(tag, px);
+    return !istDaten(u) && !imVorrat(u);
+  }
+  function kugelVorladen(t) {
+    var px = quellPx();
+    if (stufenweise(t, px)) holeBild(t, 480).then(function () { holeBild(t, px); });
+    else holeBild(t, px);
+  }
+
+  /* ================================================================
+     Schneekugel: Geometrie, vorberechnete Ebenen, Schnee-Physik
+     ================================================================ */
+  var ictx = el.innen.getContext('2d');
+  var gctx = el.glas.getContext('2d');
+  var G = { W: 0, H: 0, R: 0, cx: 0, cy: 0, boden: 0, bodenHalb: 0, sockelOben: 0, sockelHoehe: 0 };
+  var SP = 64;                         // Spalten des Schneebodens
+  var hoehe = new Float32Array(SP);    // Schneehöhe je Spalte (px)
+  var proFlocke = 0, schneeGesamt = 0, imSchnee = 0, deckeVorrat = 0, proZelle = 0, zellRest = 0;
+  var flocken = [], brocken = [];      // Flocken im Wasser / Schneebrocken, die sich gerade von der Decke lösen
+  var scharf = [], weich = [], glitzer = [], klumpen = [], muster = null, obenauf = [];
+  var quelle = null, hintergrund = null;
+  var laedt = false, hgEin = 1, quellePx = 0, grundFarbe = null; // Foto lädt noch / Einblenden 0..1 / geladene Größe / Tagesfarbe
+  var decke = null, dctx = null, deckeAlpha = 1, deckeFertig = false;
+  var zellen = [], zellenRest = 0, zellenGesamt = 0, ZN = 12, hebeBudget = 0, angefangen = false, textStufe = 0;
+  var feder = { x: 0, y: 0, vx: 0, vy: 0, zx: 0, zy: 0, rot: 0, vr: 0, zieht: false };
+  var skript = null, glanz = -1, ruhigBis = 0, ruheZeit = 0;
+  var raf = 0, zuletzt = 0, zeit = 0;
+  // Bei reduzierter Bewegung: ruhigeres Wasser, weniger Gestöber, Flocken sinken schneller (rasch wieder Ruhe)
+  var RM = REDUZIERT ? { fluss: 0.45, turb: 0.35, heben: 0.5, fall: 2.2 } : { fluss: 1, turb: 1, heben: 1, fall: 1 };
+  var FK = [0.8, 1.15, 1.6, 2.2, 3.0, 3.9];   // Radien der Flocken-Bildchen (× Größenfaktor der Kugel)
+  var kugelTag = null, kugelOffen = true, token = 0;
+  var fahrt = null, fahrtWunsch = null, bankVersatz = 0, anzeigeAktiv = null;
+
+  function messen() {
+    var W = el.huelle.clientWidth, H = el.huelle.clientHeight;
+    if (!W || !H) return false;
+    G.W = W; G.H = H; G.R = W * 0.455; G.cx = W / 2; G.cy = W * 0.03 + G.R;
+    G.boden = G.cy + G.R * 0.70; G.bodenHalb = G.R * Math.sqrt(1 - 0.49);
+    G.sockelOben = G.cy + G.R * 0.80; G.sockelHoehe = G.R * 0.50;
+    var bw = Math.round(W * DPR), bh = Math.round(H * DPR);
+    el.innen.width = bw; el.innen.height = bh; el.glas.width = bw; el.glas.height = bh;
+    var s = el.griff.style;
+    s.left = (G.cx - G.R) + 'px'; s.top = (G.cy - G.R) + 'px'; s.width = (2 * G.R) + 'px'; s.height = (2 * G.R) + 'px';
+    el.schild.style.top = (G.sockelOben + G.sockelHoehe * 0.43) + 'px';
+    el.schild.style.fontSize = Math.max(Math.min(12, W * 0.055), W * 0.041) + 'px';
+    el.laden.style.top = (G.cy - G.R * 0.12) + 'px';
+    el.fenster.style.setProperty('--sprosse', fahrtMasse().M.toFixed(2) + 'px');
+    return true;
+  }
+
+  // Wie viele Flocken? Nach Kugelgröße, Gerät und gemessener Leistung (250–700)
+  var leistung = 1, rahmenMittel = 0.016, rahmenZahl = 0;
+  try { leistung = Math.max(0.42, Math.min(1, +window.sessionStorage.getItem('adventskalender_schnee_leistung') || 1)); } catch (e) { /* egal */ }
+  function schneeMenge() {
+    var n = G.R * G.R / 40;
+    if (GROB) n *= 0.85;
+    if ((navigator.hardwareConcurrency || 4) <= 4) n *= 0.85;
+    return Math.round(Math.max(250, Math.min(700, n * leistung)));
+  }
+
+  // Flocken-Bildchen: scharf (hinten und mittig) oder weich gezeichnet (vorne, nah am Glas)
+  function punktSprite(r, unscharf) {
+    var h = r * (unscharf ? 2.3 : 1.55), px = Math.max(2, Math.ceil(h * 2 * DPR)), c = leinwand(px, px), g = c.getContext('2d');
+    var v = g.createRadialGradient(px / 2, px / 2, 0, px / 2, px / 2, px / 2), k = r / h;
+    // mit einem Hauch von bläulichem Schatten am Rand – so bleiben die Flocken auch vor hellen Fotos sichtbar
+    if (unscharf) {
+      v.addColorStop(0, 'rgba(255,255,255,.82)'); v.addColorStop(k * 0.5, 'rgba(250,253,255,.64)');
+      v.addColorStop(k * 0.95, 'rgba(214,226,242,.3)'); v.addColorStop(k * 1.3, 'rgba(70,92,130,.1)'); v.addColorStop(1, 'rgba(70,92,130,0)');
+    } else {
+      v.addColorStop(0, 'rgba(255,255,255,1)'); v.addColorStop(k * 0.6, 'rgba(250,253,255,.95)');
+      v.addColorStop(k * 0.92, 'rgba(206,220,240,.55)'); v.addColorStop(k * 1.2, 'rgba(60,82,122,.2)'); v.addColorStop(1, 'rgba(60,82,122,0)');
+    }
+    g.fillStyle = v; g.fillRect(0, 0, px, px);
+    return { c: c, h: h, d: h * 2 };
+  }
+
+  // Schneebrocken: weicher, unregelmäßiger Klumpen (wird beim Zeichnen passend skaliert)
+  function klumpenSprite(nr) {
+    var S = Math.ceil(56 * DPR), c = leinwand(S, S), g = c.getContext('2d'), r = zufall(90 + nr), h = S / 2, i;
+    for (i = 0; i < 9; i++) {
+      var a = r() * TAU, d = r() * h * 0.3, rr = h * (0.32 + r() * 0.26), x = h + Math.cos(a) * d, y = h + Math.sin(a) * d;
+      var v = g.createRadialGradient(x - rr * 0.25, y - rr * 0.3, rr * 0.1, x, y, rr);
+      v.addColorStop(0, 'rgba(255,255,255,.98)'); v.addColorStop(0.62, 'rgba(232,240,249,.92)'); v.addColorStop(1, 'rgba(196,212,232,0)');
+      g.fillStyle = v; g.beginPath(); g.arc(x, y, rr, 0, TAU); g.fill();
+    }
+    for (i = 0; i < 46; i++) {
+      g.fillStyle = r() < 0.6 ? 'rgba(255,255,255,.9)' : 'rgba(130,158,196,.3)';
+      g.beginPath(); g.arc(h + (r() - 0.5) * h * 1.1, h + (r() - 0.5) * h * 1.1, (0.4 + r() * 0.9) * DPR, 0, TAU); g.fill();
+    }
+    g.globalCompositeOperation = 'destination-in';
+    var m = g.createRadialGradient(h, h, h * 0.45, h, h, h);
+    m.addColorStop(0, 'rgba(0,0,0,1)'); m.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = m; g.fillRect(0, 0, S, S);
+    g.globalCompositeOperation = 'source-over';
+    return c;
+  }
+
+  function baueSprites() {
+    var k = Math.max(0.8, Math.min(1.45, G.R / 170)), i;
+    scharf = []; weich = []; glitzer = []; klumpen = [];
+    for (i = 0; i < FK.length; i++) { scharf.push(punktSprite(FK[i] * k, false)); weich.push(punktSprite(FK[i] * k * 1.08, true)); }
+    // Glitzer: winzige Gold- und Silberplättchen, die beim Taumeln aufblitzen
+    ['#ecc86c', '#dfe9f6'].forEach(function (farbe) {
+      var h = 2.7 * k, px = Math.ceil(h * 2 * DPR), c = leinwand(px, px), g = c.getContext('2d'), s = px * 0.2;
+      g.translate(px / 2, px / 2); g.rotate(0.6);
+      g.fillStyle = farbe; g.fillRect(-s, -s * 0.6, 2 * s, 1.2 * s);
+      g.fillStyle = 'rgba(255,252,236,.95)'; g.fillRect(-s * 0.45, -s * 0.28, s * 0.9, s * 0.56);
+      glitzer.push({ c: c, h: h, d: h * 2 });
+    });
+    for (i = 0; i < 3; i++) klumpen.push(klumpenSprite(i));
+  }
+  // einzelne Flocken, die oben auf dem Schneehügel liegen (feste Plätze)
+  (function () { var r = zufall(23); for (var i = 0; i < 30; i++) obenauf.push({ u: 0.03 + r() * 0.94, k: (r() * 3) | 0, a: 0.55 + r() * 0.45, d: r() * 2.2, gl: r() < 0.1 }); })();
+
+  function baueMuster() {
+    var n = 112, c = leinwand(n, n), g = c.getContext('2d'), r = zufall(7);
+    for (var i = 0; i < 220; i++) {
+      var x = r() * n, y = r() * n, rad = 0.5 + r() * 1.5;
+      g.fillStyle = r() < 0.55 ? 'rgba(255,255,255,' + (0.5 + r() * 0.5).toFixed(2) + ')' : 'rgba(130,158,196,' + (0.14 + r() * 0.22).toFixed(2) + ')';
+      for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) { g.beginPath(); g.arc(x + dx * n, y + dy * n, rad, 0, TAU); g.fill(); }
+    }
+    muster = ictx.createPattern(c, 'repeat');
+    try { if (muster && muster.setTransform && window.DOMMatrix) muster.setTransform(new DOMMatrix().scale(1 / DPR)); } catch (e) { /* egal */ }
+  }
+
+  /* --- Linsen-Effekt: Foto wird rund, Mitte vergrößert, Rand gestaucht --- */
+  function baueHintergrund() {
+    if (!quelle || !G.R) { hintergrund = null; return; }
+    var S = Math.max(4, Math.round(2 * G.R * DPR)), t = leinwand(S, S), g = t.getContext('2d');
+    // mittig quadratisch beschneiden (Vorschauen sind quadratisch, Ersatzbilder evtl. nicht)
+    var qw = quelle.naturalWidth || quelle.width, qh = quelle.naturalHeight || quelle.height;
+    if (!(qw > 0 && qh > 0)) { hintergrund = null; return; }
+    var qk = Math.min(qw, qh);
+    try { g.drawImage(quelle, (qw - qk) / 2, (qh - qk) / 2, qk, qk, 0, 0, S, S); } catch (e) { hintergrund = null; return; }
+    var src, out;
+    try { src = g.getImageData(0, 0, S, S); out = g.createImageData(S, S); } catch (e) { hintergrund = t; return; }
+    var sd = src.data, od = out.data, h = S / 2, inv = 1 / h;
+    for (var y = 0; y < S; y++) {
+      var ny = (y + 0.5 - h) * inv, ny2 = ny * ny;
+      for (var x = 0; x < S; x++) {
+        var nx = (x + 0.5 - h) * inv, r2 = nx * nx + ny2;
+        if (r2 > 1.0) continue;
+        var f = 0.8 + 0.2 * r2 * r2;
+        var sx = (nx * f * h + h) | 0, sy = (ny * f * h + h) | 0;
+        if (sx >= S) sx = S - 1; if (sy >= S) sy = S - 1;
+        var si = (sy * S + sx) << 2, oi = (y * S + x) << 2;
+        od[oi] = sd[si]; od[oi + 1] = sd[si + 1]; od[oi + 2] = sd[si + 2]; od[oi + 3] = 255;
+      }
+    }
+    g.putImageData(out, 0, 0);
+    g.globalCompositeOperation = 'source-atop';
+    var v = g.createRadialGradient(h * 0.78, h * 0.68, h * 0.15, h, h, h);
+    v.addColorStop(0, 'rgba(255,238,210,.07)'); v.addColorStop(0.66, 'rgba(30,52,92,.10)');
+    v.addColorStop(0.9, 'rgba(18,30,60,.32)'); v.addColorStop(1, 'rgba(10,18,40,.6)');
+    g.fillStyle = v; g.fillRect(0, 0, S, S);
+    g.globalCompositeOperation = 'source-over';
+    hintergrund = t;
+  }
+
+  /* --- November: kleine gemalte Winterszene statt Foto --- */
+  function malNovember(S) {
+    var c = leinwand(S, S), g = c.getContext('2d'), r = zufall(11);
+    var v = g.createLinearGradient(0, 0, 0, S);
+    v.addColorStop(0, '#12214a'); v.addColorStop(0.55, '#355590'); v.addColorStop(0.8, '#93abd2'); v.addColorStop(1, '#dfe9f4');
+    g.fillStyle = v; g.fillRect(0, 0, S, S);
+    g.fillStyle = 'rgba(255,250,235,.85)';
+    for (var i = 0; i < 46; i++) { g.beginPath(); g.arc(r() * S, r() * S * 0.48, S * (0.0015 + r() * 0.003), 0, TAU); g.fill(); }
+    g.fillStyle = '#fbf3da'; g.beginPath(); g.arc(S * 0.7, S * 0.22, S * 0.06, 0, TAU); g.fill();
+    g.fillStyle = '#2c4a82'; g.beginPath(); g.arc(S * 0.725, S * 0.205, S * 0.055, 0, TAU); g.fill();
+    g.fillStyle = '#c3d3e8'; g.beginPath(); g.ellipse(S * 0.25, S * 0.82, S * 0.6, S * 0.2, 0, 0, TAU); g.fill();
+    g.fillStyle = '#eef4fa'; g.beginPath(); g.ellipse(S * 0.7, S * 0.9, S * 0.7, S * 0.2, 0, 0, TAU); g.fill();
+    function tanne(x, y, s) {
+      for (var j = 0; j < 3; j++) {
+        var ty = y - j * s * 0.26, b = s * (0.36 - j * 0.08);
+        g.fillStyle = '#1d3a3a'; g.beginPath(); g.moveTo(x - b, ty); g.lineTo(x, ty - s * 0.4); g.lineTo(x + b, ty); g.closePath(); g.fill();
+        g.fillStyle = 'rgba(240,246,252,.9)'; g.beginPath(); g.moveTo(x - b * 0.45, ty - s * 0.22); g.lineTo(x, ty - s * 0.4); g.lineTo(x + b * 0.45, ty - s * 0.22); g.closePath(); g.fill();
+      }
+    }
+    tanne(S * 0.2, S * 0.76, S * 0.36); tanne(S * 0.82, S * 0.8, S * 0.3); tanne(S * 0.32, S * 0.8, S * 0.22);
+    var hx = S * 0.5, hy = S * 0.78, hw = S * 0.2, hh = S * 0.13;
+    g.fillStyle = '#7a4528'; g.fillRect(hx - hw / 2, hy - hh, hw, hh);
+    g.fillStyle = '#2a2f47'; g.beginPath(); g.moveTo(hx - hw * 0.62, hy - hh); g.lineTo(hx, hy - hh - S * 0.11); g.lineTo(hx + hw * 0.62, hy - hh); g.closePath(); g.fill();
+    g.fillStyle = '#f2f6fb'; g.beginPath(); g.moveTo(hx - hw * 0.62, hy - hh); g.lineTo(hx, hy - hh - S * 0.11); g.lineTo(hx + hw * 0.62, hy - hh); g.lineTo(hx + hw * 0.5, hy - hh + S * 0.012); g.lineTo(hx, hy - hh - S * 0.085); g.lineTo(hx - hw * 0.5, hy - hh + S * 0.012); g.closePath(); g.fill();
+    var lg = g.createRadialGradient(hx, hy - hh * 0.5, 0, hx, hy - hh * 0.5, S * 0.16);
+    lg.addColorStop(0, 'rgba(255,214,140,.55)'); lg.addColorStop(1, 'rgba(255,214,140,0)');
+    g.fillStyle = lg; g.fillRect(hx - S * 0.2, hy - hh - S * 0.1, S * 0.4, S * 0.3);
+    g.fillStyle = '#f6d38b'; g.fillRect(hx - hw * 0.3, hy - hh * 0.72, hw * 0.22, hh * 0.32); g.fillRect(hx + hw * 0.08, hy - hh * 0.72, hw * 0.22, hh * 0.32);
+    g.fillStyle = '#3a2414'; g.fillRect(hx - hw * 0.06, hy - hh * 0.5, hw * 0.12, hh * 0.5);
+    return c;
+  }
+
+  /* --- Glas und Sockel: einmal je Größe vorberechnet --- */
+  function baueGlas() {
+    var g = gctx, R = G.R, cx = G.cx, cy = G.cy;
+    g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, G.W, G.H);
+    g.save(); g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.clip();
+    var fr = g.createRadialGradient(cx - R * 0.12, cy - R * 0.18, R * 0.5, cx, cy, R);
+    fr.addColorStop(0, 'rgba(190,215,250,0)'); fr.addColorStop(0.72, 'rgba(190,215,250,.05)');
+    fr.addColorStop(0.92, 'rgba(175,205,245,.2)'); fr.addColorStop(1, 'rgba(228,240,255,.45)');
+    g.fillStyle = fr; g.fillRect(cx - R, cy - R, 2 * R, 2 * R);
+    // Spiegelung eines Sprossenfensters, der Kugel folgend gekrümmt
+    var a0 = -2.62, a1 = -1.84, r0 = 0.5, r1 = 0.9, am = (a0 + a1) / 2, rm = (r0 + r1) / 2, ga = 0.05, gr = 0.04;
+    var sp = g.createLinearGradient(cx - R * 0.85, cy - R * 0.85, cx - R * 0.1, cy - R * 0.1);
+    sp.addColorStop(0, 'rgba(236,245,255,.36)'); sp.addColorStop(1, 'rgba(236,245,255,.05)');
+    g.fillStyle = sp;
+    [[a0, am - ga / 2], [am + ga / 2, a1]].forEach(function (aa) {
+      [[r0, rm - gr / 2], [rm + gr / 2, r1]].forEach(function (rr) {
+        g.beginPath(); g.arc(cx, cy, rr[1] * R, aa[0], aa[1]); g.arc(cx, cy, rr[0] * R, aa[1], aa[0], true); g.closePath(); g.fill();
+      });
+    });
+    var hx = cx - R * 0.3, hy = cy - R * 0.66;
+    var hp = g.createRadialGradient(hx, hy, 0, hx, hy, R * 0.11);
+    hp.addColorStop(0, 'rgba(255,255,255,.95)'); hp.addColorStop(0.35, 'rgba(255,255,255,.35)'); hp.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = hp; g.beginPath(); g.arc(hx, hy, R * 0.11, 0, TAU); g.fill();
+    // Lichtkante unten rechts (warmes Lampenlicht durch das Wasser)
+    g.lineCap = 'round';
+    g.strokeStyle = 'rgba(255,212,155,.16)'; g.lineWidth = R * 0.08; g.beginPath(); g.arc(cx, cy, R * 0.95, 0.02, 1.2); g.stroke();
+    g.strokeStyle = 'rgba(255,233,196,.62)'; g.lineWidth = Math.max(1.3, R * 0.012); g.beginPath(); g.arc(cx, cy, R * 0.975, 0.1, 1.06); g.stroke();
+    var lx = cx + R * 0.6, ly = cy - R * 0.3, lp = g.createRadialGradient(lx, ly, 0, lx, ly, R * 0.24);
+    lp.addColorStop(0, 'rgba(255,214,150,.34)'); lp.addColorStop(1, 'rgba(255,214,150,0)');
+    g.fillStyle = lp; g.fillRect(lx - R * 0.26, ly - R * 0.26, R * 0.52, R * 0.52);
+    g.fillStyle = 'rgba(255,240,210,.8)'; g.beginPath(); g.arc(lx + R * 0.02, ly - R * 0.02, Math.max(1, R * 0.012), 0, TAU); g.fill();
+    g.restore();
+    g.lineWidth = 1.2; g.strokeStyle = 'rgba(235,244,255,.42)'; g.beginPath(); g.arc(cx, cy, R - 0.6, 0, TAU); g.stroke();
+    g.lineWidth = 1; g.strokeStyle = 'rgba(8,14,30,.45)'; g.beginPath(); g.arc(cx, cy, R + 0.5, 0, TAU); g.stroke();
+    zeichneSockel(g);
+  }
+
+  function zeichneSockel(g) {
+    var R = G.R, cx = G.cx, cy = G.cy;
+    var kY = cy + R * 0.70, rx = R * 0.8, ry = R * 0.075, hK = R * 0.1;
+    var yb = G.sockelOben, hB = G.sockelHoehe, yF = yb + hB;
+    var prof = [[0, 0.8], [0.1, 0.745], [0.22, 0.78], [0.42, 0.89], [0.58, 0.872], [0.66, 0.9], [0.8, 0.968], [1, 0.968]];
+    function breite(t) {
+      for (var i = 1; i < prof.length; i++) if (t <= prof[i][0]) {
+        var a = prof[i - 1], b = prof[i], u = (t - a[0]) / (b[0] - a[0]); u = (1 - Math.cos(u * Math.PI)) / 2;
+        return (a[1] + (b[1] - a[1]) * u) * R;
+      }
+      return prof[prof.length - 1][1] * R;
+    }
+    var i, t;
+    g.save();
+    g.beginPath();
+    for (i = 0; i <= 48; i++) { t = i / 48; if (i) g.lineTo(cx - breite(t), yb + t * hB); else g.moveTo(cx - breite(t), yb + t * hB); }
+    g.ellipse(cx, yF, breite(1), R * 0.065, 0, Math.PI, 0, true);
+    for (i = 48; i >= 0; i--) { t = i / 48; g.lineTo(cx + breite(t), yb + t * hB); }
+    g.closePath();
+    var wg = g.createLinearGradient(cx - R, 0, cx + R, 0);
+    wg.addColorStop(0, '#24130a'); wg.addColorStop(0.12, '#55301a'); wg.addColorStop(0.32, '#b0703f');
+    wg.addColorStop(0.42, '#9a5e34'); wg.addColorStop(0.62, '#6e3e21'); wg.addColorStop(0.86, '#40220f'); wg.addColorStop(1, '#1f1007');
+    g.fillStyle = wg; g.fill();
+    g.clip();
+    var r = zufall(42);
+    for (i = 0; i < 70; i++) {
+      var yy = yb + r() * hB * 1.1, w = breite(Math.min(1, (yy - yb) / hB));
+      g.strokeStyle = r() < 0.7 ? 'rgba(30,14,5,' + (0.08 + r() * 0.16).toFixed(2) + ')' : 'rgba(255,214,170,' + (0.04 + r() * 0.07).toFixed(2) + ')';
+      g.lineWidth = 0.5 + r() * 1.1;
+      g.beginPath(); g.ellipse(cx + (r() - 0.5) * R * 0.1, yy, w * 1.02, R * (0.03 + r() * 0.04), 0, 0.05, Math.PI - 0.05); g.stroke();
+    }
+    var vg = g.createLinearGradient(0, yb, 0, yF + R * 0.07);
+    vg.addColorStop(0, 'rgba(0,0,0,.42)'); vg.addColorStop(0.16, 'rgba(0,0,0,.05)'); vg.addColorStop(0.4, 'rgba(255,215,165,.1)');
+    vg.addColorStop(0.58, 'rgba(0,0,0,.22)'); vg.addColorStop(0.68, 'rgba(255,215,165,.08)'); vg.addColorStop(0.82, 'rgba(0,0,0,.05)'); vg.addColorStop(1, 'rgba(0,0,0,.4)');
+    g.fillStyle = vg; g.fillRect(cx - R, yb, 2 * R, hB + R * 0.1);
+    [0.1, 0.58, 0.8].forEach(function (tt) {
+      var y = yb + tt * hB, w = breite(tt);
+      g.lineWidth = 1.2; g.strokeStyle = 'rgba(20,9,3,.5)'; g.beginPath(); g.ellipse(cx, y, w, R * 0.05, 0, 0.02, Math.PI - 0.02); g.stroke();
+      g.lineWidth = 1; g.strokeStyle = 'rgba(255,220,180,.18)'; g.beginPath(); g.ellipse(cx, y + 1.6, w, R * 0.05, 0, 0.1, Math.PI - 0.1); g.stroke();
+    });
+    g.restore();
+    // Messingring: obere Fläche (nur außerhalb des Glases sichtbar)
+    g.save();
+    g.beginPath(); g.rect(0, 0, G.W, G.H); g.arc(cx, cy, R, 0, TAU, true); g.clip('evenodd');
+    var tg = g.createLinearGradient(cx - rx, 0, cx + rx, 0);
+    tg.addColorStop(0, '#4d3812'); tg.addColorStop(0.3, '#b8954a'); tg.addColorStop(0.7, '#8a6a2a'); tg.addColorStop(1, '#3d2c0e');
+    g.fillStyle = tg; g.beginPath(); g.ellipse(cx, kY, rx, ry, 0, 0, TAU); g.fill();
+    g.restore();
+    // Messingring: Vorderseite
+    g.beginPath(); g.moveTo(cx - rx, kY);
+    g.ellipse(cx, kY, rx, ry, 0, Math.PI, 0, true);
+    g.lineTo(cx + rx, kY + hK);
+    g.ellipse(cx, kY + hK, rx, ry, 0, 0, Math.PI, false);
+    g.closePath();
+    var mg = g.createLinearGradient(cx - rx, 0, cx + rx, 0);
+    mg.addColorStop(0, '#4f3a12'); mg.addColorStop(0.14, '#a2803a'); mg.addColorStop(0.3, '#f3dc9e');
+    mg.addColorStop(0.42, '#d0aa58'); mg.addColorStop(0.7, '#8c6b2b'); mg.addColorStop(0.9, '#5d4517'); mg.addColorStop(1, '#3a2a0c');
+    g.fillStyle = mg; g.fill();
+    var mv = g.createLinearGradient(0, kY, 0, kY + hK + ry);
+    mv.addColorStop(0, 'rgba(255,245,215,.3)'); mv.addColorStop(0.5, 'rgba(0,0,0,0)'); mv.addColorStop(1, 'rgba(40,25,5,.4)');
+    g.fillStyle = mv; g.fill();
+    g.lineWidth = 1; g.strokeStyle = 'rgba(255,244,210,.75)';
+    g.beginPath(); g.ellipse(cx, kY, rx, ry, 0, Math.PI * 0.97, Math.PI * 0.03, true); g.stroke();
+    g.strokeStyle = 'rgba(40,24,4,.55)';
+    g.beginPath(); g.ellipse(cx, kY + hK, rx, ry, 0, 0.03 * Math.PI, 0.97 * Math.PI); g.stroke();
+  }
+
+  /* --- Die Schneedecke eines zugeschneiten Tages --- */
+  function malDecke(g, S, tag) {
+    var h = S / 2, r = zufall(tag * 31 + 5), i;
+    g.clearRect(0, 0, S, S);
+    g.save(); g.beginPath(); g.arc(h, h, h, 0, TAU); g.clip();
+    var b = g.createRadialGradient(h * 0.66, h * 0.52, h * 0.08, h, h, h);
+    b.addColorStop(0, '#fdfeff'); b.addColorStop(0.55, '#e7eff7'); b.addColorStop(1, '#b4c5d9');
+    g.fillStyle = b; g.fillRect(0, 0, S, S);
+    for (i = 0; i < 80; i++) {
+      var x = r() * S, y = r() * S, rad = S * (0.02 + r() * 0.05);
+      var cg = g.createRadialGradient(x, y, 0, x, y, rad);
+      var hell = r() < 0.6;
+      cg.addColorStop(0, hell ? 'rgba(255,255,255,.55)' : 'rgba(150,175,208,.22)'); cg.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = cg; g.beginPath(); g.arc(x, y, rad, 0, TAU); g.fill();
+    }
+    var n = Math.round(S * S / 95);
+    for (i = 0; i < n; i++) {
+      g.fillStyle = r() < 0.6 ? 'rgba(255,255,255,' + (0.5 + r() * 0.5).toFixed(2) + ')' : 'rgba(120,150,190,' + (0.12 + r() * 0.2).toFixed(2) + ')';
+      g.beginPath(); g.arc(r() * S, r() * S, (0.5 + r() * 1.7) * DPR, 0, TAU); g.fill();
+    }
+    g.fillStyle = 'rgba(255,255,255,.95)';
+    for (i = 0; i < 40; i++) { g.beginPath(); g.arc(r() * S, r() * S, (0.6 + r() * 0.7) * DPR, 0, TAU); g.fill(); }
+    // eingedrückte Tageszahl, wie mit dem Finger in den Schnee gemalt
+    var fs = S * 0.4;
+    g.font = '700 ' + fs + 'px "Alegreya Sans", "Trebuchet MS", sans-serif';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    var tx = h, ty = h * 0.96, txt = String(tag);
+    g.fillStyle = 'rgba(255,255,255,.95)'; g.fillText(txt, tx + S * 0.005, ty + S * 0.007);
+    g.fillStyle = 'rgba(92,122,166,.5)'; g.fillText(txt, tx - S * 0.004, ty - S * 0.005);
+    g.fillStyle = 'rgba(178,198,224,.78)'; g.fillText(txt, tx, ty);
+    var sv = g.createRadialGradient(h * 0.7, h * 0.6, h * 0.5, h, h, h);
+    sv.addColorStop(0, 'rgba(60,90,135,0)'); sv.addColorStop(1, 'rgba(60,90,135,.32)');
+    g.fillStyle = sv; g.fillRect(0, 0, S, S);
+    g.restore();
+  }
+
+  function baueDecke(tag) {
+    var S = Math.max(4, Math.round(2 * G.R * DPR));
+    decke = leinwand(S, S); dctx = decke.getContext('2d');
+    deckeAlpha = 1; deckeFertig = false; angefangen = false; textStufe = 0;
+    malDecke(dctx, S, tag);
+    // Haftung je Stelle: weiches Zufallsmuster (jeden Tag anders), unten hält der Schnee etwas fester
+    var r = zufall(tag * 57 + 3), w = [r() * TAU, r() * TAU, r() * TAU], kk = [2 + r() * 2.5, 2 + r() * 2.5, 3.5 + r() * 3];
+    var ph = [r() * TAU, r() * TAU, r() * TAU], gw = [0.34, 0.26, 0.16], gr = 2 / ZN;
+    zellen = [];
+    for (var gy = 0; gy < ZN; gy++) for (var gx = 0; gx < ZN; gx++) {
+      var nx = -1 + (gx + 0.5) * gr, ny = -1 + (gy + 0.5) * gr;
+      if (nx * nx + ny * ny > 0.97 || ny > 0.74) continue;
+      var f = 0.18 * ny + (r() - 0.5) * 0.2;
+      for (var i = 0; i < 3; i++) f += gw[i] * Math.sin(kk[i] * (Math.cos(w[i]) * nx + Math.sin(w[i]) * ny) + ph[i]);
+      zellen.push({ nx: nx, ny: ny, hp: 1, fest: Math.max(0.5, 1 + f), weg: false, spaet: 0 });
+    }
+    zellenGesamt = zellenRest = zellen.length;
+    proZelle = deckeVorrat / zellenGesamt; zellRest = 0;
+  }
+
+  function blob(x, y, r) {
+    var v = dctx.createRadialGradient(x, y, 0, x, y, r);
+    v.addColorStop(0, 'rgba(0,0,0,1)'); v.addColorStop(0.62, 'rgba(0,0,0,.96)'); v.addColorStop(1, 'rgba(0,0,0,0)');
+    dctx.fillStyle = v; dctx.beginPath(); dctx.arc(x, y, r, 0, TAU); dctx.fill();
+  }
+
+  // Ein Stück Schneedecke bricht ab: Loch in die Decke, dafür ein Brocken im Wasser, der in Flocken zerfällt
+  function loeseZelle(z) {
+    z.weg = true; zellenRest--;
+    var S = decke.width, h = S / 2, gr = (2 / ZN) * h;
+    var px = h + z.nx * h + (Math.random() - 0.5) * gr * 0.35, py = h + z.ny * h + (Math.random() - 0.5) * gr * 0.35;
+    var rr = gr * (0.9 + Math.random() * 0.3);
+    dctx.globalCompositeOperation = 'destination-out';
+    blob(px, py, rr);
+    for (var k = 0; k < 6; k++) {
+      var a = Math.random() * TAU, d = rr * (0.7 + Math.random() * 0.45);
+      blob(px + Math.cos(a) * d, py + Math.sin(a) * d, rr * (0.18 + Math.random() * 0.24));
+    }
+    dctx.globalCompositeOperation = 'source-over';
+    zellRest += proZelle;
+    var n = zellenRest > 0 ? Math.floor(zellRest) : Math.round(zellRest); zellRest -= n;
+    var R = G.R, x = G.cx - R + px / DPR, y = G.cy - R + py / DPR, fl = R * RM.fluss;
+    fluss((x - G.cx) / R, (y - G.cy) / R);
+    brocken.push({ x: x, y: y, vx: fu * fl + (Math.random() - 0.5) * R * 0.5, vy: fv * fl - (0.1 + Math.random() * 0.3) * R,
+      r0: rr / DPR * 0.72, n0: n, n: n, t: 0, dauer: 0.5 + Math.random() * 0.55, k: (Math.random() * klumpen.length) | 0 });
+    // Text erst auf „taucht schon auf“ umstellen, wenn wirklich etwas frei ist (ein Zucken löst nur ein, zwei Stücke)
+    angefangen = true;
+    var stufe = zellenGesamt - zellenRest >= zellenGesamt * 0.12 ? 2 : 1;
+    if (stufe !== textStufe) { textStufe = stufe; aktualisiereText(); }
+  }
+
+  function abschluss() {
+    if (deckeFertig) return;
+    deckeFertig = true;
+    // der Rest der Decke rutscht in kurzer Folge nach
+    for (var i = 0; i < zellen.length; i++) if (!zellen[i].weg) zellen[i].spaet = zeit + 0.08 + Math.random() * 0.75;
+    if (kugelTag !== null && K.oeffne(kugelTag)) {
+      fuelleMini(kugelTag);
+      aktualisiereHilfe();
+    }
+  }
+
+  function nachOeffnen() {
+    kugelOffen = true;
+    glanz = 0;
+    aktualisiereText();
+    if (kugelTag !== null) {
+      var ti = titelVon(kugelTag);
+      sage('Tag ' + kugelTag + ' ist offen' + (ti ? ': ' + ti : '.'));
+      grossVorladen(kugelTag, 500);
+    }
+  }
+
+  // Das große Foto schon holen, wenn es gleich gebraucht wird (Kugel frei geschüttelt, Finger auf Kugel/Knopf)
+  var grossUhr = 0;
+  function grossVorladen(t, verzoegerung) {
+    clearTimeout(grossUhr);
+    grossUhr = setTimeout(function () { if (t && t === kugelTag && K.istGeoeffnet(t)) F.bild(t); }, verzoegerung || 0);
+  }
+
+  // Form des Schneehügels (Mittelwert 1): in der Mitte höher, zum Glas hin flacher, leicht wellig.
+  // So liegt der Schnee am Anfang – und in diese Form sackt er nach jedem Schütteln wieder zusammen.
+  var basis = new Float32Array(SP);
+  (function () {
+    var summe = 0, i;
+    for (i = 0; i < SP; i++) { var u = (i + 0.5) / SP * 2 - 1; basis[i] = 0.3 + 0.7 * Math.pow(1 - u * u, 1.4) + 0.05 * Math.sin(u * 9.1 + 1.3); summe += basis[i]; }
+    for (i = 0; i < SP; i++) basis[i] *= SP / summe;
+  })();
+
+  function verteileSchnee(n) {
+    imSchnee = n; hoehe.fill(0);
+    if (n <= 0) return;
+    var mittel = n * proFlocke / SP;
+    for (var i = 0; i < SP; i++) hoehe[i] = mittel * basis[i];
+  }
+
+  /* --- Eine Flocke im Wasser: eigene Größe (→ Sinkgeschwindigkeit), Trägheit, Taumeln, Tiefe ---
+     s: 0 = winzig … 1 = groß; z: 0 = hinten … 1 = vorne (größer, weicher, heller). Geschwindigkeiten in R/s. */
+  function neueFlocke(x, y) {
+    var s = Math.pow(Math.random(), 1.6), z = Math.random(), gl = Math.random() < 0.06;
+    var p = { x: x, y: y, vx: 0, vy: 0, tx: 0, ty: 0, lx: 0, ly: 0, t: 0, s: s, z: z, gl: gl, ph: Math.random() * TAU, w: false, ci: 0, a: 1 };
+    p.vt = (gl ? 0.36 : 0.2 + 0.28 * s) * (0.92 + Math.random() * 0.16) * RM.fall;    // Sinkgeschwindigkeit
+    p.tau = 0.06 + 0.1 * s;                           // so schnell folgt sie dem Wasser (kleine sofort, große träger)
+    p.beta = 0.32 + 0.2 * s;                          // Trägheit gegenüber dem Glas
+    p.wa = (0.025 + 0.06 * s) * (0.6 + Math.random() * 0.7);   // seitliches Taumeln beim Sinken
+    p.wf = 1.3 + Math.random() * 2.2;
+    p.par = 0.85 + 0.3 * z;                           // vordere Flocken scheinen schneller zu wandern
+    var rv = (0.85 + 2.0 * s) * (0.7 + 0.7 * z), i = 0;
+    if (gl) { p.ci = Math.random() < 0.5 ? 0 : 1; rv = 1.6; }
+    else {
+      while (i < FK.length - 1 && FK[i] < rv * 0.92) i++;
+      p.ci = i; p.w = z > 0.72;
+      p.a = (0.5 + 0.42 * z) * (0.85 + Math.random() * 0.15) * (p.w ? 0.92 : 1);
+    }
+    p.rw = rv * Math.max(0.8, Math.min(1.45, G.R / 170));
+    flocken.push(p);
+    return p;
+  }
+
+  function spalte(x) {
+    var c = Math.floor((x - (G.cx - G.bodenHalb)) / (2 * G.bodenHalb) * SP);
+    return c < 0 ? 0 : c >= SP ? SP - 1 : c;
+  }
+
+  // Flocke landet auf dem Hügel: sie rollt über den gewölbten Glasboden ein Stück zur Mitte und in die nächste Mulde
+  // (gemessen an der Hügelform) – so wächst nach dem Schütteln wieder ein Hügel statt einer flachen Schicht.
+  // Es kommt genau eine Flockenmenge dazu.
+  function setzeAb(x) {
+    var c = spalte(G.cx + (x - G.cx) * (0.72 + 0.28 * Math.random()));
+    var mittel = (imSchnee + 1) * proFlocke / SP, best = c, bw = 1e9;
+    for (var k = Math.max(1, c - 8); k <= Math.min(SP - 2, c + 8); k++) {
+      var e = hoehe[k] - mittel * basis[k] + Math.abs(k - c) * proFlocke * 0.06;
+      if (e < bw) { bw = e; best = k; }
+    }
+    c = best;
+    hoehe[c] += proFlocke * 0.5; hoehe[c - 1] += proFlocke * 0.25; hoehe[c + 1] += proFlocke * 0.25;
+    imSchnee++;
+  }
+
+  // Schnee sackt langsam in sich zusammen: der Haufen findet in seine Hügelform zurück, zu steile Stellen rutschen ab
+  // (gerechnet relativ zur Hügelform, damit die Mitte nicht flachgedrückt wird). Die Menge bleibt dabei gleich.
+  function glaetten(dt) {
+    var lim = proFlocke * 0.3, summe = 0, c;
+    for (c = 0; c < SP; c++) summe += hoehe[c];
+    var mittel = summe / SP, k = Math.min(0.5, dt * 0.35);
+    for (c = 0; c < SP; c++) hoehe[c] += (mittel * basis[c] - hoehe[c]) * k;
+    for (var durchgang = 0; durchgang < 2; durchgang++) {
+      for (c = 0; c < SP - 1; c++) {
+        var d = (hoehe[c] - mittel * basis[c]) - (hoehe[c + 1] - mittel * basis[c + 1]);
+        if (d > lim) { var m = Math.min(hoehe[c], (d - lim) * 0.25); hoehe[c] -= m; hoehe[c + 1] += m; }
+        else if (d < -lim) { var n = Math.min(hoehe[c + 1], (-d - lim) * 0.25); hoehe[c + 1] -= n; hoehe[c] += n; }
+      }
+    }
+  }
+
+  // Genau eine Flockenmenge vom Hügel nehmen – reicht die Spalte nicht, kommt der Rest aus den Nachbarspalten
+  function nimmSchnee(c, menge) {
+    var x = Math.min(hoehe[c], menge);
+    hoehe[c] -= x; menge -= x;
+    for (var d = 1; d < SP && menge > 1e-6; d++) {
+      if (c - d >= 0) { x = Math.min(hoehe[c - d], menge * 0.5); hoehe[c - d] -= x; menge -= x; }
+      if (c + d < SP) { x = Math.min(hoehe[c + d], menge); hoehe[c + d] -= x; menge -= x; }
+    }
+  }
+
+  // Eine Flocke vom Hügel aufwirbeln (bevorzugt dort, wo viel liegt)
+  function hebeFlocke(hm, st) {
+    var c = -1, i;
+    for (var t = 0; t < 8; t++) { var cc = (Math.random() * SP) | 0; if (hoehe[cc] >= proFlocke * 0.5 && Math.random() * hm <= hoehe[cc]) { c = cc; break; } }
+    if (c < 0) { c = 0; for (i = 1; i < SP; i++) if (hoehe[i] > hoehe[c]) c = i; }
+    var y = G.boden - hoehe[c] - 1;
+    nimmSchnee(c, proFlocke); imSchnee--;
+    if (imSchnee <= 0) { imSchnee = 0; hoehe.fill(0); }
+    var R = G.R, cw = 2 * G.bodenHalb / SP, x = G.cx - G.bodenHalb + (c + Math.random()) * cw;
+    var p = neueFlocke(x, y);
+    fluss((x - G.cx) / R, (y - G.cy) / R);
+    p.vx = fu * R * RM.fluss; p.vy = fv * R * RM.fluss;
+    // der Ruck wirft Schnee samt Wasser hoch: eine kleine Fontäne, die sich in einer halben Sekunde verliert
+    var v = (0.6 + 1.6 * Math.random()) * R * Math.pow(st, 0.6) * P.wurf * RM.heben, wa = (Math.random() - 0.5) * 1.2;
+    p.lx = Math.sin(wa) * v; p.ly = -Math.cos(wa) * v;
+  }
+
+  /* --- Strömung im Wasser ---
+     Stromfunktion ψ = (1 − r²) · Σ cₖ·Pₖ(x, y) mit kleinen Polynomen Pₖ (x, y in Kugelradien): ψ ist am Glas
+     null, das Wasser strömt dort also nur an der Wand entlang, nie hindurch, und ist überall quellenfrei.
+     Die Beiwerte cₖ (R/s an der schnellsten Stelle) folgen der Beschleunigung der Kugel und klingen ab:
+       0     großer Strudel (der schwere Schnee unten schwappt hinterher; Kippen der Kugel)
+       1     Auf-/Abstrom in der Mitte (ein Ruck nach unten wirft den Schnee hoch)
+       2     Querstrom (Ruck zur Seite)
+       3 – 9 kleinere Wirbel mit zufälliger, bei jedem Schüttelstoß neu gemischter Richtung; der große
+             Strudel trägt sie mit herum. Dazu je Flocke ein kleinräumiges Gestöber (wasser.turb). */
+  var MODI = 10, mc = new Float64Array(MODI), mn = new Float64Array(MODI), me = new Float64Array(MODI), mxi = new Float64Array(MODI);
+  var MTAU = [1.2, 0.9, 0.9, 0.8, 0.8, 0.85, 0.7, 0.7, 0.7, 0.7];   // Abklingzeiten (s)
+  var wasser = { dreh: 0, turb: 0, staerke: 0, rx: 0, ry: 0 };
+  var extern = { x: 0, y: 0, z: 0 };      // Beschleunigung des echten Handys (px/s², klingt rasch ab)
+  // Die Kugel darf im Bild nur ein Stück weit mitgehen; das Wasser spürt aber die ganze Handbewegung:
+  // eine unsichtbare zweite Feder folgt dem Finger ohne Begrenzung
+  var hand = { x: 0, y: 0, vx: 0, vy: 0, zx: 0, zy: 0, an: false };
+  var fu = 0, fv = 0, dc = 1, ds = 0;     // Ergebnis von fluss() in R/s; Drehlage der kleinen Wirbel
+
+  function fluss(X, Y) {
+    var B = 1 - X * X - Y * Y, e, u, v;
+    e = me[0]; u = -2 * Y * e; v = 2 * X * e;
+    e = me[1]; u -= 2 * X * Y * e; v += (2 * X * X - B) * e;
+    e = me[2]; u += (B - 2 * Y * Y) * e; v += 2 * X * Y * e;
+    var x = dc * X + ds * Y, y = dc * Y - ds * X, x2 = x * x, y2 = y * y, uu = 0, vv = 0, P, PX, PY;
+    e = me[3]; P = x2 - y2; PX = 2 * x; PY = -2 * y; uu += e * (B * PY - 2 * y * P); vv += e * (2 * x * P - B * PX);
+    e = me[4]; P = 2 * x * y; PX = 2 * y; PY = 2 * x; uu += e * (B * PY - 2 * y * P); vv += e * (2 * x * P - B * PX);
+    e = me[5]; P = x2 + y2; PX = 2 * x; PY = 2 * y; uu += e * (B * PY - 2 * y * P); vv += e * (2 * x * P - B * PX);
+    e = me[6]; P = x * x2 - 3 * x * y2; PX = 3 * x2 - 3 * y2; PY = -6 * x * y; uu += e * (B * PY - 2 * y * P); vv += e * (2 * x * P - B * PX);
+    e = me[7]; P = 3 * x2 * y - y * y2; PX = 6 * x * y; PY = 3 * x2 - 3 * y2; uu += e * (B * PY - 2 * y * P); vv += e * (2 * x * P - B * PX);
+    e = me[8]; P = x * (x2 + y2); PX = 3 * x2 + y2; PY = 2 * x * y; uu += e * (B * PY - 2 * y * P); vv += e * (2 * x * P - B * PX);
+    e = me[9]; P = y * (x2 + y2); PX = 2 * x * y; PY = x2 + 3 * y2; uu += e * (B * PY - 2 * y * P); vv += e * (2 * x * P - B * PX);
+    fu = u + dc * uu - ds * vv; fv = v + ds * uu + dc * vv;
+  }
+  // jedes Muster so normieren, dass es an seiner schnellsten Stelle 1 R/s hat
+  (function () {
+    for (var k = 0; k < MODI; k++) {
+      me.fill(0); me[k] = 1;
+      var mx = 0;
+      for (var i = -24; i <= 24; i++) for (var j = -24; j <= 24; j++) {
+        var X = i / 24, Y = j / 24;
+        if (X * X + Y * Y > 1) continue;
+        fluss(X, Y);
+        var q = fu * fu + fv * fv;
+        if (q > mx) mx = q;
+      }
+      mn[k] = mx > 0 ? 1 / Math.sqrt(mx) : 1;
+    }
+    me.fill(0);
+  })();
+  // Stärken der Antriebe (Strömung je Beschleunigung, Abklingen siehe MTAU)
+  var P = { k0: 0.35, k1: 0.22, k2: 0.3, g0: 0.022, g1: 0.065, g2: 0.006, sig: 0.22, turb: 0.06, turbMax: 2.2, tc: 0.45, wurf: 1.45, loesen: 0.36 };
+  function neueStoesse(anteil) { for (var k = 3; k < MODI; k++) mxi[k] = mxi[k] * (1 - anteil) + (Math.random() * 2 - 1) * anteil; }
+  function neueGeste() {
+    mxi[0] = (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random() * 0.4);
+    mxi[1] = 0.55 + Math.random() * 0.45;
+    mxi[2] = Math.random() * 2 - 1;
+  }
+  neueStoesse(1); neueGeste();
+
+  // Knopf „Schütteln“: eine Hand schüttelt kräftig hin und her (leicht unregelmäßig, mit kleiner Acht) und setzt ab
+  function skriptSchritt(h) {
+    var s = skript;
+    s.t += h;
+    var t = s.t, d = s.d;
+    if (t >= d) { skript = null; feder.zieht = false; feder.zx = 0; feder.zy = 0; return; }
+    var an = Math.min(1, t / 0.12), aus = Math.min(1, (d - t) / 0.38);
+    var env = an * an * (3 - 2 * an) * Math.sqrt(aus);
+    s.ph += h * TAU * s.f * (1 + 0.12 * Math.sin(t * 7.3 + s.j));
+    var A = G.W * 0.085 * (1 + 0.15 * Math.sin(t * 5.1 + 2 * s.j));
+    feder.zieht = true;
+    feder.zx = A * env * Math.sin(s.ph);
+    feder.zy = A * env * (0.28 * Math.sin(2 * s.ph + 0.9) - 0.14);
+  }
+
+  function schritt(dt) {
+    zeit += dt;
+    var n = Math.max(1, Math.ceil(dt * 120)), h = dt / n, W = G.W, R = G.R, iR = 1 / R, s, k, i, j;
+    var aFahrt = fahrt ? fahrtSchritt(dt) : 0;
+    var still = zeit < ruhigBis, sx = 0, sy = 0;
+    var unten = 0.45 + 0.55 * (schneeGesamt ? imSchnee / schneeGesamt : 0);
+    for (s = 0; s < n; s++) {
+      if (skript) skriptSchritt(h);
+      // die Kugel hängt an einer Feder (beim Ziehen straff, sonst weich nachwippend)
+      var st = feder.zieht ? 900 : 300, z = feder.zieht ? 0.55 : 0.13, dm = 2 * z * Math.sqrt(st);
+      var ax = st * (feder.zx - feder.x) - dm * feder.vx - extern.x * 0.12, ay = st * (feder.zy - feder.y) - dm * feder.vy - extern.y * 0.12;
+      feder.vx += ax * h; feder.vy += ay * h; feder.x += feder.vx * h; feder.y += feder.vy * h;
+      var zr = (feder.x / W) * 0.6 - (feder.vx / W) * 0.035 - (aFahrt / W) * 0.0011;
+      var ar = 240 * (zr - feder.rot) - 2 * 0.22 * Math.sqrt(240) * feder.vr;
+      feder.vr += ar * h; feder.rot += feder.vr * h;
+      // Beschleunigung, die das Wasser spürt: die Kugel selbst, sanft die Kamerafahrt, das echte Handy
+      var g = still ? 0.15 : 1;
+      // Trägheit der Flocken: gegenüber der sichtbaren Kugel
+      sx += (ax * g + aFahrt * 0.25 + extern.x) * h; sy += (ay * g + extern.y) * h;
+      if (hand.an) {
+        var hx = 900 * (hand.zx - hand.x) - 33 * hand.vx, hy = 900 * (hand.zy - hand.y) - 33 * hand.vy;
+        hand.vx += hx * h; hand.vy += hy * h; hand.x += hand.vx * h; hand.y += hand.vy * h;
+        ax = hx; ay = hy;
+      }
+      var gx = ax * g + aFahrt * 0.25 + extern.x, gy = ay * g + extern.y;
+      var fx = gx * iR, fy = gy * iR, fa = Math.sqrt(fx * fx + fy * fy) + Math.abs(extern.z) * iR * 0.6;
+      // Schüttelstärke 0 … 2: kommt sofort, klingt in einer Viertelsekunde ab
+      var I = Math.min(2, fa / 20);
+      // neue Schüttelbewegung aus der Ruhe: Drehsinn des großen Strudels und Stärke des Aufstroms neu würfeln
+      if (I > 0.3 && wasser.staerke < 0.12) neueGeste();
+      if (I > wasser.staerke) wasser.staerke += (I - wasser.staerke) * Math.min(1, h * 25);
+      // gerichteter Anteil (folgt der Bewegung) + gleichgerichteter Anteil (Rütteln treibt Strudel und Auftrieb an)
+      mc[0] += h * (P.k0 * fx * unten - 0.5 * ar * g + P.g0 * fa * mxi[0]);
+      mc[1] += h * (P.k1 * fy + P.g1 * fa * mxi[1]);
+      mc[2] += h * (-P.k2 * fx + P.g2 * fa * mxi[2]);
+      for (k = 3; k < MODI; k++) mc[k] += h * P.sig * fa * mxi[k];
+      wasser.turb += h * P.turb * fa;
+      // Richtungswechsel einer kräftigen Bewegung = neuer Schüttelstoß: die kleinen Wirbel neu mischen
+      var rx = fx > 6 ? 1 : fx < -6 ? -1 : 0, ry = fy > 6 ? 1 : fy < -6 ? -1 : 0;
+      if (rx && rx !== wasser.rx) { wasser.rx = rx; neueStoesse(0.6); }
+      if (ry && ry !== wasser.ry) { wasser.ry = ry; neueStoesse(0.4); }
+    }
+    var aF = sx / dt, aG = sy / dt;        // mittlere Beschleunigung der Kugel in diesem Bild (px/s²)
+    for (k = 0; k < MODI; k++) {
+      var c = mc[k] * Math.exp(-dt / MTAU[k]);
+      mc[k] = c > 2.6 ? 2.6 : c < -2.6 ? -2.6 : c;
+      me[k] = mc[k] * mn[k];
+    }
+    wasser.turb = Math.min(P.turbMax, wasser.turb * Math.exp(-dt / 0.7));
+    wasser.staerke *= Math.exp(-dt / 0.25);
+    var ea = Math.exp(-dt / 0.06); extern.x *= ea; extern.y *= ea; extern.z *= ea;
+    wasser.dreh += dt * (1.6 * me[0] + 0.3 * me[5]);
+    // Ist das Wasser eine Weile still, sinken die letzten Nachzügler allmählich etwas zügiger (kleine bleiben langsamer)
+    if (wasser.staerke < 0.05 && wasser.turb < 0.25) ruheZeit += dt; else ruheZeit = 0;
+    var spaet = 1 + 0.7 * Math.min(1, Math.max(0, (ruheZeit - 2.5) / 4));
+    dc = Math.cos(wasser.dreh); ds = Math.sin(wasser.dreh);
+
+    // Schneedecke: wo das Wasser kräftig am Glas entlangströmt, bricht sie Stück für Stück ab
+    if (decke && !deckeFertig) {
+      if (!still && !fahrt) {
+        var lim = 5;
+        for (i = 0; i < zellen.length; i++) {
+          var zz = zellen[i];
+          if (zz.weg) continue;
+          if (zz.hp > 0) {
+            fluss(zz.nx, zz.ny);
+            var kraft = 0.45 * Math.sqrt(fu * fu + fv * fv) + 0.75 * wasser.staerke;
+            if (kraft > 0.6) zz.hp -= (kraft - 0.6) * dt * P.loesen / zz.fest;
+          }
+          if (zz.hp <= 0 && lim > 0) { lim--; loeseZelle(zz); }
+        }
+        if (zellenRest <= zellenGesamt * 0.22) abschluss();
+      }
+    } else if (decke) {
+      var lim2 = 4;
+      for (i = 0; i < zellen.length && lim2 > 0; i++) { var z2 = zellen[i]; if (!z2.weg && zeit >= z2.spaet) { lim2--; loeseZelle(z2); } }
+      if (zellenRest <= 0) {
+        deckeAlpha -= dt / 0.9;
+        if (deckeAlpha <= 0) { decke = null; dctx = null; deckeAlpha = 0; nachOeffnen(); }
+      }
+    }
+    // liegender Schnee wird aufgewirbelt – durch das Rütteln selbst und durch die Strömung über dem Hügel
+    if (imSchnee > 0 && !still) {
+      var bs = 0;
+      for (k = 0; k < 5; k++) { fluss(-0.56 + k * 0.28, 0.62); bs += Math.sqrt(fu * fu + fv * fv); }
+      var rate = (1.7 * Math.max(0, wasser.staerke - 0.03) + 1.3 * Math.max(0, bs / 5 - 0.35)) * RM.heben;
+      hebeBudget = Math.min(80, hebeBudget + rate * imSchnee * dt);
+      var anz = Math.min(imSchnee, Math.floor(hebeBudget), 70);
+      if (anz > 0) {
+        hebeBudget -= anz;
+        var hm = 0;
+        for (i = 0; i < SP; i++) if (hoehe[i] > hm) hm = hoehe[i];
+        var stk = Math.min(1.4, wasser.staerke);
+        for (i = 0; i < anz; i++) hebeFlocke(hm, stk);
+      }
+    } else hebeBudget = 0;
+    if (glanz >= 0) glanz += dt;
+    if (hgEin < 1) hgEin = Math.min(1, hgEin + dt / 0.45);
+    if (imSchnee > 0) glaetten(dt);
+
+    for (j = brocken.length - 1; j >= 0; j--) brockenSchritt(brocken[j], j, dt, aF, aG);
+
+    // Flocken im Wasser: folgen der Strömung (je nach Größe träge), sinken, taumeln, prallen weich am Glas ab
+    var cx = G.cx, cy = G.cy, fl = R * RM.fluss, tl = wasser.turb * RM.turb * R;
+    var aL = Math.exp(-dt / 0.5), aO = Math.exp(-dt / P.tc), bO = Math.sqrt(1 - aO * aO) * 3.46 * tl;
+    var ruhig = wasser.turb * RM.turb;
+    // solange kräftig geschüttelt wird, tragen die Wirbel die Flocken mit (sie sinken kaum)
+    var trag = 1 - 0.55 * Math.min(1, wasser.staerke);
+    for (j = flocken.length - 1; j >= 0; j--) {
+      var p = flocken[j];
+      p.t += dt;
+      fluss((p.x - cx) * iR, (p.y - cy) * iR);
+      p.tx = p.tx * aO + (Math.random() - 0.5) * bO;
+      p.ty = p.ty * aO + (Math.random() - 0.5) * bO;
+      var wph = zeit * p.wf + p.ph;
+      if (p.ly) { p.lx *= aL; p.ly *= aL; if (p.ly > -1) p.lx = p.ly = 0; }
+      var zx = fu * fl * p.par + p.tx + p.lx + Math.sin(wph) * p.wa * R;
+      var zy = fv * fl * p.par + p.ty + p.ly + p.vt * R * trag * spaet * (1 + 0.22 * Math.cos(2 * wph));
+      var q = dt / p.tau;
+      p.vx = (p.vx + q * zx - p.beta * aF * dt) / (1 + q);
+      p.vy = (p.vy + q * zy - p.beta * aG * dt) / (1 + q);
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      var dx = p.x - cx, dy = p.y - cy, d2 = dx * dx + dy * dy, rin = R * 0.968 - p.rw;
+      if (d2 > rin * rin) {
+        var d = Math.sqrt(d2), ex = dx / d, ey = dy / d, vn = p.vx * ex + p.vy * ey;
+        p.x = cx + ex * rin; p.y = cy + ey * rin;
+        if (vn > 0) { p.vx = (p.vx - vn * ex) * 0.85 - 0.45 * vn * ex; p.vy = (p.vy - vn * ey) * 0.85 - 0.45 * vn * ey; }
+        // auch das Gestöber prallt ab (sonst klebt die Flocke, bis es von selbst dreht)
+        var tn = p.tx * ex + p.ty * ey;
+        if (tn > 0) { p.tx -= 2 * tn * ex; p.ty -= 2 * tn * ey; }
+      }
+      // auf dem Hügel: bei ruhigem Wasser bleibt sie liegen, sonst hüpft sie weiter
+      var fy = G.boden - hoehe[spalte(p.x)];
+      if (p.y >= fy) {
+        if (p.t > 0.25 && p.vy >= 0 && (Math.sqrt(fu * fu + fv * fv) * RM.fluss + ruhig < 0.42 || Math.random() < dt * 2)) {
+          setzeAb(p.x); flocken[j] = flocken[flocken.length - 1]; flocken.pop(); continue;
+        }
+        p.y = fy - 0.5; if (p.vy > 0) p.vy *= -0.3;
+        // wird noch kräftig geschüttelt, wirft es sie gleich wieder hoch
+        if (wasser.staerke > 0.25 && p.ly > -R * 0.3) {
+          var vw = (0.4 + 1.2 * Math.random()) * R * Math.pow(Math.min(1.4, wasser.staerke), 0.8) * P.wurf * RM.heben, ww = (Math.random() - 0.5) * 1.2;
+          p.lx = Math.sin(ww) * vw; p.ly = -Math.cos(ww) * vw;
+        }
+      }
+    }
+  }
+
+  // Ein Brocken treibt im Wasser, sinkt etwas schneller und zerfällt dabei in einzelne Flocken
+  function brockenSchritt(b, j, dt, aF, aG) {
+    var R = G.R, cx = G.cx, cy = G.cy, fl = R * RM.fluss;
+    b.t += dt;
+    fluss((b.x - cx) / R, (b.y - cy) / R);
+    var q = dt / 0.3;
+    b.vx = (b.vx + q * fu * fl - 0.35 * aF * dt) / (1 + q);
+    b.vy = (b.vy + q * (fv * fl + 0.55 * R * RM.fall) - 0.35 * aG * dt) / (1 + q);
+    b.x += b.vx * dt; b.y += b.vy * dt;
+    var u = Math.min(1, b.t / b.dauer), r = b.r0 * (0.4 + 0.6 * Math.sqrt(1 - u));
+    var dx = b.x - cx, dy = b.y - cy, d2 = dx * dx + dy * dy, rin = R * 0.95 - r * 0.6;
+    if (d2 > rin * rin) {
+      var d = Math.sqrt(d2), ex = dx / d, ey = dy / d, vn = b.vx * ex + b.vy * ey;
+      b.x = cx + ex * rin; b.y = cy + ey * rin;
+      if (vn > 0) { b.vx -= 1.3 * vn * ex; b.vy -= 1.3 * vn * ey; }
+    }
+    var fy = G.boden - hoehe[spalte(b.x)], unten = b.y >= fy - r * 0.3;
+    var soll = unten ? 0 : Math.round(b.n0 * (1 - u));
+    while (b.n > soll) {
+      b.n--;
+      var a = Math.random() * TAU, e = Math.sqrt(Math.random()) * r;
+      var p = neueFlocke(b.x + Math.cos(a) * e, Math.min(fy - 1, b.y + Math.sin(a) * e));
+      p.vx = b.vx + (Math.random() - 0.5) * R * 0.6; p.vy = b.vy + (Math.random() - 0.6) * R * 0.5;
+    }
+    if (u >= 1 || unten) { brocken[j] = brocken[brocken.length - 1]; brocken.pop(); }
+  }
+
+  function zeichneSchneeboden(g) {
+    var R = G.R, x0 = G.cx - G.bodenHalb, w = 2 * G.bodenHalb, cw = w / SP, b = G.boden, unten = G.cy + R + 2;
+    var hm = 0, i;
+    for (i = 0; i < SP; i++) if (hoehe[i] > hm) hm = hoehe[i];
+    g.beginPath();
+    g.moveTo(x0 - R * 0.3, unten);
+    g.lineTo(x0 - R * 0.3, b - hoehe[0]);
+    var px = x0, py = b - hoehe[0];
+    g.lineTo(px, py);
+    for (i = 0; i < SP; i++) {
+      var x = x0 + (i + 0.5) * cw, y = b - hoehe[i];
+      g.quadraticCurveTo(px, py, (px + x) / 2, (py + y) / 2); px = x; py = y;
+    }
+    g.lineTo(x0 + w, py);
+    g.lineTo(x0 + w + R * 0.3, py);
+    g.lineTo(x0 + w + R * 0.3, unten);
+    g.closePath();
+    var v = g.createLinearGradient(0, b - hm - 2, 0, G.cy + R * 0.82);
+    v.addColorStop(0, '#f9fcff'); v.addColorStop(1, '#b4c5da');
+    g.fillStyle = v; g.fill();
+    if (muster) { g.fillStyle = muster; g.fill(); }
+    g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1; g.stroke();
+    // einzelne Flocken obenauf
+    for (i = 0; i < obenauf.length; i++) {
+      var o = obenauf[i], hh = hoehe[Math.min(SP - 1, (o.u * SP) | 0)];
+      if (hh < 2.5) continue;
+      var sp = o.gl ? glitzer[o.k & 1] : scharf[o.k];
+      g.globalAlpha = o.a;
+      g.drawImage(sp.c, x0 + o.u * w - sp.h, b - hh - sp.h * 0.6 + o.d, sp.d, sp.d);
+    }
+    g.globalAlpha = 1;
+  }
+
+  function zeichneBrocken(g) {
+    for (var i = 0; i < brocken.length; i++) {
+      var b = brocken[i], u = Math.min(1, b.t / b.dauer), r = b.r0 * (0.4 + 0.6 * Math.sqrt(1 - u));
+      g.globalAlpha = 0.96 * (0.35 + 0.65 * (1 - u));
+      g.drawImage(klumpen[b.k], b.x - r, b.y - r, 2 * r, 2 * r);
+    }
+    g.globalAlpha = 1;
+  }
+
+  function zeichneFlocken(g) {
+    for (var i = 0; i < flocken.length; i++) {
+      var p = flocken[i], sp;
+      if (p.gl) { sp = glitzer[p.ci]; var tw = Math.sin(p.ph + zeit * p.wf * 2.4); tw *= tw; g.globalAlpha = 0.22 + 0.78 * tw * tw; }
+      else { sp = (p.w ? weich : scharf)[p.ci]; g.globalAlpha = p.a; }
+      g.drawImage(sp.c, p.x - sp.h, p.y - sp.h, sp.d, sp.d);
+    }
+    g.globalAlpha = 1;
+  }
+
+  function zeichneGlanz(g) {
+    var u = glanz / 1.1;
+    if (u >= 1) { glanz = -1; return; }
+    var R = G.R, p = -1.4 + u * 2.8, x = G.cx + p * R * 0.7, y = G.cy + p * R * 0.7;
+    var lg = g.createLinearGradient(x - R * 0.3, y - R * 0.3, x + R * 0.3, y + R * 0.3);
+    lg.addColorStop(0, 'rgba(255,250,235,0)'); lg.addColorStop(0.5, 'rgba(255,250,235,.32)'); lg.addColorStop(1, 'rgba(255,250,235,0)');
+    g.fillStyle = lg; g.fillRect(G.cx - R, G.cy - R, 2 * R, 2 * R);
+  }
+
+  // Solange das Foto lädt (oder fehlt): sanftes Leuchten in der Tagesfarbe statt leerem Dunkel
+  function zeichneErsatzGrund(g) {
+    var R = G.R, cx = G.cx, cy = G.cy;
+    g.fillStyle = '#1d2c4c'; g.fillRect(cx - R, cy - R, 2 * R, 2 * R);
+    var f = /^#[0-9a-f]{6}$/i.test(grundFarbe || '') ? grundFarbe : '#5f82b9';
+    var rr = parseInt(f.slice(1, 3), 16), gg = parseInt(f.slice(3, 5), 16), bb = parseInt(f.slice(5, 7), 16);
+    var v = g.createRadialGradient(cx - R * 0.2, cy - R * 0.3, R * 0.05, cx, cy, R);
+    v.addColorStop(0, 'rgba(' + rr + ',' + gg + ',' + bb + ',.8)');
+    v.addColorStop(0.6, 'rgba(' + rr + ',' + gg + ',' + bb + ',.35)');
+    v.addColorStop(1, 'rgba(' + rr + ',' + gg + ',' + bb + ',0)');
+    g.fillStyle = v; g.fillRect(cx - R, cy - R, 2 * R, 2 * R);
+  }
+
+  function zeichne() {
+    if (!G.R) return;
+    var g = ictx, R = G.R, cx = G.cx, cy = G.cy;
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    g.clearRect(0, 0, G.W, G.H);
+    g.save();
+    g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.clip();
+    if (!hintergrund || hgEin < 1) zeichneErsatzGrund(g);
+    if (hintergrund) {
+      if (hgEin < 1) g.globalAlpha = Math.max(0, hgEin);
+      g.drawImage(hintergrund, cx - R, cy - R, 2 * R, 2 * R);
+      g.globalAlpha = 1;
+    }
+    zeichneSchneeboden(g);
+    if (decke) { g.globalAlpha = Math.max(0, deckeAlpha); g.drawImage(decke, cx - R, cy - R, 2 * R, 2 * R); g.globalAlpha = 1; }
+    if (brocken.length) zeichneBrocken(g);
+    zeichneFlocken(g);
+    if (glanz >= 0) zeichneGlanz(g);
+    g.restore();
+  }
+
+  function wende() {
+    if (REDUZIERT) return;
+    var px = 0;
+    if (fahrt) {
+      var f = fahrt, c = f.c, cx = 'translateX(' + c.toFixed(1) + 'px)';
+      px = c - f.S;
+      f.doppel.style.transform = cx; f.dSchatten.style.transform = cx;
+      el.fenster.style.setProperty('--sprossen-x', (c * f.fW).toFixed(1) + 'px');
+      landSetzen(f.land0 + c * f.fL);
+      girlandeSetzen(f.girl0 + c * f.fW);
+      bankSetzen(f.bank0 + c * f.fS);
+    }
+    el.huelle.style.transform = 'translate3d(' + (px + feder.x).toFixed(2) + 'px,' + feder.y.toFixed(2) + 'px,0) rotate(' + feder.rot.toFixed(4) + 'rad)';
+    el.schatten.style.transform = px ? 'translateX(' + (px + feder.x * 0.9).toFixed(1) + 'px)' : '';
+    var lift = Math.max(0, -feder.y) / (G.W * 0.08);
+    el.schatten.style.opacity = Math.max(0.3, 1 - Math.min(0.5, lift * 0.5) - Math.min(0.3, Math.abs(feder.x) / (G.W * 0.3))).toFixed(3);
+  }
+
+  function bankSetzen(x) {
+    bankVersatz = x;
+    var v = (x % 236).toFixed(1) + 'px 0';
+    el.bank.style.backgroundPosition = v + ',' + v + ',' + v + ',0 0,0 0';
+  }
+  var landVersatz = 0, girlVersatz = 0, aussen = el.fenster.querySelector('.fenster-aussen');
+  function landSetzen(x) {
+    landVersatz = x;
+    var v = x.toFixed(1) + 'px ';
+    aussen.style.backgroundPosition = v + '100%,' + v + '0,' + v + '0,' + v + '0,' + v + '0,' + v + '0';
+  }
+  function girlandeSetzen(x) {
+    girlVersatz = x;
+    el.girlande.style.backgroundPosition = (x % 44).toFixed(1) + 'px 0,' + (x % 22).toFixed(1) + 'px 2px,' + ((x + 11) % 22).toFixed(1) + 'px 6px';
+  }
+
+  /* --- Kamerafahrt zur nächsten Kugel ---
+     Die Kugeln stehen nebeneinander auf einer langen Fensterbank, die Kamera fährt nach links:
+     die alte Kugel (als Standbild) läuft rechts hinaus, während die neue (live, mit Schnee) schon links
+     hereinkommt. Abstand S = Bildhälfte + halbe Kugel, damit die neue genau außerhalb startet.
+     Parallaxe: Landschaft 14 %, Fenstersprossen ein Sprossenabstand pro Fahrt (≈ 33 %), Fensterbank 100 %. */
+  var FAHRT_DAUER = 0.86, FAHRT_ENDE = 0.3;
+  function fahrtMasse() {
+    var fb = el.fenster.offsetWidth || G.W * 1.3, H = fb / 2 + 10;
+    var S = H + G.W / 2 + 4;
+    return { H: H, S: S, M: S * 0.33 };
+  }
+
+  function starteFahrt(ziel, fokus) {
+    var m = fahrtMasse(), breite = el.platz.clientWidth;
+    el.fenster.style.setProperty('--sprosse', m.M.toFixed(2) + 'px');
+    // Standbild der alten Kugel (Glas, Inhalt, Schild) – fährt rechts hinaus
+    var d = el.huelle.cloneNode(true);
+    d.removeAttribute('id'); d.classList.add('doppel'); d.setAttribute('aria-hidden', 'true');
+    [].forEach.call(d.querySelectorAll('[id]'), function (n) { n.removeAttribute('id'); });
+    var gr = d.querySelector('.kugel-griff'); if (gr) gr.parentNode.removeChild(gr);
+    var la = d.querySelector('.kugel-laden'); if (la) la.parentNode.removeChild(la);
+    d.removeAttribute('aria-busy');
+    var cs = d.querySelectorAll('canvas'), quellen = [el.innen, el.glas];
+    for (var i = 0; i < cs.length && i < 2; i++) {
+      cs[i].removeAttribute('role'); cs[i].removeAttribute('aria-label');
+      cs[i].width = quellen[i].width; cs[i].height = quellen[i].height;
+      cs[i].getContext('2d').drawImage(quellen[i], 0, 0);
+    }
+    d.style.left = el.huelle.offsetLeft + 'px'; d.style.top = el.huelle.offsetTop + 'px'; d.style.transform = '';
+    el.platz.appendChild(d);
+    var ds = el.schatten.cloneNode(true); ds.removeAttribute('id'); ds.style.opacity = '';
+    el.platz.insertBefore(ds, el.schatten);
+    var ins = (breite / 2 - m.H).toFixed(1);
+    el.platz.style.clipPath = 'inset(-90px ' + ins + 'px -90px ' + ins + 'px)';
+    fahrt = { t: 0, u: 0, c: 0, S: m.S, fW: m.M / m.S, fL: 0.14, fS: 1, ziel: ziel, fokus: !!fokus,
+      doppel: d, dSchatten: ds, bank0: bankVersatz, land0: landVersatz, girl0: girlVersatz, mitte: false };
+    el.kugelText.classList.add('wechselt');
+    skript = null; zug = null;
+    zeigeTag(ziel, true);          // die Live-Kugel zeigt ab jetzt die neue – noch links außerhalb
+    feder.zieht = false;
+    neueStoesse(1);
+    wende();                       // sofort nach links setzen, bevor gezeichnet wird
+    starte();
+  }
+
+  function fahrtSchritt(dt) {
+    var f = fahrt, T = FAHRT_DAUER, m = FAHRT_ENDE;
+    f.t += dt;
+    var u = Math.min(1, f.t / T);
+    f.u = u;
+    // kubische Hermite-Kurve: sanft los, endet mit etwas Restschwung (für das Federnachwippen)
+    f.c = f.S * ((m - 2) * u * u * u + (3 - m) * u * u);
+    var a = f.S * (6 * (m - 2) * u + 2 * (3 - m)) / (T * T);
+    if (!f.mitte && f.c >= f.S * 0.45) { f.mitte = true; el.kugelText.classList.remove('wechselt'); }
+    if (u >= 1) { beendeFahrt(true); return 0; }
+    return a;
+  }
+
+  function beendeFahrt(mitSchwung) {
+    var f = fahrt;
+    if (!f) return;
+    fahrt = null;
+    if (f.doppel.parentNode) f.doppel.parentNode.removeChild(f.doppel);
+    if (f.dSchatten.parentNode) f.dSchatten.parentNode.removeChild(f.dSchatten);
+    el.platz.style.clipPath = '';
+    el.fenster.style.setProperty('--sprossen-x', '0px');
+    landSetzen(f.land0 + f.S * f.fL);
+    girlandeSetzen(f.girl0 + f.S * f.fW);
+    bankSetzen(f.bank0 + f.S * f.fS);
+    el.schatten.style.transform = '';
+    el.kugelText.classList.remove('wechselt');
+    anzeigeAktiv = null;
+    if (!mitSchwung) {
+      feder.x = feder.vx = feder.rot = feder.vr = 0;
+      el.huelle.style.transform = '';
+      return;
+    }
+    feder.vx += FAHRT_ENDE * f.S / FAHRT_DAUER;
+    ruhigBis = zeit + 2.2;
+    starte();
+    sage('Kugel ' + kugelTag + ' steht jetzt auf dem Sockel.');
+    if (f.fokus) el.schuetteln.focus({ preventScroll: true });
+    var w = fahrtWunsch; fahrtWunsch = null;
+    if (w && w.t !== kugelTag) { markiereAktiv(w.t); starteFahrt(w.t, w.fokus); }
+  }
+
+  function markiereAktiv(t) {
+    var alt = anzeigeAktiv !== null ? anzeigeAktiv : kugelTag;
+    anzeigeAktiv = t;
+    if (alt) fuelleMini(alt);
+    if (kugelTag && kugelTag !== alt) fuelleMini(kugelTag);
+    if (t) fuelleMini(t);
+  }
+
+  function wasserBewegt() {
+    if (wasser.staerke > 0.03 || Math.abs(extern.x) + Math.abs(extern.y) + Math.abs(extern.z) > G.R * 0.5) return true;
+    if (imSchnee > 0) for (var k = 0; k < MODI; k++) if (Math.abs(mc[k]) > 0.3) return true;
+    return false;
+  }
+
+  function inBewegung() {
+    return !!fahrt || flocken.length > 0 || brocken.length > 0 || !!skript || feder.zieht || !!(decke && deckeFertig) || glanz >= 0 || hgEin < 1 || wasserBewegt() ||
+      Math.abs(feder.x) > 0.05 || Math.abs(feder.y) > 0.05 || Math.abs(feder.vx) > 0.5 || Math.abs(feder.vy) > 0.5 ||
+      Math.abs(feder.rot) > 0.0005 || Math.abs(feder.vr) > 0.005;
+  }
+
+  function wasserStill() {
+    mc.fill(0); me.fill(0); wasser.turb = wasser.staerke = 0; extern.x = extern.y = extern.z = 0; hebeBudget = 0; hand.an = false; ruheZeit = 0;
+  }
+
+  // Kommt das Gerät nicht mit, beim nächsten Stillstand mit weniger, dafür etwas „schwereren“ Flocken weiter
+  function mengeAnpassen() {
+    if (decke || flocken.length || brocken.length || !schneeGesamt) return;
+    var neu = schneeMenge();
+    if (neu >= schneeGesamt) return;
+    var f = schneeGesamt / neu;
+    proFlocke *= f; imSchnee = Math.round(imSchnee / f); schneeGesamt = neu;
+  }
+
+  function ruhe() {
+    feder.x = feder.y = feder.vx = feder.vy = feder.rot = feder.vr = 0;
+    wasserStill();
+    mengeAnpassen();
+    el.huelle.style.transform = ''; el.schatten.style.opacity = ''; el.schatten.style.transform = '';
+    zeichne();
+  }
+
+  // Bildrate beobachten, solange viel Schnee fliegt (unter ca. 42 Bildern/s → weniger Flocken)
+  function leistungMessen(roh) {
+    if (flocken.length < 150 || roh > 0.25) return;
+    rahmenMittel += (roh - rahmenMittel) * 0.05;
+    if (++rahmenZahl > 90 && rahmenMittel > 0.024 && leistung > 0.45) {
+      leistung = Math.max(0.42, leistung * 0.75); rahmenZahl = 0; rahmenMittel = 0.016;
+      try { window.sessionStorage.setItem('adventskalender_schnee_leistung', String(leistung)); } catch (e) { /* egal */ }
+    }
+  }
+
+  function tick(jetzt) {
+    raf = 0;
+    var roh = (jetzt - zuletzt) / 1000;
+    var dt = Math.min(0.033, Math.max(0.001, roh)); zuletzt = jetzt;
+    leistungMessen(roh);
+    schritt(dt); zeichne(); wende();
+    if (inBewegung()) { if (!raf) raf = requestAnimationFrame(tick); }
+    else if (!raf) ruhe();
+  }
+
+  function starte() {
+    if (raf || document.hidden || !G.R) return;
+    zuletzt = performance.now();
+    raf = requestAnimationFrame(tick);
+  }
+
+  function schuettle() {
+    if (fahrt) return;
+    skript = { t: 0, d: 1.25, f: 3.2, ph: 0, j: Math.random() * TAU };
+    ruhigBis = 0;
+    starte();
+  }
+
+  /* --- Ziehen und Wischen an der Kugel --- */
+  var zug = null;
+  el.griff.addEventListener('pointerdown', function (e) {
+    if (e.button > 0 || fahrt) return;
+    var jetzt = performance.now();
+    zug = { id: e.pointerId, x: e.clientX, y: e.clientY, t: jetzt, weit: 0, lx: e.clientX, ly: e.clientY, lt: jetzt, vx: 0, vy: 0 };
+    if (kugelOffen && kugelTag !== null) grossVorladen(kugelTag, 0);
+    try { el.griff.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+    skript = null; ruhigBis = 0; feder.zieht = true; feder.zx = feder.x; feder.zy = feder.y;
+    zug.bx = feder.x; zug.by = feder.y;
+    hand.an = true; hand.x = hand.zx = feder.x; hand.y = hand.zy = feder.y; hand.vx = feder.vx; hand.vy = feder.vy;
+    e.preventDefault();
+    starte();
+  });
+  el.griff.addEventListener('pointermove', function (e) {
+    if (!zug || e.pointerId !== zug.id) return;
+    var dx = e.clientX - zug.x, dy = e.clientY - zug.y, mx = G.W * 0.1, my = G.W * 0.06;
+    zug.weit = Math.max(zug.weit, Math.abs(dx) + Math.abs(dy));
+    // Geschwindigkeit des Fingers (für den Schwung beim Loslassen)
+    var jetzt = performance.now(), dz = Math.max(8, jetzt - zug.lt) / 1000;
+    zug.vx += ((e.clientX - zug.lx) / dz - zug.vx) * 0.5; zug.vy += ((e.clientY - zug.ly) / dz - zug.vy) * 0.5;
+    zug.lx = e.clientX; zug.ly = e.clientY; zug.lt = jetzt;
+    hand.zx = dx * 0.7 + zug.bx; hand.zy = dy * 0.5 + zug.by;
+    feder.zx = mx * Math.tanh(hand.zx / mx);
+    feder.zy = my * Math.tanh(hand.zy / my);
+    starte();
+  });
+  function zugEnde(e) {
+    if (!zug || e.pointerId !== zug.id) return;
+    var z = zug, kurz = z.weit < 8 && performance.now() - z.t < 450;
+    zug = null; hand.an = false; feder.zieht = false; feder.zx = 0; feder.zy = 0;
+    if (kurz && e.type === 'pointerup' && kugelOffen && kugelTag !== null) { starte(); oeffneAnsicht(kugelTag, el.ansehen); return; }
+    if (kurz && e.type === 'pointerup') { feder.vy -= G.W * 1.1; feder.vx += (Math.random() - 0.5) * G.W * 0.6; }
+    else if (e.type === 'pointerup' && performance.now() - z.lt < 80) {
+      // Schwung mitnehmen: wer die Kugel wegschnippt, lässt sie kräftig nachfedern
+      var lim = G.W * 2.5;
+      feder.vx += Math.max(-lim, Math.min(lim, z.vx * 0.35)); feder.vy += Math.max(-lim, Math.min(lim, z.vy * 0.25));
+    }
+    starte();
+  }
+  // Browser ohne touch-action: solange ein Finger an der Kugel zieht, nicht scrollen (zwei Finger = Zoom bleibt)
+  el.griff.addEventListener('touchmove', function (e) { if (zug && e.touches && e.touches.length === 1 && e.cancelable) e.preventDefault(); }, { passive: false });
+  el.griff.addEventListener('pointerup', zugEnde);
+  el.griff.addEventListener('pointercancel', zugEnde);
+  el.griff.addEventListener('lostpointercapture', zugEnde);
+
+  /* --- Das Handy wirklich schütteln (DeviceMotion) ---
+     Immer zuhören; kommen Werte (Android & Co.), geht es sofort. iPhone/iPad liefern erst nach einer Erlaubnis
+     (DeviceMotionEvent.requestPermission nach einer Geste) – nur dort erscheint ein kleiner Knopf, solange nichts
+     entschieden ist (gemerkt in localStorage). Chrome kennt requestPermission inzwischen auch, antwortet aber sofort
+     ohne Rückfrage – dort (und an Geräten ohne Sensor) bleibt der Hinweis weg.
+     Kleine Bewegungen (Gehen, Scrollen, Tippen) bleiben unter der Schwelle und tun nichts. */
+  var HANDY = 'adventskalender_handy_schuetteln', DM = window.DeviceMotionEvent;
+  var hoertZu = false, handyDa = false, kugelImBild = true, schwer = { x: 0, y: 0, z: 0, ok: false };
+  var brauchtErlaubnis = !!(DM && typeof DM.requestPermission === 'function' && window.isSecureContext !== false);
+  var UA = navigator.userAgent || '';
+  var IOS = /iP(hone|ad|od)/.test(UA) || (/Macintosh/.test(UA) && (navigator.maxTouchPoints || 0) > 1);
+  var frischErlaubt = false;   // gerade erlaubt: „Jetzt schütteln!“ erst zeigen, wenn wirklich Werte kommen
+  function handyMerken(w) { try { window.localStorage.setItem(HANDY, w); } catch (e) { /* egal */ } }
+  function handyGemerkt() { try { return window.localStorage.getItem(HANDY) || ''; } catch (e) { return ''; } }
+  function handyBewegung(e) {
+    var a = e.acceleration, x, y, z;
+    if (a && typeof a.x === 'number') { x = a.x || 0; y = a.y || 0; z = a.z || 0; }
+    else {
+      a = e.accelerationIncludingGravity;
+      if (!a || typeof a.x !== 'number') return;
+      // ohne getrennte Werte: die Schwerkraft als langsamen Anteil abziehen
+      if (!schwer.ok) { schwer.x = a.x; schwer.y = a.y || 0; schwer.z = a.z || 0; schwer.ok = true; }
+      schwer.x += (a.x - schwer.x) * 0.1; schwer.y += ((a.y || 0) - schwer.y) * 0.1; schwer.z += ((a.z || 0) - schwer.z) * 0.1;
+      x = a.x - schwer.x; y = (a.y || 0) - schwer.y; z = (a.z || 0) - schwer.z;
+    }
+    if (!handyDa && GROB) {
+      // das Gerät liefert Werte: Schütteln geht schon (Hinweis überflüssig), im Text darauf hinweisen
+      handyDa = true;
+      if (frischErlaubt) { frischErlaubt = false; handyHinweis('frei'); }
+      else if (!el.handy.hidden && !el.handy.classList.contains('fertig')) handyHinweis('');
+      if (!kugelOffen && kugelTag !== null) aktualisiereText();
+    }
+    if (el.dlg.open || document.hidden || fahrt || !kugelImBild || !G.R) return;
+    var m = Math.sqrt(x * x + y * y + z * z);
+    if (!(m > 4.5)) return;                               // Schwelle in m/s²
+    var f = (m - 4.5) / m * G.R * 2.8;                    // m/s² → px/s² in der Kugel
+    // Achsen des Geräts → Bildschirm (x nach rechts, y nach unten), je nach Drehung
+    var o = window.screen && window.screen.orientation && typeof window.screen.orientation.angle === 'number' ? window.screen.orientation.angle : (window.orientation || 0);
+    var wi = o * Math.PI / 180, co = Math.cos(wi), si = Math.sin(wi);
+    extern.x = (x * co - y * si) * f; extern.y = -(x * si + y * co) * f; extern.z = z * f;
+    ruhigBis = 0;
+    starte();
+  }
+  function handyHoeren() {
+    if (hoertZu || !DM) return;
+    hoertZu = true;
+    window.addEventListener('devicemotion', handyBewegung, { passive: true });
+  }
+  function handyHinweis(art) {
+    var h = el.handy;
+    if (!art) { h.hidden = true; return; }
+    h.hidden = false; h.classList.remove('weg'); h.classList.toggle('frage', art === 'frage');
+    if (art === 'frei') {
+      h.classList.add('fertig');
+      el.handyAn.lastChild.textContent = 'Jetzt das Handy schütteln!';
+      sage('Jetzt kannst du dein Handy schütteln.');
+      setTimeout(function () { h.classList.add('weg'); setTimeout(function () { h.hidden = true; }, 420); }, 3200);
+    }
+  }
+  function handyFragen(leise) {
+    if (!brauchtErlaubnis || handyDa) return;
+    var antwort;
+    try { antwort = DM.requestPermission(); } catch (e) { return; }
+    if (!antwort || typeof antwort.then !== 'function') return;
+    antwort.then(function (s) {
+      if (s === 'granted') {
+        handyMerken('ja'); handyHoeren();
+        if (leise) return;
+        if (handyDa) { handyHinweis('frei'); return; }
+        // „Jetzt das Handy schütteln!“ erst, wenn wirklich Bewegungswerte kommen – sonst still ausblenden
+        frischErlaubt = true;
+        setTimeout(function () { if (frischErlaubt) { frischErlaubt = false; handyHinweis(''); } }, 2000);
+      }
+      else { handyMerken('nein'); handyHinweis(''); }
+    }, function () { handyHinweis(''); });
+  }
+  if (DM) {
+    handyHoeren();   // Zuhören schadet nie – ohne Erlaubnis kommen einfach keine Werte
+    if (brauchtErlaubnis && GROB) {
+      var handyFrueher = handyGemerkt();
+      if (handyFrueher === 'ja') {
+        // schon einmal erlaubt: beim nächsten Schütteln still erneut anfragen (iOS fragt dann nicht noch einmal)
+        var handyEinmal = function () {
+          el.schuetteln.removeEventListener('click', handyEinmal); el.griff.removeEventListener('touchend', handyEinmal);
+          handyFragen(true);
+        };
+        el.schuetteln.addEventListener('click', handyEinmal); el.griff.addEventListener('touchend', handyEinmal);
+      } else if (handyFrueher !== 'nein' && IOS) handyHinweis('frage');   // gleich von Anfang an: später verschiebt sich nichts
+    }
+  }
+  el.handyAn.addEventListener('click', function () { if (!el.handy.classList.contains('fertig')) handyFragen(false); });
+  el.handyWeg.addEventListener('click', function () { handyMerken('nein'); handyHinweis(''); el.schuetteln.focus({ preventScroll: true }); });
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function (e) { kugelImBild = e[e.length - 1].intersectionRatio >= 0.3; }, { threshold: [0, 0.3, 0.6] }).observe(el.huelle);
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; }
+    else if (inBewegung()) starte();
+  });
+
+  /* --- Einen Tag auf den großen Sockel stellen --- */
+  function zeigeTag(tag, ausFahrt) {
+    token++;
+    var mein = token;
+    var alt = kugelTag;
+    kugelTag = tag;
+    flocken.length = 0; brocken.length = 0; wasserStill(); skript = null; glanz = -1;
+    feder.x = feder.y = feder.vx = feder.vy = feder.rot = feder.vr = 0; feder.zx = feder.zy = 0;
+    kugelOffen = tag === null || K.istGeoeffnet(tag);
+    schneeGesamt = schneeMenge();
+    proFlocke = 0.1 * G.R * SP / schneeGesamt;
+    if (kugelOffen) { decke = null; deckeVorrat = 0; verteileSchnee(schneeGesamt); }
+    else { deckeVorrat = Math.round(schneeGesamt * 0.72); verteileSchnee(schneeGesamt - deckeVorrat); baueDecke(tag); }
+    quelle = null; hintergrund = null; hgEin = 1; laedt = false;
+    grundFarbe = tag === null ? null : F.farbe(tag);
+    if (tag === null) { quelle = malNovember(640); baueHintergrund(); }
+    else ladeQuelle(tag, mein, false);
+    zeichne();
+    aktualisiereText();
+    if (alt !== tag || ausFahrt) { if (alt) fuelleMini(alt); if (tag) fuelleMini(tag); if (anzeigeAktiv && anzeigeAktiv !== tag) fuelleMini(anzeigeAktiv); }
+  }
+
+  // Foto des Tages für die Kugel holen. Gezeichnet (und per getImageData verzerrt) wird erst nach onload + decode.
+  // nachladen = true: nur schärfere Fassung nach einer Größenänderung – das bisherige Bild bleibt bis dahin stehen.
+  function ladeQuelle(tag, mein, nachladen) {
+    var px = quellPx();
+    quellePx = px;
+    function uebernehmen(im, endgueltig) {
+      if (mein !== token) return;
+      if (im) {
+        var schonDa = !!hintergrund;
+        quelle = im;
+        baueHintergrund();
+        laedt = false;
+        // sanft einblenden, wenn man das Foto gerade sieht; unter der Schneedecke oder beim Schärfer-Tausch sofort
+        hgEin = (schonDa || nachladen || REDUZIERT || !fotoSichtbar() || !hintergrund) ? 1 : 0;
+      } else if (endgueltig) {
+        laedt = false;   // gar nichts zu bekommen: es bleibt das Leuchten in der Tagesfarbe
+      }
+      miniFreigeben();
+      zeigeLaden();
+      if (hgEin < 1) starte(); else if (!raf) zeichne();
+    }
+    if (stufenweise(tag, px) && !nachladen) {
+      holeBild(tag, 480).then(function (grob) {
+        if (mein !== token) return null;
+        if (grob && !grob.ersatz) uebernehmen(grob, false);
+        return holeBild(tag, px);
+      }).then(function (scharf) {
+        if (mein !== token) return;
+        // Ersatzbild nur nehmen, wenn noch gar kein Foto da ist
+        if (scharf && scharf.ersatz && hintergrund && quelle && !quelle.ersatz) scharf = null;
+        uebernehmen(scharf, true);
+      });
+    } else {
+      holeBild(tag, px).then(function (im) {
+        if (mein !== token) return;
+        if (nachladen && (!im || im.ersatz)) im = null; // bisheriges Bild behalten
+        uebernehmen(im, true);
+      });
+    }
+    if (!nachladen) { laedt = true; zeigeLaden(); }
+  }
+
+  // Regal-Fotos erst laden, wenn das Kugel-Foto da ist (oder nach kurzer Zeit) – das Wichtigste zuerst
+  var miniFrei = false;
+  function miniFreigeben() {
+    if (miniFrei) return;
+    miniFrei = true;
+    for (var t = 1; t <= 24; t++) if (minis[t] && zustand(t) === 'offen') miniFoto(minis[t], t);
+  }
+  setTimeout(miniFreigeben, 2500);
+  // Ist das Foto in der Kugel gerade zu sehen (offen, beim Freischütteln oder beim Ausblenden der Decke)?
+  function fotoSichtbar() { return kugelTag !== null && (kugelOffen || angefangen || !decke || deckeFertig); }
+  function zeigeLaden() {
+    var an = laedt && fotoSichtbar();
+    el.laden.classList.toggle('an', an);
+    if (an) el.huelle.setAttribute('aria-busy', 'true'); else el.huelle.removeAttribute('aria-busy');
+  }
+
+  /* ================================================================
+     Texte
+     ================================================================ */
+  function standardTag() { var h = K.heute(); return h === 0 ? null : h >= 25 ? 24 : h; }
+
+  // Vor dem Öffnen ist Schütteln die Hauptsache, danach das große Foto
+  // Beide Knöpfe behalten ihren Platz – nichts rutscht unter dem Finger weg.
+  function knoepfe(offen) {
+    el.ansehen.hidden = kugelTag === null;
+    el.schuetteln.className = 'knopf ' + (offen ? 'knopf-glas' : 'knopf-messing');
+    el.ansehen.className = 'knopf ' + (offen ? 'knopf-messing' : 'knopf-glas');
+    if (offen) el.ansehen.removeAttribute('aria-disabled'); else el.ansehen.setAttribute('aria-disabled', 'true');
+  }
+
+  function aktualisiereText() {
+    var h = K.heute(), t = kugelTag, titel, info;
+    el.schild.innerHTML = mitZiffern(t === null ? 'Advent ' + K.JAHR : 'Tag ' + t);
+    if (t === null) {
+      titel = 'Bald ist Advent';
+      info = 'Am 1. Dezember steht hier die erste Kugel mit einem Foto. Schütteln darfst du schon jetzt.';
+      knoepfe(false);
+      el.innen.setAttribute('aria-label', 'Schneekugel mit einem verschneiten Häuschen');
+    } else if (kugelOffen) {
+      // Ohne Bildunterschrift wird das Datum zur Überschrift (nie eine leere Zeile)
+      var bu = titelVon(t), folgt = fotoFolgt(t);
+      titel = bu || K.datumText(t);
+      if (h >= 25 && t === 24 && !folgt) info = 'Alle 24 Kugeln sind offen. Schüttle sie, so oft du magst.';
+      else if (folgt) info = (bu ? K.datumText(t) + ' – ' : '') + (bu ? 'das' : 'Das') + ' Foto für diesen Tag kommt bald.';
+      else if (bu) info = K.datumText(t) + (t === h ? ' – das Foto von heute.' : '.');
+      else info = t === h ? 'Das Foto von heute.' : 'Das Foto von Tag ' + t + '.';
+      knoepfe(true);
+      el.innen.setAttribute('aria-label', 'Schneekugel Tag ' + t + (bu ? ', Foto: ' + bu : ', Foto vom ' + K.datumText(t)));
+    } else {
+      titel = t === h ? 'Tag ' + t + ' ist zugeschneit' : 'Tag ' + t + ' wartet noch auf dich';
+      if (textStufe === 2) info = 'Weiter schütteln – das Foto taucht schon auf.';
+      else if (textStufe === 1) info = 'Weiter kräftig schütteln – der Schnee sitzt noch fest!';
+      else info = (t === h ? K.datumText(t) + '. ' : 'Verpasst? Kein Problem. ') + (handyDa ? 'Schüttel dein Handy, zieh die Kugel kräftig hin und her oder drück auf „Schütteln“.' : 'Zieh die Kugel kräftig hin und her oder rauf und runter – oder drück auf „Schütteln“.');
+      knoepfe(false);
+      el.innen.setAttribute('aria-label', 'Schneekugel Tag ' + t + ', noch zugeschneit');
+    }
+    el.titel.innerHTML = mitZiffern(titel); el.info.textContent = info;
+    aktualisiereNachholen();
+    zeigeLaden();
+  }
+
+  // Verpasste Kugel direkt unter der großen Kugel anbieten (im Regal steht sie wegen der gemischten Reihenfolge oft weit unten)
+  var nachholTag = 0;
+  function aktualisiereNachholen() {
+    var h = Math.min(24, K.heute()), t = 0;
+    for (var d = h; d >= 1; d--) if (zustand(d) === 'verpasst' && d !== kugelTag) { t = d; break; }
+    nachholTag = t;
+    if (!t || (kugelTag !== null && !kugelOffen)) { el.nachholen.hidden = true; return; }
+    el.nachholen.hidden = false;
+    el.nachholen.textContent = (t === K.heute() - 1 ? 'Gestern verpasst: Kugel ' : 'Verpasst: Kugel ') + t + ' holen';
+  }
+
+  // Titel aus den Einstellungen, falls der Server ihn mitliefert; Zahlen mit Versalziffern
+  var M = window.ADVENTSKALENDER;
+  if (M && typeof M.titel === 'string' && M.titel.trim()) el.h1.innerHTML = mitZiffern(M.titel.trim());
+
+  function kopf() {
+    var h = K.heute();
+    document.body.classList.toggle('november', h === 0);
+    document.body.classList.toggle('fest', h >= 25);
+    el.heuteZeile.textContent = h === 0 ? 'Noch ist November. Am 1. Dezember geht’s los.'
+      : h >= 25 ? 'Frohe Weihnachten! Alle 24 Kugeln stehen im Regal.'
+      : 'Heute ist ' + K.datumText(h) + '.';
+  }
+
+  /* ================================================================
+     Regal mit 24 Mini-Kugeln
+     ================================================================ */
+  var minis = [];
+  var mqHandy = window.matchMedia('(max-width: 599px)');
+  // Feste, gemischte Anordnung wie bei einem echten Adventskalender
+  function anordnung() {
+    var r = K.reihenfolge ? K.reihenfolge() : null, ok = r && r.length === 24, i;
+    if (ok) { var gesehen = {}; for (i = 0; i < 24; i++) { if (!(r[i] >= 1 && r[i] <= 24) || gesehen[r[i]]) ok = false; gesehen[r[i]] = 1; } }
+    if (ok) return r;
+    r = []; for (i = 1; i <= 24; i++) r.push(i); return r;
+  }
+
+  function zustand(t) {
+    if (!K.darfOeffnen(t)) return 'zu';
+    if (K.istGeoeffnet(t)) return 'offen';
+    return t === K.heute() ? 'heute' : 'verpasst';
+  }
+
+  function aktualisiereHilfe() {
+    var h = K.heute(), verpasst = false;
+    for (var t = 1; t <= 24; t++) if (zustand(t) === 'verpasst') verpasst = true;
+    var text;
+    if (h === 0) text = 'Alle Kugeln sind noch eingepackt. Ab 1. Dezember darfst du jeden Tag eine auspacken.';
+    else if (h >= 25 && !verpasst) text = 'Alle Kugeln sind offen. Tippe eine an, um sie auf den großen Sockel zu stellen.';
+    else if (h >= 25) text = 'Ein paar Kugeln sind noch zugeschneit – tippe sie an und schüttle sie frei. Roter Punkt: noch nicht geöffnet.';
+    else text = 'Tippe eine Kugel an, dann kommt sie auf den Sockel. Weiße sind zugeschneit, eingepackte kommen noch.' +
+      (verpasst ? ' Roter Punkt: verpasst, jetzt nachholen.' : '');
+    el.hilfe.textContent = text;
+  }
+
+  function fuelleMini(t) {
+    var b = minis[t];
+    if (!b) return;
+    var z = zustand(t), h = K.heute(), istHeute = t === h, aktiv = t === (anzeigeAktiv !== null ? anzeigeAktiv : kugelTag);
+    b.className = 'mini z-' + z + (istHeute ? ' ist-heute' : '') + (aktiv ? ' ist-aktiv' : '');
+    var kugel;
+    if (z === 'offen') kugel = '<span class="mini-kugel mk-offen"></span>';
+    else if (z === 'zu') kugel = '<span class="mini-kugel mk-zu mk-papier-' + (t % 2 ? 'a' : 'b') + '"><svg class="schleife" viewBox="0 0 24 16" aria-hidden="true"><use href="#schleife"/></svg></span>';
+    else kugel = '<span class="mini-kugel mk-schnee"></span>';
+    b.innerHTML = (istHeute ? '<span class="mini-heute" aria-hidden="true">Heute</span>' : '') +
+      '<span class="mini-figur">' + kugel + '<span class="mini-sockel"><span class="mini-zahl">' + t + '</span></span></span>' +
+      (z === 'verpasst' ? '<span class="mini-punkt" aria-hidden="true"></span>' : '');
+    if (z === 'offen') miniFoto(b, t);
+    var status = z === 'offen' ? 'geöffnet' : z === 'zu' ? 'noch eingepackt' : z === 'heute' ? 'heute, noch zugeschneit' : 'verpasst, jetzt nachholen';
+    b.setAttribute('aria-label', 'Tag ' + t + ', ' + K.datumText(t) + ' – ' + status + (aktiv ? ', steht auf dem Sockel' : ''));
+    if (aktiv) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+  }
+
+  /* --- Fotos der offenen Mini-Kugeln: kleine Vorschau (480 px), erst wenn das Regal in Sichtnähe ist --- */
+  var miniBilder = {};   // url → { stand: 'laedt' | 'ok' | 'fehler', ersatz }
+  var miniSicht = window.IntersectionObserver ? new IntersectionObserver(function (eintraege) {
+    eintraege.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var b = e.target, t = +b.dataset.tag;
+      b.dataset.sicht = '1';
+      miniSicht.unobserve(b);
+      if (minis[t] === b && zustand(t) === 'offen') miniFoto(b, t);
+    });
+  }, { rootMargin: '240px 0px' }) : null;
+
+  function miniFoto(b, t) {
+    var span = b.querySelector('.mini-kugel');
+    if (!span) return;
+    var u = F.vorschau(t, 160), e = miniBilder[u];
+    span.style.backgroundColor = F.farbe(t);
+    if (istDaten(u) || (e && e.stand === 'ok')) { span.style.backgroundImage = cssUrl(u); return; }
+    if (e && e.stand === 'fehler') { if (e.ersatz) span.style.backgroundImage = cssUrl(e.ersatz); return; }
+    span.classList.add('mk-laedt');
+    if (e) return;                                   // lädt schon – meldet sich gleich
+    if (miniSicht && !b.dataset.sicht) return;       // noch weit weg vom Bildschirm
+    if (!miniFrei) return;                           // erst das Kugel-Foto
+    e = miniBilder[u] = { stand: 'laedt', ersatz: '' };
+    var im = new Image();
+    im.decoding = 'async';
+    im.onload = function () { e.stand = 'ok'; miniFertig(t, u); };
+    im.onerror = function () { e.stand = 'fehler'; e.ersatz = ersatzUrl(t, 160); miniFertig(t, u); };
+    e.im = im;
+    im.src = u;
+  }
+  function miniFertig(t, u) {
+    var b = minis[t], e = miniBilder[u];
+    if (e) e.im = null;
+    if (!b || zustand(t) !== 'offen' || F.vorschau(t, 160) !== u) return;
+    var span = b.querySelector('.mini-kugel');
+    if (!span) return;
+    span.classList.remove('mk-laedt');
+    var bild = e && e.stand === 'ok' ? u : (e && e.ersatz);
+    if (bild) span.style.backgroundImage = cssUrl(bild);
+    if (e && e.stand === 'fehler' && !e.ersatz) delete miniBilder[u]; // ohne Ersatz später erneut versuchen
+  }
+
+  function baueRegal() {
+    var cols = mqHandy.matches ? 4 : 6, folge = anordnung();
+    el.bretter.innerHTML = ''; minis = [];
+    if (miniSicht) miniSicht.disconnect();
+    el.bretter.style.setProperty('--cols', cols);
+    for (var r = 0; r < 24 / cols; r++) {
+      var brett = document.createElement('div'); brett.className = 'brett';
+      for (var i = 0; i < cols; i++) {
+        var t = folge[r * cols + i], b = document.createElement('button');
+        b.type = 'button'; b.dataset.tag = t; minis[t] = b; brett.appendChild(b); fuelleMini(t);
+        if (miniSicht) miniSicht.observe(b);
+      }
+      el.bretter.appendChild(brett);
+    }
+    aktualisiereHilfe();
+  }
+  var mqWechsel = function () { versteckeBlase(); baueRegal(); };
+  if (mqHandy.addEventListener) mqHandy.addEventListener('change', mqWechsel); else if (mqHandy.addListener) mqHandy.addListener(mqWechsel);
+
+  var blaseTimer = 0;
+  function versteckeBlase() { clearTimeout(blaseTimer); el.blase.hidden = true; }
+  function zeigeBlase(btn, kopfText, unterText) {
+    var b = el.blase;
+    b.innerHTML = '<strong></strong><span></span>';
+    b.firstChild.innerHTML = mitZiffern(kopfText); b.lastChild.textContent = unterText;
+    b.hidden = false; b.classList.remove('unten');
+    b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
+    var rr = el.regal.getBoundingClientRect(), br = btn.getBoundingClientRect();
+    var w = b.offsetWidth, mitte = br.left + br.width / 2 - rr.left;
+    var left = Math.max(2, Math.min(rr.width - w - 2, mitte - w / 2));
+    var top = br.top - rr.top - b.offsetHeight - 4;
+    if (br.top - b.offsetHeight - 14 < 0) { top = br.bottom - rr.top + 8; b.classList.add('unten'); }
+    b.style.left = left + 'px'; b.style.top = top + 'px';
+    b.style.setProperty('--pfeil', Math.max(16, Math.min(w - 16, mitte - left)) + 'px');
+    sage(kopfText + ' ' + unterText);
+    clearTimeout(blaseTimer); blaseTimer = setTimeout(versteckeBlase, 2800);
+  }
+
+  function sperre(btn, t) {
+    var fig = btn.querySelector('.mini-figur');
+    if (fig) { fig.classList.remove('wackelt'); void fig.offsetWidth; fig.classList.add('wackelt'); }
+    zeigeBlase(btn, K.sperrText(t), 'Kugel ' + t + ' ist am ' + K.datumText(t) + ' dran.');
+  }
+
+  el.bretter.addEventListener('animationend', function (e) { if (e.target.classList) e.target.classList.remove('wackelt'); });
+  el.bretter.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('.mini');
+    if (!btn) return;
+    var t = +btn.dataset.tag;
+    if (!K.darfOeffnen(t)) { sperre(btn, t); return; }
+    versteckeBlase();
+    var perTaste = e.detail === 0;
+    if (t === kugelTag && !fahrt && !wartet) {
+      // steht schon auf dem Sockel: keine Fahrt, nur zur Bühne (am Desktop ein kleiner Hüpfer als Antwort)
+      zurBuehne().then(function (gescrollt) {
+        if (!gescrollt) { feder.vy -= G.W * 0.6; starte(); }
+        if (perTaste) el.schuetteln.focus({ preventScroll: true });
+      });
+      return;
+    }
+    setzeAufSockel(t, btn, perTaste);
+  });
+  el.nachholen.addEventListener('click', function () {
+    if (nachholTag) setzeAufSockel(nachholTag, minis[nachholTag], true);
+  });
+  document.addEventListener('pointerdown', function (e) { if (!el.blase.hidden && !(e.target.closest && e.target.closest('.mini'))) versteckeBlase(); });
+
+  // Bühne sichtbar machen (nur per window.scrollTo, damit die Übersichtsseite nicht mitscrollt); löst aus, wenn das Scrollen fertig ist
+  function zurBuehne() {
+    return new Promise(function (fertig) {
+      var r = el.platz.getBoundingClientRect(), vh = window.innerHeight;
+      var kr = el.huelle.getBoundingClientRect();
+      if (kr.top >= -kr.height * 0.05 && kr.top + kr.height * 0.85 <= vh) { fertig(false); return; }
+      var ziel = Math.max(0, Math.round(window.scrollY + r.top - 10)), erledigt = false, timer = 0;
+      function ende() {
+        if (erledigt) return;
+        erledigt = true; clearTimeout(timer); window.removeEventListener('scrollend', ende);
+        fertig(true);
+      }
+      window.addEventListener('scrollend', ende);
+      timer = setTimeout(ende, REDUZIERT ? 80 : 620);
+      try { window.scrollTo({ top: ziel, behavior: REDUZIERT ? 'auto' : 'smooth' }); } catch (x) { window.scrollTo(0, ziel); }
+      (function warte() {
+        if (erledigt) return;
+        if (Math.abs(window.scrollY - ziel) < 2) { ende(); return; }
+        requestAnimationFrame(warte);
+      })();
+    });
+  }
+
+  // Eine andere Kugel wählen: erst zur Bühne scrollen, dann Kamerafahrt (oder bei reduzierter Bewegung überblenden)
+  var wartet = null;
+  function setzeAufSockel(t, btn, fokus) {
+    versteckeBlase();
+    // Foto schon während des Hochscrollens holen, damit die neue Kugel fertig hereinfährt
+    if (K.darfOeffnen(t) && t !== kugelTag) kugelVorladen(t);
+    if (fahrt) {
+      // die ankommende Kugel ist schon zu sehen: nicht umlenken, sondern die letzte Wahl vormerken
+      if (t === fahrt.ziel) { fahrtWunsch = null; markiereAktiv(t); return; }
+      fahrtWunsch = { t: t, fokus: fokus }; markiereAktiv(t);
+      return;
+    }
+    if (wartet) { wartet.t = t; wartet.fokus = wartet.fokus || !!fokus; markiereAktiv(t); return; }
+    if (t === kugelTag) return;
+    wartet = { t: t, fokus: !!fokus };
+    markiereAktiv(t);
+    zurBuehne().then(function () {
+      var w = wartet; wartet = null;
+      if (!w) return;
+      if (w.t === kugelTag || !K.darfOeffnen(w.t)) { anzeigeAktiv = null; fuelleMini(w.t); if (kugelTag) fuelleMini(kugelTag); return; }
+      if (REDUZIERT || !G.R) blende(w.t, w.fokus); else starteFahrt(w.t, w.fokus);
+    });
+  }
+
+  function blende(t, fokus) {
+    el.huelle.classList.add('blendet');
+    setTimeout(function () {
+      anzeigeAktiv = null;
+      zeigeTag(t, true);
+      el.huelle.classList.remove('blendet');
+      sage('Kugel ' + t + ' steht jetzt auf dem Sockel.');
+      if (fokus) el.schuetteln.focus({ preventScroll: true });
+    }, 170);
+  }
+
+  el.schuetteln.addEventListener('click', schuettle);
+  el.ansehen.addEventListener('pointerdown', function () { if (kugelOffen && kugelTag !== null) grossVorladen(kugelTag, 0); });
+  el.ansehen.addEventListener('click', function () {
+    if (kugelTag !== null && kugelOffen) { oeffneAnsicht(kugelTag, el.ansehen); return; }
+    if (kugelTag !== null) { el.info.textContent = 'Erst schütteln – das Foto ist noch zugeschneit.'; feder.vy -= G.W * 0.6; starte(); }
+  });
+
+  /* ================================================================
+     Bildansicht
+     ================================================================ */
+  var A = { liste: [], i: 0, opener: null, zug: null };
+
+  function oeffneAnsicht(t, opener) {
+    A.liste = K.geoeffnet(); A.i = A.liste.indexOf(t);
+    if (A.i < 0) return;
+    A.opener = opener || document.activeElement;
+    zeigeAnsichtsBild(0);
+    if (!el.dlg.open) {
+      if (el.dlg.showModal) el.dlg.showModal(); else el.dlg.setAttribute('open', '');
+      document.documentElement.classList.add('gesperrt');
+      if (!REDUZIERT && el.dlg.animate) el.dlg.firstElementChild.animate([{ opacity: 0, transform: 'scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: 'ease-out' });
+    }
+    try { el.schliessen.focus({ preventScroll: true }); } catch (x) { el.schliessen.focus(); }
+  }
+
+  function schliesseAnsicht() { if (el.dlg.open) { if (el.dlg.close) el.dlg.close(); else { el.dlg.removeAttribute('open'); nachSchliessen(); } } }
+  function nachSchliessen() {
+    document.documentElement.classList.remove('gesperrt');
+    var z = A.opener && document.contains(A.opener) && !A.opener.hidden ? A.opener : el.schuetteln;
+    try { z.focus({ preventScroll: true }); } catch (x) { z.focus(); }
+  }
+  el.dlg.addEventListener('close', nachSchliessen);
+  el.schliessen.addEventListener('click', schliesseAnsicht);
+
+  // Großes Foto setzen: bis es geladen ist, ist das alte Bild unsichtbar und ein Ladehinweis erscheint
+  var ansichtUrl = '', ansichtTag = 0, ansichtFehler = 0;
+  function ansichtBildSetzen(t) {
+    var u = F.bild(t);
+    ansichtTag = t; ansichtUrl = u; ansichtFehler = 0;
+    if (el.bild.getAttribute('src') !== u) {
+      el.bild.removeAttribute('data-platzhalter');
+      el.spur.classList.add('laedt'); el.aLaden.classList.add('an'); el.aBuehne.setAttribute('aria-busy', 'true');
+      el.bild.src = u;
+    }
+    if (el.bild.complete && el.bild.naturalWidth > 0) ansichtGeladen();
+  }
+  function ansichtGeladen() { el.spur.classList.remove('laedt'); el.aLaden.classList.remove('an'); el.aBuehne.removeAttribute('aria-busy'); }
+  el.bild.addEventListener('load', function () { if (el.bild.complete && el.bild.naturalWidth > 0) ansichtGeladen(); });
+  el.bild.addEventListener('error', function () {
+    ansichtFehler++;
+    if (ansichtFehler === 1) {
+      // Der Produktions-Baustein tauscht fehlgeschlagene Fotos selbst gegen den Platzhalter (data:) – dann folgt gleich „load“
+      if (istDaten(el.bild.getAttribute('src'))) return;
+      var e = ersatzUrl(ansichtTag);
+      if (e) { el.bild.src = e; return; }
+    }
+    ansichtGeladen();
+  });
+
+  var vorladeTimer = 0;
+  function zeigeAnsichtsBild(richtung) {
+    var t = A.liste[A.i];
+    function setze() {
+      ansichtBildSetzen(t);
+      var bu = titelVon(t);
+      el.bild.alt = 'Fotocollage von Tag ' + t + (bu ? ': ' + bu : ', ' + K.datumText(t));
+      // ohne Bildunterschrift: „Tag 12“ als Überschrift, darunter nur das Datum
+      el.aTitel.innerHTML = mitZiffern(bu || 'Tag ' + t);
+      el.aDatum.textContent = bu ? 'Tag ' + t + ' – ' + K.datumText(t) : K.datumText(t);
+      el.aZaehler.textContent = A.liste.length === 1 ? '1 Foto geöffnet' : A.liste.length + ' Fotos geöffnet';
+      el.zurueck.disabled = A.i <= 0; el.weiter.disabled = A.i >= A.liste.length - 1;
+      clearTimeout(vorladeTimer);
+      vorladeTimer = setTimeout(function () {
+        if (!el.dlg.open) return;
+        if (A.i + 1 < A.liste.length) F.bild(A.liste[A.i + 1]);
+        setTimeout(function () { if (el.dlg.open && A.i - 1 >= 0) F.bild(A.liste[A.i - 1]); }, 180);
+      }, 260);
+    }
+    if (!richtung || REDUZIERT || !el.spur.animate) { setze(); el.spur.style.transform = ''; return; }
+    var von = el.spur.style.transform || 'translateX(0px)';
+    var aus = el.spur.animate([{ transform: von, opacity: 1 }, { transform: 'translateX(' + (-richtung * 36) + '%)', opacity: 0 }], { duration: 170, easing: 'ease-in', fill: 'forwards' });
+    aus.onfinish = function () {
+      setze(); el.spur.style.transform = '';
+      aus.cancel();
+      el.spur.animate([{ transform: 'translateX(' + (richtung * 36) + '%)', opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 250, easing: 'cubic-bezier(.2,.7,.2,1)' });
+    };
+  }
+
+  function blaettern(d) {
+    var n = A.i + d;
+    if (n < 0 || n >= A.liste.length) { zurueckfedern(); return; }
+    A.i = n; zeigeAnsichtsBild(d);
+  }
+  function zurueckfedern() {
+    var von = el.spur.style.transform || 'translateX(0px)';
+    el.spur.style.transform = '';
+    if (el.spur.animate && !REDUZIERT) el.spur.animate([{ transform: von }, { transform: 'translateX(0)' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1.2)' });
+  }
+  el.zurueck.addEventListener('click', function () { blaettern(-1); });
+  el.weiter.addEventListener('click', function () { blaettern(1); });
+  el.dlg.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); blaettern(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); blaettern(1); }
+  });
+  el.aBuehne.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  el.aBuehne.addEventListener('pointerdown', function (e) {
+    if (e.button > 0) return;
+    if (e.pointerType === 'mouse') e.preventDefault();
+    A.zug = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), dx: 0 };
+    try { el.aBuehne.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+  });
+  el.aBuehne.addEventListener('pointermove', function (e) {
+    var z = A.zug;
+    if (!z || e.pointerId !== z.id) return;
+    var dx = e.clientX - z.x;
+    if ((dx > 0 && A.i <= 0) || (dx < 0 && A.i >= A.liste.length - 1)) dx *= 0.3;
+    z.dx = dx;
+    el.spur.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+  });
+  function ansichtZugEnde(e) {
+    var z = A.zug;
+    if (!z || e.pointerId !== z.id) return;
+    A.zug = null;
+    var dx = z.dx, dauer = performance.now() - z.t, grenze = Math.min(90, el.aBuehne.clientWidth * 0.18);
+    if (e.type !== 'pointercancel' && (Math.abs(dx) > grenze || (Math.abs(dx) > 28 && dauer < 260))) blaettern(dx < 0 ? 1 : -1);
+    else if (dx !== 0) zurueckfedern();
+  }
+  el.aBuehne.addEventListener('pointerup', ansichtZugEnde);
+  el.aBuehne.addEventListener('pointercancel', ansichtZugEnde);
+
+  /* ================================================================
+     Größe, Datum, Start
+     ================================================================ */
+  function neuVermessen() {
+    var altR = G.R, altCx = G.cx, altCy = G.cy;
+    if (!messen()) return;
+    if (altR) {
+      var f = G.R / altR;
+      for (var i = 0; i < flocken.length; i++) { var p = flocken[i]; p.x = G.cx + (p.x - altCx) * f; p.y = G.cy + (p.y - altCy) * f; p.rw *= f; }
+      for (var b = 0; b < brocken.length; b++) { var q = brocken[b]; q.x = G.cx + (q.x - altCx) * f; q.y = G.cy + (q.y - altCy) * f; q.r0 *= f; }
+      for (var c = 0; c < SP; c++) hoehe[c] *= f;
+      proFlocke *= f;
+    }
+    baueSprites(); baueGlas(); baueHintergrund();
+    // Kugel deutlich größer geworden (z. B. Handy gedreht): schärfere Vorschau nachladen
+    if (kugelTag !== null && !laedt && quellPx() > quellePx) ladeQuelle(kugelTag, token, true);
+    if (decke) {
+      var S = Math.max(4, Math.round(2 * G.R * DPR)), neu = leinwand(S, S);
+      neu.getContext('2d').drawImage(decke, 0, 0, S, S);
+      decke = neu; dctx = neu.getContext('2d');
+    }
+    zeichne();
+  }
+
+  function renderAlles() {
+    schliesseAnsicht(); versteckeBlase();
+    wartet = null; fahrtWunsch = null;
+    if (fahrt) beendeFahrt(false);
+    anzeigeAktiv = null;
+    kopf();
+    kugelTag = standardTag();
+    baueRegal();
+    kugelTag = -1;
+    zeigeTag(standardTag());
+  }
+
+  messen(); baueSprites(); baueMuster(); baueGlas();
+  renderAlles();
+  K.onChange(renderAlles);
+
+  if (window.ResizeObserver) {
+    var roWartet = false;
+    new ResizeObserver(function () {
+      if (roWartet) return; roWartet = true;
+      requestAnimationFrame(function () { roWartet = false; if (Math.abs(el.huelle.clientWidth - G.W) > 0.5 || Math.abs(el.huelle.clientHeight - G.H) > 0.5) neuVermessen(); });
+    }).observe(el.huelle);
+  } else window.addEventListener('resize', neuVermessen);
+
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('700 40px "Alegreya Sans"').then(function () {
+      if (decke && !angefangen && dctx && kugelTag) { malDecke(dctx, decke.width, kugelTag); if (!raf) zeichne(); }
+    }, function () {});
+  }
+
+  // Nur zum Testen (Adresse mit ?debug=schnee): lesender Blick auf den Schnee – sonst gibt es das nicht
+  if (/[?&]debug=schnee(&|$)/.test(window.location.search)) {
+    window.__schnee = Object.freeze({
+      stand: function () {
+        return {
+          R: G.R, cx: G.cx, cy: G.cy, boden: G.boden, bodenHalb: G.bodenHalb, gesamt: schneeGesamt, imHaufen: imSchnee,
+          fliegend: flocken.length, brocken: brocken.length, offen: kugelOffen, tag: kugelTag, laeuft: !!raf, leistung: leistung, zeit: zeit,
+          decke: decke ? { rest: zellenRest, gesamt: zellenGesamt, fertig: deckeFertig } : null,
+          staerke: wasser.staerke, turb: wasser.turb, modi: Array.prototype.slice.call(mc), hoehe: Array.prototype.slice.call(hoehe),
+          feder: { x: feder.x, y: feder.y, rot: feder.rot },
+          flocken: flocken.map(function (p) { return [p.x, p.y, p.s, p.z]; })
+        };
+      }
+    });
+  }
+
+  // Einmalige, leise Einladung: die zugeschneite Kugel wackelt kurz
+  if (!REDUZIERT) setTimeout(function () {
+    if (!kugelOffen && !angefangen && !raf) { ruhigBis = zeit + 2.6; feder.vx += G.W * 0.55; starte(); }
+  }, 1500);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3b1c33">
+<title>Der Drehbaum – Dein Adventskalender</title>
+<link rel="stylesheet" href="../fonts/baum.css">
+<style>
+:root{
+  /* Farben: Wohnzimmerecke am Abend */
+  --pflaume:#3b1c33;   /* Wand im Lampenlicht */
+  --nacht:#1d0c19;     /* tiefe Schatten, Bildansicht */
+  --tanne:#1e4a37;     /* Nordmanntanne */
+  --honig:#f2c46a;     /* Lichterkette, Stern, Akzente */
+  --kupfer:#cf7446;    /* Kupferkugeln, warme Knöpfe */
+  --creme:#f8ecda;     /* Schrift, Strick-Baumdecke */
+  /* Schriften: weiche Grotesk-Antiqua für Titel und Zahlen, skandinavische Grotesk für Text */
+  --schrift-titel:'Young Serif','Iowan Old Style','Palatino Linotype',Georgia,serif;
+  --schrift-text:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  /* Menü-Knopf aus kalender.js (#kalender-reset, runder 40-px-Knopf: Ansicht wechseln, Testmodus): sitzt fest
+     unten links (Lage setzt kalender.js, hier nichts verschieben). Diese Seite hält nur seine Ecke frei
+     (--menue-knopf-zone, 64 × 64 px ab der Ecke, zzgl. Safe-Area): Hochkant rückt die Knopfleiste rechts neben die
+     Zone (siehe .knoepfe), quer und am Desktop liegt dort nur die Wand neben dem Baum. Während Bildansicht und
+     Kugel-Liste ist der Knopf ausgeblendet (siehe unten). */
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;background:var(--nacht);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{height:100%;margin:0;overflow:hidden;color:var(--creme);font-family:var(--schrift-text);font-size:16px;line-height:1.45;font-variant-numeric:lining-nums;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--honig);outline-offset:3px}
+.unsichtbar{position:absolute!important;top:0;left:0;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+svg.i{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Szene (Canvas hinter allem) ---------- */
+#szene{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+.leuchten{position:fixed;left:0;top:0;width:0;height:0;z-index:1;pointer-events:none;display:none}
+.leuchten.an{display:block}
+.leuchten i{position:absolute;border-radius:50%;mix-blend-mode:screen;will-change:transform,opacity;
+  background:radial-gradient(closest-side,rgba(255,236,170,0) 34%,rgba(255,224,135,.95) 42%,rgba(255,198,96,.5) 58%,rgba(255,170,70,.14) 80%,rgba(255,170,70,0) 100%);
+  animation:puls 1.9s ease-in-out infinite}
+.leuchten.hinten i{background:radial-gradient(closest-side,rgba(255,226,160,.62),rgba(255,190,100,.36) 32%,rgba(255,160,80,.12) 64%,rgba(255,150,70,0) 100%);animation-duration:2.3s}
+.leuchten.seite i{animation-duration:1.45s}
+.leuchten.nah i{animation-duration:1.05s}
+.leuchten.gefunden i::after{content:"";position:absolute;inset:-30%;border-radius:50%;border:2px solid rgba(255,226,150,.9);animation:ring .9s ease-out forwards}
+/* Funken, wenn die heutige Kugel gefunden ist */
+.funken{position:fixed;left:0;top:0;width:0;height:0;z-index:30;pointer-events:none}
+.funken i{position:absolute;left:-5px;top:-5px;width:10px;height:10px;opacity:0;background:#ffe3a0;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);
+  filter:drop-shadow(0 0 4px rgba(255,200,110,.95));animation:funke var(--t,.9s) cubic-bezier(.15,.7,.3,1) var(--v,0s) forwards}
+@keyframes funke{0%{opacity:1;transform:translate(0,0) scale(.3) rotate(0)}70%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(var(--s,1)) rotate(140deg)}}
+@keyframes puls{0%,100%{opacity:.5;transform:scale(.88)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes ring{from{opacity:1;transform:scale(.45)}to{opacity:0;transform:scale(1.25)}}
+
+/* ---------- Raster ---------- */
+.app{position:relative;z-index:2;height:100vh;height:100dvh;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"kopf" "buehne" "steuer";
+  padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.kopf{grid-area:kopf;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:start;column-gap:6px}
+.titel{grid-column:2;text-align:center;min-width:0}
+h1{margin:3px 0 0;font-family:var(--schrift-titel);font-weight:400;font-size:clamp(1.32rem,5.7vw,2.1rem);line-height:1.08;letter-spacing:-.005em;text-wrap:balance;text-shadow:0 2px 16px rgba(16,4,12,.75)}
+.datum{margin:.28rem 0 0;font-size:clamp(.84rem,3.9vw,.95rem);font-weight:600;text-wrap:balance;color:var(--honig);text-shadow:0 1px 8px rgba(16,4,12,.8)}
+.listen-knopf{grid-column:3;grid-row:1;width:44px;height:44px;margin-top:1px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--creme);background:rgba(29,12,25,.5);box-shadow:inset 0 0 0 1.5px rgba(242,196,106,.6)}
+.listen-knopf svg{width:22px;height:22px}
+.listen-knopf:active,.ton-knopf:active{background:rgba(242,196,106,.18)}
+.kopf{position:relative}
+/* Ton-Knopf: Handy/Tablet links in der Kopfzeile (Gegenstück zum Listen-Knopf), Desktop über dem Titel */
+.titel{grid-row:1}
+.ton-knopf{grid-column:1;grid-row:1;position:relative;z-index:3;width:44px;height:44px;margin-top:1px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--creme);background:rgba(29,12,25,.42);box-shadow:inset 0 0 0 1.5px rgba(248,236,218,.32)}
+.ton-knopf svg{width:21px;height:21px}
+.ton-knopf[aria-pressed="false"]{color:rgba(248,236,218,.6)}
+/* nur für den Prototyp-Baustein (dort wird der Knopf nach dem Zurücksetzen kurz zur breiten Textpille und läge
+   dann über dem „‹“-Knopf) – mit dem Produktions-Baustein wirkungslos */
+html body #kalender-reset.ok{width:40px;padding:0}html body #kalender-reset.ok span{display:none}
+
+.buehne{grid-area:buehne;position:relative;min-height:0}
+.baum-platz{position:absolute;inset:0;touch-action:pan-y pinch-zoom;cursor:grab;border-radius:28px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.baum-platz.zieht{cursor:grabbing}
+html.oben,html.oben body{overscroll-behavior:none}
+.baum-platz:focus{outline:none}
+.baum-platz:focus-visible{outline:2px dashed rgba(242,196,106,.5);outline-offset:-6px}
+.baum-platz.zeiger:focus-visible{outline:none}
+
+.steuer{grid-area:steuer;padding:4px 0 0;text-align:center}
+.hinweis{margin:0 auto 10px;max-width:30rem;height:2.9em;overflow:hidden;font-size:1rem;line-height:1.45;text-wrap:balance;text-shadow:0 1px 10px rgba(16,4,12,.95),0 0 2px rgba(16,4,12,.6)}
+/* Knopfleiste: mittig, aber nie in der Ecke des Menü-Knopfs. --kz = wie weit die Leiste vom linken Rand der
+   Steuer-Spalte wegbleiben muss (Zone + Safe-Area − Seitenrand der .app). Ab etwa 550 px Breite bleibt sie mittig,
+   darunter beginnt sie rechts neben der Zone und reicht bis zum rechten Rand. */
+.knoepfe{--kz:calc(var(--menue-knopf-zone,64px) + env(safe-area-inset-left,0px) - max(10px,env(safe-area-inset-left,0px)));
+  display:grid;grid-template-columns:52px minmax(0,1fr) 52px;align-items:center;gap:10px;
+  width:min(420px,calc(100% - var(--kz)));max-width:420px;margin:0 0 0 max(var(--kz),calc((100% - 420px) / 2))}
+.knopf-rund{width:52px;height:52px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--creme);background:rgba(29,12,25,.6);box-shadow:inset 0 0 0 1.5px rgba(242,196,106,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.knopf-rund:active{background:rgba(242,196,106,.2)}
+.knopf-rund:disabled{opacity:.32;cursor:default}
+.knopf-haupt{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;min-height:52px;padding:.6rem 1rem;border:0;border-radius:26px;cursor:pointer;font-weight:700;font-size:1.04rem;line-height:1.15;color:#2b1021;
+  background:linear-gradient(180deg,#f8dc98,var(--honig) 55%,#d8a246);box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -2px 0 rgba(120,70,20,.35),0 10px 22px -10px rgba(0,0,0,.85)}
+.knopf-haupt svg{width:22px;height:22px}
+.knopf-haupt span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.knopf-haupt:active{transform:translateY(1px)}
+.knopf-haupt.kupfer{color:#26090f;background:linear-gradient(180deg,#eeac86,var(--kupfer) 55%,#a5532e)}
+.knopf-haupt.ruhig{color:var(--creme);background:rgba(29,12,25,.62);box-shadow:inset 0 0 0 1.5px rgba(248,236,218,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+
+/* Sprechblase und Dreh-Hinweis */
+.blase{position:fixed;z-index:50;left:0;top:0;width:max-content;max-width:min(270px,82vw);padding:.55rem .9rem .65rem;border-radius:14px;background:var(--creme);color:#2a1424;font-size:.95rem;line-height:1.3;box-shadow:0 14px 30px -10px rgba(0,0,0,.75);pointer-events:none;animation:blaseRein .32s cubic-bezier(.2,.9,.3,1.3)}
+.blase strong{display:block;margin-bottom:.1rem;font-family:var(--schrift-titel);font-weight:400;font-size:1.22rem;line-height:1.15}
+.blase::after{content:"";position:absolute;top:100%;left:var(--pfeil,50%);margin-left:-8px;border:8px solid transparent;border-top-color:var(--creme)}
+.blase.unten::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--creme)}
+@keyframes blaseRein{from{opacity:0;transform:translateY(8px) scale(.92)}to{opacity:1;transform:none}}
+.pfeil{position:absolute;left:50%;bottom:4px;z-index:3;display:inline-flex;align-items:center;gap:.45rem;padding:.45rem 1rem .45rem .8rem;border-radius:999px;white-space:nowrap;pointer-events:none;font-weight:700;color:var(--honig);background:rgba(29,12,25,.78);box-shadow:inset 0 0 0 1px rgba(242,196,106,.45),0 8px 20px -8px rgba(0,0,0,.7);transform:translateX(-50%);animation:schubsL 1.5s ease-in-out infinite}
+.pfeil[hidden]{display:none}
+.pfeil svg{width:22px;height:22px}
+.pfeil.rechts{flex-direction:row-reverse;padding:.45rem .8rem .45rem 1rem;animation-name:schubsR}
+@keyframes schubsL{0%,100%{translate:0 0}50%{translate:-9px 0}}
+@keyframes schubsR{0%,100%{translate:0 0}50%{translate:9px 0}}
+@keyframes wackeln{0%{transform:rotate(0)}15%{transform:rotate(-12deg)}35%{transform:rotate(9deg)}55%{transform:rotate(-6deg)}75%{transform:rotate(3deg)}100%{transform:rotate(0)}}
+
+/* ---------- Liste aller Kugeln (Handy: Blatt von unten, Desktop: Seitenleiste) ---------- */
+.liste{position:fixed;z-index:40;left:0;right:0;bottom:0;max-height:min(84vh,660px);overflow:auto;overscroll-behavior:contain;
+  padding:14px max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+  border-radius:22px 22px 0 0;background:linear-gradient(180deg,#4a2540,#2b1227 70%);box-shadow:0 -24px 60px -12px rgba(0,0,0,.65),inset 0 1px 0 rgba(242,196,106,.3);
+  transform:translateY(104%);visibility:hidden;transition:transform .34s cubic-bezier(.2,.8,.2,1),visibility 0s linear .34s}
+.liste.offen{transform:none;visibility:visible;transition:transform .34s cubic-bezier(.2,.8,.2,1),visibility 0s}
+.liste-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:520px;margin:0 auto}
+.liste h2{margin:0;font-family:var(--schrift-titel);font-weight:400;font-size:1.45rem;line-height:1.1}
+.liste-hilfe{max-width:520px;margin:.3rem auto .8rem;font-size:.92rem;color:rgba(248,236,218,.78);text-wrap:pretty}
+.knopf-rund.klein{width:44px;height:44px}
+.gitter{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px 6px;max-width:520px;margin:0 auto}
+.mini{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:60px;padding:7px 0 5px;border:0;border-radius:12px;background:rgba(248,236,218,.05);cursor:pointer}
+.mini:active{background:rgba(242,196,106,.14)}
+.mk{position:relative;display:block;width:36px;height:44px;margin-top:-6px}
+.mk canvas{display:block;width:100%;height:100%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+.mk-stern{width:34px;height:34px;margin:2px 0 4px}
+.mk-stern svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.mz{font-weight:700;font-size:.86rem;line-height:1}
+.z-zu .mz{color:rgba(248,236,218,.6)}
+.mini.ist-heute{box-shadow:inset 0 0 0 2px var(--honig);background:rgba(242,196,106,.12)}
+.mini.ist-heute .mz{color:var(--honig)}
+.mini.wackelt .mk{animation:wackeln .6s ease-out}
+.legende{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;max-width:520px;margin:.9rem auto 0;padding:0;list-style:none;font-size:.84rem;color:rgba(248,236,218,.72)}
+.legende li{display:inline-flex;align-items:center;gap:6px}
+.legende canvas{display:block;width:20px;height:24px;flex:none}
+.schleier{position:fixed;inset:0;z-index:39;background:rgba(14,4,11,.55);opacity:0;pointer-events:none;transition:opacity .3s}
+.schleier.offen{opacity:1;pointer-events:auto}
+
+/* ---------- Bildansicht ---------- */
+.ansicht{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;overflow:hidden;color:var(--creme);
+  background:radial-gradient(70% 55% at var(--kx,50%) var(--ky,44%),#5b2c48 0%,#36172c 52%,var(--nacht) 100%)}
+.ansicht::backdrop{background:transparent}
+.ansicht:focus{outline:none}
+.ansicht::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.8;
+  background:radial-gradient(18px 18px at 12% 18%,rgba(255,214,130,.22),transparent),radial-gradient(26px 26px at 86% 12%,rgba(255,196,110,.16),transparent),
+    radial-gradient(14px 14px at 78% 84%,rgba(255,220,150,.2),transparent),radial-gradient(30px 30px at 8% 78%,rgba(207,116,70,.16),transparent),
+    radial-gradient(12px 12px at 50% 6%,rgba(255,230,170,.18),transparent),radial-gradient(22px 22px at 94% 52%,rgba(255,206,120,.14),transparent)}
+.ansicht-innen{position:relative;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:6px;
+  padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.ansicht-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;width:100%;max-width:1100px;margin:0 auto}
+.zaehler{margin:0 0 0 4px;font-size:.95rem;font-weight:600;color:var(--honig)}
+.ansicht-buehne{position:relative;min-height:0;overflow:hidden;touch-action:pan-y pinch-zoom;cursor:grab;-webkit-user-select:none;user-select:none}
+.spur{position:relative;height:100%;display:flex;align-items:center;justify-content:center}
+.spur img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 18px 34px rgba(0,0,0,.6));-webkit-user-drag:none;user-select:none;pointer-events:none;transition:opacity .25s}
+.spur.laedt img,.spur.fehler img{opacity:0}
+/* Solange das große Bild unterwegs ist: die schon geladene kleine Vorschau unscharf dahinter (nur wenn vorhanden) */
+.vorbild{position:absolute;inset:4%;background:center/contain no-repeat;filter:blur(18px) saturate(1.1);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s,visibility 0s linear .25s}
+.spur.laedt.mitvor .vorbild{opacity:.5;visibility:visible;transition:opacity .25s}
+.lader{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--honig);font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}
+.spur.laedt .lader{opacity:1;transition-delay:.18s}
+.lader svg{width:46px;height:46px;filter:drop-shadow(0 1px 6px rgba(16,4,12,.8))}
+.lader span{text-shadow:0 1px 8px rgba(16,4,12,.95),0 0 2px rgba(16,4,12,.7)}
+.spur.laedt .lader svg{animation:drehen 1.6s linear infinite}   /* dreht nur, solange wirklich geladen wird */
+@keyframes drehen{to{transform:rotate(360deg)}}
+.fehlbild{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center}
+.spur.fehler .fehlbild{display:flex}
+.fehlbild p{margin:0;max-width:22rem}
+.knopf-text{min-height:48px;padding:.6rem 1.2rem;border:0;border-radius:24px;font-weight:700;cursor:pointer;color:#2b1021;background:linear-gradient(180deg,#f8dc98,var(--honig) 55%,#d8a246)}
+.ansicht-fuss{display:grid;grid-template-columns:52px minmax(0,1fr) 52px;align-items:center;gap:8px;width:100%;max-width:780px;margin:0 auto}
+.ansicht-text{min-width:0;text-align:center}
+.ansicht-text h2{margin:0;font-family:var(--schrift-titel);font-weight:400;font-size:clamp(1.25rem,4.8vw,1.8rem);line-height:1.15;text-wrap:balance}
+.ansicht-text p{margin:.2rem 0 0;font-size:.95rem;color:var(--honig)}
+html.vollansicht #kalender-reset,html.listeoffen #kalender-reset{display:none}
+
+/* ---------- Schmale Handys hochkant: Leiste rechts neben der Menü-Zone – kleinere Rundknöpfe, Symbol im
+   Hauptknopf erst ab 420 px, damit auch „Kugel 12 aufmachen“ / „Kugel 22 ist noch zu“ ganz lesbar bleiben ---------- */
+@media (max-width:559px){
+  .knoepfe{grid-template-columns:48px minmax(0,1fr) 48px;gap:8px}
+  .knoepfe .knopf-rund{width:48px;height:48px}
+  .knopf-haupt{min-height:48px;padding:.6rem .7rem}
+}
+@media (max-width:419px){
+  .knopf-haupt svg{display:none}
+}
+@media (max-width:380px){
+  .knoepfe{grid-template-columns:46px minmax(0,1fr) 46px;gap:6px}
+  .knoepfe .knopf-rund{width:46px;height:46px}
+  .knopf-haupt{min-height:46px;padding:.55rem .5rem;font-size:.96rem}
+}
+/* ---------- Querformat am Handy (Menü-Knopf liegt hier unten links vor der Wand, die Leiste steht rechts) ---------- */
+@media (orientation:landscape) and (max-height:540px) and (max-width:999px){
+  .app{grid-template-columns:minmax(0,1fr) minmax(230px,300px);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"buehne kopf" "buehne steuer";column-gap:12px}
+  h1{font-size:1.3rem}
+  .steuer{align-self:end}
+  .hinweis{height:4.4em}
+  .knoepfe{width:auto;margin:0 auto;grid-template-columns:48px minmax(0,1fr) 48px;gap:8px}
+  .knoepfe .knopf-rund{width:48px;height:48px}
+  .knopf-haupt{min-height:48px;padding:.6rem .7rem}
+  .knopf-haupt svg{display:none}
+}
+/* ---------- Desktop: Baum mittig, Info links, Liste rechts ---------- */
+@media (min-width:1000px) and (min-height:560px){
+  .app{grid-template-columns:minmax(270px,330px) minmax(0,1fr) minmax(270px,330px);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"kopf buehne liste" "steuer buehne liste";column-gap:clamp(14px,2.4vw,40px);padding:22px 28px}
+  .kopf{display:block;padding-top:48px}
+  .titel{text-align:left}
+  h1{font-size:clamp(2rem,2.8vw,2.75rem);line-height:1.05}
+  .datum{font-size:1.02rem;margin-top:.55rem}
+  .listen-knopf{display:none}
+  .ton-knopf{position:absolute;top:-12px;left:0}
+  .steuer{align-self:start;padding-top:22px;text-align:left}
+  .hinweis{height:auto;min-height:4.4em;margin:0 0 18px;font-size:1.05rem;text-wrap:pretty}
+  /* Spalte ist 330 px breit: etwas kleinere Rundknöpfe, damit auch „Kugel 22 ist noch zu“ mit Symbol ganz passt */
+  .knoepfe{width:auto;margin:0;max-width:340px;grid-template-columns:48px minmax(0,1fr) 48px;gap:8px}
+  .knoepfe .knopf-rund{width:48px;height:48px}
+  .knopf-haupt{min-height:48px;padding:.6rem .75rem;font-size:1rem}
+  .liste{position:relative;z-index:auto;inset:auto;grid-area:liste;align-self:center;max-height:100%;padding:18px 18px 16px;border-radius:20px;transform:none;visibility:visible;transition:none;
+    background:rgba(29,12,25,.58);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:inset 0 0 0 1px rgba(242,196,106,.25),0 20px 40px -20px rgba(0,0,0,.6)}
+  .liste #listeZu{display:none}
+  .gitter{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  .schleier{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .leuchten i,.pfeil,.spur.laedt .lader svg{animation:none}
+  .funken{display:none}
+  .blase{animation:none}
+  .liste,.liste.offen{transition:none}
+}
+</style>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-links" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></symbol>
+  <symbol id="i-rechts" viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"/></symbol>
+  <symbol id="i-zu" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-dreh" viewBox="0 0 24 24"><path d="M20 12a8 4 0 0 1-8 4H5"/><path d="M8 13l-3 3 3 3"/><path d="M4 12a8 4 0 0 1 8-4h2"/></symbol>
+  <symbol id="i-stern" viewBox="0 0 24 24"><path d="M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.4 6.9 19.1l1-5.6-4.1-4 5.7-.8z"/></symbol>
+  <symbol id="i-kugel" viewBox="0 0 24 24"><circle cx="12" cy="14" r="6.5"/><path d="M10 7.5h4M12 4.5v3"/></symbol>
+  <symbol id="i-liste" viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.3"/><circle cx="12" cy="7" r="2.3"/><circle cx="18" cy="7" r="2.3"/><circle cx="6" cy="15" r="2.3"/><circle cx="12" cy="15" r="2.3"/><circle cx="18" cy="15" r="2.3"/></symbol>
+  <symbol id="i-ton" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11"/></symbol>
+  <symbol id="i-stumm" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></symbol>
+  <symbol id="i-bild" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 16l4.5-4.5 4 4 2.5-2.5L20 18"/><circle cx="15.5" cy="9.5" r="1.5"/></symbol>
+</svg>
+
+<canvas id="szene" aria-hidden="true"></canvas>
+<div class="leuchten" id="leuchten" aria-hidden="true"><i></i></div>
+
+<div class="app" id="app">
+  <header class="kopf" id="kopf">
+    <button type="button" class="ton-knopf" id="ton" aria-label="Glöckchen-Ton" aria-pressed="true" title="Glöckchen-Ton an oder aus"><svg class="i" aria-hidden="true"><use href="#i-ton"/></svg></button>
+    <div class="titel">
+      <h1>Dein Adventskalender</h1>
+      <p class="datum" id="datum"></p>
+    </div>
+    <button type="button" class="listen-knopf" id="listeAuf" aria-label="Alle Kugeln als Liste zeigen" aria-controls="liste" aria-expanded="false"><svg class="i" aria-hidden="true"><use href="#i-liste"/></svg></button>
+  </header>
+
+  <main class="buehne" id="buehne">
+    <div class="baum-platz" id="platz" tabindex="0" role="application" aria-roledescription="Drehbaum" aria-describedby="hinweis"></div>
+    <p class="pfeil" id="pfeil" hidden aria-hidden="true"><svg class="i"><use href="#i-links"/></svg><span>Dreh nach links</span></p>
+  </main>
+
+  <section class="steuer" id="steuer" aria-label="Baum bedienen">
+    <p class="hinweis" id="hinweis"></p>
+    <div class="knoepfe">
+      <button type="button" class="knopf-rund" id="links" aria-label="Baum nach links drehen"><svg class="i" aria-hidden="true"><use href="#i-links"/></svg></button>
+      <button type="button" class="knopf-haupt" id="haupt"><svg class="i" aria-hidden="true"><use href="#i-stern"/></svg><span>Heute finden</span></button>
+      <button type="button" class="knopf-rund" id="rechts" aria-label="Baum nach rechts drehen"><svg class="i" aria-hidden="true"><use href="#i-rechts"/></svg></button>
+    </div>
+  </section>
+
+  <div class="schleier" id="schleier"></div>
+  <aside class="liste" id="liste" aria-labelledby="listeTitel">
+    <div class="liste-kopf">
+      <h2 id="listeTitel">Alle Kugeln</h2>
+      <button type="button" class="knopf-rund klein" id="listeZu" aria-label="Liste schließen"><svg class="i" aria-hidden="true"><use href="#i-zu"/></svg></button>
+    </div>
+    <p class="liste-hilfe" id="listeHilfe"></p>
+    <div class="gitter" id="gitter"></div>
+    <ul class="legende" id="legende" aria-hidden="true">
+      <li data-art="glas">glänzend: darf auf</li>
+      <li data-art="frost">bereift: kommt noch</li>
+      <li data-art="schleife">rote Schleife: verpasst</li>
+      <li data-art="foto">mit Foto: schon offen</li>
+    </ul>
+  </aside>
+</div>
+<div class="blase" id="blase" hidden></div>
+<p class="unsichtbar" id="ansage" role="status" aria-live="polite"></p>
+
+<dialog class="ansicht" id="ansicht" aria-labelledby="aTitel" tabindex="-1">
+  <div class="ansicht-innen">
+    <div class="ansicht-kopf">
+      <p class="zaehler" id="aZaehler"></p>
+      <button type="button" class="knopf-rund" id="aZu" aria-label="Bildansicht schließen"><svg class="i" aria-hidden="true"><use href="#i-zu"/></svg></button>
+    </div>
+    <div class="ansicht-buehne" id="aBuehne">
+      <div class="spur" id="spur">
+        <div class="vorbild" id="aVor" aria-hidden="true"></div>
+        <img id="aBild" alt="" draggable="false">
+        <div class="lader" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16l-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg><span>Foto wird geholt …</span></div>
+        <div class="fehlbild"><p>Dieses Foto lässt sich gerade nicht laden.</p><button type="button" class="knopf-text" id="aNochmal">Nochmal versuchen</button></div>
+      </div>
+    </div>
+    <div class="ansicht-fuss">
+      <button type="button" class="knopf-rund" id="aZurueck" aria-label="Vorheriges Foto"><svg class="i" aria-hidden="true"><use href="#i-links"/></svg></button>
+      <div class="ansicht-text"><h2 id="aTitel"></h2><p id="aDatum"></p></div>
+      <button type="button" class="knopf-rund" id="aWeiter" aria-label="Nächstes Foto"><svg class="i" aria-hidden="true"><use href="#i-rechts"/></svg></button>
+    </div>
+  </div>
+</dialog>
+
+<script src="../shared/start.js" data-ansicht="baum"></script>
+<script src="../shared/kalender.js"></script>
+<script src="../shared/fotos.js"></script>
+<script>
+(function () {
+  'use strict';
+  var K = window.Kalender.init('baum');
+  var F = window.Fotos;
+  var TAU = Math.PI * 2;
+  var REDUZIERT = !!K.bewegungReduziert;
+  var GROB = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  var DPR = Math.min(2, window.devicePixelRatio || 1);
+  function $(s) { return document.getElementById(s); }
+  var el = {
+    szene: $('szene'), leuchten: $('leuchten'), app: $('app'), kopf: $('kopf'), buehne: $('buehne'), steuer: $('steuer'),
+    datum: $('datum'), platz: $('platz'), pfeil: $('pfeil'), hinweis: $('hinweis'),
+    links: $('links'), rechts: $('rechts'), haupt: $('haupt'),
+    listeAuf: $('listeAuf'), ton: $('ton'), legende: $('legende'), liste: $('liste'), listeZu: $('listeZu'), listeHilfe: $('listeHilfe'), gitter: $('gitter'), schleier: $('schleier'),
+    blase: $('blase'), ansage: $('ansage'),
+    dlg: $('ansicht'), aZaehler: $('aZaehler'), aZu: $('aZu'), aBuehne: $('aBuehne'), spur: $('spur'), aBild: $('aBild'), aVor: $('aVor'),
+    aTitel: $('aTitel'), aDatum: $('aDatum'), aZurueck: $('aZurueck'), aWeiter: $('aWeiter'), aNochmal: $('aNochmal')
+  };
+  var g = el.szene.getContext('2d');
+  // Direkt geöffnet (nicht im iframe): Zieh-zum-Neuladen abschalten. Im iframe darf die Übersicht weiterscrollen.
+  try { if (window.top === window.self) document.documentElement.classList.add('oben'); } catch (e) { /* fremder Rahmen */ }
+
+  /* ---------------- Hilfen ---------------- */
+  function leinwand(w, h) { var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; }
+  function zufall(seed) {
+    var a = seed >>> 0;
+    return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function wrap(a) { a = (a + Math.PI) % TAU; if (a < 0) a += TAU; return a - Math.PI; }
+  function klemm(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function rgb(hex) { var n = parseInt(hex.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+  function mische(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+  function css(c, al) { return 'rgba(' + Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]) + ',' + (al === undefined ? 1 : al) + ')'; }
+  function sanft(u) { return u * u * (3 - 2 * u); }
+  function ease(u) { return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; }
+  function jetzt() { return performance.now(); }
+  function sage(t) { el.ansage.textContent = ''; setTimeout(function () { el.ansage.textContent = t; }, 40); }
+
+  /* Bilder: immer über Image laden (später kommen echte Server-URLs, evtl. 403/404) */
+  function ladeUrl(quelle) {
+    return new Promise(function (ok, fehl) {
+      Promise.resolve(quelle).then(function (url) {
+        if (!url) { fehl(new Error('keine URL')); return; }
+        var img = new Image();
+        img.decoding = 'async';
+        img.onload = function () {
+          if (img.decode) img.decode().then(function () { ok(img); }, function () { ok(img); }); else ok(img);
+        };
+        img.onerror = function () { fehl(new Error('Bild nicht ladbar')); };
+        img.src = url;
+      }, fehl);
+    });
+  }
+  // Große Bilder (F.bild, nur für Bildansicht und Flug): höchstens ein paar dekodiert im Speicher halten –
+  // wer am 25. alle 24 Fotos durchblättert, soll am Handy nicht 24 große Bilder gleichzeitig im RAM haben.
+  var bildCache = {}, bildReihe = [], BILD_MAX = 5, vorschauCache = {};
+  var vorschauFertig = {}, vorschauUnterwegs = {};   // je Tag: fertige bzw. gerade ladende Vorschau (für die Bildansicht)
+  function merkeBild(t) {
+    var i = bildReihe.indexOf(t);
+    if (i >= 0) bildReihe.splice(i, 1);
+    bildReihe.push(t);
+    while (bildReihe.length > BILD_MAX) delete bildCache[bildReihe.shift()];
+  }
+  function holeBild(t) {
+    if (!K.darfOeffnen(t)) return Promise.reject(new Error('gesperrt'));
+    if (!bildCache[t]) {
+      var q; try { q = F.bild(t); } catch (e) { return Promise.reject(e); }
+      var pr = bildCache[t] = ladeUrl(q);
+      pr.catch(function () { setTimeout(function () { if (bildCache[t] === pr) delete bildCache[t]; }, 1500); });
+    }
+    merkeBild(t);
+    return bildCache[t];
+  }
+  // Vorschauen (kleine quadratische Bilder, in der Produktion Größe k = 480 px): nach URL gemerkt, damit Kugel,
+  // Liste und Flug dieselbe Datei nur einmal holen
+  function holeVorschau(t, px) {
+    if (!K.darfOeffnen(t)) return Promise.reject(new Error('gesperrt'));
+    var q; try { q = F.vorschau(t, px); } catch (e) { return Promise.reject(e); }
+    var k = typeof q === 'string' && q.length < 600 ? q : t + '_' + px;
+    if (!vorschauCache[k]) {
+      var pr = vorschauCache[k] = vorschauUnterwegs[t] = ladeUrl(q);
+      pr.then(function (img) {
+        vorschauFertig[t] = img;
+        if (vorschauUnterwegs[t] === pr) delete vorschauUnterwegs[t];
+      }, function () {
+        if (vorschauCache[k] === pr) delete vorschauCache[k];
+        if (vorschauUnterwegs[t] === pr) delete vorschauUnterwegs[t];
+      });
+    }
+    return vorschauCache[k];
+  }
+  // Ersatz, wenn ein Server-Bild fehlt (403/404/Netz): gemalter Platzhalter aus fotos.js (nur Produktion)
+  function holeErsatz(t, px) {
+    if (!K.darfOeffnen(t) || typeof F.platzhalter !== 'function') return Promise.reject(new Error('kein Ersatz'));
+    var q; try { q = F.platzhalter(t, px); } catch (e) { return Promise.reject(e); }
+    return ladeUrl(q);
+  }
+  function titelVon(t) { var s = ''; try { s = F.titel(t) || ''; } catch (e) { s = ''; } return String(s).trim(); }
+
+  /* Ton: ganz leises Glöckchen (nur als Antwort auf Aktionen), abschaltbar, Wahl wird gemerkt */
+  var ac = null, TON_KEY = 'adventskalender:baum:ton', tonAn = true;
+  try { tonAn = window.localStorage.getItem(TON_KEY) !== '0'; } catch (e) { /* egal */ }
+  var KLANG = {
+    bimmel: [[2093, 0], [2489, 0.1], [2093, 0.2]],
+    pling: [[1568, 0], [2349, 0.08], [3136, 0.16]],
+    ting: [[2637, 0]],
+    fund: [[1568, 0], [1976, 0.07], [2349, 0.14], [3136, 0.23]],
+    rassel: [[740, 0], [831, 0.05], [698, 0.1], [880, 0.15]]
+  };
+  function ton(art) {
+    if (!tonAn) return;
+    try {
+      if (!ac) {
+        var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+        if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;   // erst nach einer Berührung
+        ac = new AC();
+      }
+      if (ac.state === 'suspended') ac.resume();
+      var t0 = ac.currentTime + 0.01, laut = art === 'ting' ? 0.5 : art === 'rassel' ? 0.8 : 1, kurz = art === 'rassel' ? 0.2 : 1;
+      (KLANG[art] || KLANG.pling).forEach(function (n) {
+        [[1, 0.045, 0.7], [2.76, 0.012, 0.28]].forEach(function (p) {
+          var o = ac.createOscillator(), v = ac.createGain();
+          o.type = 'sine'; o.frequency.value = n[0] * p[0];
+          v.gain.setValueAtTime(0.0001, t0 + n[1]);
+          v.gain.exponentialRampToValueAtTime(p[1] * laut, t0 + n[1] + 0.006);
+          v.gain.exponentialRampToValueAtTime(0.0001, t0 + n[1] + p[2] * kurz);
+          o.connect(v); v.connect(ac.destination); o.start(t0 + n[1]); o.stop(t0 + n[1] + p[2] * kurz + 0.05);
+        });
+      });
+    } catch (e) { /* ohne Ton */ }
+  }
+  function zeigeTon() {
+    el.ton.setAttribute('aria-pressed', tonAn ? 'true' : 'false');
+    el.ton.querySelector('use').setAttribute('href', tonAn ? '#i-ton' : '#i-stumm');
+    el.ton.title = tonAn ? 'Glöckchen-Ton ist an' : 'Glöckchen-Ton ist aus';
+  }
+  el.ton.addEventListener('click', function () {
+    tonAn = !tonAn;
+    try { window.localStorage.setItem(TON_KEY, tonAn ? '1' : '0'); } catch (e) { /* egal */ }
+    zeigeTon(); sage(tonAn ? 'Ton an' : 'Ton aus');
+    if (tonAn) ton('ting');
+  });
+  zeigeTon();
+  function brumm(ms) { if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) { /* egal */ } } }
+
+  /* ---------------- Datum & Zustände ---------------- */
+  function zustand(t) {
+    if (!K.darfOeffnen(t)) return 'zu';
+    if (K.istGeoeffnet(t)) return 'offen';
+    return t === K.heute() ? 'heute' : 'verpasst';
+  }
+  function zustandText(t) {
+    var z = zustand(t);
+    return z === 'offen' ? 'geöffnet' : z === 'zu' ? 'noch zu' : z === 'heute' ? 'heute, noch zu' : 'verpasst, jetzt nachholen';
+  }
+  function anordnung() {
+    var r = K.reihenfolge ? K.reihenfolge() : null, ok = r && r.length === 24, i, gesehen = {};
+    if (ok) for (i = 0; i < 24; i++) { if (!(r[i] >= 1 && r[i] <= 24) || gesehen[r[i]]) ok = false; gesehen[r[i]] = 1; }
+    if (ok) return r;
+    r = []; for (i = 1; i <= 24; i++) r.push(i); return r;
+  }
+
+  /* ================================================================
+     Baum-Modell: Etagen (Kegel), Zweige, Kugeln, Lichterkette
+     Modell: y = 0 (unterste Etage) … 1 (Spitze), Radius in Einheiten von R
+     ================================================================ */
+  var ETAGEN = [
+    { yb: 0.000, yt: 0.360, rb: 1.00 },
+    { yb: 0.155, yt: 0.495, rb: 0.88 },
+    { yb: 0.300, yt: 0.620, rb: 0.75 },
+    { yb: 0.440, yt: 0.740, rb: 0.61 },
+    { yb: 0.575, yt: 0.855, rb: 0.47 },
+    { yb: 0.700, yt: 1.000, rb: 0.32 }
+  ];
+  var PLAETZE = [6, 5, 4, 4, 2, 2];          // 23 Kugeln, Tag 24 ist der Stern
+  var GOLD = Math.PI * (3 - Math.sqrt(5));     // Goldener Winkel: Kugeln rundum gut verteilt
+  var FARBEN = ['#b42f3d', '#cf7446', '#2d7d77', '#e0ad52', '#c3ccd5', '#8c3f69', '#35629c'];
+  var HELL = { '#e0ad52': 1, '#c3ccd5': 1 };
+  function etagenR(e, y) { return e.rb * (e.yt - y) / (e.yt - e.yb); }
+  function huelleR(y) {
+    var m = 0;
+    for (var i = 0; i < ETAGEN.length; i++) { var e = ETAGEN[i]; if (y >= e.yb && y <= e.yt) m = Math.max(m, etagenR(e, y)); }
+    if (y < 0) m = 1;
+    return m;
+  }
+
+  var etagenListen = [], kugeln = [], kugelVon = {}, birnen = [];
+  function baueModell() {
+    var r = zufall(2026), i, j, k;
+    etagenListen = []; kugeln = []; kugelVon = {}; birnen = [];
+    var folge = anordnung().filter(function (t) { return t !== 24; });
+    var platz = 0;
+    for (k = 0; k < ETAGEN.length; k++) {
+      var e = ETAGEN[k], hk = e.yt - e.yb, liste = [];
+      var oben = k === ETAGEN.length - 1;
+      var reihen = oben ? [0.03, 0.16, 0.31, 0.48, 0.66, 0.82] : [0.02, 0.13, 0.26];
+      for (j = 0; j < reihen.length; j++) {
+        var f = reihen[j], y = e.yb + f * hk, rr = e.rb * (1 - f);
+        var n = Math.max(oben ? 4 : 6, Math.round(TAU * rr / (oben ? 0.12 : 0.15)));
+        var versatz = r() * TAU;
+        for (i = 0; i < n; i++) {
+          var th = versatz + (i + (r() - 0.5) * 0.55) * TAU / n;
+          var lang = 0.85 + r() * 0.3;
+          liste.push({
+            typ: 0, e: k, th: th,
+            rIn: rr * (oben ? 0.35 : 0.5), yIn: y + hk * 0.07,
+            rOut: rr * (1.02 + r() * 0.06) * (lang > 1 ? 1.02 : 1), yOut: y - hk * (j === 0 ? 0.07 + r() * 0.05 : 0.03 + r() * 0.04),
+            dick: (0.1 + 0.14 * Math.sqrt(e.rb)) * (0.85 + r() * 0.3) * (oben ? 0.8 : j === 0 ? 1.12 : 1),
+            v: (r() * 3) | 0, hell: (r() - 0.5) * 0.12 - (oben ? 0 : j * 0.07),
+            z: 0, ca: 0, sa: 0
+          });
+        }
+      }
+      // Lichterkette: zwei Windungen je Etage
+      [0.06, 0.22].forEach(function (f0, w) {
+        var nb = Math.round(11 * e.rb) + 3, start = r() * TAU;
+        for (var b = 0; b < nb; b++) {
+          var u = b / nb, fy = f0 + u * 0.12;
+          var yb = e.yb + fy * hk;
+          var bir = { typ: 2, e: k, th: start + u * TAU, r: etagenR(e, yb) * 1.0 + 0.012, y: yb, z: 0, ca: 0, sa: 0, ph: r() * TAU };
+          liste.push(bir); birnen.push(bir);
+        }
+      });
+      // Kugeln an den Zweigspitzen
+      for (j = 0; j < PLAETZE[k]; j++) {
+        var tag = folge[platz];
+        var fy2 = (k === 0 ? 0.29 : 0.07) + ((platz * 0.618) % 1) * 0.1;
+        var yk = e.yb + fy2 * hk;
+        var kg = {
+          typ: 1, e: k, tag: tag, th: 0.4 + platz * GOLD, r: etagenR(e, yk) + 0.025, y: yk,
+          gr: k >= 4 ? 0.84 : 1, gr0: k >= 4 ? 0.84 : 1, L: k >= 4 ? 0.055 : 0.07,
+          psi: 0, psiV: 0, w0: 8.2 + r() * 2.4, farbe: FARBEN[(tag * 5) % FARBEN.length],
+          z: 0, ca: 0, sa: 0, sx: 0, sy: 0, sr: 0, hx: 0, hy: 0,
+          bild: null, foto: null, fotoErsatz: false, fotoLaedt: false, fliegt: false
+        };
+        liste.push(kg); kugeln.push(kg); kugelVon[tag] = kg;
+        platz++;
+      }
+      liste.push({ typ: 3, e: k, z: -0.03 * e.rb });
+      etagenListen.push(liste);
+    }
+  }
+
+  /* ================================================================
+     Geometrie & Projektion
+     ================================================================ */
+  var G = { W: 0, H: 0, bx: 0, by: 0, bw: 0, bh: 0, cx: 0, R: 0, TH: 0, apexY: 0, y0: 0, eyeY: 0, floorY: 0, br: 0, starR: 0, starY: 0 };
+  var DIST = 8, TILT = 0.15;
+  var P = { x: 0, y: 0, s: 1 };
+  function proj(r, y, a) {
+    var z = r * Math.cos(a), s = DIST / (DIST - z);
+    P.x = G.cx + r * Math.sin(a) * G.R * s;
+    P.y = G.eyeY + (G.y0 - y * G.TH - G.eyeY) * s + z * G.R * TILT;
+    P.s = s;
+    return z;
+  }
+
+  function messen() {
+    var W = document.documentElement.clientWidth || window.innerWidth, H = window.innerHeight;
+    var b = el.platz.getBoundingClientRect();
+    if (!W || !H || b.width < 40 || b.height < 60) return false;
+    G.W = W; G.H = H; G.bx = b.left; G.by = b.top; G.bw = b.width; G.bh = b.height;
+    var R = Math.min(b.width * 0.45, b.height / 4.1);
+    G.R = R; G.TH = R * 2.72; G.starR = R * 0.16;
+    var luft = G.starR * 2.1, gesamt = luft + G.TH + R * 1.03, rest = Math.max(0, b.height - gesamt);
+    G.apexY = b.top + luft + rest * 0.38;
+    G.y0 = G.apexY + G.TH;
+    G.eyeY = G.apexY + G.TH * 0.48;
+    G.floorY = G.y0 + R * 0.62;
+    G.cx = b.left + b.width / 2;
+    // am Handy etwas größere Kugeln. Kleine Bäume (Handy quer, Mini-Handys): Kugeln nie kleiner als am 360er-Handy
+    // (16 px), höchstens 0,17 · R – sonst wird die Tageszahl auf den Foto-Kugeln zu klein bzw. deckt das Foto zu.
+    G.br = R < 150 ? Math.max(R * 0.122, Math.min(R * 0.17, 16)) : R * (R < 210 ? 0.11 : 0.1);
+    var kr = el.kopf.getBoundingClientRect();
+    G.kopfUnten = kr.width && kr.left < G.cx && kr.right > G.cx ? kr.bottom : 6;   // Strahlen enden unter der Kopfzeile bzw. am Bildrand
+    G.starY = G.apexY - G.starR * 0.72;
+    el.szene.width = Math.round(W * DPR); el.szene.height = Math.round(H * DPR);
+    return true;
+  }
+
+  /* ================================================================
+     Zweig-Bilder: ein Tannenzweig in 3 Formen × 7 Helligkeiten
+     ================================================================ */
+  var ZW_W = 200, ZW_H = 100, STUFEN = 7, zweigBilder = [];
+  function zweigForm(r) {
+    var nadeln = [], staemme = [];
+    function ast(x0, y0, ang, len, tiefe) {
+      var n = Math.max(4, Math.round(len / 3.4)), px = x0, py = y0, a = ang, pkt = [[px, py]];
+      for (var i = 1; i <= n; i++) {
+        var u = i / n;
+        a += (r() - 0.45) * 0.05 + (tiefe ? 0 : 0.004);
+        px += Math.cos(a) * len / n; py += Math.sin(a) * len / n;
+        pkt.push([px, py]);
+        var nl = (tiefe ? 7.5 : 9.5) * (1 - u * 0.4) * (0.8 + r() * 0.4);
+        for (var sd = -1; sd <= 1; sd += 2) {
+          var na = a + sd * (1.0 + r() * 0.4) + 0.12;
+          nadeln.push([px, py, px + Math.cos(na) * nl, py + Math.sin(na) * nl, u, sd]);
+        }
+        if (!tiefe && i > 4 && i < n - 3 && i % 5 === 0) {
+          var seite = (i / 5) % 2 ? -1 : 1;
+          ast(px, py, a + seite * (0.5 + r() * 0.2), len * (0.42 - u * 0.2), 1);
+        }
+      }
+      staemme.push(pkt);
+    }
+    ast(3, ZW_H / 2 - 4, 0.06, ZW_W - 20, 0);
+    return { nadeln: nadeln, staemme: staemme };
+  }
+  function malZweig(form, stufe) {
+    var c = leinwand(ZW_W, ZW_H), z = c.getContext('2d');
+    var L = [8, 11, 14.5, 18.5, 23, 28, 33.5][stufe];
+    z.lineCap = 'round';
+    form.staemme.forEach(function (pkt) {
+      z.strokeStyle = 'hsl(30,30%,' + (L * 0.7 + 4) + '%)'; z.lineWidth = 2.2;
+      z.beginPath(); z.moveTo(pkt[0][0], pkt[0][1]); for (var i = 1; i < pkt.length; i++) z.lineTo(pkt[i][0], pkt[i][1]); z.stroke();
+    });
+    // drei Farbstapel: Unterseite, Oberseite, frische Spitzen
+    var stapel = [
+      { f: 'hsl(158,36%,' + Math.max(4, L - 3.5) + '%)', w: 2.5, test: function (n) { return n[5] > 0 && n[4] < 0.72; } },
+      { f: 'hsl(150,40%,' + (L + 2.5) + '%)', w: 2.4, test: function (n) { return n[5] < 0 && n[4] < 0.72; } },
+      { f: 'hsl(128,42%,' + (L + 9) + '%)', w: 2.2, test: function (n) { return n[4] >= 0.72; } }
+    ];
+    stapel.forEach(function (s) {
+      z.strokeStyle = s.f; z.lineWidth = s.w; z.beginPath();
+      for (var i = 0; i < form.nadeln.length; i++) { var n = form.nadeln[i]; if (!s.test(n)) continue; z.moveTo(n[0], n[1]); z.lineTo(n[2], n[3]); }
+      z.stroke();
+    });
+    return c;
+  }
+  function baueZweige() {
+    zweigBilder = [];
+    for (var v = 0; v < 3; v++) {
+      var form = zweigForm(zufall(71 + v * 29)), reihe = [];
+      for (var s = 0; s < STUFEN; s++) reihe.push(malZweig(form, s));
+      zweigBilder.push(reihe);
+    }
+  }
+
+  var gluehBild = null;
+  function baueGlueh() {
+    var S = 64, c = leinwand(S, S), z = c.getContext('2d'), v = z.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+    v.addColorStop(0, 'rgba(255,240,200,1)'); v.addColorStop(0.12, 'rgba(255,220,150,.85)'); v.addColorStop(0.35, 'rgba(255,190,100,.28)'); v.addColorStop(1, 'rgba(255,170,80,0)');
+    z.fillStyle = v; z.fillRect(0, 0, S, S); gluehBild = c;
+  }
+
+  /* ================================================================
+     Kugeln malen (Ursprung = Kugelmitte, r = Radius in CSS-px)
+     ================================================================ */
+  var SCHRIFT_OK = false;
+  function malKappe(z, r) {
+    var kg = z.createLinearGradient(-r * 0.24, 0, r * 0.24, 0);
+    kg.addColorStop(0, '#6e5524'); kg.addColorStop(0.35, '#f3dc9c'); kg.addColorStop(0.6, '#c9a352'); kg.addColorStop(1, '#5a4419');
+    z.fillStyle = kg;
+    z.beginPath(); z.rect(-r * 0.22, -r * 1.12, r * 0.44, r * 0.25); z.fill();
+    z.fillStyle = 'rgba(40,24,6,.45)'; z.fillRect(-r * 0.22, -r * 0.9, r * 0.44, r * 0.04);
+    z.strokeStyle = '#d8b765'; z.lineWidth = Math.max(1, r * 0.07);
+    z.beginPath(); z.arc(0, -r * 1.2, r * 0.1, 0, TAU); z.stroke();
+  }
+  function malSchleife(z, r) {
+    z.save(); z.translate(r * 0.3, -r * 0.98); z.rotate(0.25);
+    z.fillStyle = '#c8303e'; z.strokeStyle = 'rgba(60,8,16,.55)'; z.lineWidth = Math.max(0.8, r * 0.04);
+    var s = r * 0.32;
+    z.beginPath(); z.moveTo(0, 0); z.bezierCurveTo(-s * 1.3, -s * 0.9, -s * 1.4, s * 0.8, 0, 0); z.fill(); z.stroke();
+    z.beginPath(); z.moveTo(0, 0); z.bezierCurveTo(s * 1.3, -s * 0.9, s * 1.4, s * 0.8, 0, 0); z.fill(); z.stroke();
+    z.beginPath(); z.moveTo(-s * 0.1, s * 0.1); z.lineTo(-s * 0.55, s * 1.2); z.lineTo(-s * 0.2, s * 1.05); z.lineTo(0, s * 0.2);
+    z.lineTo(s * 0.2, s * 1.05); z.lineTo(s * 0.55, s * 1.2); z.lineTo(s * 0.1, s * 0.1); z.closePath(); z.fill();
+    z.fillStyle = '#e24a55'; z.beginPath(); z.arc(0, 0, s * 0.28, 0, TAU); z.fill();
+    z.restore();
+  }
+  function malZahl(z, r, t, farbe, alpha) {
+    z.font = '400 ' + (r * (t > 9 ? 0.98 : 1.1)).toFixed(1) + 'px "Young Serif", Georgia, serif';
+    z.textAlign = 'center'; z.textBaseline = 'middle';
+    var ga = z.globalAlpha;
+    z.globalAlpha = ga * alpha;
+    z.fillStyle = 'rgba(20,6,14,.35)'; z.fillText(String(t), r * 0.03, r * 0.13);
+    z.fillStyle = farbe; z.fillText(String(t), 0, r * 0.09);
+    z.globalAlpha = ga;
+  }
+  /* Tageszahl auf geöffneten Foto-Kugeln: cremefarbenes Emaille-Schildchen unten auf der Kugel.
+     fs = Schriftgröße im Kugel-Maßstab. Es wird ins Kugelbild eingebacken: wächst mit der Perspektive,
+     pendelt mit und wird auf der Rückseite mit der Kugel abgedunkelt – und kostet beim Drehen nichts extra. */
+  function pille(z, x0, y0, w, h) {
+    var q = h / 2;
+    z.beginPath(); z.moveTo(x0 + q, y0); z.lineTo(x0 + w - q, y0);
+    z.arc(x0 + w - q, y0 + q, q, -Math.PI / 2, Math.PI / 2); z.lineTo(x0 + q, y0 + h);
+    z.arc(x0 + q, y0 + q, q, Math.PI / 2, Math.PI * 1.5); z.closePath();
+  }
+  function malSchild(z, r, t, fs) {
+    var s = String(t);
+    z.font = '400 ' + fs.toFixed(2) + 'px "Young Serif", Georgia, serif';
+    z.textAlign = 'center'; z.textBaseline = 'middle';
+    var tw = z.measureText(s).width, h = fs * 1.06, q = h / 2, w = Math.max(h * 1.12, tw + fs * 0.46), a = w / 2;
+    // so tief wie möglich, aber ganz innerhalb der Kugel-Silhouette (sonst schwebt es hinten unabgedunkelt neben der Kugel)
+    var rho = r * 0.95, lim = (rho - q) * (rho - q) - (a - q) * (a - q);
+    var yc = Math.min(r * 0.52, lim > 0 ? Math.sqrt(lim) : 0), y0 = yc - q;
+    z.fillStyle = 'rgba(24,6,16,.42)'; pille(z, -a, y0 + fs * 0.07, w, h); z.fill();
+    var pg = z.createLinearGradient(0, y0, 0, y0 + h);
+    pg.addColorStop(0, '#fffaf1'); pg.addColorStop(0.55, '#f6e8d2'); pg.addColorStop(1, '#d9c29d');
+    z.fillStyle = pg; pille(z, -a, y0, w, h); z.fill();
+    z.strokeStyle = '#b8924a'; z.lineWidth = Math.max(0.5, fs * 0.075); z.stroke();
+    z.fillStyle = 'rgba(255,255,255,.6)'; pille(z, -a + q * 0.6, y0 + h * 0.09, w - q * 1.2, h * 0.17); z.fill();
+    z.fillStyle = '#4a1f3c'; z.fillText(s, 0, yc + fs * 0.05);
+  }
+  // art: 'glas' | 'frost' | 'foto'; schildFs: Schriftgröße der Tageszahl auf Foto-Kugeln (fehlt: 0,62 · r; ohneZahl: keine);
+  // schildDeck: Deckkraft des Schildchens (fehlt: 1) – nur für die Überblendung im Flug
+  function malKugel(z, r, t, art, farbe, foto, schleife, ohneZahl, schildFs, schildDeck) {
+    var basis = rgb(farbe), weiss = [255, 255, 255], dunkel = [24, 8, 18], i;
+    malKappe(z, r);
+    z.save();
+    z.beginPath(); z.arc(0, 0, r, 0, TAU); z.clip();
+    if (art === 'frost') {
+      var fb = mische(basis, [226, 230, 234], 0.62);
+      var fg = z.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.1, 0, 0, r * 1.05);
+      fg.addColorStop(0, css(mische(fb, weiss, 0.45))); fg.addColorStop(0.6, css(fb)); fg.addColorStop(1, css(mische(fb, dunkel, 0.32)));
+      z.fillStyle = fg; z.fillRect(-r, -r, 2 * r, 2 * r);
+      var rr = zufall(t * 17 + 3), klein = r < 22;
+      for (i = 0; i < (klein ? 24 : 46); i++) {
+        z.fillStyle = rr() < 0.75 ? 'rgba(255,255,255,' + (0.4 + rr() * 0.5).toFixed(2) + ')' : 'rgba(120,130,150,.3)';
+        z.beginPath(); z.arc((rr() - 0.5) * 2 * r, (rr() - 0.5) * 2 * r, Math.max(0.6, r * (klein ? 0.045 + rr() * 0.05 : 0.025 + rr() * 0.04)), 0, TAU); z.fill();
+      }
+      if (!ohneZahl) malZahl(z, r, t, css(mische(basis, dunkel, 0.55)), 0.7);
+      var fh = z.createRadialGradient(-r * 0.4, -r * 0.45, 0, -r * 0.4, -r * 0.45, r * 0.6);
+      fh.addColorStop(0, 'rgba(255,255,255,.45)'); fh.addColorStop(1, 'rgba(255,255,255,0)');
+      z.fillStyle = fh; z.fillRect(-r, -r, 2 * r, 2 * r);
+    } else if (art === 'foto' && foto) {
+      var s = Math.max(2 * r / foto.width, 2 * r / foto.height) * 1.18;
+      try { z.drawImage(foto, -foto.width * s / 2, -foto.height * s / 2 - r * 0.06, foto.width * s, foto.height * s); } catch (e) { /* Bild defekt */ }
+      var sv = z.createRadialGradient(-r * 0.25, -r * 0.3, r * 0.2, 0, 0, r * 1.02);
+      sv.addColorStop(0, 'rgba(255,240,220,.06)'); sv.addColorStop(0.7, 'rgba(30,10,24,.12)'); sv.addColorStop(0.92, 'rgba(30,10,24,.42)'); sv.addColorStop(1, 'rgba(20,6,16,.7)');
+      z.fillStyle = sv; z.fillRect(-r, -r, 2 * r, 2 * r);
+      if (!ohneZahl && schildDeck !== 0) {
+        var gaS = z.globalAlpha;
+        if (schildDeck !== undefined) z.globalAlpha = gaS * schildDeck;
+        malSchild(z, r, t, schildFs || r * 0.62);
+        z.globalAlpha = gaS;
+      }
+    } else {
+      var gg = z.createRadialGradient(-r * 0.36, -r * 0.42, r * 0.04, 0, 0, r * 1.02);
+      gg.addColorStop(0, css(mische(basis, weiss, 0.6))); gg.addColorStop(0.3, css(basis));
+      gg.addColorStop(0.82, css(mische(basis, dunkel, 0.5))); gg.addColorStop(1, css(mische(basis, dunkel, 0.72)));
+      z.fillStyle = gg; z.fillRect(-r, -r, 2 * r, 2 * r);
+      if (!ohneZahl) malZahl(z, r, t, HELL[farbe] ? '#4a1f3c' : '#f7dc9b', 1);
+    }
+    if (art !== 'frost') {
+      // warmes Licht der Lichterkette unten rechts
+      z.strokeStyle = 'rgba(255,206,130,.38)'; z.lineWidth = r * 0.12;
+      z.beginPath(); z.arc(0, 0, r * 0.93, 0.15, 1.35); z.stroke();
+      var hl = z.createRadialGradient(-r * 0.38, -r * 0.44, 0, -r * 0.38, -r * 0.44, r * 0.42);
+      hl.addColorStop(0, 'rgba(255,255,255,.95)'); hl.addColorStop(0.25, 'rgba(255,255,255,.4)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+      z.fillStyle = hl; z.fillRect(-r, -r, 2 * r, 2 * r);
+      z.fillStyle = 'rgba(255,255,255,.9)';
+      z.beginPath(); z.ellipse(-r * 0.4, -r * 0.47, r * 0.13, r * 0.07, -0.7, 0, TAU); z.fill();
+    }
+    z.restore();
+    z.lineWidth = Math.max(0.8, r * 0.05);
+    z.strokeStyle = art === 'foto' ? 'rgba(255,236,200,.55)' : 'rgba(20,6,14,.35)';
+    z.beginPath(); z.arc(0, 0, r - z.lineWidth / 2, 0, TAU); z.stroke();
+    if (schleife) malSchleife(z, r);
+  }
+  function kugelArt(k) {
+    var z = zustand(k.tag);
+    if (z === 'zu') return 'frost';
+    if (z === 'offen' && k.foto) return 'foto';
+    return 'glas';
+  }
+  // Tageszahl auf Foto-Kugeln: vorn hängend mindestens SCHILD_MIN CSS-px groß (das Kugelbild wird mit der Perspektive skaliert)
+  var SCHILD_MIN = 12.6;
+  function schildFs(k, r) { return klemm(SCHILD_MIN * (DIST - k.r) / DIST, r * 0.6, r * 0.98); }
+  function baueKugelBild(k) {
+    var r = G.br * k.gr, f = DPR * 1.2, S = Math.ceil(r * 2.7 * f);
+    var c = k.bild && k.bild.width === S ? k.bild : leinwand(S, S), z = c.getContext('2d');
+    z.setTransform(1, 0, 0, 1, 0, 0); z.clearRect(0, 0, S, S);
+    z.setTransform(f, 0, 0, f, S / 2, S / 2);
+    malKugel(z, r, k.tag, kugelArt(k), k.farbe, k.foto, zustand(k.tag) === 'verpasst', false, schildFs(k, r));
+    k.bild = c; k.bildR = r;
+  }
+  function baueAlleKugelBilder() { for (var i = 0; i < kugeln.length; i++) baueKugelBild(kugeln[i]); baueSternSchild(); }
+
+  // Stern 24 (geöffnet): Emaille-Knopf „24“ in der Sternmitte, vorab gemalt – beim Drehen nur ein drawImage
+  var sternSchild = null;
+  function baueSternSchild() {
+    var R = G.starR;
+    if (!R) return;
+    var fs = Math.min(Math.max(SCHILD_MIN, R * 0.48), R * 0.62), f = DPR * 1.5;
+    var mz = leinwand(4, 4).getContext('2d');
+    mz.font = '400 ' + fs.toFixed(2) + 'px "Young Serif", Georgia, serif';
+    var tw = mz.measureText('24').width;
+    var ri = Math.max(R * 0.4, Math.sqrt(tw * tw / 4 + fs * fs * 0.13) + fs * 0.06), rad = ri + Math.max(1.1, fs * 0.1);
+    var half = rad * 1.2, S = Math.ceil(half * 2 * f);
+    var c = sternSchild && sternSchild.c.width === S ? sternSchild.c : leinwand(S, S), z = c.getContext('2d');
+    z.setTransform(1, 0, 0, 1, 0, 0); z.clearRect(0, 0, S, S);
+    z.setTransform(f, 0, 0, f, S / 2, S / 2);
+    z.fillStyle = 'rgba(70,40,8,.5)'; z.beginPath(); z.arc(0, rad * 0.12, rad, 0, TAU); z.fill();
+    var gf = z.createLinearGradient(-rad, -rad, rad, rad);
+    gf.addColorStop(0, '#fff0bf'); gf.addColorStop(0.5, '#d9ad55'); gf.addColorStop(1, '#8a6424');
+    z.fillStyle = gf; z.beginPath(); z.arc(0, 0, rad, 0, TAU); z.fill();
+    var eg = z.createRadialGradient(-ri * 0.35, -ri * 0.4, ri * 0.1, 0, 0, ri);
+    eg.addColorStop(0, '#fffdf7'); eg.addColorStop(0.62, '#f6e8d2'); eg.addColorStop(1, '#d6bf98');
+    z.fillStyle = eg; z.beginPath(); z.arc(0, 0, ri, 0, TAU); z.fill();
+    z.fillStyle = 'rgba(255,255,255,.7)'; z.beginPath(); z.ellipse(-ri * 0.36, -ri * 0.56, ri * 0.32, ri * 0.12, -0.5, 0, TAU); z.fill();
+    z.font = mz.font; z.textAlign = 'center'; z.textBaseline = 'middle';
+    z.fillStyle = '#4a1f3c'; z.fillText('24', 0, fs * 0.05);
+    sternSchild = { c: c, half: half };
+  }
+
+  // Fotos für geöffnete Kugeln holen (nie für gesperrte Tage): immer die kleine Vorschau (Spiegelung in der
+  // Kugel, Liste), höchstens zwei gleichzeitig, die gerade vorn hängenden zuerst. Solange die Bildansicht offen
+  // ist, ruht die Schlange (dann bekommt das große Bild die ganze Leitung). Bis das Foto da ist, bleibt die
+  // Kugel eine glänzende Glaskugel mit Zahl – nie eine leere oder schwarze Fläche.
+  // px < 120: echte Bilder kommen in Größe k, ein gemalter Platzhalter (Tag ohne Foto) dann ohne „Foto folgt“-Schild,
+  // das auf einer so kleinen Kugel ohnehin nicht lesbar wäre.
+  var KUGEL_PX = 112, fotoSchlange = [], fotoLaeufe = 0, FOTO_PARALLEL = 2;
+  function ladeKugelFotos() {
+    fotoSchlange = [];
+    for (var i = 0; i < kugeln.length; i++) {
+      var k = kugeln[i];
+      if (zustand(k.tag) !== 'offen') { k.foto = null; k.fotoErsatz = false; continue; }
+      if ((!k.foto || k.fotoErsatz) && !k.fotoLaedt) fotoSchlange.push(k);
+    }
+    pumpe();
+  }
+  function pumpe() {
+    while (fotoLaeufe < FOTO_PARALLEL && fotoSchlange.length && !A.offen) {
+      var bi = 0, bc = -9;
+      for (var i = 0; i < fotoSchlange.length; i++) { var c = Math.cos(fotoSchlange[i].th + phi); if (c > bc) { bc = c; bi = i; } }
+      ladeKugelFoto(fotoSchlange.splice(bi, 1)[0]);
+    }
+  }
+  function ladeKugelFoto(k) {
+    var t = k.tag;
+    fotoLaeufe++; k.fotoLaedt = true;
+    holeVorschau(t, KUGEL_PX).then(function (img) { return { img: img, ersatz: false }; }, function () {
+      // Server-Bild fehlt oder Netz weg: gemalter Platzhalter (beim nächsten Öffnen wird es erneut versucht)
+      return holeErsatz(t, KUGEL_PX).then(function (img) { return { img: img, ersatz: true }; });
+    }).then(function (r) {
+      if (zustand(t) !== 'offen' || (k.foto && !k.fotoErsatz)) return;
+      k.foto = r.img; k.fotoErsatz = r.ersatz;
+      baueKugelBild(k);
+      if (!raf) zeichne();
+      if (listeSichtbar()) fuelleMini(t);
+    }, function () { /* bleibt Glaskugel */ }).then(function () {
+      k.fotoLaedt = false; fotoLaeufe--; setTimeout(pumpe, 20);
+    });
+  }
+
+  /* ================================================================
+     Wohnzimmer: Wand, Dielen, Strick-Baumdecke, Korb, Geschenke
+     ================================================================ */
+  var raumHinten = null, geschenke = [];
+  var tapete = null;
+  function baueTapete() {
+    var w = 34, h = 40, c = leinwand(w * DPR, h * DPR), z = c.getContext('2d');
+    z.scale(DPR, DPR);
+    z.strokeStyle = 'rgba(242,196,106,.045)'; z.lineWidth = 1;
+    z.beginPath(); z.moveTo(0, 0); z.lineTo(w / 2, h / 2); z.lineTo(0, h); z.moveTo(w, 0); z.lineTo(w / 2, h / 2); z.lineTo(w, h); z.stroke();
+    z.fillStyle = 'rgba(242,196,106,.07)';
+    z.beginPath(); z.arc(w / 2, h / 2, 1.6, 0, TAU); z.fill();
+    z.beginPath(); z.arc(0, 0, 1.2, 0, TAU); z.arc(w, 0, 1.2, 0, TAU); z.arc(0, h, 1.2, 0, TAU); z.arc(w, h, 1.2, 0, TAU); z.fill();
+    // kleiner Zweig in der Raute
+    z.strokeStyle = 'rgba(248,236,218,.05)';
+    z.beginPath(); z.moveTo(w / 2, h * 0.12); z.lineTo(w / 2, h * 0.36); z.moveTo(w / 2, h * 0.2); z.lineTo(w / 2 - 3, h * 0.16); z.moveTo(w / 2, h * 0.2); z.lineTo(w / 2 + 3, h * 0.16);
+    z.moveTo(w / 2, h * 0.28); z.lineTo(w / 2 - 3.5, h * 0.24); z.moveTo(w / 2, h * 0.28); z.lineTo(w / 2 + 3.5, h * 0.24); z.stroke();
+    tapete = c;
+  }
+
+  function geschenkSchatten(z, x, boden, w, h, tiefe) {
+    var dx = (x < G.cx ? 1 : -1) * tiefe * 0.45, dy = tiefe * 0.42;
+    var sg = z.createRadialGradient(x + dx * 0.4, boden, 0, x + dx * 0.4, boden, w * 0.8);
+    sg.addColorStop(0, 'rgba(10,3,6,.55)'); sg.addColorStop(1, 'rgba(10,3,6,0)');
+    z.fillStyle = sg; z.beginPath(); z.ellipse(x + dx * 0.4, boden - dy * 0.2, w * 0.8, h * 0.28 + dy, 0, 0, TAU); z.fill();
+  }
+  function geschenk(z, x, boden, w, h, tiefe, farbe, muster, band, seed) {
+    var r = zufall(seed), b = rgb(farbe), hell = css(mische(b, [255, 240, 220], 0.28)), dunkel = css(mische(b, [20, 6, 14], 0.42));
+    var seite = x < G.cx ? 1 : -1, dx = seite * tiefe * 0.45, dy = tiefe * 0.42;
+    var l = x - w / 2, o = boden - h;
+    // Seite
+    z.fillStyle = dunkel; z.beginPath();
+    var sx = seite > 0 ? l + w : l;
+    z.moveTo(sx, o); z.lineTo(sx + dx, o - dy); z.lineTo(sx + dx, boden - dy); z.lineTo(sx, boden); z.closePath(); z.fill();
+    // Deckel
+    z.fillStyle = hell; z.beginPath(); z.moveTo(l, o); z.lineTo(l + dx, o - dy); z.lineTo(l + w + dx, o - dy); z.lineTo(l + w, o); z.closePath(); z.fill();
+    // Front mit Muster
+    z.save(); z.beginPath(); z.rect(l, o, w, h); z.clip();
+    var fg = z.createLinearGradient(0, o, 0, boden); fg.addColorStop(0, farbe); fg.addColorStop(1, css(mische(b, [20, 6, 14], 0.25)));
+    z.fillStyle = fg; z.fillRect(l, o, w, h);
+    z.fillStyle = 'rgba(255,245,225,.32)'; z.strokeStyle = 'rgba(255,245,225,.3)'; z.lineWidth = Math.max(1, w * 0.035);
+    var i, j;
+    if (muster === 'punkte') { for (i = 0; i < 6; i++) for (j = 0; j < 6; j++) { z.beginPath(); z.arc(l + (i + (j % 2) * 0.5) * w / 5, o + j * h / 5 + h * 0.08, Math.max(1, w * 0.035), 0, TAU); z.fill(); } }
+    else if (muster === 'streifen') { for (i = -6; i < 12; i++) { z.beginPath(); z.moveTo(l + i * w / 6, boden); z.lineTo(l + i * w / 6 + h, o); z.stroke(); } }
+    else if (muster === 'sterne') { for (i = 0; i < 9; i++) { var px = l + r() * w, py = o + r() * h, q = w * 0.05; z.beginPath(); z.moveTo(px - q, py); z.lineTo(px + q, py); z.moveTo(px, py - q); z.lineTo(px, py + q); z.stroke(); } }
+    z.restore();
+    // Band
+    var bw = Math.max(2, w * 0.13);
+    z.fillStyle = band;
+    z.fillRect(x - bw / 2, o, bw, h);
+    z.beginPath(); z.moveTo(x - bw / 2, o); z.lineTo(x - bw / 2 + dx, o - dy); z.lineTo(x + bw / 2 + dx, o - dy); z.lineTo(x + bw / 2, o); z.closePath(); z.fill();
+    z.beginPath(); z.moveTo(l + dx * 0.5, o - dy * 0.5 - bw * 0.35); z.lineTo(l + w + dx * 0.5, o - dy * 0.5 - bw * 0.35); z.lineTo(l + w + dx * 0.5, o - dy * 0.5 + bw * 0.35); z.lineTo(l + dx * 0.5, o - dy * 0.5 + bw * 0.35); z.closePath(); z.fill();
+    // Schleife oben
+    var mx = x + dx * 0.5, my = o - dy * 0.5, s = w * 0.2;
+    z.fillStyle = band; z.strokeStyle = 'rgba(30,10,10,.35)'; z.lineWidth = 1;
+    z.beginPath(); z.moveTo(mx, my); z.bezierCurveTo(mx - s * 1.5, my - s * 1.3, mx - s * 1.6, my + s * 0.3, mx, my); z.fill(); z.stroke();
+    z.beginPath(); z.moveTo(mx, my); z.bezierCurveTo(mx + s * 1.5, my - s * 1.3, mx + s * 1.6, my + s * 0.3, mx, my); z.fill(); z.stroke();
+    z.beginPath(); z.arc(mx, my, s * 0.3, 0, TAU); z.fill();
+    // Lichtkante
+    z.strokeStyle = 'rgba(255,220,160,.25)'; z.lineWidth = 1;
+    z.beginPath(); z.moveTo(l, o); z.lineTo(l + w, o); z.stroke();
+  }
+
+  function geschenkListe() {
+    var h = K.heute(), R = G.R, f = G.floorY;
+    var hinten = [], vorne = [];
+    if (h === 0) return { hinten: [], vorne: [] };
+    hinten.push([G.cx - R * 0.8, f - R * 0.02, R * 0.4, R * 0.3, R * 0.22, '#2d7d77', 'streifen', '#f2c46a', 3]);
+    vorne.push([G.cx + R * 0.8, f + R * 0.12, R * 0.36, R * 0.38, R * 0.2, '#b42f3d', 'punkte', '#f8ecda', 5]);
+    vorne.push([G.cx - R * 0.78, f + R * 0.16, R * 0.46, R * 0.24, R * 0.24, '#e0ad52', 'sterne', '#b42f3d', 7]);
+    if (h >= 24) {
+      hinten.push([G.cx + R * 0.72, f - R * 0.04, R * 0.32, R * 0.36, R * 0.2, '#8c3f69', 'punkte', '#f2c46a', 11]);
+      vorne.push([G.cx + R * 0.2, f + R * 0.26, R * 0.3, R * 0.2, R * 0.18, '#35629c', 'sterne', '#f8ecda', 13]);
+    }
+    if (h >= 25) {
+      vorne.push([G.cx - R * 0.3, f + R * 0.3, R * 0.34, R * 0.16, R * 0.2, '#cf7446', 'streifen', '#2d7d77', 17]);
+      vorne.push([G.cx + R * 0.52, f + R * 0.36, R * 0.24, R * 0.17, R * 0.16, '#eee2cc', 'punkte', '#b42f3d', 19]);
+    }
+    return { hinten: hinten, vorne: vorne };
+  }
+
+  function baueRaum() {
+    var W = G.W, H = G.H, R = G.R, cx = G.cx, h = K.heute(), lichtAn = h > 0;
+    raumHinten = raumHinten && raumHinten.width === el.szene.width && raumHinten.height === el.szene.height ? raumHinten : leinwand(el.szene.width, el.szene.height);
+    var z = raumHinten.getContext('2d');
+    z.setTransform(DPR, 0, 0, DPR, 0, 0); z.clearRect(0, 0, W, H);
+    var horizont = G.floorY - R * 0.5;
+    // Wand
+    var wg = z.createLinearGradient(0, 0, 0, horizont);
+    wg.addColorStop(0, '#24101f'); wg.addColorStop(0.55, '#3b1c33'); wg.addColorStop(1, '#4b2541');
+    z.fillStyle = wg; z.fillRect(0, 0, W, horizont);
+    if (tapete) {
+      var mu = z.createPattern(tapete, 'repeat');
+      try { if (mu.setTransform && window.DOMMatrix) mu.setTransform(new DOMMatrix().scale(1 / DPR)); } catch (e) { /* egal */ }
+      z.fillStyle = mu; z.fillRect(0, 0, W, horizont);
+    }
+    // Lampenlicht von links oben und warmer Schein des Baums
+    var lg = z.createRadialGradient(W * 0.04, H * 0.1, 0, W * 0.04, H * 0.1, Math.max(W, H) * 0.75);
+    lg.addColorStop(0, 'rgba(255,196,120,.2)'); lg.addColorStop(1, 'rgba(255,196,120,0)');
+    z.fillStyle = lg; z.fillRect(0, 0, W, horizont);
+    var my = G.apexY + G.TH * 0.55, bg = z.createRadialGradient(cx, my, R * 0.2, cx, my, R * 2.1);
+    var st = h === 0 ? 0.06 : h >= 25 ? 0.3 : 0.22;
+    bg.addColorStop(0, 'rgba(255,196,110,' + st + ')'); bg.addColorStop(0.5, 'rgba(255,170,90,' + st * 0.4 + ')'); bg.addColorStop(1, 'rgba(255,170,90,0)');
+    z.fillStyle = bg; z.fillRect(0, 0, W, horizont);
+    wandDeko(z, horizont);
+    // Fußleiste
+    z.fillStyle = '#26101f'; z.fillRect(0, horizont - R * 0.07, W, R * 0.07);
+    z.fillStyle = 'rgba(255,214,160,.16)'; z.fillRect(0, horizont - R * 0.07, W, 1);
+    // Dielen mit Fluchtpunkt
+    var fg = z.createLinearGradient(0, horizont, 0, H);
+    fg.addColorStop(0, '#3e2418'); fg.addColorStop(0.35, '#4f2e1d'); fg.addColorStop(1, '#2a160e');
+    z.fillStyle = fg; z.fillRect(0, horizont, W, H - horizont);
+    var vx = cx, vy = horizont - R * 2.6, breite = R * 0.34;
+    z.strokeStyle = 'rgba(16,6,3,.42)'; z.lineWidth = 1;
+    z.save(); z.beginPath(); z.rect(0, horizont, W, H - horizont); z.clip();
+    for (var i = -40; i <= 40; i++) {
+      var xb = cx + i * breite * (H - vy) / (horizont - vy);
+      if (xb < -W || xb > 2 * W) continue;
+      z.beginPath(); z.moveTo(vx + (xb - vx) * (horizont - vy) / (H - vy), horizont); z.lineTo(xb, H); z.stroke();
+    }
+    var rr = zufall(5);
+    z.strokeStyle = 'rgba(16,6,3,.3)';
+    for (i = 0; i < 70; i++) {
+      var yy = horizont + Math.pow(rr(), 0.8) * (H - horizont), xx = rr() * W, ll = R * 0.3 * (yy - vy) / (horizont - vy);
+      z.beginPath(); z.moveTo(xx, yy); z.lineTo(xx + ll * 0.25, yy); z.stroke();
+    }
+    z.restore();
+    var sp = z.createRadialGradient(cx, G.floorY + R * 0.1, 0, cx, G.floorY + R * 0.1, R * 1.8);
+    sp.addColorStop(0, 'rgba(255,190,110,' + (lichtAn ? 0.24 : 0.06) + ')'); sp.addColorStop(1, 'rgba(255,190,110,0)');
+    z.fillStyle = sp; z.beginPath(); z.ellipse(cx, G.floorY + R * 0.1, R * 1.9, R * 0.55, 0, 0, TAU); z.fill();
+    var vg = z.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.8);
+    vg.addColorStop(0, 'rgba(12,4,10,0)'); vg.addColorStop(1, 'rgba(12,4,10,.55)');
+    z.fillStyle = vg; z.fillRect(0, 0, W, H);
+
+    // Strick-Baumdecke
+    var dy = G.floorY, drx = R * 1.02, dry = R * 0.24;
+    z.fillStyle = 'rgba(10,3,6,.45)'; z.beginPath(); z.ellipse(cx, dy + R * 0.03, drx * 1.02, dry * 1.05, 0, 0, TAU); z.fill();
+    var dg = z.createRadialGradient(cx - drx * 0.3, dy - dry * 0.4, 0, cx, dy, drx);
+    dg.addColorStop(0, '#fbf1e2'); dg.addColorStop(0.7, '#e7d6bd'); dg.addColorStop(1, '#bfa889');
+    z.fillStyle = dg; z.beginPath(); z.ellipse(cx, dy, drx, dry, 0, 0, TAU); z.fill();
+    z.strokeStyle = '#b42f3d'; z.lineWidth = Math.max(1, R * 0.012);
+    for (var ring = 0; ring < 2; ring++) {
+      var f = 0.86 - ring * 0.2, n = 22 - ring * 6;
+      for (i = 0; i < n; i++) {
+        var a = i / n * TAU, px = cx + Math.cos(a) * drx * f, py = dy + Math.sin(a) * dry * f, q = R * 0.022;
+        z.beginPath(); z.moveTo(px - q, py - q * 0.5); z.lineTo(px + q, py + q * 0.5); z.moveTo(px + q, py - q * 0.5); z.lineTo(px - q, py + q * 0.5); z.stroke();
+      }
+    }
+    z.strokeStyle = 'rgba(120,90,60,.35)'; z.lineWidth = 1;
+    z.beginPath(); z.ellipse(cx, dy, drx * 0.97, dry * 0.95, 0, 0, TAU); z.stroke();
+
+    // Stamm und geflochtener Korb
+    var kt = G.floorY - R * 0.3, kbO = R * 0.25, kbU = R * 0.2;
+    z.fillStyle = '#4a2c18'; z.fillRect(cx - R * 0.05, G.y0 - R * 0.05, R * 0.1, kt - G.y0 + R * 0.06);
+    var kg = z.createLinearGradient(cx - kbO, 0, cx + kbO, 0);
+    kg.addColorStop(0, '#5a3a18'); kg.addColorStop(0.35, '#c99a55'); kg.addColorStop(0.65, '#a3753a'); kg.addColorStop(1, '#4a2e12');
+    z.fillStyle = kg; z.beginPath(); z.moveTo(cx - kbO, kt); z.lineTo(cx + kbO, kt); z.lineTo(cx + kbU, G.floorY + R * 0.02); z.lineTo(cx - kbU, G.floorY + R * 0.02); z.closePath(); z.fill();
+    z.strokeStyle = 'rgba(40,20,6,.45)'; z.lineWidth = Math.max(1, R * 0.012);
+    for (i = 1; i < 6; i++) { var yk = kt + (G.floorY - kt) * i / 6, wk = kbO + (kbU - kbO) * i / 6; z.beginPath(); z.moveTo(cx - wk, yk); z.lineTo(cx + wk, yk); z.stroke(); }
+    z.fillStyle = '#d8ad66'; z.fillRect(cx - kbO - R * 0.02, kt - R * 0.03, 2 * kbO + R * 0.04, R * 0.04);
+
+    // Geschenke: Schatten fest auf den Boden, jedes Paket als eigenes Bild (es hüpft, wenn man es antippt)
+    var gl = geschenkListe(), alt = geschenke;
+    geschenke = [];
+    gl.hinten.concat(gl.vorne).forEach(function (p, n) {
+      geschenkSchatten(z, p[0], p[1], p[2], p[3], p[4]);
+      var dxa = p[4] * 0.45, dy = p[4] * 0.42;
+      var bx = Math.floor(p[0] - p[2] / 2 - dxa - 4), bx1 = Math.ceil(p[0] + p[2] / 2 + dxa + 4);
+      var by = Math.floor(Math.min(p[1] - p[3] - dy, p[1] - p[3] - dy * 0.5 - p[2] * 0.27) - 4), by1 = Math.ceil(p[1] + 2);
+      var c = leinwand((bx1 - bx) * DPR, (by1 - by) * DPR), zc = c.getContext('2d');
+      zc.setTransform(DPR, 0, 0, DPR, -bx * DPR, -by * DPR);
+      geschenk(zc, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8]);
+      var vorher = alt[n] && alt[n].seed === p[8] ? alt[n] : null;
+      geschenke.push({ x: p[0], boden: p[1], bx: bx, by: by, bw: bx1 - bx, bh: by1 - by, c: c, vorne: n >= gl.hinten.length, seed: p[8],
+        hop: vorher ? vorher.hop : 0, hopV: vorher ? vorher.hopV : 0, kipp: vorher ? vorher.kipp : 0, kippV: vorher ? vorher.kippV : 0 });
+    });
+  }
+
+  // Tablet: viel freie Wand neben dem Baum - Fenster mit Schneenacht und Stehlampe
+  function wandDeko(z, horizont) {
+    var R = G.R, frei = (G.W - 2.15 * R) / 2;
+    if (istPanel() || G.bw < G.W * 0.85 || frei < 120 || G.TH < 320) return;
+    // Fenster rechts
+    var fw = Math.min(frei * 0.6, 190), fh = Math.min(fw * 1.5, (horizont - G.apexY) * 0.62);
+    var fx = (G.cx + 1.075 * R + G.W) / 2 - fw / 2, fy = G.apexY + G.TH * 0.06;
+    var sp = z.createRadialGradient(fx + fw / 2, fy + fh / 2, fw * 0.3, fx + fw / 2, fy + fh / 2, fw * 1.3);
+    sp.addColorStop(0, 'rgba(120,150,210,.16)'); sp.addColorStop(1, 'rgba(120,150,210,0)');
+    z.fillStyle = sp; z.fillRect(fx - fw, fy - fw, fw * 3, fh + fw * 2);
+    var rand = Math.max(6, fw * 0.07);
+    z.fillStyle = '#1c0b17'; z.fillRect(fx - rand, fy - rand, fw + 2 * rand, fh + 2 * rand);
+    var hg = z.createLinearGradient(0, fy, 0, fy + fh);
+    hg.addColorStop(0, '#0b1730'); hg.addColorStop(0.7, '#1d3a64'); hg.addColorStop(1, '#3a5f8c');
+    z.fillStyle = hg; z.fillRect(fx, fy, fw, fh);
+    var rr = zufall(41), i;
+    z.save(); z.beginPath(); z.rect(fx, fy, fw, fh); z.clip();
+    var mg = z.createRadialGradient(fx + fw * 0.3, fy + fh * 0.2, 0, fx + fw * 0.3, fy + fh * 0.2, fw * 0.4);
+    mg.addColorStop(0, 'rgba(255,248,225,.95)'); mg.addColorStop(0.18, 'rgba(255,244,215,.9)'); mg.addColorStop(0.22, 'rgba(200,215,255,.25)'); mg.addColorStop(1, 'rgba(200,215,255,0)');
+    z.fillStyle = mg; z.fillRect(fx, fy, fw, fh);
+    z.fillStyle = '#0c1424';
+    z.beginPath(); z.moveTo(fx, fy + fh);
+    for (i = 0; i <= 8; i++) { var hx = fx + fw * i / 8; z.lineTo(hx, fy + fh * (0.8 + 0.08 * Math.sin(i * 1.7)) - (i % 3 === 1 ? fw * 0.12 : 0)); }
+    z.lineTo(fx + fw, fy + fh); z.closePath(); z.fill();
+    z.fillStyle = 'rgba(255,214,140,.85)';
+    for (i = 0; i < 5; i++) z.fillRect(fx + fw * (0.08 + rr() * 0.84), fy + fh * (0.84 + rr() * 0.1), 2, 2.5);
+    for (i = 0; i < 46; i++) { z.fillStyle = 'rgba(255,255,255,' + (0.35 + rr() * 0.55).toFixed(2) + ')'; z.beginPath(); z.arc(fx + rr() * fw, fy + rr() * fh, 0.7 + rr() * 1.5, 0, TAU); z.fill(); }
+    z.restore();
+    z.strokeStyle = '#2a1222'; z.lineWidth = Math.max(4, fw * 0.045);
+    z.beginPath(); z.moveTo(fx + fw / 2, fy); z.lineTo(fx + fw / 2, fy + fh); z.moveTo(fx, fy + fh * 0.42); z.lineTo(fx + fw, fy + fh * 0.42); z.stroke();
+    z.fillStyle = 'rgba(245,248,255,.85)';
+    [[fx, fx + fw / 2], [fx + fw / 2, fx + fw]].forEach(function (q) {
+      z.beginPath(); z.moveTo(q[0], fy + fh); z.quadraticCurveTo((q[0] + q[1]) / 2, fy + fh - fw * 0.07, q[1], fy + fh); z.closePath(); z.fill();
+    });
+    z.fillStyle = '#5a3346'; z.fillRect(fx - rand * 1.8, fy + fh + rand * 0.5, fw + rand * 3.6, rand * 1.1);
+    z.fillStyle = 'rgba(255,220,170,.22)'; z.fillRect(fx - rand * 1.8, fy + fh + rand * 0.5, fw + rand * 3.6, 1);
+    // Stehlampe links
+    var lx = (G.bx + G.cx - 1.075 * R) / 2, sw = Math.min(frei * 0.5, 120), sy = G.apexY + G.TH * 0.24, fuss = horizont + R * 0.22;
+    var lg = z.createRadialGradient(lx, sy + sw * 0.3, 0, lx, sy + sw * 0.3, sw * 2.4);
+    lg.addColorStop(0, 'rgba(255,200,120,.28)'); lg.addColorStop(1, 'rgba(255,200,120,0)');
+    z.fillStyle = lg; z.fillRect(lx - sw * 2.4, sy - sw * 2, sw * 4.8, sw * 4.8);
+    z.strokeStyle = '#1e0c18'; z.lineWidth = Math.max(3, sw * 0.05);
+    z.beginPath(); z.moveTo(lx, sy + sw * 0.5); z.lineTo(lx, fuss); z.stroke();
+    z.fillStyle = '#1e0c18'; z.beginPath(); z.ellipse(lx, fuss, sw * 0.3, sw * 0.07, 0, 0, TAU); z.fill();
+    var sg = z.createLinearGradient(lx - sw / 2, 0, lx + sw / 2, 0);
+    sg.addColorStop(0, '#c8955a'); sg.addColorStop(0.45, '#f7dba4'); sg.addColorStop(1, '#b07a44');
+    z.fillStyle = sg; z.beginPath(); z.moveTo(lx - sw * 0.32, sy); z.lineTo(lx + sw * 0.32, sy); z.lineTo(lx + sw * 0.5, sy + sw * 0.55); z.lineTo(lx - sw * 0.5, sy + sw * 0.55); z.closePath(); z.fill();
+    z.fillStyle = 'rgba(255,236,190,.55)'; z.beginPath(); z.ellipse(lx, sy + sw * 0.55, sw * 0.5, sw * 0.06, 0, 0, TAU); z.fill();
+  }
+
+  /* ================================================================
+     Zeichnen: Etage für Etage von unten nach oben, darin nach Tiefe sortiert
+     ================================================================ */
+  var phi = 0, phiLetzt = 0, omega = 0, ziel = null, zug = null, wGlatt = 0, wVorher = 0;
+  var raf = 0, zuletzt = 0, zeit = 0;
+  var flug = null, sternLicht = 0, sternAnim = null, sternWackel = 0, sternWackelV = 0, fokusRing = false;
+  var heuteK = null, welle = null;
+  var kernFarben = [];
+  function nachZ(a, b) { return a.z - b.z; }
+
+  function baueKernFarben() {
+    kernFarben = ETAGEN.map(function (e) {
+      var kg = g.createLinearGradient(G.cx - e.rb * G.R, 0, G.cx + e.rb * G.R, 0);
+      kg.addColorStop(0, '#1a4030'); kg.addColorStop(0.4, '#123223'); kg.addColorStop(1, '#061610');
+      return kg;
+    });
+  }
+
+  function zeichneGlut(k) {
+    if (k.ca > 0.3) return;
+    proj(k.r, k.y, k.th + phi);
+    var s = P.s, rad = G.br * k.gr * s, x = P.x, y = P.y + k.L * G.R * s + rad * 1.3;
+    var st = klemm((0.3 - k.ca) / 0.7, 0, 1), gr = rad * (8 + 8 * st);
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    g.globalCompositeOperation = 'lighter';
+    g.globalAlpha = 0.55 + 0.35 * st;
+    g.drawImage(gluehBild, x - gr / 2, y - gr / 2, gr, gr);
+    g.globalAlpha = 0.34 * st;
+    g.drawImage(gluehBild, x - gr, y - gr * 0.9, gr * 2, gr * 1.8);
+    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  }
+  function zeichneKern(k) {
+    var e = ETAGEN[k];
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    proj(0, e.yt, 0);
+    g.beginPath(); g.moveTo(P.x, P.y);
+    var yb = e.yb + (e.yt - e.yb) * 0.03;
+    for (var i = 0; i <= 18; i++) { proj(e.rb * 0.95, yb, -Math.PI / 2 + i / 18 * Math.PI); g.lineTo(P.x, P.y); }
+    g.closePath();
+    g.fillStyle = kernFarben[k] || '#0e2a1d'; g.fill();
+    if (heuteK && heuteK.e === k && !heuteK.fliegt) zeichneGlut(heuteK);
+  }
+
+  var dunkler = 0;
+  function zeichneZweig(it, e) {
+    if (it.z < -0.42 * e.rb) return;
+    var a = it.th + phi;
+    proj(it.rIn, it.yIn, a); var x1 = P.x, y1 = P.y;
+    proj(it.rOut, it.yOut, a); var dx = P.x - x1, dy = P.y - y1, s = P.s;
+    var len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 0.01) { dx = 0; dy = 1; len = 1; }
+    var ux = dx / len, uy = dy / len, minL = (it.rOut - it.rIn) * G.R * 0.42;
+    if (len < minL) len = minL;
+    var nx, ny;
+    if (ux >= 0) { nx = -uy; ny = ux; } else { nx = uy; ny = -ux; }
+    var hell = 0.4 + 0.36 * it.ca - 0.2 * it.sa + it.hell + (it.yOut - 0.4) * 0.25 - dunkler;
+    var st = klemm(Math.round(hell * (STUFEN - 1)), 0, STUFEN - 1), dick = it.dick * G.R * s;
+    g.setTransform(DPR * ux, DPR * uy, DPR * nx, DPR * ny, DPR * x1, DPR * y1);
+    g.drawImage(zweigBilder[it.v][st], 0, -dick / 2, len * 1.08, dick);
+  }
+
+  function zeichneKugel(k) {
+    var a = k.th + phi;
+    proj(k.r, k.y, a);
+    var hx = P.x, hy = P.y, s = P.s, rad = G.br * k.gr * s, L = k.L * G.R * s;
+    var sp = Math.sin(k.psi), cp = Math.cos(k.psi);
+    k.hx = hx; k.hy = hy; k.sr = rad;
+    k.sx = hx + sp * (L + rad * 1.3); k.sy = hy + cp * (L + rad * 1.3);
+    if (k.ca < -0.6) return;
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var dunkel = Math.max(0, (0.3 - k.ca) * 0.72);
+    if (k.fliegt) {
+      g.strokeStyle = 'rgba(216,183,101,.6)'; g.lineWidth = Math.max(0.8, rad * 0.07);
+      g.beginPath(); g.moveTo(hx, hy); g.lineTo(hx, hy + L * 0.6); g.stroke();
+      return;
+    }
+    g.strokeStyle = 'rgba(216,183,101,' + (0.8 - dunkel * 0.6).toFixed(2) + ')'; g.lineWidth = Math.max(0.8, rad * 0.07);
+    g.beginPath(); g.moveTo(hx, hy); g.lineTo(hx + sp * L, hy + cp * L); g.stroke();
+    if (!k.bild) return;
+    var c = Math.cos(-k.psi), sn = Math.sin(-k.psi), half = k.bildR * 1.35 * s;
+    g.setTransform(DPR * c, DPR * sn, -DPR * sn, DPR * c, DPR * k.sx, DPR * k.sy);
+    g.drawImage(k.bild, -half, -half, 2 * half, 2 * half);
+    if (dunkel > 0.02) {
+      g.fillStyle = 'rgba(6,18,12,' + Math.min(0.78, dunkel).toFixed(3) + ')';
+      g.beginPath(); g.arc(0, 0, rad * 1.02, 0, TAU); g.fill();
+    }
+  }
+
+  function zeichneBirne(b, lichtAn) {
+    if (b.ca < -0.25) return;
+    proj(b.r, b.y, b.th + phi);
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var rad = Math.max(1.1, G.R * 0.0105) * P.s;
+    if (lichtAn) {
+      var st = klemm(0.25 + b.ca * 0.75, 0, 1), gr = rad * 10;
+      if (welle) {
+        var dw = zeit - welle.t0 - b.y * 0.6, boost = Math.exp(-dw * dw / 0.005);
+        if (boost > 0.02) { st = Math.min(1, st + boost * 0.8); gr *= 1 + boost * 0.9; rad *= 1 + boost * 0.45; }
+      }
+      g.globalCompositeOperation = 'lighter';
+      g.globalAlpha = st * 0.9;
+      g.drawImage(gluehBild, P.x - gr / 2, P.y - gr / 2, gr, gr);
+      g.globalAlpha = 1;
+      g.globalCompositeOperation = 'source-over';
+      g.fillStyle = '#fff4d6';
+    } else g.fillStyle = 'rgba(232,222,204,.3)';
+    g.beginPath(); g.arc(P.x, P.y, rad, 0, TAU); g.fill();
+  }
+
+  // Schatten, den der Rock einer Etage auf die darunterliegende wirft
+  function zeichneRockSchatten(e) {
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    g.beginPath();
+    for (var i = 0; i <= 16; i++) { proj(e.rb * 0.8, e.yb - 0.02, -Math.PI / 2 + i / 16 * Math.PI); if (i) g.lineTo(P.x, P.y); else g.moveTo(P.x, P.y); }
+    g.lineCap = 'round';
+    g.strokeStyle = 'rgba(2,12,7,.26)'; g.lineWidth = G.R * 0.22; g.stroke();
+    g.strokeStyle = 'rgba(2,12,7,.32)'; g.lineWidth = G.R * 0.1; g.stroke();
+  }
+  function zeichneEtage(k, lichtAn) {
+    var liste = etagenListen[k], e = ETAGEN[k], i, it, a;
+    if (k > 0) zeichneRockSchatten(e);
+    for (i = 0; i < liste.length; i++) {
+      it = liste[i];
+      if (it.typ === 3) continue;
+      a = it.th + phi; it.ca = Math.cos(a); it.sa = Math.sin(a);
+      if (it.typ === 0) it.z = (it.rIn + it.rOut) * 0.5 * it.ca;
+      else if (it.typ === 1) it.z = (it.r + 0.07) * it.ca;
+      else it.z = it.r * it.ca + 0.005;
+    }
+    liste.sort(nachZ);
+    for (i = 0; i < liste.length; i++) {
+      it = liste[i];
+      if (it.typ === 0) zeichneZweig(it, e);
+      else if (it.typ === 1) zeichneKugel(it);
+      else if (it.typ === 2) zeichneBirne(it, lichtAn);
+      else zeichneKern(k);
+    }
+  }
+
+  /* --- Stern an der Spitze (Tag 24): 3D-Stern mit Facetten, dreht sich mit --- */
+  var STERN = [];
+  (function () { for (var i = 0; i < 10; i++) { var w = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 0.43 : 1; STERN.push([Math.cos(w) * r, Math.sin(w) * r]); } })();
+  var LICHT = (function () { var v = [-0.45, -0.6, 0.66], n = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]); return [v[0] / n, v[1] / n, v[2] / n]; })();
+  var GOLD_AN = [250, 206, 112], GOLD_AUS = [150, 124, 78];
+  var facetten = [];
+  for (var fi = 0; fi < 20; fi++) facetten.push({ p: null, z: 0, d: 0, n: [0, 0, 0], sicht: false });
+  function zeichneStern() {
+    var R = G.starR, cx = G.cx, cy = G.starY, w = phi, cw = Math.cos(w), sw = Math.sin(w), T = 0.3;
+    var an = sternLicht, wa = Math.cos(sternWackel), wb = Math.sin(sternWackel), i;
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    g.strokeStyle = '#5a4419'; g.lineWidth = Math.max(1.5, R * 0.12);
+    g.beginPath(); g.moveTo(cx, G.apexY + R * 0.2); g.lineTo(cx, cy + R * 0.3); g.stroke();
+    var blitz = sternAnim ? Math.sin(Math.min(1, sternAnim.u) * Math.PI) : 0;
+    if (an > 0.01 || blitz > 0) {
+      var oben = Math.max(R * 1.5, cy - G.kopfUnten - 6);   // Platz bis zur Kopfzeile
+      var gr = Math.min(R * (3.4 + blitz * 2.2), Math.max(R * 2.2, oben * 1.25)), hg = g.createRadialGradient(cx, cy, R * 0.2, cx, cy, gr);
+      hg.addColorStop(0, 'rgba(255,226,150,' + (0.55 * an + 0.4 * blitz).toFixed(3) + ')'); hg.addColorStop(0.35, 'rgba(255,200,110,' + (0.2 * an + 0.2 * blitz).toFixed(3) + ')'); hg.addColorStop(1, 'rgba(255,190,100,0)');
+      g.globalCompositeOperation = 'lighter'; g.fillStyle = hg; g.fillRect(cx - gr, cy - gr, 2 * gr, 2 * gr);
+      // feine Strahlen
+      g.strokeStyle = 'rgba(255,230,170,' + (0.22 * an + 0.3 * blitz).toFixed(3) + ')'; g.lineWidth = 1.2;
+      g.beginPath();
+      for (i = 0; i < 8; i++) {
+        var sa = i * Math.PI / 4 + 0.2, lang = R * (2.1 + (i % 2) * 0.7 + blitz), hoch = Math.sin(sa);
+        if (hoch < -0.1) lang = Math.min(lang, oben / -hoch);
+        if (lang < R * 1.45) continue;
+        g.moveTo(cx + Math.cos(sa) * R * 1.25, cy + hoch * R * 1.25); g.lineTo(cx + Math.cos(sa) * lang, cy + hoch * lang);
+      }
+      g.stroke();
+      g.globalCompositeOperation = 'source-over';
+    }
+    var V = [];
+    for (i = 0; i < 10; i++) V.push([STERN[i][0] * cw, STERN[i][1], -STERN[i][0] * sw]);
+    var spitzen = [[T * sw, 0, T * cw], [-T * sw, 0, -T * cw]], n = 0;
+    for (i = 0; i < 10; i++) {
+      var v1 = V[i], v2 = V[(i + 1) % 10];
+      for (var s = 0; s < 2; s++) {
+        var c = spitzen[s], f = facetten[n++];
+        var ax = v2[0] - v1[0], ay = v2[1] - v1[1], az = v2[2] - v1[2], bx = c[0] - v1[0], by = c[1] - v1[1], bz = c[2] - v1[2];
+        var nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx;
+        if (nx * c[0] + ny * c[1] + nz * c[2] < 0) { nx = -nx; ny = -ny; nz = -nz; }
+        var nl = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1; nx /= nl; ny /= nl; nz /= nl;
+        f.sicht = nz > -0.02; f.p = [v1, v2, c]; f.z = (v1[2] + v2[2] + c[2]) / 3;
+        f.d = Math.max(0, nx * LICHT[0] + ny * LICHT[1] + nz * LICHT[2]);
+      }
+    }
+    var sicht = facetten.filter(function (f) { return f.sicht; }).sort(nachZ);
+    var basis = mische(GOLD_AUS, GOLD_AN, an);
+    for (i = 0; i < sicht.length; i++) {
+      var ff = sicht[i], hel = 0.34 + 0.72 * ff.d + an * 0.12, spec = Math.pow(ff.d, 10) * (60 + 120 * an);
+      var col = [Math.min(255, basis[0] * hel + spec), Math.min(255, basis[1] * hel + spec), Math.min(255, basis[2] * hel + spec * 0.8)];
+      g.fillStyle = css(col); g.strokeStyle = css(col); g.lineWidth = 0.6;
+      g.beginPath();
+      for (var q = 0; q < 3; q++) {
+        var px = ff.p[q][0] * R, py = ff.p[q][1] * R, X = cx + px * wa - py * wb, Y = cy + px * wb + py * wa;
+        if (q) g.lineTo(X, Y); else g.moveTo(X, Y);
+      }
+      g.closePath(); g.fill(); g.stroke();
+    }
+    if (sternSchild && an > 0.02 && zustand(24) === 'offen') {
+      // geöffnet: die „24“ erscheint, während der Stern angeht, wackelt mit ihm und dreht sich mit dem Baum
+      // (seitlich gesehen schmaler, aber nie unter 62 % Breite – die Zahl bleibt lesbar; Rückseite trägt denselben Knopf)
+      var sh = sternSchild.half, sq = Math.max(0.62, Math.abs(cw));
+      g.globalAlpha = Math.min(1, an);
+      g.setTransform(DPR * wa * sq, DPR * wb * sq, -DPR * wb, DPR * wa, DPR * cx, DPR * cy);
+      g.drawImage(sternSchild.c, -sh, -sh, 2 * sh, 2 * sh);
+      g.globalAlpha = 1;
+      g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    if (an < 0.5 && K.heute() > 0 && !K.darfOeffnen(24)) {
+      // noch aus: leicht bereift
+      g.fillStyle = 'rgba(235,240,245,.12)'; g.beginPath(); g.arc(cx, cy, R * 0.5, 0, TAU); g.fill();
+    }
+  }
+
+  function zeichneFlug() {
+    var f = flug, u = ease(klemm(f.u, 0, 1));
+    var x = f.x0 + (f.x1 - f.x0) * u, y = f.y0 + (f.y1 - f.y0) * u - Math.sin(u * Math.PI) * f.bogen, r = f.r0 + (f.r1 - f.r0) * u;
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var hg = g.createRadialGradient(x, y, r * 0.8, x, y, r * 2.2);
+    hg.addColorStop(0, 'rgba(255,210,130,' + (0.45 * u).toFixed(3) + ')'); hg.addColorStop(1, 'rgba(255,210,130,0)');
+    g.globalCompositeOperation = 'lighter'; g.fillStyle = hg; g.fillRect(x - r * 2.2, y - r * 2.2, r * 4.4, r * 4.4);
+    g.globalCompositeOperation = 'source-over';
+    g.save(); g.translate(x, y); g.rotate(f.dreh * (1 - u));
+    var k = f.k, fs = r * (f.schild0 + (0.62 - f.schild0) * u);   // Zahl wächst ohne Sprung aus der Baum-Größe heraus
+    if (f.warFoto && (f.foto || k.foto)) malKugel(g, r, k.tag, 'foto', k.farbe, f.foto || k.foto, false, false, fs);
+    else {
+      // Glas → Foto überblenden. Die Zahl wechselt nacheinander, nie zwei Zahlen übereinander:
+      // erste Hälfte blendet die große Glas-Zahl aus, zweite Hälfte das Schildchen ein.
+      var ein = f.foto ? sanft(klemm((f.u - 0.3) / 0.55, 0, 1)) : 0;
+      malKugel(g, r, k.tag, 'glas', k.farbe, null, false, ein > 0);
+      if (ein > 0) {
+        if (ein < 0.5) malZahl(g, r, k.tag, HELL[k.farbe] ? '#4a1f3c' : '#f7dc9b', 1 - 2 * ein);
+        g.globalAlpha = ein; malKugel(g, r, k.tag, 'foto', k.farbe, f.foto, false, false, fs, ein < 1 ? klemm(2 * ein - 1, 0, 1) / ein : 1); g.globalAlpha = 1;
+      }
+    }
+    g.restore();
+  }
+
+  function zeichneFokus() {
+    var v = vorneKugel();
+    if (!v) return;
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    g.strokeStyle = 'rgba(242,196,106,.95)'; g.lineWidth = 2.5; g.setLineDash([5, 4]);
+    g.beginPath(); g.arc(v.sx, v.sy, v.sr + 7, 0, TAU); g.stroke(); g.setLineDash([]);
+  }
+
+  function zeichneGeschenk(gs) {
+    if (!gs.hop && !gs.kipp) { g.setTransform(DPR, 0, 0, DPR, 0, 0); g.drawImage(gs.c, gs.bx, gs.by, gs.bw, gs.bh); return; }
+    var c = Math.cos(gs.kipp), sn = Math.sin(gs.kipp);
+    g.setTransform(DPR * c, DPR * sn, -DPR * sn, DPR * c, DPR * gs.x, DPR * (gs.boden + gs.hop));
+    g.drawImage(gs.c, gs.bx - gs.x, gs.by - gs.boden, gs.bw, gs.bh);
+  }
+
+  var leuchtGr = 0, leuchtI = el.leuchten.querySelector('i');
+  function setzeLeuchten() {
+    var h = K.heute(), x, y, r, stufe = 'nah', op = 1;
+    if (h >= 1 && h <= 23 && zustand(h) === 'heute') {
+      var k = kugelVon[h];
+      if (k && !k.fliegt) {
+        x = k.sx; y = k.sy; r = k.sr;
+        // warm/kalt: hinten ein großer, langsamer Schein; je weiter vorn, desto schneller und heller pulsiert sie
+        stufe = k.ca < -0.05 ? 'hinten' : k.ca < 0.8 ? 'seite' : 'nah';
+        if (stufe === 'hinten') { op = 0.85; r *= 2.4; } else if (stufe === 'seite') op = 0.82 + k.ca * 0.2;
+      }
+    } else if (h === 24 && zustand(24) === 'heute' && !sternAnim) { x = G.cx; y = G.starY; r = G.starR * 1.2; }
+    if (x === undefined || A.offen) { el.leuchten.classList.remove('an'); return; }
+    el.leuchten.classList.add('an');
+    if (el.leuchten.dataset.stufe !== stufe) {
+      el.leuchten.classList.remove('hinten', 'seite', 'nah'); el.leuchten.classList.add(stufe); el.leuchten.dataset.stufe = stufe;
+    }
+    var d = Math.round(r * 5.2);
+    if (d !== leuchtGr) { leuchtGr = d; leuchtI.style.width = leuchtI.style.height = d + 'px'; leuchtI.style.left = leuchtI.style.top = (-d / 2) + 'px'; }
+    el.leuchten.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+    el.leuchten.style.opacity = op.toFixed(2);
+  }
+
+  function zeichne() {
+    if (!G.R || !raumHinten) return;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+    g.drawImage(raumHinten, 0, 0);
+    var lichtAn = K.heute() > 0, h = K.heute(), i;
+    heuteK = h >= 1 && h <= 23 && zustand(h) === 'heute' ? kugelVon[h] : null;
+    dunkler = lichtAn ? 0 : 0.1;
+    for (i = 0; i < geschenke.length; i++) if (!geschenke[i].vorne) zeichneGeschenk(geschenke[i]);
+    for (var k = 0; k < etagenListen.length; k++) zeichneEtage(k, lichtAn);
+    zeichneStern();
+    for (i = 0; i < geschenke.length; i++) if (geschenke[i].vorne) zeichneGeschenk(geschenke[i]);
+    if (flug) zeichneFlug();
+    if (fokusRing && !flug) zeichneFokus();
+    setzeLeuchten();
+  }
+
+  /* ================================================================
+     Bewegung: Drehen mit Schwung, Feder zum Ziel, Magnet, Pendeln
+     ================================================================ */
+  function setzeZiel(k, steif, fertig, frueh) { ziel = { k: k, steif: steif, fertig: fertig || null, frueh: !!frueh }; anstossen(); }
+  function zielErreicht() { var z = ziel; ziel = null; omega = 0; if (z && z.fertig) z.fertig(); }
+  function magnetZiel() {
+    var pz = phi + omega * 0.8, best = null, bd = 1e9, h = K.heute();
+    for (var i = 0; i < kugeln.length; i++) {
+      var k = kugeln[i], d = Math.abs(wrap(k.th + pz));
+      if (k.tag === h && zustand(h) === 'heute' && d < 0.42) return k;
+      if (d < bd) { bd = d; best = k; }
+    }
+    return bd < 0.5 ? best : null;
+  }
+  function vorneKugel() {
+    var best = null, bd = 0.3;
+    for (var i = 0; i < kugeln.length; i++) { var k = kugeln[i]; if (k.fliegt) continue; var d = Math.abs(wrap(k.th + phi)); if (d < bd) { bd = d; best = k; } }
+    return best;
+  }
+
+  function schritt(dt) {
+    zeit += dt;
+    var phiAlt = phiLetzt;
+    if (zug && zug.aktiv) { /* phi folgt dem Finger */ }
+    else if (ziel) {
+      var d = wrap(-ziel.k.th - phi);
+      if (REDUZIERT) { phi += d; zielErreicht(); }
+      else {
+        var acc = ziel.steif * d - 2 * 0.88 * Math.sqrt(ziel.steif) * omega;
+        omega += acc * dt; phi += omega * dt;
+        d = wrap(-ziel.k.th - phi);
+        if (ziel.frueh && Math.abs(d) < 0.06) { var cb = ziel.fertig; ziel.fertig = null; ziel.frueh = false; if (cb) cb(); }
+        if (Math.abs(d) < 0.002 && Math.abs(omega) < 0.03) { phi += d; zielErreicht(); }
+      }
+    } else if (omega !== 0) {
+      omega *= Math.exp(-dt / 0.8);
+      phi += omega * dt;
+      if (Math.abs(omega) < 1.5) { var m = magnetZiel(); if (m) setzeZiel(m, REDUZIERT ? 1 : 30); else if (Math.abs(omega) < 0.04) omega = 0; }
+    }
+    phiLetzt = phi;
+    var w = (phi - phiAlt) / dt;
+    wGlatt += (w - wGlatt) * Math.min(1, dt * 16);
+    var beschl = klemm((wGlatt - wVorher) / dt, -140, 140); wVorher = wGlatt;
+    if (Math.abs(wGlatt) < 0.004) wGlatt = 0;
+    for (var i = 0; i < kugeln.length; i++) {
+      var k = kugeln[i];
+      var kraft = REDUZIERT ? 0 : -beschl * k.r * k.ca * 0.2 + wGlatt * wGlatt * k.r * k.sa * 0.22;
+      k.psiV += (kraft - k.w0 * k.w0 * k.psi - 2 * 0.16 * k.w0 * k.psiV) * dt;
+      k.psi += k.psiV * dt;
+      if (k.psi > 0.6) { k.psi = 0.6; k.psiV *= -0.3; } else if (k.psi < -0.6) { k.psi = -0.6; k.psiV *= -0.3; }
+    }
+    sternWackelV += (-70 * sternWackel - 3.2 * sternWackelV) * dt; sternWackel += sternWackelV * dt;
+    for (i = 0; i < geschenke.length; i++) {
+      var gs = geschenke[i];
+      if (gs.hop < 0 || gs.hopV) {
+        gs.hopV += G.R * 18 * dt; gs.hop += gs.hopV * dt;
+        if (gs.hop >= 0) { gs.hop = 0; gs.hopV = gs.hopV > G.R * 0.6 ? -gs.hopV * 0.3 : 0; }
+      }
+      if (gs.kipp || gs.kippV) {
+        gs.kippV += (-110 * gs.kipp - 6 * gs.kippV) * dt; gs.kipp += gs.kippV * dt;
+        if (Math.abs(gs.kipp) < 0.002 && Math.abs(gs.kippV) < 0.02) gs.kipp = gs.kippV = 0;
+      }
+    }
+    if (welle && zeit - welle.t0 > 1.1) welle = null;
+    if (flug) { flug.u += dt / flug.dauer; if (flug.u >= 1 && !flug.fertig) { flug.fertig = true; flugFertig(); } }
+    if (sternAnim) {
+      sternAnim.u += dt / (REDUZIERT ? 0.05 : 0.75);
+      sternLicht = sternAnim.von + (1 - sternAnim.von) * sanft(Math.min(1, sternAnim.u));
+      if (sternAnim.u >= 1 && !sternAnim.fertig) { sternAnim.fertig = true; sternFertig(); }
+    }
+    pruefeGefunden();
+  }
+
+  function bewegt() {
+    if ((zug && zug.aktiv) || ziel || omega !== 0 || (flug && !flug.fertig) || (sternAnim && !sternAnim.fertig) || wGlatt !== 0) return true;
+    if (Math.abs(sternWackel) > 0.002 || Math.abs(sternWackelV) > 0.01 || welle) return true;
+    for (var j = 0; j < geschenke.length; j++) if (geschenke[j].hop || geschenke[j].hopV || geschenke[j].kipp || geschenke[j].kippV) return true;
+    for (var i = 0; i < kugeln.length; i++) { var k = kugeln[i]; if (Math.abs(k.psi) > 0.004 || Math.abs(k.psiV) > 0.035) return true; }
+    return false;
+  }
+
+  function tick(t) {
+    raf = 0;
+    var dt = klemm((t - zuletzt) / 1000, 0.001, 0.034); zuletzt = t;
+    schritt(dt); zeichne(); nachRahmen();
+    if (bewegt()) { if (!raf) raf = requestAnimationFrame(tick); }
+    else ruhe();
+  }
+  function anstossen() {
+    if (raf || document.hidden || !G.R) return;
+    zuletzt = jetzt();
+    raf = requestAnimationFrame(tick);
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; }
+    else anstossen();
+  });
+
+  /* ================================================================
+     Finger / Maus: der Baum klebt am Finger, beim Loslassen Schwung
+     ================================================================ */
+  var letzteAktion = jetzt();
+  function rAnfass(y) {
+    var ym = (G.y0 - y) / G.TH;
+    var r = ym > 1 ? 0.32 : ym < 0 ? 1 : huelleR(ym);
+    return klemm(r, 0.32, 1) * G.R * 1.08;
+  }
+  el.platz.addEventListener('pointerdown', function (e) {
+    if (!e.isPrimary || e.button > 0 || (flug && !flug.fertig) || A.offen || (sternAnim && !sternAnim.fertig)) return;
+    versteckeBlase(); versteckePfeil(); letzteAktion = jetzt();
+    // Nur ein schneller, freier Schwung wird vom Finger „gefangen“ (Tipp hält an, öffnet nichts).
+    // Beim Einrasten oder „Heute finden“ öffnet der Tipp die getroffene Kugel sofort.
+    var drehte = !ziel && (Math.abs(omega) > 3 || Math.abs(wGlatt) > 3);
+    zug = { id: e.pointerId, x0: e.clientX, y0: e.clientY, t0: jetzt(), phi0: phi, aktiv: false, proben: [[jetzt(), e.clientX]], rT: rAnfass(e.clientY), gefangen: drehte };
+    try { el.platz.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+    omega = 0; ziel = null;
+    if (e.pointerType === 'mouse') e.preventDefault();
+    anstossen();
+  });
+  el.platz.addEventListener('pointermove', function (e) {
+    if (!zug || e.pointerId !== zug.id) return;
+    var dx = e.clientX - zug.x0, dy = e.clientY - zug.y0, t = jetzt();
+    if (!zug.aktiv) {
+      if (Math.abs(dx) < 7 && Math.abs(dy) < 7) return;
+      zug.aktiv = true; el.platz.classList.add('zieht');
+    }
+    phi = zug.phi0 + dx / zug.rT;
+    zug.proben.push([t, e.clientX]);
+    while (zug.proben.length > 2 && t - zug.proben[0][0] > 100) zug.proben.shift();
+    letzteAktion = t;
+    anstossen();
+  });
+  function zugEnde(e) {
+    if (!zug || e.pointerId !== zug.id) return;
+    var z = zug, t = jetzt(), abbruch = e.type !== 'pointerup';   // pointercancel: Browser scrollt oder zoomt
+    zug = null; el.platz.classList.remove('zieht');
+    if (!z.aktiv) {
+      if (!abbruch && !z.gefangen && t - z.t0 < 700) tippen(e.clientX, e.clientY);
+      else { var m0 = magnetZiel(); if (m0) setzeZiel(m0, 30); }
+      anstossen(); return;
+    }
+    var p = z.proben, v = 0;
+    if (!abbruch && p.length >= 2 && t - p[p.length - 1][0] < 80) {
+      var a = p[0], b = p[p.length - 1];
+      v = (b[1] - a[1]) / Math.max(16, b[0] - a[0]) * 1000 / z.rT;
+    }
+    omega = REDUZIERT ? 0 : klemm(v, -14, 14);
+    if (Math.abs(omega) < 0.05) { omega = 0; var m = magnetZiel(); if (m) setzeZiel(m, 30); }
+    anstossen();
+  }
+  el.platz.addEventListener('pointerup', zugEnde);
+  el.platz.addEventListener('pointercancel', zugEnde);
+  el.platz.addEventListener('lostpointercapture', zugEnde);
+  el.platz.addEventListener('contextmenu', function (e) { if (GROB) e.preventDefault(); });
+  // Waagerechtes Ziehen mit einem Finger gehört uns (Baum drehen, Fotos blättern): touchmove abfangen, damit der
+  // Browser daraus keine – wegen touch-action ohnehin wirkungslose – Wisch-Geste mit Schwung macht. Sonst hält
+  // Chrome den nächsten Tipp kurz danach für „Schwung anhalten“ und schluckt den Klick (z. B. auf ›, × oder
+  // „Heute finden“). Senkrechtes Wischen (Übersicht im Rahmen scrollen) und Zwei-Finger-Zoom bleiben frei.
+  function waagerechtHalten(knoten) {
+    var x0 = 0, y0 = 0, mehrere = false;
+    knoten.addEventListener('touchstart', function (e) {
+      mehrere = e.touches.length > 1;
+      if (!mehrere) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }
+    }, { passive: true });
+    knoten.addEventListener('touchmove', function (e) {
+      if (e.touches.length > 1) mehrere = true;
+      if (mehrere || !e.cancelable) return;
+      var t = e.touches[0];
+      if (Math.abs(t.clientX - x0) > Math.abs(t.clientY - y0)) e.preventDefault();
+    }, { passive: false });
+  }
+  waagerechtHalten(el.platz);
+  // Trackpad waagerecht (oder Umschalt + Mausrad) dreht; senkrechtes Rad bleibt für die Seite
+  var radUhr = 0;
+  el.platz.addEventListener('wheel', function (e) {
+    if (A.offen || zug || (flug && !flug.fertig) || (sternAnim && !sternAnim.fertig) || !G.R) return;
+    var dx = e.deltaX, dy = e.deltaY;
+    if (e.shiftKey && !dx) { dx = dy; dy = 0; }
+    if (!dx || Math.abs(dx) <= Math.abs(dy)) return;
+    e.preventDefault();
+    var f = e.deltaMode === 1 ? 18 : e.deltaMode === 2 ? 320 : 1;
+    ziel = null; omega = 0;
+    phi -= klemm(dx * f / (G.R * 1.7), -0.6, 0.6);
+    letzteAktion = jetzt(); versteckeBlase(); versteckePfeil();
+    anstossen();
+    clearTimeout(radUhr);
+    radUhr = setTimeout(function () { if (!zug && !ziel && !omega) { var m = magnetZiel(); if (m) setzeZiel(m, 30); } }, 170);
+  }, { passive: false });
+
+  function tippen(x, y) {
+    if (Math.hypot(x - G.cx, y - G.starY) < Math.max(G.starR * 1.35, 30)) { sternAntippen(el.platz); return; }
+    var best = null, bs = 1e9, rand = GROB ? 16 : 9;
+    for (var i = 0; i < kugeln.length; i++) {
+      var k = kugeln[i];
+      if (k.fliegt || k.ca < -0.2) continue;
+      var d = Math.hypot(x - k.sx, y - k.sy);
+      if (d < k.sr + rand) { var sc = d - k.ca * 14; if (sc < bs) { bs = sc; best = k; } }
+    }
+    if (best) { kugelAntippen(best, el.platz); return; }
+    for (var n = geschenke.length - 1; n >= 0; n--) {
+      var gs = geschenke[n];
+      if (x > gs.bx + 4 && x < gs.bx + gs.bw - 4 && y > gs.by + 4 + gs.hop && y < gs.boden + 4 + gs.hop) { geschenkSchubsen(gs); return; }
+    }
+    if (Math.abs(x - G.cx) < G.R * 1.05 && y > G.apexY && y < G.y0 + G.R * 0.3) {
+      for (var j = 0; j < kugeln.length; j++) kugeln[j].psiV += (Math.random() - 0.5) * 2.4;
+      if (K.heute() > 0 && !REDUZIERT) { welle = { t0: zeit }; ton('ting'); }   // Lichterkette funkelt von unten nach oben
+      anstossen();
+    }
+  }
+  var geschenkSpruch = 0;
+  function geschenkSchubsen(gs) {
+    var h = K.heute();
+    if (!REDUZIERT) { gs.hopV = -G.R * 2.5; gs.kippV += (Math.random() < 0.5 ? -1 : 1) * (3 + Math.random() * 2); }
+    ton('rassel'); brumm(10); anstossen();
+    var s = h >= 24 ? [['Hohoho!', 'Schon alles ausgepackt?'], ['Raschel, raschel …', 'Für wen das wohl ist?']]
+      : [['Psst!', 'Geschenke gibt es erst an Heiligabend.'], ['Da raschelt was …', h === 23 ? 'Morgen ist Heiligabend!' : 'Noch ' + (24 - h) + '× schlafen bis Heiligabend.'], ['Nicht schütteln!', 'Da ist vielleicht was Zerbrechliches drin.']];
+    var sp = s[geschenkSpruch++ % s.length];
+    zeigeBlase(gs.x, gs.by + gs.hop, gs.boden, sp[0], sp[1]);
+  }
+
+  /* ---------------- Kugel öffnen, bimmeln, Stern anknipsen ---------------- */
+  function kugelAntippen(k, opener) {
+    versteckeBlase(); versteckePfeil();
+    if (!K.darfOeffnen(k.tag)) { bimmeln(k); return; }
+    if ((flug && !flug.fertig) || A.offen) return;
+    var erstes = zustand(k.tag) !== 'offen';
+    if (erstes) K.oeffne(k.tag);
+    starteFlug(k, erstes, opener);
+  }
+  function bimmeln(k) {
+    k.psiV += (k.psi >= 0 ? -1 : 1) * 5.5;
+    ton('bimmel'); brumm(12); anstossen();
+    zeigeBlase(k.sx, k.sy - k.sr * 1.7, k.sy + k.sr * 1.3, K.sperrText(k.tag), 'Kugel ' + k.tag + ' ist am ' + K.datumText(k.tag) + ' dran.');
+  }
+  function starteFlug(k, erstes, opener) {
+    var r1 = Math.min(G.W, G.H) * 0.24;
+    var f = { k: k, u: 0, dauer: REDUZIERT ? 0.01 : 0.62, x0: k.sx, y0: k.sy, r0: k.sr, x1: G.W / 2, y1: G.H * 0.46, r1: r1,
+      bogen: r1 * 0.35, dreh: -k.psi, foto: null, warFoto: !erstes && !!k.foto, opener: opener, erstes: erstes, fertig: false,
+      schild0: k.bildR ? schildFs(k, k.bildR) / k.bildR : 0.62 };
+    // erst die kleine Vorschau (blendet während des Flugs ein, meist schon da), dann das große Bild für die Ansicht;
+    // kommt die Vorschau nicht rechtzeitig, fliegt die Glaskugel – gezeichnet wird nur ein fertig dekodiertes Bild
+    holeVorschau(k.tag, 320).then(function (img) {
+      f.foto = img;
+      // Hatte die Kugel bisher nur das gemalte Ersatzbild (Vorschau war z. B. kurz nicht ladbar) oder noch gar
+      // keins, bekommt sie jetzt gleich das echte Foto – nicht erst beim Öffnen der nächsten Kugel
+      if (zustand(k.tag) === 'offen' && (!k.foto || k.fotoErsatz)) {
+        k.foto = img; k.fotoErsatz = false;
+        baueKugelBild(k);
+        if (listeSichtbar()) fuelleMini(k.tag);
+      }
+    }, function () { /* ohne Foto weiterfliegen */ });
+    holeBild(k.tag).catch(function () { /* Ansicht zeigt den Fehler */ });
+    k.fliegt = true; k.psi = k.psiV = 0;
+    flug = f;
+    ton('pling');
+    anstossen();
+  }
+  function flugFertig() {
+    var f = flug;
+    if (f.erstes) aktualisiereZustand(f.k.tag);
+    oeffneAnsicht(f.k.tag, { x: f.x1, y: f.y1, r: f.r1 }, f.opener, function () {
+      if (flug === f) flug = null;
+      f.k.fliegt = false; anstossen();
+    });
+  }
+  function sternAntippen(opener) {
+    versteckeBlase(); versteckePfeil();
+    if (!K.darfOeffnen(24)) {
+      sternWackelV += 7; ton('bimmel'); brumm(12); anstossen();
+      zeigeBlase(G.cx, G.starY - G.starR * 1.3, G.starY + G.starR * 1.2, K.sperrText(24), 'Den Stern knipst du am ' + K.datumText(24) + ' an.');
+      return;
+    }
+    if ((sternAnim && !sternAnim.fertig) || A.offen) return;
+    var erstes = zustand(24) !== 'offen';
+    if (erstes) K.oeffne(24);
+    holeBild(24).catch(function () { /* Ansicht zeigt den Fehler */ });
+    sternAnim = { u: 0, von: sternLicht, opener: opener, erstes: erstes, fertig: false };
+    ton('pling'); brumm(10); anstossen();
+  }
+  function sternFertig() {
+    var s = sternAnim;
+    if (s.erstes) aktualisiereZustand(24);
+    oeffneAnsicht(24, { x: G.cx, y: G.starY, r: G.starR * 1.3 }, s.opener, function () { if (sternAnim === s) sternAnim = null; anstossen(); });
+  }
+  function aktualisiereZustand(t) {
+    fuelleMini(t);
+    if (kugelVon[t]) baueKugelBild(kugelVon[t]);
+    ladeKugelFotos();
+    hauptAlt = ''; nachRahmen();
+    sage((t === 24 ? 'Der Stern leuchtet. ' : 'Kugel ' + t + ' ist offen. ') + (titelVon(t) || K.datumText(t)));
+  }
+
+  /* ---------------- Drehen per Knopf und Tastatur ---------------- */
+  function dreheSchritt(dir) {
+    var basis = ziel ? -ziel.k.th : phi, best = null, bd = 1e9;
+    for (var i = 0; i < kugeln.length; i++) {
+      var a = wrap(kugeln[i].th + basis);
+      if (dir < 0 && a > 0.06 && a < bd) { bd = a; best = kugeln[i]; }
+      if (dir > 0 && a < -0.06 && -a < bd) { bd = -a; best = kugeln[i]; }
+    }
+    letzteAktion = jetzt(); versteckeBlase(); versteckePfeil();
+    if (best) setzeZiel(best, 42, meldeVorne);
+  }
+  function heuteFinden() {
+    var k = kugelVon[K.heute()];
+    letzteAktion = jetzt(); versteckePfeil();
+    if (k) setzeZiel(k, 14, meldeVorne);
+  }
+  function meldeVorne() {
+    var v = vorneKugel();
+    if (v) sage('Vorne hängt Kugel ' + v.tag + ', ' + K.datumText(v.tag) + ' – ' + zustandText(v.tag) + '.');
+  }
+  el.links.addEventListener('click', function () { dreheSchritt(-1); });
+  el.rechts.addEventListener('click', function () { dreheSchritt(1); });
+  el.platz.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (k === 'ArrowLeft') { e.preventDefault(); dreheSchritt(-1); }
+    else if (k === 'ArrowRight') { e.preventDefault(); dreheSchritt(1); }
+    else if (k === 'Enter' || k === ' ') { e.preventDefault(); var v = vorneKugel(); if (v) kugelAntippen(v, el.platz); }
+    else if (k === 'ArrowUp') { e.preventDefault(); sternAntippen(el.platz); }
+    else if (k === 'Home' || k === 'h' || k === 'H') { e.preventDefault(); heuteFinden(); }
+  });
+  var perTastatur = false;
+  document.addEventListener('keydown', function (e) { if (e.key === 'Tab' || e.key.indexOf('Arrow') === 0 || e.key === 'Enter' || e.key === ' ') { perTastatur = true; el.platz.classList.remove('zeiger'); } }, true);
+  document.addEventListener('pointerdown', function () { perTastatur = false; el.platz.classList.add('zeiger'); }, true);
+  function fokusSichtbar() { if (!perTastatur) return false; try { return el.platz.matches(':focus-visible'); } catch (x) { return true; } }
+  el.platz.addEventListener('focus', function () { fokusRing = fokusSichtbar(); if (fokusRing) meldeVorne(); anstossen(); zeichne(); });
+  el.platz.addEventListener('blur', function () { fokusRing = false; zeichne(); });
+
+  /* ---------------- Sprechblase, Dreh-Hinweis, „Gefunden“ ---------------- */
+  var blaseUhr = 0;
+  function zeigeBlase(x, yOben, yUnten, kopf, text) {
+    var b = el.blase;
+    b.innerHTML = '<strong></strong><span></span>';
+    b.firstChild.textContent = kopf; b.lastChild.textContent = text;
+    b.hidden = false; b.classList.remove('unten');
+    b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
+    var w = b.offsetWidth, h = b.offsetHeight, W = G.W || window.innerWidth;
+    var left = klemm(x - w / 2, 8, Math.max(8, W - w - 8)), top = yOben - h - 10;
+    if (top < 8) { top = yUnten + 12; b.classList.add('unten'); }
+    b.style.left = left.toFixed(1) + 'px'; b.style.top = top.toFixed(1) + 'px';
+    b.style.setProperty('--pfeil', klemm(x - left, 16, w - 16).toFixed(1) + 'px');
+    sage(kopf + ' ' + text);
+    clearTimeout(blaseUhr); blaseUhr = setTimeout(versteckeBlase, 3000);
+  }
+  function versteckeBlase() { clearTimeout(blaseUhr); el.blase.hidden = true; }
+  document.addEventListener('pointerdown', function (e) {
+    if (!el.blase.hidden && !(e.target.closest && e.target.closest('.mini,#haupt'))) versteckeBlase();
+  }, true);
+
+  var pfeilUhr = 0;
+  function planePfeil() { clearTimeout(pfeilUhr); pfeilUhr = setTimeout(pruefePfeil, 6500); }
+  function pruefePfeil() {
+    var h = K.heute();
+    if (A.offen || listeOffen || h < 1 || h > 23 || zustand(h) !== 'heute') return;
+    if (jetzt() - letzteAktion < 4500 || raf || zug) { planePfeil(); return; }
+    var a = wrap(kugelVon[h].th + phi);
+    if (Math.abs(a) < 0.35) return;
+    var links = a > 0;
+    el.pfeil.classList.toggle('rechts', !links);
+    el.pfeil.querySelector('use').setAttribute('href', links ? '#i-links' : '#i-rechts');
+    el.pfeil.querySelector('span').textContent = links ? 'Dreh nach links' : 'Dreh nach rechts';
+    el.pfeil.hidden = false;
+  }
+  function versteckePfeil() { el.pfeil.hidden = true; planePfeil(); }
+
+  var gefunden = false, gefundenBlase = false, warVorn = false, letzterTing = -9;
+  function pruefeGefunden() {
+    var h = K.heute();
+    if (gefunden || h < 1 || h > 23 || zustand(h) !== 'heute') return;
+    var k = kugelVon[h];
+    if (!k) return;
+    // wärmer: leises Glöckchen, wenn die leuchtende Kugel nach vorn kommt
+    var vorn = k.ca > 0.45;
+    if (vorn && !warVorn && zeit - letzterTing > 1.5 && (zug || Math.abs(wGlatt) > 0.3)) { letzterTing = zeit; ton('ting'); }
+    warVorn = vorn;
+    if (Math.abs(wrap(k.th + phi)) > 0.32 || Math.abs(wGlatt) > 1.1) return;   // erst, wenn sie vorn zur Ruhe kommt
+    gefunden = true; gefundenBlase = true; brumm(15);
+    el.leuchten.classList.remove('gefunden'); void el.leuchten.offsetWidth; el.leuchten.classList.add('gefunden');
+    el.pfeil.hidden = true;
+    ton('fund'); funken(k.sx, k.sy);
+    hauptAlt = '';
+  }
+  function funken(x, y) {
+    if (REDUZIERT || !isFinite(x)) return;
+    var d = document.createElement('div'), html = '', i;
+    d.className = 'funken'; d.setAttribute('aria-hidden', 'true');
+    d.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+    for (i = 0; i < 16; i++) {
+      var w = i / 16 * TAU + Math.random() * 0.35, l = G.br * (2.6 + Math.random() * 3.2);
+      html += '<i style="--dx:' + (Math.cos(w) * l).toFixed(0) + 'px;--dy:' + (Math.sin(w) * l - G.br).toFixed(0) + 'px;--s:' + (0.7 + Math.random() * 0.9).toFixed(2) +
+        ';--v:' + (Math.random() * 0.12).toFixed(2) + 's;--t:' + (0.75 + Math.random() * 0.45).toFixed(2) + 's"></i>';
+    }
+    d.innerHTML = html; document.body.appendChild(d);
+    setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 1600);
+  }
+  function ruhe() {
+    wGlatt = wVorher = 0;
+    nachRahmen();
+    if (gefundenBlase) {
+      gefundenBlase = false;
+      var h = K.heute(), k = kugelVon[h];
+      if (k && zustand(h) === 'heute' && !A.offen && Math.abs(wrap(k.th + phi)) < 0.35) zeigeBlase(k.sx, k.sy - k.sr * 1.8, k.sy + k.sr * 1.4, 'Da ist sie!', 'Tipp Kugel ' + h + ' an.');
+    }
+    planePfeil();
+  }
+
+  /* ---------------- Texte und Hauptknopf ---------------- */
+  var hinweisAlt = '', hauptAlt = '', hauptM = null, suchStart = 0, SUCH_MS = 9000, hilfeUhr = 0;
+  function kopfText() {
+    var h = K.heute();
+    el.datum.textContent = h === 0 ? 'Noch ist November' : h >= 25 ? 'Frohe Weihnachten!' : h === 24 ? 'Heiligabend, 24. Dezember' : 'Heute: ' + K.datumText(h);
+    el.platz.setAttribute('aria-label', 'Weihnachtsbaum mit 23 Kugeln und einem Stern. Pfeiltasten links und rechts drehen den Baum, die Eingabetaste öffnet die vordere Kugel, Pfeil nach oben den Stern.');
+  }
+  function verpassteTage() { var r = [], h = Math.min(24, K.heute()); for (var t = 1; t <= h; t++) if (zustand(t) === 'verpasst') r.push(t); return r; }
+  function hinweisBerechnen() {
+    var h = K.heute();
+    if (h === 0) return 'Noch ist November. Ab 1. Dezember hängt hier jeden Tag eine Kugel mit Foto.';
+    if (h <= 23 && zustand(h) === 'heute') {
+      var a = Math.abs(wrap(kugelVon[h].th + phi));
+      if (a < 0.35) return 'Gefunden! Tipp die leuchtende Kugel ' + h + ' an.';
+      if (a < 1.45) return 'Da schimmert Kugel ' + h + ' schon! Noch ein Stück drehen.';
+      return 'Irgendwo leuchtet Kugel ' + h + ' … Dreh den Baum ' + (GROB ? 'mit dem Finger' : 'mit der Maus oder den Pfeiltasten') + ', bis du sie findest.';
+    }
+    if (zustand(24) === 'heute') return 'Heiligabend! Tipp den Stern an der Spitze an und knipse ihn an.';
+    var v = verpassteTage();
+    if (h >= 24) {
+      var nK = v.filter(function (t) { return t !== 24; }).length, sternZu = v.indexOf(24) >= 0;
+      var rest = nK === 1 ? 'Eine Kugel mit roter Schleife wartet noch.' : nK + ' Kugeln mit roter Schleife warten noch.';
+      if (h >= 25) {
+        if (sternZu) return 'Alles darf auf! Knips den Stern an' + (nK ? ' – und ' + (nK === 1 ? 'eine Kugel wartet' : nK + ' Kugeln warten') + ' auch noch.' : '.');
+        if (nK) return 'Alles darf auf! ' + rest;
+        return 'Alle 24 Fotos hängen am Baum – dreh ihn und schau sie dir noch einmal an.';
+      }
+      if (nK) return 'Der Stern leuchtet! ' + rest;
+      return 'Frohe Weihnachten! Alle 24 Fotos hängen am Baum – dreh ihn und schau sie an.';
+    }
+    if (v.length === 1) { var t = v[0]; return 'Kugel ' + h + ' ist offen. ' + (t === h - 1 ? 'Kugel ' + t + ' von gestern' : 'Kugel ' + t) + ' wartet noch – mit roter Schleife.'; }
+    // mehrere verpasst (z. B. Erstbesuch am 12.): ehrlich zählen; welche als Nächstes dran ist, sagt der Hauptknopf
+    // („Kugel 11 finden“ bzw. „Kugel 6 nachholen“, wenn gerade eine verpasste vorn hängt)
+    if (v.length) return 'Kugel ' + h + ' ist offen. Noch ' + v.length + ' Kugeln mit roter Schleife warten aufs Nachholen.';
+    return 'Kugel ' + h + ' ist offen. Tipp eine Foto-Kugel an – morgen hängt die nächste.';
+  }
+  function hauptModus() {
+    var h = K.heute(), v = vorneKugel();
+    if (h === 0) return { m: 'nov', text: 'Ab 1. Dezember', icon: 'i-stern', stil: 'ruhig' };
+    if (h <= 23 && zustand(h) === 'heute') {
+      if (v && v.tag === h) return { m: 'auf', k: v, text: 'Kugel ' + h + ' aufmachen', icon: 'i-kugel', stil: '' };
+      // Erst darf gesucht werden: die Hilfe ist da, leuchtet aber erst nach ein paar Sekunden golden
+      return { m: 'finden', text: 'Heute finden', icon: 'i-stern', stil: jetzt() - suchStart < SUCH_MS && !REDUZIERT ? 'ruhig' : '' };
+    }
+    if (zustand(24) === 'heute' || (h >= 24 && zustand(24) === 'verpasst')) return { m: 'stern', text: 'Stern anknipsen', icon: 'i-stern', stil: '' };
+    if (v && zustand(v.tag) === 'verpasst') return { m: 'auf', k: v, text: 'Kugel ' + v.tag + ' nachholen', icon: 'i-kugel', stil: '' };
+    var vp = verpassteTage().filter(function (t) { return t !== 24; });
+    if (vp.length) { var tv = vp[vp.length - 1]; return { m: 'suche', k: kugelVon[tv], text: 'Kugel ' + tv + ' finden', icon: 'i-kugel', stil: '' }; }
+    if (v) {
+      if (zustand(v.tag) === 'offen') return { m: 'auf', k: v, text: 'Foto ' + v.tag + ' ansehen', icon: 'i-bild', stil: 'kupfer' };
+      return { m: 'zu', k: v, text: 'Kugel ' + v.tag + ' ist noch zu', icon: 'i-kugel', stil: 'ruhig' };
+    }
+    if (K.geoeffnet().length) return { m: 'fotos', text: 'Fotos ansehen', icon: 'i-bild', stil: 'kupfer' };
+    return { m: 'finden', text: 'Heute finden', icon: 'i-stern', stil: '' };
+  }
+  function aktualisiereHaupt(m) {
+    hauptM = m;
+    var key = m.m + '|' + m.text + '|' + m.stil;
+    if (key === hauptAlt) return;
+    hauptAlt = key;
+    el.haupt.className = 'knopf-haupt' + (m.stil ? ' ' + m.stil : '');
+    el.haupt.querySelector('use').setAttribute('href', '#' + m.icon);
+    el.haupt.querySelector('span').textContent = m.text;
+  }
+  function nachRahmen() {
+    if ((Math.abs(wGlatt) < 2.2 && !(flug && !A.offen)) || !hauptM) aktualisiereHaupt(hauptModus());
+    var t = hinweisBerechnen();
+    if (t !== hinweisAlt) { hinweisAlt = t; el.hinweis.textContent = t; }
+  }
+  el.haupt.addEventListener('click', function () {
+    var m = hauptModus(); aktualisiereHaupt(m);
+    letzteAktion = jetzt(); versteckePfeil();
+    if (m.m === 'nov') { ton('bimmel'); var r = el.haupt.getBoundingClientRect(); zeigeBlase(r.left + r.width / 2, r.top, r.bottom, K.sperrText(1), 'Bis dahin darfst du den Baum schon drehen.'); return; }
+    if (m.m === 'finden') { heuteFinden(); return; }
+    if (m.m === 'suche') { setzeZiel(m.k, 14, meldeVorne); return; }
+    if (m.m === 'stern') { sternAntippen(el.haupt); return; }
+    if (m.m === 'auf') { kugelAntippen(m.k, el.haupt); return; }
+    if (m.m === 'zu') { bimmeln(m.k); return; }
+    if (m.m === 'fotos') { var off = K.geoeffnet(); oeffneAnsicht(off[off.length - 1], null, el.haupt); }
+  });
+
+  /* ================================================================
+     Liste aller Kugeln (gemischt wie am Baum)
+     ================================================================ */
+  var minis = {}, listeOffen = false, listeOpener = null;
+  var mqPanel = window.matchMedia('(min-width: 1000px) and (min-height: 560px)');
+  function istPanel() { return mqPanel.matches; }
+  function listeSichtbar() { return istPanel() || listeOffen; }
+  function baueListe() {
+    el.gitter.innerHTML = ''; minis = {};
+    anordnung().forEach(function (t) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'mini'; b.dataset.tag = t;
+      minis[t] = b; el.gitter.appendChild(b);
+    });
+    fuelleListe();
+  }
+  function fuelleListe() {
+    for (var t = 1; t <= 24; t++) fuelleMini(t);
+    var h = K.heute();
+    el.listeHilfe.textContent = h === 0 ? 'Alle Kugeln sind noch bereift. Ab 1. Dezember darf jeden Tag eine auf.'
+      : 'Durcheinander wie am Baum. Tipp eine an – der Baum dreht sich zu ihr und sie macht sich auf.';
+  }
+  function fuelleMini(t) {
+    var b = minis[t];
+    if (!b) return;
+    var z = zustand(t), h = K.heute(), inner;
+    b.className = 'mini z-' + z + (t === h ? ' ist-heute' : '');
+    if (t === 24) {
+      inner = '<span class="mk mk-stern"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.7 5.8 6.3.7-4.7 4.3 1.3 6.2L12 16.4l-5.6 3.1 1.3-6.2L3 9l6.3-.7z" fill="' + (z === 'zu' ? '#b9ad93' : z === 'offen' ? '#ffd877' : '#e9b85a') + '" stroke="#5a4419" stroke-width="1"/></svg></span>';
+    } else inner = '<span class="mk"></span>';
+    b.innerHTML = inner + '<span class="mz">' + t + '</span>';
+    b.setAttribute('aria-label', (t === 24 ? 'Stern, ' : 'Kugel, ') + 'Tag ' + t + ', ' + K.datumText(t) + ' – ' + zustandText(t));
+    if (t === 24) return;
+    // dieselbe Kugel wie am Baum: glänzend (darf auf), bereift (kommt noch), rote Schleife (verpasst), mit Foto (offen)
+    var kg = kugelVon[t], farbe = kg ? kg.farbe : '#cf7446', c = miniLeinwand(36, 44);
+    b.querySelector('.mk').appendChild(c);
+    // Das Foto kommt aus derselben Vorschau wie die Kugel am Baum (ladeKugelFotos); bis dahin glänzende Kugel,
+    // ist es da, wird die Kachel neu gefüllt
+    var foto = z === 'offen' && kg && kg.foto ? kg.foto : null;
+    malMini(c, 36, 44, 14.5, t, foto ? 'foto' : z === 'zu' ? 'frost' : 'glas', farbe, foto, z === 'verpasst');
+  }
+  function miniLeinwand(w, h) { var c = leinwand(w * DPR, h * DPR); c.setAttribute('aria-hidden', 'true'); return c; }
+  function malMini(c, w, h, r, t, art, farbe, foto, schleife) {
+    var z = c.getContext('2d');
+    z.setTransform(1, 0, 0, 1, 0, 0); z.clearRect(0, 0, c.width, c.height);
+    z.setTransform(DPR, 0, 0, DPR, DPR * w / 2, DPR * (h - r - 1.5));
+    malKugel(z, r, t, art, farbe, foto, schleife, true);
+  }
+  function baueLegende() {
+    var bild = leinwand(48, 48), z = bild.getContext('2d'), v = z.createLinearGradient(0, 0, 0, 48);
+    v.addColorStop(0, '#8fc0e0'); v.addColorStop(0.55, '#d9ecf5'); v.addColorStop(0.56, '#7fb24f'); v.addColorStop(1, '#4f8a35');
+    z.fillStyle = v; z.fillRect(0, 0, 48, 48);
+    z.fillStyle = '#f2c46a'; z.beginPath(); z.arc(34, 13, 6, 0, TAU); z.fill();
+    z.fillStyle = '#d63a3a'; z.fillRect(15, 22, 7, 13); z.fillStyle = '#2f6fd0'; z.fillRect(25, 25, 6, 10);
+    z.fillStyle = '#e8c4a0'; z.beginPath(); z.arc(18.5, 19, 3.4, 0, TAU); z.arc(28, 22.5, 3, 0, TAU); z.fill();
+    var lis = el.legende.querySelectorAll('li');
+    for (var i = 0; i < lis.length; i++) {
+      var art = lis[i].getAttribute('data-art'), c = miniLeinwand(20, 24);
+      malMini(c, 20, 24, 8.5, 5, art === 'schleife' ? 'glas' : art, '#b42f3d', art === 'foto' ? bild : null, art === 'schleife');
+      lis[i].insertBefore(c, lis[i].firstChild);
+    }
+  }
+  function oeffneListe() {
+    if (istPanel() || listeOffen) return;
+    listeOffen = true; listeOpener = document.activeElement;
+    fuelleListe();
+    el.liste.classList.add('offen'); el.schleier.classList.add('offen');
+    el.liste.setAttribute('role', 'dialog'); el.liste.setAttribute('aria-modal', 'true');
+    el.listeAuf.setAttribute('aria-expanded', 'true');
+    document.documentElement.classList.add('listeoffen');
+    [el.kopf, el.buehne, el.steuer].forEach(function (n) { n.inert = true; });
+    versteckeBlase(); el.pfeil.hidden = true;
+    setTimeout(function () { try { el.listeZu.focus({ preventScroll: true }); } catch (x) { el.listeZu.focus(); } }, 40);
+  }
+  function schliesseListe(fokusZurueck) {
+    if (!listeOffen) return;
+    listeOffen = false;
+    el.liste.classList.remove('offen'); el.schleier.classList.remove('offen');
+    el.liste.removeAttribute('role'); el.liste.removeAttribute('aria-modal');
+    el.listeAuf.setAttribute('aria-expanded', 'false');
+    document.documentElement.classList.remove('listeoffen');
+    [el.kopf, el.buehne, el.steuer].forEach(function (n) { n.inert = false; });
+    versteckeBlase();
+    if (fokusZurueck !== false) {
+      var z = listeOpener && document.contains(listeOpener) ? listeOpener : el.listeAuf;
+      try { z.focus({ preventScroll: true }); } catch (x) { /* egal */ }
+    }
+  }
+  el.listeAuf.addEventListener('click', oeffneListe);
+  el.listeZu.addEventListener('click', function () { schliesseListe(); });
+  el.schleier.addEventListener('click', function () { schliesseListe(); });
+  el.liste.addEventListener('keydown', function (e) { if (e.key === 'Escape' && listeOffen) { e.preventDefault(); schliesseListe(); } });
+  el.gitter.addEventListener('animationend', function (e) { var m = e.target.closest && e.target.closest('.mini'); if (m) m.classList.remove('wackelt'); });
+  el.gitter.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.mini');
+    if (!b) return;
+    var t = +b.dataset.tag;
+    letzteAktion = jetzt();
+    if (!K.darfOeffnen(t)) {
+      b.classList.remove('wackelt'); void b.offsetWidth; b.classList.add('wackelt');
+      ton('bimmel');
+      var r = b.getBoundingClientRect();
+      zeigeBlase(r.left + r.width / 2, r.top, r.bottom, K.sperrText(t), (t === 24 ? 'Den Stern knipst du' : 'Kugel ' + t + ' ist') + ' am ' + K.datumText(t) + (t === 24 ? ' an.' : ' dran.'));
+      return;
+    }
+    var opener = istPanel() ? b : el.listeAuf;
+    if (listeOffen) schliesseListe(false);
+    geheZu(t, opener);
+  });
+  function geheZu(t, opener) {
+    if (t === 24) { sternAntippen(opener); return; }
+    var k = kugelVon[t];
+    if (!k) return;
+    if (REDUZIERT || Math.abs(wrap(k.th + phi)) < 0.05) {
+      phi += wrap(-k.th - phi); phiLetzt = phi; omega = 0; ziel = null; zeichne();
+      kugelAntippen(k, opener); return;
+    }
+    setzeZiel(k, 24, function () { kugelAntippen(k, opener); }, true);
+  }
+  var mqWechsel = function () { if (listeOffen && istPanel()) schliesseListe(false); fuelleListe(); };
+  if (mqPanel.addEventListener) mqPanel.addEventListener('change', mqWechsel); else if (mqPanel.addListener) mqPanel.addListener(mqWechsel);
+
+  /* ================================================================
+     Bildansicht: Kreis öffnet sich aus der Kugel, Wischen zwischen Fotos
+     ================================================================ */
+  var A = { liste: [], i: 0, opener: null, zug: null, offen: false, token: 0, anim: null };
+  function kreisClip(x, y, r) { return 'circle(' + Math.max(0, r).toFixed(1) + 'px at ' + x.toFixed(1) + 'px ' + y.toFixed(1) + 'px)'; }
+  function weitesterRadius(x, y) { return Math.hypot(Math.max(x, G.W - x), Math.max(y, G.H - y)) + 30; }
+
+  function oeffneAnsicht(t, kreis, opener, nachher) {
+    A.liste = K.geoeffnet(); A.i = A.liste.indexOf(t);
+    if (A.i < 0) { if (nachher) nachher(); return; }
+    A.opener = opener || el.platz; A.offen = true;
+    versteckeBlase(); el.pfeil.hidden = true; schliesseListe(false);
+    el.leuchten.classList.remove('an');
+    setzeAnsichtsInhalt();
+    if (!el.dlg.open) { if (el.dlg.showModal) el.dlg.showModal(); else el.dlg.setAttribute('open', ''); }
+    document.documentElement.classList.add('vollansicht');
+    var fertig = function () { A.anim = null; var n = nachher; nachher = null; if (n) n(); };
+    if (kreis && !REDUZIERT && el.dlg.animate) {
+      el.dlg.style.setProperty('--kx', kreis.x.toFixed(0) + 'px'); el.dlg.style.setProperty('--ky', kreis.y.toFixed(0) + 'px');
+      A.anim = el.dlg.animate([{ clipPath: kreisClip(kreis.x, kreis.y, kreis.r) }, { clipPath: kreisClip(kreis.x, kreis.y, weitesterRadius(kreis.x, kreis.y)) }],
+        { duration: 540, easing: 'cubic-bezier(.45,0,.2,1)' });
+      A.anim.onfinish = fertig; A.anim.oncancel = fertig;
+    } else if (!REDUZIERT && el.dlg.animate) {
+      el.dlg.style.removeProperty('--kx'); el.dlg.style.removeProperty('--ky');
+      A.anim = el.dlg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
+      A.anim.onfinish = fertig; A.anim.oncancel = fertig;
+    } else fertig();
+    try { el.aZu.focus({ preventScroll: true }); } catch (x) { el.aZu.focus(); }
+  }
+
+  function schliesseAnsicht(sofort) {
+    if (!A.offen) return;
+    var t = A.liste[A.i], kreis = null;
+    A.offen = false;
+    if (A.anim) { try { A.anim.cancel(); } catch (x) { /* egal */ } A.anim = null; }
+    if (!sofort && !REDUZIERT && el.dlg.animate && G.R) {
+      if (t === 24) kreis = { x: G.cx, y: G.starY, r: G.starR * 1.2 };
+      else if (kugelVon[t]) {
+        // Baum dahinter so drehen, dass das zuletzt gesehene Foto vorn hängt – der Kreis schließt sich in ihm
+        var k = kugelVon[t];
+        flug = null; k.fliegt = false; ziel = null; omega = 0;
+        phi += wrap(-k.th - phi); phiLetzt = phi;
+        zeichne();
+        kreis = { x: k.sx, y: k.sy, r: k.sr };
+        k.psiV += 3.4;
+      }
+    }
+    if (kreis) {
+      var an = el.dlg.animate([{ clipPath: kreisClip(kreis.x, kreis.y, weitesterRadius(kreis.x, kreis.y)) }, { clipPath: kreisClip(kreis.x, kreis.y, kreis.r) }],
+        { duration: 430, easing: 'cubic-bezier(.55,0,.75,.2)', fill: 'forwards' });
+      an.onfinish = function () { endeAnsicht(); an.cancel(); };
+    } else endeAnsicht();
+  }
+  function endeAnsicht() {
+    if (el.dlg.open) { if (el.dlg.close) el.dlg.close(); else el.dlg.removeAttribute('open'); }
+    document.documentElement.classList.remove('vollansicht');
+    var z = A.opener && document.contains(A.opener) && A.opener.getClientRects().length ? A.opener : el.platz;
+    try { z.focus({ preventScroll: true }); } catch (x) { /* egal */ }
+    fokusRing = z === el.platz && fokusSichtbar();
+    nachRahmen(); anstossen();
+    pumpe();   // Kugel-Fotos weiterladen (ruhten während der Bildansicht)
+  }
+  el.dlg.addEventListener('cancel', function (e) { e.preventDefault(); schliesseAnsicht(); });
+  el.dlg.addEventListener('close', function () { if (A.offen) { A.offen = false; document.documentElement.classList.remove('vollansicht'); pumpe(); } });
+  el.aZu.addEventListener('click', function () { schliesseAnsicht(); });
+
+  var vorladeUhr = 0;
+  function setzeAnsichtsInhalt() {
+    var t = A.liste[A.i], mein = ++A.token, ti = titelVon(t);
+    el.aTitel.textContent = ti || K.datumText(t);
+    el.aDatum.textContent = ti ? 'Tag ' + t + ' · ' + K.datumText(t) : (t === 24 ? 'Heiligabend · Tag 24' : 'Tag ' + t);
+    el.aZaehler.textContent = A.liste.length === 1 ? 'Dein erstes Foto' : 'Foto ' + (A.i + 1) + ' von ' + A.liste.length;
+    el.aZurueck.disabled = A.i <= 0; el.aWeiter.disabled = A.i >= A.liste.length - 1;
+    el.aBild.alt = 'Fotocollage von Tag ' + t + (ti ? ': ' + ti : '');
+    el.spur.classList.add('laedt'); el.spur.classList.remove('fehler');
+    // Vorschau dieses Tages (Kugel, Liste oder Flug haben sie meist schon geholt) als unscharfer Platzhalter, bis das
+    // große Bild da ist; ist sie noch unterwegs, kommt sie nach. Für die Ansicht allein wird keine extra geholt.
+    zeigeVorbild(vorschauFertig[t]);
+    if (!vorschauFertig[t] && vorschauUnterwegs[t]) vorschauUnterwegs[t].then(function (img) {
+      if (mein === A.token && el.spur.classList.contains('laedt')) zeigeVorbild(img);
+    }, function () { /* dann eben ohne */ });
+    holeBild(t).then(function (img) {
+      if (mein !== A.token) return;
+      el.aBild.src = img.src; el.spur.classList.remove('laedt');
+    }, function () {
+      if (mein !== A.token) return;
+      el.aBild.removeAttribute('src'); el.spur.classList.remove('laedt'); el.spur.classList.add('fehler');
+    });
+    clearTimeout(vorladeUhr);
+    vorladeUhr = setTimeout(function () {
+      if (!A.offen) return;
+      if (A.i + 1 < A.liste.length) holeBild(A.liste[A.i + 1]).catch(function () { /* später */ });
+      setTimeout(function () { if (A.offen && A.i > 0) holeBild(A.liste[A.i - 1]).catch(function () { /* später */ }); }, 220);
+    }, 420);
+    fokusRetten();
+  }
+  function zeigeVorbild(img) {
+    var src = img && img.src && K.darfOeffnen(A.liste[A.i]) ? String(img.src).replace(/["\\\n\r]/g, '') : '';
+    el.aVor.style.backgroundImage = src ? 'url("' + src + '")' : 'none';
+    el.spur.classList.toggle('mitvor', !!src);
+  }
+  // Der fokussierte Knopf verschwindet („Nochmal versuchen“ beim Neuladen) oder wird gesperrt (am Ende der Reihe):
+  // Fokus in der Bildansicht halten, sonst landen Pfeiltasten und Tab im Nichts. Ziel ist der Dialog selbst – nicht
+  // der Gegenknopf, sonst blättert wiederholtes Enter am Ende der Reihe plötzlich rückwärts. Pfeiltasten wirken
+  // über den document-Handler weiter, Tab führt zum ×.
+  function fokusRetten() {
+    var ae = document.activeElement;
+    if (!A.offen || (ae && ae !== document.body && el.dlg.contains(ae) && !ae.disabled && ae.getClientRects().length)) return;
+    try { el.dlg.focus({ preventScroll: true }); } catch (x) { /* egal */ }
+  }
+  el.aNochmal.addEventListener('click', function () { delete bildCache[A.liste[A.i]]; setzeAnsichtsInhalt(); });
+
+  function blaettern(d) {
+    var n = A.i + d;
+    if (n < 0 || n >= A.liste.length) { zurueckfedern(); return; }
+    A.i = n;
+    if (REDUZIERT || !el.spur.animate) { setzeAnsichtsInhalt(); el.spur.style.transform = ''; return; }
+    var von = el.spur.style.transform || 'translateX(0px)';
+    var aus = el.spur.animate([{ transform: von, opacity: 1 }, { transform: 'translateX(' + (-d * 34) + '%)', opacity: 0 }], { duration: 170, easing: 'ease-in', fill: 'forwards' });
+    aus.onfinish = function () {
+      setzeAnsichtsInhalt(); el.spur.style.transform = ''; aus.cancel();
+      el.spur.animate([{ transform: 'translateX(' + (d * 34) + '%)', opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 250, easing: 'cubic-bezier(.2,.7,.2,1)' });
+    };
+  }
+  function zurueckfedern() {
+    var von = el.spur.style.transform || 'translateX(0px)';
+    el.spur.style.transform = '';
+    if (el.spur.animate && !REDUZIERT) el.spur.animate([{ transform: von }, { transform: 'translateX(0)' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1.2)' });
+  }
+  el.aZurueck.addEventListener('click', function () { blaettern(-1); });
+  el.aWeiter.addEventListener('click', function () { blaettern(1); });
+  // Pfeiltasten blättern, egal wo der Fokus gerade steht (auch wenn er auf <body> gefallen ist)
+  document.addEventListener('keydown', function (e) {
+    if (!A.offen || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); blaettern(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); blaettern(1); }
+  });
+  el.aBuehne.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  waagerechtHalten(el.aBuehne);
+  el.aBuehne.addEventListener('pointerdown', function (e) {
+    if (e.button > 0 || !e.isPrimary || (e.target.closest && e.target.closest('button'))) return;
+    if (e.pointerType === 'mouse') e.preventDefault();
+    A.zug = { id: e.pointerId, x: e.clientX, t: jetzt(), dx: 0 };
+    try { el.aBuehne.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+  });
+  el.aBuehne.addEventListener('pointermove', function (e) {
+    var z = A.zug;
+    if (!z || e.pointerId !== z.id) return;
+    var dx = e.clientX - z.x;
+    if ((dx > 0 && A.i <= 0) || (dx < 0 && A.i >= A.liste.length - 1)) dx *= 0.3;
+    z.dx = dx;
+    el.spur.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+  });
+  function ansichtZugEnde(e) {
+    var z = A.zug;
+    if (!z || e.pointerId !== z.id) return;
+    A.zug = null;
+    var dx = z.dx, dauer = jetzt() - z.t, grenze = Math.min(90, el.aBuehne.clientWidth * 0.18);
+    if (e.type !== 'pointercancel' && (Math.abs(dx) > grenze || (Math.abs(dx) > 28 && dauer < 260))) blaettern(dx < 0 ? 1 : -1);
+    else if (dx !== 0) zurueckfedern();
+  }
+  el.aBuehne.addEventListener('pointerup', ansichtZugEnde);
+  el.aBuehne.addEventListener('pointercancel', ansichtZugEnde);
+
+  /* ================================================================
+     Start, Datumswechsel, Größe
+     ================================================================ */
+  function startWinkel() {
+    var h = K.heute(), k;
+    if (h >= 1 && h <= 23) { k = kugelVon[h]; return zustand(h) === 'heute' ? -k.th + 2.5 : -k.th; }
+    k = kugelVon[h >= 24 ? 23 : 1];
+    return -k.th;
+  }
+  var teaserUhr = 0;
+  function planeTeaser() {
+    clearTimeout(teaserUhr);
+    if (REDUZIERT) return;
+    teaserUhr = setTimeout(function () {
+      if (jetzt() - letzteAktion < 1200 || A.offen || listeOffen || zug || raf) return;
+      omega = -1.0; anstossen();
+    }, 1400);
+  }
+
+  function renderAlles() {
+    if (A.offen || el.dlg.open) { A.offen = true; schliesseAnsicht(true); }
+    schliesseListe(false); versteckeBlase(); el.pfeil.hidden = true;
+    flug = null; sternAnim = null; ziel = null; omega = 0; zug = null;
+    for (var i = 0; i < kugeln.length; i++) { var k = kugeln[i]; k.fliegt = false; k.psi = k.psiV = 0; k.gr = k.gr0 * (k.tag === K.heute() ? 1.14 : 1); if (zustand(k.tag) !== 'offen') { k.foto = null; k.fotoErsatz = false; } }
+    gefunden = false; gefundenBlase = false; welle = null; el.leuchten.classList.remove('gefunden');
+    for (i = 0; i < geschenke.length; i++) { var gs = geschenke[i]; gs.hop = gs.hopV = gs.kipp = gs.kippV = 0; }
+    kopfText();
+    sternLicht = zustand(24) === 'offen' ? 1 : 0;
+    if (G.R) { baueRaum(); baueAlleKugelBilder(); }
+    ladeKugelFotos();
+    phi = startWinkel(); phiLetzt = phi; wGlatt = wVorher = 0;
+    fuelleListe();
+    hauptAlt = ''; hinweisAlt = ''; hauptM = null;
+    zeichne(); nachRahmen();
+    letzteAktion = jetzt() - 2000;
+    suchStart = jetzt(); warVorn = false;
+    clearTimeout(hilfeUhr); hilfeUhr = setTimeout(function () { hauptAlt = ''; nachRahmen(); }, SUCH_MS + 50);
+    planeTeaser(); planePfeil();
+  }
+
+  function neuAufbauen() {
+    if (!messen()) return;
+    baueKernFarben(); baueRaum(); baueAlleKugelBilder();
+    versteckeBlase();
+    zeichne(); nachRahmen();
+  }
+
+  baueModell(); baueZweige(); baueGlueh(); baueTapete();
+  baueListe(); baueLegende();
+  if (messen()) baueKernFarben();
+  renderAlles();
+  K.onChange(renderAlles);
+
+  var groesseWartet = false;
+  function groesseGeaendert() {
+    if (groesseWartet) return;
+    groesseWartet = true;
+    requestAnimationFrame(function () {
+      groesseWartet = false;
+      var b = el.platz.getBoundingClientRect(), W = document.documentElement.clientWidth || window.innerWidth;
+      if (Math.abs(b.width - G.bw) > 0.5 || Math.abs(b.height - G.bh) > 0.5 || Math.abs(b.top - G.by) > 0.5 || Math.abs(b.left - G.bx) > 0.5 || W !== G.W || window.innerHeight !== G.H) neuAufbauen();
+    });
+  }
+  if (window.ResizeObserver) new ResizeObserver(groesseGeaendert).observe(el.platz);
+  window.addEventListener('resize', groesseGeaendert);
+
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('400 30px "Young Serif"').then(function () { if (G.R) { baueAlleKugelBilder(); zeichne(); } }, function () { /* Ersatzschrift */ });
+  }
+
+  // für Tests
+  window.__baum = {
+    phi: function () { return phi; },
+    kugel: function (t) { var k = kugelVon[t]; return k ? { x: k.sx, y: k.sy, r: k.sr, a: wrap(k.th + phi), ca: k.ca, art: kugelArt(k), zahlPx: k.bildR ? schildFs(k, k.bildR) * k.sr / k.bildR : 0 } : null; },
+    stern: function () { return { x: G.cx, y: G.starY, r: G.starR }; },
+    laeuft: function () { return !!raf; },
+    fotos: function () { return kugeln.filter(function (k) { return k.foto; }).map(function (k) { return k.tag + (k.fotoErsatz ? '*' : ''); }); },
+    geschenke: function () { return geschenke.map(function (gs) { return { x: gs.x, boden: gs.boden, by: gs.by, vorne: gs.vorne }; }); },
+    messeZeichnen: function (n) { var t0 = performance.now(); for (var i = 0; i < n; i++) { phi += 0.05; zeichne(); } return (performance.now() - t0) / n; },
+    dreheZu: function (t) { var k = kugelVon[t]; phi += wrap(-k.th - phi); phiLetzt = phi; omega = 0; ziel = null; zeichne(); nachRahmen(); }
+  };
+})();
+</script>
+</body>
+</html>
