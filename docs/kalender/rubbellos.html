@@ -274,6 +274,8 @@ img { -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
 @keyframes blase { from { transform: translateY(6px) scale(.7); opacity: 0; } }
 
 /* ---------- Fokus-Ansicht zum Rubbeln ---------- */
+/* Das Rubbelfeld hat die Form des Fotos (--fv = Breite : Höhe, setzt oeffneFokus) – so rubbelt man das ganze
+   Bild frei. --kf = Höhe : Breite der ganzen Karte (0,57 für Kopf, Fuß und Ränder + 0,86 / --fv fürs Feld). */
 .fokus {
   position: fixed; inset: 0; z-index: 40;
   display: flex; align-items: center; justify-content: center;
@@ -289,11 +291,11 @@ img { -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
 @keyframes ausblenden { to { opacity: 0; } }
 .fokus__mitte { position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px; }
 .fokus__los {
-  --b: min(92vw, 440px, calc((100vh - 150px) / 1.43));
+  --b: min(92vw, 440px, calc((100vh - 150px) / var(--kf, 1.43)));
   width: var(--b); container-type: inline-size; position: relative;
   filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .6));
 }
-@supports (height: 100dvh) { .fokus__los { --b: min(92vw, 440px, calc((100dvh - 150px) / 1.43)); } }
+@supports (height: 100dvh) { .fokus__los { --b: min(92vw, 440px, calc((100dvh - 150px) / var(--kf, 1.43))); } }
 .fokus__los .karte { padding: 0 7cqi 5.6cqi; }
 .fokus__kopf {
   display: flex; align-items: center; justify-content: space-between; gap: 3cqi; position: relative;
@@ -312,8 +314,9 @@ img { -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
   text-shadow: 0 1px 0 rgba(255, 248, 215, .7);
   transform: rotate(-12deg);
 }
-.fokus__feld { margin-top: 5cqi; aspect-ratio: 1; border-radius: 3cqi; }
+.fokus__feld { margin-top: 5cqi; aspect-ratio: var(--fv, 1); border-radius: 3cqi; }
 .fokus__foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; transition: opacity .3s ease-out; }
+.fokus__feld.passt-ein .fokus__foto { object-fit: contain; }
 .fokus__folie {
   position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1;
   touch-action: none;
@@ -432,8 +435,8 @@ html.ruhig #kalender-reset { display: none !important; }
 
 @media (orientation: landscape) and (max-height: 520px) {
   .fokus__mitte { flex-direction: row; gap: 24px; }
-  .fokus__los { --b: min(60vw, 440px, calc((100vh - 36px) / 1.43)); }
-  @supports (height: 100dvh) { .fokus__los { --b: min(60vw, 440px, calc((100dvh - 36px) / 1.43)); } }
+  .fokus__los { --b: min(60vw, 440px, calc((100vh - 36px) / var(--kf, 1.43))); }
+  @supports (height: 100dvh) { .fokus__los { --b: min(60vw, 440px, calc((100dvh - 36px) / var(--kf, 1.43))); } }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1200,6 +1203,16 @@ html.ruhig #kalender-reset { display: none !important; }
     zeiger: null, letzter: null, rect: null, auto: 0, timer: 0, schliess: 0, quelle: null, ziel: null, angefangen: false,
     kruemelWeg: 0, letzteZeit: 0 };
 
+  // Form des Rubbelfelds = Seitenverhältnis des Fotos (Breite : Höhe) – hoch, quer oder quadratisch, je Tag
+  // verschieden. Das Feld selbst bleibt zwischen 2:3 und 3:2 (sonst wird das Los am Handy zu schmal); noch
+  // extremere Bilder (z. B. 9:16, Panorama) stehen ganz im Feld, mit schmalen Rändern in der Tagesfarbe.
+  // Platzhalter sind quadratisch.
+  function fotoForm(t) {
+    var v = 1;
+    try { v = typeof F.verhaeltnis === 'function' ? F.verhaeltnis(t) : 1; } catch (e) { v = 1; }
+    return v > 0 ? v : 1;
+  }
+  function feldForm(t) { return Math.max(2 / 3, Math.min(1.5, fotoForm(t))); }
   function maleFokusFolie() {
     fctx.setTransform(1, 0, 0, 1, 0, 0);
     fctx.globalCompositeOperation = 'source-over';
@@ -1211,6 +1224,10 @@ html.ruhig #kalender-reset { display: none !important; }
     FK.offen = true; FK.tag = t; FK.art = folienArt(t); FK.fertig = false; FK.frei = 0; FK.angefangen = false;
     FK.gitter = new Uint8Array(N * N); FK.zeiger = null; FK.uebergabe = null; FK.letzter = null; FK.quelle = quelle; FK.ziel = ziel;
     fokusLos.className = 'fokus__los ' + karton(t) + ' folie--' + FK.art;
+    var fv = feldForm(t);
+    fokusLos.style.setProperty('--fv', fv.toFixed(4));
+    fokusLos.style.setProperty('--kf', (0.57 + 0.86 / fv).toFixed(4));
+    feld.classList.toggle('passt-ein', Math.abs(fotoForm(t) - fv) > 0.01);
     $('#fokus-nr').textContent = t;
     $('#fokus-wt').textContent = K.wochentag(t);
     $('#fokus-titel-text').textContent = tx('rubbellos.fokus.titel', 'Los vom {datum}', { datum: K.datumText(t) });
@@ -1236,7 +1253,9 @@ html.ruhig #kalender-reset { display: none !important; }
     folie.width = Math.round(w * DPR); folie.height = Math.round(h * DPR);
     maleFokusFolie();
     // Das Bild unter der Folie lädt asynchron: bis dahin Tagesfarbe + Schimmer (sichtbar, wo schon gerubbelt ist)
-    var px = Math.min(800, Math.round(w * DPR / 40) * 40), fotoUrl = F.vorschau(t, px);
+    // ganzes Bild (nie beschnitten), passend zur langen Kante des Feldes
+    var px = Math.min(960, Math.round(Math.max(w, h) * DPR / 40) * 40);
+    var fotoUrl = typeof F.ganz === 'function' ? F.ganz(t, px) : F.vorschau(t, px);
     feld.style.backgroundColor = F.farbe(t);
     feld.classList.toggle('laedt', !schonGeladen(fokusFoto, fotoUrl));
     ladeBild(fokusFoto, fotoUrl, t, px, function () { feld.classList.remove('laedt'); });
@@ -1394,7 +1413,7 @@ html.ruhig #kalender-reset { display: none !important; }
     if (ruhe) { aufloesen(); return; }
     if (FK.auto) return;
     FK.angefangen = true;
-    var w = FK.w, h = FK.h, pk = [], reihen = 5, k;
+    var w = FK.w, h = FK.h, pk = [], reihen = Math.max(4, Math.min(8, Math.round(5 * h / w))), k; // hohes Feld: mehr Bahnen
     for (k = 0; k < reihen; k++) {
       var y = h * (0.13 + k * 0.74 / (reihen - 1));
       pk.push({ x: k % 2 ? w * 0.9 : w * 0.1, y: y });
@@ -1409,7 +1428,7 @@ html.ruhig #kalender-reset { display: none !important; }
       }
       return pk[pk.length - 1];
     }
-    var t0 = performance.now(), dauer = 1100, letzter = pk[0];
+    var t0 = performance.now(), dauer = 220 * reihen, letzter = pk[0];
     FK.rect = folie.getBoundingClientRect();
     rubbel(letzter.x, letzter.y);
     function schritt(t) {

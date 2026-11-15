@@ -4,7 +4,7 @@
  * Liefert die eigenen Bilder als URLs. werkzeuge/bauen.mjs verkleinert sie nach web/, die URL-Vorlagen und Angaben
  * stehen in window.ADVENTSKALENDER: bildUrl 'web/{t}-{g}-{v}.webp', einzelUrl 'web/{t}-e{i}-{g}-{v}.webp',
  * tage { '1': { bild, w, h, farbe, titel, v, einzel }, … } – nur freigegebene Tage.
- * Platzhalter: {t} Tag, {g} Größe (k|q|m|l), {v} zufälliger Namensteil, {i} Einzelfoto (1-basiert).
+ * Platzhalter: {t} Tag, {g} Größe (k|q|s|m|l), {v} zufälliger Namensteil, {i} Einzelfoto (1-basiert).
  * Bilder laden asynchron (onload/decode abwarten, bevor auf Canvas gezeichnet wird). Für gesperrte Tage wird nie eine
  * URL erzeugt; fehlt ein Bild, gibt es einen gemalten Platzhalter „Foto folgt“. Scheitert ein <img>, tauscht der
  * Baustein die Quelle gegen den Platzhalter (abschalten pro Bild mit dem Attribut data-kein-ersatz).
@@ -14,6 +14,8 @@
  *                          startet zugleich das Vorladen (wie im Prototyp darf man bild(t) zum „Vorbereiten“ aufrufen)
  *   format(tag)            'quadrat' | 'hoch' (aus den Abmessungen; Querformat zählt als 'quadrat')
  *   vorschau(tag, px=320)  quadratische Vorschau: px ≤ 480 → Größe 'k' (480 px), sonst 'q' (960 px)
+ *   ganz(tag, px=480)      ganzes Bild, nie beschnitten: px = lange Kante; px ≤ 640 → Größe 's' (640 px), sonst 'm' (1000 px)
+ *   verhaeltnis(tag)       Seitenverhältnis Breite : Höhe des Bildes (Platzhalter: 1)
  *   einzelbilder(tag)      Array der Einzelfoto-URLs (Größe wie bild) oder [bild(tag)], wenn es keine gibt
  *   titel(tag)             Bildunterschrift ('' wenn keine)
  *   farbe(tag)             Leitfarbe des Tages als Hex (Durchschnittsfarbe des Bildes)
@@ -529,6 +531,17 @@
     return freigegeben(t) ? platzhalterVorschau(t, groesse) : neutral(groesse);
   }
 
+  // Ganzes Bild in Vorschaugröße (nie beschnitten) – für Rahmen, die sich dem Foto anpassen.
+  // px = gewünschte lange Kante in echten Pixeln. Ohne echtes Bild: quadratischer Platzhalter.
+  function ganz(tag, px) {
+    var t = ganzzahl(tag), groesse = Math.min(960, ganzzahl(px) || 480), d = mitBild(t);
+    if (d) {
+      var u = urlBauen(BILD_URL, t, groesse <= 640 ? 's' : 'm', 0, d);
+      if (u) return merken(u, { t: t, art: 'vorschau', px: groesse });
+    }
+    return freigegeben(t) ? platzhalterVorschau(t, groesse) : neutral(groesse);
+  }
+
   function einzelbilder(tag) {
     var t = ganzzahl(tag), d = freieDaten(t), n = einzelAnzahl(d), r = [];
     if (d && n && EINZEL_URL) {
@@ -552,6 +565,8 @@
     var d = mitBild(ganzzahl(tag)), w = d ? +d.w : 0, h = d ? +d.h : 0;
     return (w > 0 && h > 0) ? { w: w, h: h } : { w: PLATZ, h: PLATZ };
   }
+
+  function verhaeltnis(tag) { var m = masse(tag); return m.w / m.h; }
 
   function titel(tag) {
     var d = freieDaten(ganzzahl(tag));
@@ -603,6 +618,8 @@
     bild: bild,
     format: format,
     vorschau: vorschau,
+    ganz: ganz,
+    verhaeltnis: verhaeltnis,
     einzelbilder: einzelbilder,
     titel: titel,
     farbe: farbe,

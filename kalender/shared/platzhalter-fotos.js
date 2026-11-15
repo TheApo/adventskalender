@@ -509,6 +509,17 @@
     return freigegeben(t) ? platzhalterVorschau(t, groesse) : neutral(groesse);
   }
 
+  // Ganzes Bild in Vorschaugröße (nie beschnitten) – für Rahmen, die sich dem Foto anpassen.
+  // px = gewünschte lange Kante in echten Pixeln. Ohne echtes Bild: quadratischer Platzhalter.
+  function ganz(tag, px) {
+    var t = ganzzahl(tag), groesse = Math.min(960, ganzzahl(px) || 480), d = mitBild(t);
+    if (d) {
+      var u = urlBauen(BILD_URL, t, groesse <= 640 ? 's' : 'm', 0, d);
+      if (u) return merken(u, { t: t, art: 'vorschau', px: groesse });
+    }
+    return freigegeben(t) ? platzhalterVorschau(t, groesse) : neutral(groesse);
+  }
+
   function einzelbilder(tag) {
     var t = ganzzahl(tag), d = freieDaten(t), n = einzelAnzahl(d), r = [];
     if (d && n && EINZEL_URL) {
@@ -532,6 +543,8 @@
     var d = mitBild(ganzzahl(tag)), w = d ? +d.w : 0, h = d ? +d.h : 0;
     return (w > 0 && h > 0) ? { w: w, h: h } : { w: PLATZ, h: PLATZ };
   }
+
+  function verhaeltnis(tag) { var m = masse(tag); return m.w / m.h; }
 
   function titel(tag) {
     var d = freieDaten(ganzzahl(tag));
@@ -583,6 +596,8 @@
     bild: bild,
     format: format,
     vorschau: vorschau,
+    ganz: ganz,
+    verhaeltnis: verhaeltnis,
     einzelbilder: einzelbilder,
     titel: titel,
     farbe: farbe,

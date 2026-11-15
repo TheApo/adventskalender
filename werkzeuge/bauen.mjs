@@ -2,7 +2,7 @@
 /*
  * Dein Adventskalender – eigenen Kalender bauen
  * =============================================
- * Liest einstellungen.json und die Bilder aus bilder/, verkleinert die Bilder (WebP in vier Größen) und schreibt
+ * Liest einstellungen.json und die Bilder aus bilder/, verkleinert die Bilder (WebP in fünf Größen) und schreibt
  * einen fertigen, rein statischen Kalender nach ausgabe/. Den INHALT von ausgabe/ auf einen beliebigen Webspace
  * hochladen – PHP oder eine Datenbank sind nicht nötig.
  *
@@ -45,6 +45,7 @@ const VORLAGE = path.join(KALENDER_ORDNER, 'vorlage', 'index.html');
 const GROESSEN = [
   { g: 'k', art: 'quadrat', px: 480 },
   { g: 'q', art: 'quadrat', px: 960 },
+  { g: 's', art: 'kante', px: 640 },
   { g: 'm', art: 'kante', px: 1000 },
   { g: 'l', art: 'kante', px: 1800 }
 ];
@@ -345,7 +346,7 @@ function hexFarbe(r, g, b) {
 function formatVon(w, h) { return !w || !h ? '' : (h / w > 1.22 ? 'hoch' : 'quadrat'); }
 function formatText(w, h) { return h / w > 1.22 ? 'hoch' : (w / h > 1.05 ? 'quer' : 'quadrat'); }
 
-/** Dekodiert ein Bild einmal (EXIF-Drehung, sRGB) und schreibt alle vier Größen nach <basis>-<g>-<hash>.webp */
+/** Dekodiert ein Bild einmal (EXIF-Drehung, sRGB) und schreibt alle Größen nach <basis>-<g>-<hash>.webp */
 async function bildVerarbeiten(sharp, quelle, basis, hash, qualitaet) {
   const meta = await sharp(quelle.datei, { failOn: 'error' }).metadata();
   const { data, info } = await sharp(quelle.datei, { failOn: 'error' }).rotate().toColourspace('srgb')
@@ -515,7 +516,7 @@ async function bauen() {
     if (einzel.length !== quelleTag.einzel.length) {        // lückenlos nummerieren, falls eines nicht lesbar war
       einzel.forEach((ez, idx) => {
         for (const d of ez.dateien) {
-          const neu = d.datei.replace(/-e\d+-([kqml])-([0-9a-f]{10})\.webp$/, `-e${idx + 1}-$1-$2.webp`);
+          const neu = d.datei.replace(/-e\d+-([kqsml])-([0-9a-f]{10})\.webp$/, `-e${idx + 1}-$1-$2.webp`);
           if (neu !== d.datei) { fs.renameSync(d.datei, neu); d.datei = neu; }
         }
       });

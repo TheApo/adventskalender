@@ -253,7 +253,9 @@ button { font: inherit; color: inherit; }
   box-shadow: 0 3px 6px -2px rgba(0,0,0,.5);
 }
 
-/* Sofortbild */
+/* Sofortbild: Die Bildfläche hat die Form des Fotos (--fv = Breite : Höhe, hoch / quer / quadratisch) – so ist
+   immer das ganze Foto zu sehen. Hohe Sofortbilder sind schmaler, quere breiter (--bf), der Schreibrand
+   unten bleibt gleich hoch. */
 .sofort {
   position: relative;
   display: block;
@@ -261,21 +263,23 @@ button { font: inherit; color: inherit; }
   box-shadow: 0 9px 14px -7px rgba(0,0,0,.65), 0 1px 1px rgba(0,0,0,.2);
 }
 .sofort.klein {
-  width: var(--foto-w);
-  height: calc(var(--foto-w) * 1.2159);
-  padding: calc(var(--foto-w) * .06) calc(var(--foto-w) * .06) 0;
+  --pw: calc(var(--foto-w) * var(--bf, 1));
+  width: var(--pw);
+  padding: calc(var(--pw) * .06) calc(var(--pw) * .06) calc(var(--foto-w) * .031);
 }
 .s-bild {
   position: relative;
   display: block;
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: var(--fv, 1);
   overflow: hidden;
   background: var(--farbe, color-mix(in srgb, var(--foto) 55%, var(--wand)));
   box-shadow: inset 0 0 0 1px rgba(0,0,0,.14);
 }
 .s-bild img { display: block; width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; user-select: none; opacity: 0; transition: opacity .35s; }
 .s-bild.da img { opacity: 1; }
+/* sehr schmale oder sehr breite Fotos (jenseits 2:3 / 3:2): ganz zeigen, schmale Ränder in der Tagesfarbe */
+.s-bild.ein img { object-fit: contain; }
 /* Ladezustand: bis das Foto da ist, zeigt der Rahmen die Leitfarbe des Tages mit sanftem Lichtschimmer */
 .s-bild::after {
   content: '';
@@ -502,7 +506,7 @@ html.gesperrt #kalender-reset { display: none; }
   left: 0; top: 0;
   z-index: 3;
   width: var(--w);
-  height: calc(var(--w) * 1.2159);
+  height: calc(var(--w) * var(--hf, 1.2159));
   margin: 0;
   padding: calc(var(--w) * .06) calc(var(--w) * .06) 0;
   border: 0;
@@ -878,6 +882,32 @@ html.gesperrt #kalender-reset { display: none; }
     return typeof t === 'string' ? t.replace(/^\s+|\s+$/g, '') : '';
   }
 
+  /* ---------- Form der Sofortbilder ----------
+     Jedes Foto hat sein eigenes Seitenverhältnis (Breite : Höhe) – hoch, quer oder quadratisch. Der Rahmen
+     übernimmt es (zwischen 2:3 und 3:2; noch extremere Bilder stehen ganz darin, Klasse „ein“). */
+  function fotoForm(tag) {
+    var v = 1;
+    try { v = typeof F.verhaeltnis === 'function' ? F.verhaeltnis(tag) : 1; } catch (e) { v = 1; }
+    return v > 0 ? v : 1;
+  }
+  function rahmenForm(tag) { return klemm(fotoForm(tag), 2 / 3, 1.5); }
+  function passtEin(tag) { return Math.abs(fotoForm(tag) - rahmenForm(tag)) > 0.01; }
+  // kleines Sofortbild an der Leine: Breite (× --foto-w) so, dass die Bildfläche etwa gleich groß bleibt
+  function kleinBreite(v) { return Math.sqrt(v); }
+  // … und seine Höhe (× --foto-w): Rand oben + Bild + Nummernrand (wie im CSS)
+  function kleinHoehe(v) { var b = kleinBreite(v); return b * 0.06 + b * 0.88 / v + 0.276; }
+  // großes Sofortbild auf der Bühne: Höhe (× Breite) = Rand oben + Bild + Schreibrand
+  function grossHoehe(v) { return 0.06 + 0.88 / v + 0.2759; }
+  // Höchstes kleines Sofortbild aller freigegebenen Tage (× --foto-w) – danach richtet sich die Zeilenhöhe
+  function leinenFaktor() {
+    var f = 1.2159;
+    for (var t = 1; t <= 24; t++) if (K.darfOeffnen(t)) f = Math.max(f, kleinHoehe(rahmenForm(t)));
+    return f;
+  }
+  // ganze Fotos (nie beschnitten): klein für die Leine (lange Kante ≤ 640 px), groß für die Bühne (1000 px)
+  function kleinUrl(tag) { return typeof F.ganz === 'function' ? F.ganz(tag, 256) : F.vorschau(tag, 256); }
+  function grossUrl(tag) { return typeof F.ganz === 'function' ? F.ganz(tag, 720) : F.vorschau(tag, 720); }
+
   /* ---------- Bilder laden ----------
      Die echten Fotos kommen übers Netz (asynchron). wennGeladen ruft fertig(img) erst, wenn das Bild geladen
      und dekodiert ist; bereits vorhandene Bilder sofort. Ladefehler (403/404/Netz): fotos.js tauscht die
@@ -1025,20 +1055,21 @@ html.gesperrt #kalender-reset { display: none; }
     var innen = wand.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     var n = spaltenZahl(), slot = innen / n;
     var envW = Math.min(slot * 0.87, 150);
+    var hf = leinenFaktor();   // 1,2159 bei quadratischen Fotos, mehr, sobald ein hohes Foto dabei ist
     // Desktop: so groß, dass alle Leinen ohne Scrollen ins Fenster passen (Kopf + Leinen + Platz unten)
     if (root.clientWidth >= 1000) {
       var kopfH = (doc.querySelector('.kopf') || {}).offsetHeight || 150, zeilenN = Math.ceil(24 / n);
       var frei = window.innerHeight - kopfH - 10 - 96 - zeilenN * 54;
-      envW = Math.max(84, Math.min(envW, frei / (zeilenN * 1.17)));
+      envW = Math.max(84, Math.min(envW, frei / (zeilenN * (1.17 + 0.82 * (hf - 1.2159)))));
     }
     var envH = envW / 1.42;
-    var fotoW = Math.min(slot * 0.7, 120, envW * 0.82), fotoH = fotoW * 1.2159;
+    var fotoW = Math.min(slot * 0.7, 120, envW * 0.82), fotoH = fotoW * hf;
     var sag = klemm(innen * 0.026, 10, 18);
     var y0 = Math.round(envW * 0.2232 + 4);
     var nurU = K.heute() === 0;   // November: nur verschlossene Umschläge, Zeilen kompakter
     var itemH = (nurU ? envH : Math.max(fotoH, envH + envW * 0.24)) + 6;
     var zeileH = Math.round(y0 + 2 + sag + itemH + (n === 3 ? 10 : 16));
-    return { innen: innen, n: n, slot: slot, envW: envW, envH: envH, fotoW: fotoW, fotoH: fotoH, sag: sag, y0: y0, itemH: itemH, zeileH: zeileH, nurU: nurU };
+    return { innen: innen, n: n, slot: slot, envW: envW, envH: envH, fotoW: fotoW, fotoH: fotoH, sag: sag, y0: y0, itemH: itemH, zeileH: zeileH, nurU: nurU, hf: hf };
   }
 
   function schnur(W, H, y0, s, zeile) {
@@ -1064,9 +1095,11 @@ html.gesperrt #kalender-reset { display: none; }
     b.style.setProperty('--neig', neig.toFixed(2) + 'deg');
     b._neig = neig;
     if (z === 'offen') {
-      // kleine quadratische Vorschau; Bilder weit unterhalb laden erst beim Hinscrollen (spart Daten am Handy)
-      inhalt = '<span class="gegenstand sofort klein"><span class="s-bild" style="--farbe:' + farbeVon(tag) + '">' +
-        '<img alt="" draggable="false" decoding="async" loading="lazy" src="' + esc(F.vorschau(tag, 256)) + '"></span>' +
+      // kleines ganzes Foto in seiner eigenen Form; Bilder weit unterhalb laden erst beim Hinscrollen (spart Daten am Handy)
+      var fv = rahmenForm(tag);
+      inhalt = '<span class="gegenstand sofort klein" style="--bf:' + kleinBreite(fv).toFixed(4) + ';--fv:' + fv.toFixed(4) + '">' +
+        '<span class="s-bild' + (passtEin(tag) ? ' ein' : '') + '" style="--farbe:' + farbeVon(tag) + '">' +
+        '<img alt="" draggable="false" decoding="async" loading="lazy" src="' + esc(kleinUrl(tag)) + '"></span>' +
         '<span class="s-nr">' + tag + '</span></span>';
     } else {
       inhalt = '<span class="gegenstand umschlag"><svg class="u-svg" viewBox="0 0 142 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><use href="#s-umschlag"/></svg><span class="u-nr">' + tag + '</span>';
@@ -1130,9 +1163,10 @@ html.gesperrt #kalender-reset { display: none; }
     if (layoutPruefen()) return;
     for (var t = 1; t <= 24; t++) if (knoepfe[t]) { knoepfe[t].classList.remove('versteckt'); fuellen(knoepfe[t], t); }
   }
-  // Wechsel zwischen November (nur Umschläge) und Dezember braucht neue Zeilenhöhen
+  // Wechsel zwischen November (nur Umschläge) und Dezember braucht neue Zeilenhöhen – ebenso, wenn (im
+  // Testmodus) ein Tag mit höherem Foto dazukommt oder wegfällt
   function layoutPruefen() {
-    if (M && M.nurU !== (K.heute() === 0)) { bauen(); return true; }
+    if (M && (M.nurU !== (K.heute() === 0) || Math.abs(M.hf - leinenFaktor()) > 0.001)) { bauen(); return true; }
     return false;
   }
   function tagNeu(tag) {
@@ -1350,8 +1384,8 @@ html.gesperrt #kalender-reset { display: none; }
           '<path d="M0 0L71 58L142 0Z" fill="currentColor"/><path d="M0 0L71 58L142 0Z" fill="#fff" fill-opacity=".06"/>' +
           '<path d="M0 .6L71 58L142 .6" fill="none" stroke="#3a2614" stroke-opacity=".32" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg></div>' +
           '<div class="k-innen"></div></div>' +
-        '<button type="button" class="b-foto sofort gross" aria-label="' + esc(titel ? tx('fotoleine.buehne.fotoTitel', 'Foto vom {n}. Dezember: {titel}. Antippen zeigt die ganze Collage.', { n: tag, titel: titel }) : tx('fotoleine.buehne.foto', 'Foto vom {n}. Dezember. Antippen zeigt die ganze Collage.', { n: tag })) + '">' +
-          '<span class="s-bild" style="--farbe:' + farbeVon(tag) + '"><img alt="" draggable="false" decoding="async" src="' + esc(F.vorschau(tag, 720)) + '"><span class="milch"></span><span class="glanz"></span></span>' +
+        '<button type="button" class="b-foto sofort gross" style="--fv:' + rahmenForm(tag).toFixed(4) + ';--hf:' + grossHoehe(rahmenForm(tag)).toFixed(4) + '" aria-label="' + esc(titel ? tx('fotoleine.buehne.fotoTitel', 'Foto vom {n}. Dezember: {titel}. Antippen zeigt die ganze Collage.', { n: tag, titel: titel }) : tx('fotoleine.buehne.foto', 'Foto vom {n}. Dezember. Antippen zeigt die ganze Collage.', { n: tag })) + '">' +
+          '<span class="s-bild' + (passtEin(tag) ? ' ein' : '') + '" style="--farbe:' + farbeVon(tag) + '"><img alt="" draggable="false" decoding="async" src="' + esc(grossUrl(tag)) + '"><span class="milch"></span><span class="glanz"></span></span>' +
           '<span class="s-titel' + titelKlasse + '"><span>' + esc(aufschrift) + '</span></span></button>' +
         '<div class="b-teil b-front"><svg viewBox="0 0 142 100" preserveAspectRatio="none" aria-hidden="true"><use href="#s-tasche"/></svg></div>' +
         (mitSiegel ? '<svg class="b-siegel" viewBox="0 0 40 40" aria-hidden="true"><use href="#s-siegel"/></svg>' : '') +
@@ -1374,7 +1408,7 @@ html.gesperrt #kalender-reset { display: none; }
       if (im.parentNode) im.parentNode.classList.add('da');
       if (B !== bb) return;
       hinweisText();
-      vorladen(F.vorschau(tag, 256));
+      vorladen(kleinUrl(tag));
       if (typeof F.hatBild === 'function' && F.hatBild(tag)) F.bild(tag); // echte Version: lädt die Collage vorab
     });
     seiteSperren(el);
@@ -1409,8 +1443,9 @@ html.gesperrt #kalender-reset { display: none; }
     if (!B) return;
     var mitte = B.el.querySelector('.b-mitte');
     var mw = mitte.clientWidth, mh = mitte.clientHeight;
-    var Wp = Math.floor(Math.min(mw * 0.86, 400, (mh - 10) / 1.2159));
-    var Hp = Wp * 1.2159;
+    var hf = grossHoehe(rahmenForm(B.tag));   // Höhe : Breite des Sofortbilds (1,2159 bei quadratischem Foto)
+    var Wp = Math.floor(Math.min(mw * 0.86, 400, (mh - 10) / hf));
+    var Hp = Wp * hf;
     var Wb = Math.min(Wp * 1.1, mw - 20), Hb = Wb / 1.42;
     var E = { x: (Wp - Wb) / 2, y: Hp * 0.4, w: Wb, h: Hb };
     var sz = B.szene;

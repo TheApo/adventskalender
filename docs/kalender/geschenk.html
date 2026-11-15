@@ -112,7 +112,9 @@ body.fest .kopf { padding-top: 34px; }
 @keyframes schein { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
 .z-zu .fig { filter: saturate(.86); }
 .gabe.weg .fig { visibility: hidden; }
-/* Foto in der offenen Schachtel: zwischen Rückwand (SVG hinten) und Vorderwand (SVG vorn) */
+/* Foto in der offenen Schachtel: zwischen Rückwand (SVG hinten) und Vorderwand (SVG vorn). Es hat die Form des
+   Bildes (hoch, quer oder quadratisch – Breite und aspect-ratio setzt ausgepackt()) und steht ganz über der
+   Vorderkante, damit nichts vom Foto verdeckt ist. */
 .vk { position: absolute; z-index: 1; aspect-ratio: 1; padding: 3.2%; margin: 0; background: var(--seide); border-radius: 2px; box-shadow: 0 2px 5px rgba(61, 24, 48, .3); rotate: var(--vkd, 0deg); }
 /* Fotofläche: solange das Vorschaubild (echte Bilder kommen asynchron vom Server) noch lädt, sieht man hier
    einen hellen Hauch der Tagesfarbe, der sanft pulsiert – nie ein leeres oder dunkles Feld */
@@ -120,6 +122,8 @@ body.fest .kopf { padding-top: 34px; }
   background: color-mix(in srgb, var(--fb, #e9d6cf) 34%, #f3e3dd); }
 .vk img, .vk .ersatz { position: relative; display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 1px; }
 .vk img { transition: opacity .3s ease-out; }
+/* sehr schmale oder sehr breite Fotos (jenseits 2:3 / 3:2): ganz zeigen statt beschneiden */
+.vk.ein img, .fk-foto.ein img { object-fit: contain; }
 .vk.wartet img { opacity: 0; transition: none; }
 .vk.wartet::before { animation: laedt 1.1s ease-in-out infinite alternate; }
 .fig .vorn { z-index: 2; }
@@ -515,6 +519,12 @@ html.vollansicht .weiter-unten { display: none; }
     if (m && m.w > 0 && m.h > 0) return m.w / m.h;
     return sicher(function () { return F.format(t); }) === 'hoch' ? 2 / 3 : 1;
   }
+  // Form des Fotorahmens: wie das Bild, aber höchstens 2:3 bzw. 3:2 (extremere Bilder stehen ganz darin)
+  // (ohne F.ganz – z. B. ein älterer Foto-Baustein im Browser-Cache – bleibt der Rahmen quadratisch)
+  function rahmenForm(t) { return typeof F.ganz === 'function' ? klemme(seitenVerhaeltnis(t) || 1, 2 / 3, 1.5) : 1; }
+  function passtEin(t) { return typeof F.ganz === 'function' && Math.abs((seitenVerhaeltnis(t) || 1) - rahmenForm(t)) > .01; }
+  // Ganzes Foto (nie beschnitten) in Vorschaugröße; px = lange Kante in echten Pixeln
+  function ganzesFoto(t, px) { return typeof F.ganz === 'function' ? F.ganz(t, px) : F.vorschau(t, px); }
   function farbeVon(t) { var f = sicher(function () { return F.farbe(t); }); return /^#[0-9a-f]{6}$/i.test(f) ? f : '#c98f8f'; }
 
   /* ================================================================
@@ -665,8 +675,9 @@ html.vollansicht .weiter-unten { display: none; }
 
   // Raster-Geometrie im 100×118-Feld
   var BASIS = 114;
-  function masse(i, offen) {
+  function masse(i, offen, hhMax) {
     var B = offen ? i.b * .9 : i.b, HH = offen ? i.hh * .72 : i.hh;
+    if (hhMax && HH > hhMax) HH = hhMax;   // offene Schachtel flacher, wenn ein hohes Foto darüber Platz braucht
     var T = klemme(B * .19, 9, 16), D = klemme(B * .11, 6, 10);
     var x0 = 50 - B / 2 + i.versatz, yb = BASIS, yf = yb - HH;
     return { B: B, HH: HH, T: T, D: D, x0: x0, yb: yb, yf: yf, cx: x0 + B / 2, cy: yf - T / 2, xF: x0 + (B - D) / 2 };
@@ -760,15 +771,22 @@ html.vollansicht .weiter-unten { display: none; }
 
   // Offene Schachtel: Rückwand + Deckel (hinten), Foto (HTML), Vorderwand + Papierreste (vorn)
   function ausgepackt(i, t) {
-    var m = masse(i, true), fl = flaechen(m), pat = 'url(#pap-' + i.papier + ')';
+    // Foto in der Form des Bildes (Maße im 100×118-Feld): Bildfläche etwa gleich groß, hoch = schmaler,
+    // quer = breiter; rundherum 3,2 Rand (wie das CSS-padding). Es muss in die Schachtelöffnung passen.
+    var fv = rahmenForm(t), RAND = 3.2, m0 = masse(i, true);
+    var kB = Math.min(50 * Math.sqrt(fv) + 2 * RAND, m0.B - m0.D - 2), kH = (kB - 2 * RAND) / fv + 2 * RAND;
+    // Das Foto steht ganz über der Vorderkante (5 darüber, so verdeckt auch das Seidenpapier nichts);
+    // dafür wird die offene Schachtel bei hohen Fotos flacher.
+    var m = masse(i, true, Math.max(22, BASIS - 5 - kH - 2)), fl = flaechen(m), pat = 'url(#pap-' + i.papier + ')';
+    if (kH > m.yf - 7) { kH = m.yf - 7; kB = (kH - 2 * RAND) * fv + 2 * RAND; }
     var hinten = '<ellipse cx="' + f1(m.cx) + '" cy="' + (m.yb + .5) + '" rx="' + f1(m.B * .62) + '" ry="3" fill="#3d1830" fill-opacity=".2"/>';
     // Deckel lehnt hinten an
     var dw = m.B * .96, dh = m.T + 8, dx = m.x0 + m.B * .06, dy = m.yf - m.T - dh * .8;
     hinten += '<g transform="rotate(' + (i.seite * -9) + ' ' + f1(dx + dw / 2) + ' ' + f1(dy + dh) + ')"><rect x="' + f1(dx) + '" y="' + f1(dy) + '" width="' + f1(dw) + '" height="' + f1(dh) + '" rx="1.5" fill="url(#pappe)"/><rect x="' + f1(dx) + '" y="' + f1(dy) + '" width="' + f1(dw) + '" height="' + f1(dh) + '" rx="1.5" fill="#3d1830" fill-opacity=".18"/></g>';
     hinten += '<path d="' + pfad(fl.oben) + '" fill="#4a2a16"/>';
     hinten += '<path d="M' + f1(m.x0 + 4) + ' ' + f1(m.yf - 2) + 'q6 -12 14 -6 q6 -10 14 -3 q8 -9 14 0 q6 -7 ' + f1(m.B - 50) + ' 2 L' + f1(m.x0 + m.B - 6) + ' ' + f1(m.yf - m.T + 2) + 'Z" fill="#fde7ea"/>';
-    var P = klemme(m.B * .84, 50, 64), kartenUnten = m.yf + m.HH * .34, kartenOben = kartenUnten - P;
-    var kL = m.cx - P / 2;
+    var kartenUnten = m.yf - 5, kartenOben = kartenUnten - kH;
+    var kL = m.cx - kB / 2;
     var vorn = '<path d="' + pfad(fl.front) + '" fill="url(#pappe)"/><path d="' + pfad(fl.front) + '" fill="url(#licht)"/>';
     vorn += '<path d="' + pfad(fl.seite) + '" fill="url(#pappe)"/><path d="' + pfad(fl.seite) + '" fill="#2a0c1e" fill-opacity=".3"/>';
     vorn += '<path d="M' + f1(m.x0 + 2) + ' ' + f1(m.yf + 1) + 'q5 -9 11 -3 q4 -8 10 -1 q5 -6 9 1" fill="#fff6f8" stroke="#e7b9c1" stroke-width=".5"/>';
@@ -779,10 +797,10 @@ html.vollansicht .weiter-unten { display: none; }
     var rx = i.seite < 0 ? m.x0 + m.B + 1 : m.x0 - 15, ry = m.yb - 9;
     vorn += '<path d="M' + f1(rx) + ' ' + f1(ry + 9) + 'l3 -9 6 3 4 -4 3 8 -2 2z" fill="' + pat + '"/><path d="M' + f1(rx) + ' ' + f1(ry + 9) + 'l3 -9 6 3 4 -4 3 8 -2 2z" fill="#2a0c1e" fill-opacity=".12"/>';
     vorn += '<path d="M' + f1(rx - (i.seite < 0 ? 4 : -10)) + ' ' + f1(m.yb) + 'c3 -6 8 -6 9 -1s-5 4 -4 -1" fill="none" stroke="' + i.band + '" stroke-width="2.4" stroke-linecap="round"/>';
-    // Kleine quadratische Vorschau (nie das große Bild). Die Quelle steht erst in data-src und wird gesetzt,
+    // Kleines ganzes Foto (nie das große Bild). Die Quelle steht erst in data-src und wird gesetzt,
     // sobald das Geschenk in Sichtnähe kommt (vkBeobachten); schon einmal geladene kommen sofort.
-    var bild = sicher(function () { return F.vorschau(t, VK_PX); }), schon = !!(bild && geladen[bild]);
-    var foto = '<span class="vk' + (bild && !schon ? ' wartet' : '') + '" style="left:' + f1(kL) + '%;top:' + f1(kartenOben / 118 * 100) + '%;width:' + f1(P) + '%;--vkd:' + f1(i.kartenDreh) + 'deg;--fb:' + farbeVon(t) + '">' +
+    var bild = sicher(function () { return ganzesFoto(t, VK_PX); }), schon = !!(bild && geladen[bild]);
+    var foto = '<span class="vk' + (bild && !schon ? ' wartet' : '') + (passtEin(t) ? ' ein' : '') + '" style="left:' + f1(kL) + '%;top:' + f1(kartenOben / 118 * 100) + '%;width:' + f1(kB) + '%;aspect-ratio:' + f1(kB) + '/' + f1(kH) + ';--vkd:' + f1(i.kartenDreh) + 'deg;--fb:' + farbeVon(t) + '">' +
       (bild ? '<img alt="" decoding="async" draggable="false" data-tag="' + t + '" ' + (schon ? 'src' : 'data-src') + '="' + esc(bild) + '">' : '<span class="ersatz">' + tx('allgemein.fotoFolgt', 'Foto folgt') + '</span>') + '</span>';
     return '<span class="fig"><svg viewBox="0 0 100 118" aria-hidden="true" focusable="false">' + hinten + '</svg>' + foto +
       '<svg class="vorn" viewBox="0 0 100 118" aria-hidden="true" focusable="false">' + vorn + '</svg></span>';
@@ -844,7 +862,7 @@ html.vollansicht .weiter-unten { display: none; }
     if (!vk || zustand(t) !== 'offen') return;
     var img = vk.querySelector('img');
     if (img && !img.hasAttribute('data-platzhalter') && !img._ersatz) return;
-    var url = sicher(function () { return F.vorschau(t, VK_PX); });
+    var url = sicher(function () { return ganzesFoto(t, VK_PX); });
     if (!url || url.indexOf('data:') === 0) return;
     fuelleGabe(t);
   }
@@ -1323,13 +1341,17 @@ html.vollansicht .weiter-unten { display: none; }
   /* --- Layout der Bühne --- */
   function fkLayout() {
     var sw = el.fkBuehne.clientWidth, sh = el.fkBuehne.clientHeight, i = FK.info;
-    var ratio = klemme(i.hh / i.b, .62, .86), tR = .18, dR = .11, pR = .8;
+    var ratio = klemme(i.hh / i.b, .62, .86), tR = .18, dR = .11;
+    // Foto in der Form des Bildes (Anteile von B): Bildfläche bis 0,72 breit (hohe Fotos schmaler), rundherum
+    // 0,04 Rand (CSS-padding). Es steigt ganz aus der Schachtel: Unterkante 0,10 unter der Schachtel-Oberkante
+    // (hinten in der Öffnung) – so verdecken weder Vorderwand noch Seidenpapier etwas vom Bild.
+    var fv = rahmenForm(FK.tag), pwR = .72 * Math.min(1, Math.sqrt(fv)) + .08, phR = (pwR - .08) / fv + .08, fussR = .1;
     // Unter der Schachtel liegen nach dem Auspacken Band und Schnipsel auf dem Tisch (bis ≈ 0,14·B unter der
     // Kante). Steht die Fußzeile darunter (nicht quer), bleibt dazu noch etwas Luft bis zu Schritten und Hinweis
     // plus ein Streifen von 20 px für die Fortschrittsleiste beim Reißen (sitzt knapp über den Schritten).
     var fu = el.fkInnen.lastElementChild.getBoundingClientRect(), br = el.fkBuehne.getBoundingClientRect();
     var quer = fu.left > br.left + br.width * .6, unten = quer ? .12 : .15, luft = quer ? 0 : 12 + 20;
-    var oben = Math.max(pR - tR - .3 * ratio, .3), gesamt = oben + tR + ratio + unten;
+    var oben = Math.max(phR - fussR, .3), gesamt = oben + tR + ratio + unten;
     var B = Math.max(130, Math.min(sw * (sw < 500 ? .76 : .6), (sh - 8 - luft) / gesamt, 430));
     var T = B * tR, D = B * dR, HH = B * ratio;
     // Geschenk (mit Schleife) mittig – aber oben immer Platz für das aufsteigende Foto lassen
@@ -1341,9 +1363,10 @@ html.vollansicht .weiter-unten { display: none; }
     var tisch = el.fkTisch.style;
     tisch.width = (B * 1.9) + 'px'; tisch.height = (B * .26) + 'px'; tisch.top = (gy + T + HH - B * .12) + 'px';
     var halter = el.fkFotoHalter.style; halter.width = B + 'px'; halter.height = (T + HH) + 'px';
-    var P = pR * B, fs = el.fkFoto.style;
-    fs.width = P + 'px'; fs.height = P + 'px'; fs.left = (B / 2 - P / 2 - D * .1) + 'px'; fs.top = (T + 3) + 'px';
-    FK.rise = (T + HH * .3 - P) - (T + 3); FK.P = P; FK.fotoL = B / 2 - P / 2 - D * .1;
+    var Pw = pwR * B, Ph = phR * B, fs = el.fkFoto.style;
+    fs.width = Pw + 'px'; fs.height = Ph + 'px'; fs.left = (B / 2 - Pw / 2 - D * .1) + 'px'; fs.top = (T + 3) + 'px';
+    FK.rise = (fussR * B - Ph) - (T + 3); FK.Pw = Pw; FK.Ph = Ph; FK.fotoL = B / 2 - Pw / 2 - D * .1;
+    el.fkFoto.classList.toggle('ein', passtEin(FK.tag));
     var r = el.fkBuehne.getBoundingClientRect();
     FK.ox = r.left + gx; FK.oy = r.top + gy;
     fussMessen(); // Bereich von Hinweis und Knöpfen: dort wird kein Konfetti gezeichnet
@@ -1571,10 +1594,10 @@ html.vollansicht .weiter-unten { display: none; }
     if (FK.phase === 'fertig' && fotoGetroffen(a, b)) wackelFoto();
   }
   function fotoGetroffen(a, b) {
-    var l = FK.fotoL, o = FK.T + 3 + FK.rise, P = FK.P;
+    var l = FK.fotoL, o = FK.T + 3 + FK.rise;
     for (var s = 0; s <= 1; s += .5) {
       var x = a.x + (b.x - a.x) * s, y = a.y + (b.y - a.y) * s;
-      if (x > l && x < l + P && y > o && y < o + P) return true;
+      if (x > l && x < l + FK.Pw && y > o && y < o + FK.Ph) return true;
     }
     return false;
   }
@@ -1770,14 +1793,14 @@ html.vollansicht .weiter-unten { display: none; }
   }
 
   /* --- Fokus öffnen / schließen --- */
-  // Foto in der Schachtel: quadratische Vorschau passend zur Anzeigegröße (≤ 480 px → klein, sonst 960 px),
+  // Foto in der Schachtel: das ganze Bild passend zur Anzeigegröße (lange Kante ≤ 640 px → klein, sonst 1000 px),
   // nie das große Bild. Bis es dekodiert ist: Karte „Foto kommt …“; bei Fehlern der gemalte Platzhalter.
   function ladeFokusFoto(t) {
     var halter = el.fkFoto, nr = (FK.fotoNr || 0) + 1;
     FK.fotoNr = nr;
     FK.fotoGeladen = false;
-    var px = Math.round(FK.P * Math.min(2, window.devicePixelRatio || 1));
-    var url = sicher(function () { return F.vorschau(t, px); });
+    var px = Math.round(Math.max(FK.Pw, FK.Ph) * Math.min(2, window.devicePixelRatio || 1));
+    var url = sicher(function () { return ganzesFoto(t, px); });
     function aktuell() { return FK.offen && FK.tag === t && FK.fotoNr === nr; }
     function zeige(src) {
       var bild = document.createElement('img'); bild.alt = ''; bild.draggable = false; bild.src = src;
